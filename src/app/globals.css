@@ -1,0 +1,96 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+
+  /* Accent color defaults (violet) — overridden dynamically par ThemeStyle */
+  --accent-bg: #7c3aed;
+  --accent-bg-hover: #6d28d9;
+  --accent-light: #ede9fe;
+  --accent-text: #6d28d9;
+  --accent-ring: #8b5cf6;
+  --accent-dark-text: #a78bfa;
+  --theme-font: var(--font-geist-sans), system-ui, sans-serif;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--theme-font);
+}
+
+/* ============================================================
+   THEMING DYNAMIQUE — couleur accent
+   On surcharge les classes Tailwind violet-* utilisées dans
+   les boutons primaires et les badges accent.
+   Les états d'erreur (red), succès (emerald), info (blue) ne
+   sont PAS touchés — seuls les éléments violet (accent) changent.
+   ============================================================ */
+
+/* Boutons primaires */
+[class~="bg-violet-600"] {
+  background-color: var(--accent-bg) !important;
+}
+[class~="hover\:bg-violet-700"]:hover {
+  background-color: var(--accent-bg-hover) !important;
+}
+
+/* Texte accent */
+[class~="text-violet-600"],
+[class~="text-violet-700"] {
+  color: var(--accent-text) !important;
+}
+.dark [class~="text-violet-400"],
+[class~="dark\:text-violet-400"] {
+  color: var(--accent-dark-text) !important;
+}
+
+/* Arrière-plans légers accent (badges, avatars) */
+[class~="bg-violet-100"] {
+  background-color: var(--accent-light) !important;
+}
+.dark [class~="dark\:bg-violet-900\/40"] {
+  background-color: color-mix(in srgb, var(--accent-bg) 25%, transparent) !important;
+}
+
+/* Bordures accent */
+[class~="border-violet-600"] {
+  border-color: var(--accent-bg) !important;
+}
+[class~="hover\:border-violet-400"]:hover {
+  border-color: var(--accent-ring) !important;
+}
+
+/* Focus rings */
+[class~="focus\:ring-violet-500"]:focus,
+[class~="ring-violet-500"] {
+  --tw-ring-color: var(--accent-ring) !important;
+}
+
+/* Indicateur de nav active dans la Sidebar */
+[class~="bg-violet-50"] {
+  background-color: color-mix(in srgb, var(--accent-bg) 8%, transparent) !important;
+}
+.dark [class~="dark\:bg-violet-950\/30"] {
+  background-color: color-mix(in srgb, var(--accent-bg) 15%, transparent) !important;
+}
+
+/* Checkbox / radio checked */
+[class~="group-has-\[\:checked\]\:ring-current"] {
+  ring-color: var(--accent-bg);
+}

@@ -1,0 +1,32 @@
+import { NextResponse } from "next/server";
+import { createClient } from "@/utils/supabase/server";
+import { productsToCsv } from "@/features/stock/csv";
+
+export async function GET() {
+  const supabase = await createClient();
+
+  const { data: products, error } = await supabase
+    .from("products")
+    .select("name, purchase_price, selling_price, quantity_in_stock, categories(name)")
+    .eq("is_active", true)
+    .order("name", { ascending: true });
+
+  if (error) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+
+  const rows = (products ?? []).map((p) => ({
+    name: p.name,
+    category: (p.categories as unknown as { name: string } | null)?.name ?? "",
+    purchase_price: p.purchase_price,
+    selling_price: p.selling_price,
+    quantity_in_stock: p.quantity_in_stock,
+  }));
+
+  return new NextResponse(productsToCsv(rows), {
+    headers: {
+      "Content-Type": "text/csv; charset=utf-8",
+      "Content-Disposition": 'attachment; filename="stock.csv"',
+    },
+  });
+}
