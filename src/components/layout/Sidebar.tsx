@@ -2,7 +2,7 @@
 
 import { Link } from "@/i18n/routing";
 import { useTranslations } from "next-intl";
-import { Package, ShoppingCart, Users, MessageCircle, Settings, LayoutDashboard, Menu, X, LogOut, UserCircle, Store } from "lucide-react";
+import { Package, ShoppingCart, Users, MessageCircle, Settings, LayoutDashboard, Menu, X, LogOut, UserCircle, Store, ExternalLink } from "lucide-react";
 import { useState } from "react";
 import { logout } from "@/app/[locale]/login/actions";
 import Image from "next/image";
@@ -17,9 +17,10 @@ type SidebarProps = {
   profile?: Profile | null;
   shopName?: string | null;
   shopLogoUrl?: string | null;
+  shopSlug?: string | null;
 }
 
-export default function Sidebar({ profile, shopName, shopLogoUrl }: SidebarProps) {
+export default function Sidebar({ profile, shopName, shopLogoUrl, shopSlug }: SidebarProps) {
   const t = useTranslations("Sidebar");
   const tSettings = useTranslations("Settings");
   const [isOpen, setIsOpen] = useState(false);
@@ -141,6 +142,18 @@ export default function Sidebar({ profile, shopName, shopLogoUrl }: SidebarProps
                 {t("online_orders")}
               </Link>
             </li>
+            {shopSlug && (
+              <li>
+                <Link
+                  href={`/boutique/${shopSlug}`}
+                  target="_blank"
+                  className="flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-violet-600 hover:bg-violet-50 dark:text-violet-400 dark:hover:bg-violet-900/20"
+                >
+                  <ExternalLink className="h-4 w-4" />
+                  {tSettings("view_online_shop")}
+                </Link>
+              </li>
+            )}
           </ul>
         </nav>
 
