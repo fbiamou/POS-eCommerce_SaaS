@@ -1,6 +1,16 @@
 import { parse } from "csv-parse/sync";
 
-export const CSV_HEADERS = ["nom", "categorie", "type", "marque", "prix_achat", "prix_vente", "quantite"] as const;
+export const CSV_HEADERS = [
+  "nom",
+  "categorie",
+  "type",
+  "marque",
+  "prix_achat",
+  "prix_vente",
+  "quantite",
+  "image_url",
+  "en_ligne",
+] as const;
 
 export type ImportRow = {
   name: string;
@@ -10,6 +20,10 @@ export type ImportRow = {
   purchase_price: number;
   selling_price: number;
   quantity: number;
+  image_url: string;
+  // undefined = column left blank / not mentioned — leave existing value
+  // untouched on restock, default to "not published" only for a new product.
+  is_published_online: boolean | undefined;
 };
 
 export type ImportRowError = {
@@ -32,19 +46,39 @@ function toCsv(rows: (string | number)[][]): string {
 export function buildCsvTemplate(): string {
   return toCsv([
     [...CSV_HEADERS],
-    ["Fond de teint Mac NC45", "Cosmétiques", "", "Mac", 3000, 6000, 10],
+    ["Fond de teint Mac NC45", "Cosmétiques", "", "Mac", 3000, 6000, 10, "", "non"],
   ]);
 }
 
 export function productsToCsv(
-  products: { name: string; category: string; purchase_price: number; selling_price: number; quantity_in_stock: number }[]
+  products: {
+    name: string;
+    category: string;
+    purchase_price: number;
+    selling_price: number;
+    quantity_in_stock: number;
+    image_url?: string | null;
+    is_published_online?: boolean;
+  }[]
 ): string {
   const rows: (string | number)[][] = [[...CSV_HEADERS]];
   for (const p of products) {
-    rows.push([p.name, p.category, "", "", p.purchase_price, p.selling_price, p.quantity_in_stock]);
+    rows.push([
+      p.name,
+      p.category,
+      "",
+      "",
+      p.purchase_price,
+      p.selling_price,
+      p.quantity_in_stock,
+      p.image_url || "",
+      p.is_published_online ? "oui" : "non",
+    ]);
   }
   return toCsv(rows);
 }
+
+const TRUTHY_VALUES = new Set(["oui", "true", "1", "yes"]);
 
 export function parseImportCsv(text: string): { rows: ImportRow[]; errors: ImportRowError[] } {
   const records: Record<string, string>[] = parse(text, {
@@ -83,6 +117,8 @@ export function parseImportCsv(text: string): { rows: ImportRow[]; errors: Impor
       return;
     }
 
+    const enLigneRaw = record.en_ligne?.trim().toLowerCase();
+
     rows.push({
       name,
       category: record.categorie?.trim() || "",
@@ -91,6 +127,8 @@ export function parseImportCsv(text: string): { rows: ImportRow[]; errors: Impor
       purchase_price: purchasePrice,
       selling_price: sellingPrice,
       quantity,
+      image_url: record.image_url?.trim() || "",
+      is_published_online: enLigneRaw ? TRUTHY_VALUES.has(enLigneRaw) : undefined,
     });
   });
 

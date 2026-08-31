@@ -70,7 +70,7 @@ export async function addProduct(formData: FormData) {
   try {
     const categoryId = await findOrCreateCategory(supabase, profile.shop_id, categoryText);
 
-    const { error: insertError } = await supabase
+    const { data: newProduct, error: insertError } = await supabase
       .from("products")
       .insert({
         shop_id: profile.shop_id,
@@ -81,7 +81,9 @@ export async function addProduct(formData: FormData) {
         quantity_in_stock: stockQty,
         description,
         is_published_online: isPublishedOnline,
-      });
+      })
+      .select("id")
+      .single();
 
     if (insertError) {
       console.error("Product insert error:", insertError);
@@ -92,7 +94,7 @@ export async function addProduct(formData: FormData) {
     revalidatePath("/sales");
     revalidatePath("/");
 
-    return { success: true };
+    return { success: true, productId: newProduct.id };
   } catch (err: any) {
     console.error("Add product failed:", err);
     return { error: "Erreur interne." };
@@ -277,6 +279,16 @@ export async function importProductsCsv(formData: FormData): Promise<{ summary?:
         errors.push({ line: 0, message: `"${finalName}": ${rpcError.message}` });
         continue;
       }
+
+      // image_url / en_ligne are optional and left untouched when blank —
+      // only overwrite them if the CSV row actually specified a value.
+      const catalogUpdates: Record<string, string | boolean> = {};
+      if (row.image_url) catalogUpdates.image_url = row.image_url;
+      if (row.is_published_online !== undefined) catalogUpdates.is_published_online = row.is_published_online;
+      if (Object.keys(catalogUpdates).length > 0) {
+        await supabase.from("products").update(catalogUpdates).eq("id", existingProduct.id);
+      }
+
       restocked++;
     } else {
       const categoryId = await findOrCreateCategory(supabase, profile.shop_id, row.category);
@@ -287,6 +299,8 @@ export async function importProductsCsv(formData: FormData): Promise<{ summary?:
         purchase_price: row.purchase_price,
         selling_price: row.selling_price,
         quantity_in_stock: row.quantity,
+        image_url: row.image_url || null,
+        is_published_online: row.is_published_online ?? false,
       });
       if (insertError) {
         errors.push({ line: 0, message: `"${finalName}": ${insertError.message}` });

@@ -7,7 +7,7 @@ export async function GET() {
 
   const { data: products, error } = await supabase
     .from("products")
-    .select("name, purchase_price, selling_price, quantity_in_stock, categories(name)")
+    .select("name, purchase_price, selling_price, quantity_in_stock, image_url, is_published_online, categories(name)")
     .eq("is_active", true)
     .order("name", { ascending: true });
 
@@ -21,6 +21,8 @@ export async function GET() {
     purchase_price: p.purchase_price,
     selling_price: p.selling_price,
     quantity_in_stock: p.quantity_in_stock,
+    image_url: p.image_url,
+    is_published_online: p.is_published_online,
   }));
 
   return new NextResponse(productsToCsv(rows), {
