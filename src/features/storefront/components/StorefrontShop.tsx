@@ -105,22 +105,24 @@ export default function StorefrontShop({
 
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950">
-      <header className="border-b bg-white dark:bg-zinc-900 px-4 py-6">
-        <div className="mx-auto flex max-w-5xl items-center justify-between gap-4">
-          <div className="flex items-center gap-4">
+      <header className="border-b bg-white dark:bg-zinc-900 px-4 py-4 sm:py-6">
+        <div className="mx-auto flex max-w-5xl flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex min-w-0 items-center gap-4">
             {shop.shop_logo_url ? (
-              <Image src={shop.shop_logo_url} alt={shop.shop_name || ""} width={56} height={56} className="h-14 w-14 rounded-xl object-cover" />
+              <Image src={shop.shop_logo_url} alt={shop.shop_name || ""} width={56} height={56} className="h-14 w-14 shrink-0 rounded-xl object-cover" />
             ) : (
-              <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-violet-600 text-xl font-bold text-white">
+              <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-violet-600 text-xl font-bold text-white">
                 {(shop.shop_name || "B")[0].toUpperCase()}
               </div>
             )}
-            <div>
-              <h1 className="text-xl font-bold">{shop.shop_name || t("default_shop_name")}</h1>
-              {shop.shop_address && <p className="text-sm text-zinc-500">{shop.shop_address}</p>}
+            <div className="min-w-0">
+              <h1 className="truncate text-xl font-bold">{shop.shop_name || t("default_shop_name")}</h1>
+              {shop.shop_address && <p className="truncate text-sm text-zinc-500">{shop.shop_address}</p>}
             </div>
           </div>
-          <LocaleSwitcher variant="pills" />
+          <div className="shrink-0 self-start sm:self-auto">
+            <LocaleSwitcher variant="pills" />
+          </div>
         </div>
       </header>
 

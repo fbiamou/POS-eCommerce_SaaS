@@ -51,7 +51,7 @@ export function LocaleSwitcher({ variant = 'pills' }: Props) {
 
   // Pills variant — for login page
   return (
-    <div className="flex items-center gap-1" role="group" aria-label="Langue">
+    <div className="flex flex-wrap items-center gap-1" role="group" aria-label="Langue">
       {LOCALES.map((l) => (
         <button
           key={l.code}

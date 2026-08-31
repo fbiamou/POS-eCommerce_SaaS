@@ -166,8 +166,8 @@ export default function Sidebar({ profile, shopName, shopLogoUrl, shopSlug }: Si
             </Link>
           </div>
 
-          {/* User Profile card + Language switcher */}
-          <div className="border-t p-3 space-y-2">
+          {/* User Profile card */}
+          <div className="border-t p-3">
             <div className="flex items-center gap-3 px-1 py-2">
               <div className="flex h-8 w-8 items-center justify-center rounded-full bg-violet-100 dark:bg-violet-900">
                 <UserCircle className="h-5 w-5 text-violet-600 dark:text-violet-400" />
@@ -188,9 +188,6 @@ export default function Sidebar({ profile, shopName, shopLogoUrl, shopSlug }: Si
               >
                 <LogOut className="h-4 w-4" />
               </button>
-            </div>
-            <div className="px-1">
-              <LocaleSwitcher variant="dropdown" />
             </div>
           </div>
         </div>
