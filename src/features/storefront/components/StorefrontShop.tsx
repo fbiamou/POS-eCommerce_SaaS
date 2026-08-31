@@ -6,7 +6,7 @@ import { Plus, Minus, Trash2, ShoppingBag, CheckCircle2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { LocaleSwitcher } from "@/components/LocaleSwitcher";
 import { createClient } from "@/utils/supabase/client";
-import { PHONE_COUNTRY_CODES } from "@/lib/phoneCountryCodes";
+import { PhoneCountryCodeSelect } from "./PhoneCountryCodeSelect";
 import type { PublicProduct, PublicShopProfile } from "../actions";
 
 type CartItem = { productId: string; quantity: number };
@@ -233,18 +233,11 @@ export default function StorefrontShop({
                 />
                 <div className="flex flex-col gap-1">
                   <div className="flex gap-2">
-                    <select
+                    <PhoneCountryCodeSelect
                       value={phoneCountryCode}
-                      onChange={(e) => setPhoneCountryCode(e.target.value)}
-                      aria-label={t("phone_country_code")}
-                      className="w-28 shrink-0 rounded-md border border-zinc-300 p-2 text-sm dark:border-zinc-700 dark:bg-zinc-800"
-                    >
-                      {PHONE_COUNTRY_CODES.map((c) => (
-                        <option key={c.code} value={c.code}>
-                          {c.code} {c.label}
-                        </option>
-                      ))}
-                    </select>
+                      onChange={setPhoneCountryCode}
+                      label={t("phone_country_code")}
+                    />
                     <input
                       required
                       type="tel"
