@@ -27,6 +27,7 @@ export type ShopSettings = {
   whatsapp_api_token: string | null
   whatsapp_template_name: string | null
   shop_slug: string | null
+  default_phone_country_code: string
 }
 
 export async function getShopSettings(): Promise<ShopSettings | null> {
@@ -65,6 +66,7 @@ export async function updateShopProfile(formData: FormData) {
     shop_email: formData.get('shop_email') as string || null,
     currency_code: formData.get('currency_code') as string || 'XAF',
     currency_symbol: formData.get('currency_symbol') as string || 'FCFA',
+    default_phone_country_code: formData.get('default_phone_country_code') as string || '+237',
     tax_id: formData.get('tax_id') as string || null,
     trade_register: formData.get('trade_register') as string || null,
     vat_registered: vatRegistered,

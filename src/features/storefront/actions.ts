@@ -9,6 +9,7 @@ export type PublicShopProfile = {
   currency_symbol: string;
   theme_accent_color: string;
   theme_font: string;
+  default_phone_country_code: string;
 };
 
 export type PublicProduct = {

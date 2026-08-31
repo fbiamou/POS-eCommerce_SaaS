@@ -6,6 +6,7 @@ import { Plus, Minus, Trash2, ShoppingBag, CheckCircle2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { LocaleSwitcher } from "@/components/LocaleSwitcher";
 import { createClient } from "@/utils/supabase/client";
+import { PHONE_COUNTRY_CODES } from "@/lib/phoneCountryCodes";
 import type { PublicProduct, PublicShopProfile } from "../actions";
 
 type CartItem = { productId: string; quantity: number };
@@ -22,6 +23,7 @@ export default function StorefrontShop({
 
   const [cart, setCart] = useState<CartItem[]>([]);
   const [customerName, setCustomerName] = useState("");
+  const [phoneCountryCode, setPhoneCountryCode] = useState(shop.default_phone_country_code || "+237");
   const [customerPhone, setCustomerPhone] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -85,10 +87,12 @@ export default function StorefrontShop({
       const supabase = createClient();
       const items = cart.map((item) => ({ product_id: item.productId, quantity: item.quantity }));
 
+      const fullPhone = `${phoneCountryCode}${customerPhone.replace(/\D/g, "")}`;
+
       const { error: rpcError } = await supabase.rpc("place_online_order", {
         _shop_id: shop.shop_id,
         _customer_name: customerName,
-        _customer_phone: customerPhone,
+        _customer_phone: fullPhone,
         _items: items,
       });
 
@@ -227,14 +231,31 @@ export default function StorefrontShop({
                   onChange={(e) => setCustomerName(e.target.value)}
                   className="rounded-md border border-zinc-300 p-2 text-sm dark:border-zinc-700 dark:bg-zinc-800"
                 />
-                <input
-                  required
-                  type="text"
-                  placeholder={t("your_phone")}
-                  value={customerPhone}
-                  onChange={(e) => setCustomerPhone(e.target.value)}
-                  className="rounded-md border border-zinc-300 p-2 text-sm dark:border-zinc-700 dark:bg-zinc-800"
-                />
+                <div className="flex flex-col gap-1">
+                  <div className="flex gap-2">
+                    <select
+                      value={phoneCountryCode}
+                      onChange={(e) => setPhoneCountryCode(e.target.value)}
+                      aria-label={t("phone_country_code")}
+                      className="w-28 shrink-0 rounded-md border border-zinc-300 p-2 text-sm dark:border-zinc-700 dark:bg-zinc-800"
+                    >
+                      {PHONE_COUNTRY_CODES.map((c) => (
+                        <option key={c.code} value={c.code}>
+                          {c.code} {c.label}
+                        </option>
+                      ))}
+                    </select>
+                    <input
+                      required
+                      type="tel"
+                      placeholder={t("your_phone")}
+                      value={customerPhone}
+                      onChange={(e) => setCustomerPhone(e.target.value)}
+                      className="min-w-0 flex-1 rounded-md border border-zinc-300 p-2 text-sm dark:border-zinc-700 dark:bg-zinc-800"
+                    />
+                  </div>
+                  <p className="text-xs text-zinc-400">{t("phone_country_hint")}</p>
+                </div>
               </div>
 
               <p className="text-xs text-zinc-500">{t("pickup_notice")}</p>

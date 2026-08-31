@@ -5,6 +5,7 @@ import { TeamMemberRow } from '@/features/team/components/TeamMemberRow'
 import { LogoUploadButton } from '@/features/settings/components/LogoUploadButton'
 import { ShopSlugField } from '@/features/settings/components/ShopSlugField'
 import { CurrencySelect } from '@/features/settings/components/CurrencySelect'
+import { PHONE_COUNTRY_CODES } from '@/lib/phoneCountryCodes'
 import { getTranslations } from 'next-intl/server'
 import {
   UserCircle, ShieldCheck, ShoppingBag, Plus, Building2,
@@ -180,6 +181,16 @@ export default async function SettingsPage({
                   <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1" htmlFor="shop_phone">{t('phone')}</label>
                   <input id="shop_phone" name="shop_phone" type="tel" defaultValue={shopSettings?.shop_phone || ''} placeholder="+237 6XX XXX XXX"
                     className="w-full px-3 py-2 border border-zinc-200 dark:border-zinc-700 rounded-lg bg-zinc-50 dark:bg-zinc-800 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500" />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1" htmlFor="default_phone_country_code">{t('default_phone_country_code')}</label>
+                  <select id="default_phone_country_code" name="default_phone_country_code" defaultValue={shopSettings?.default_phone_country_code || '+237'}
+                    className="w-full px-3 py-2 border border-zinc-200 dark:border-zinc-700 rounded-lg bg-zinc-50 dark:bg-zinc-800 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500">
+                    {PHONE_COUNTRY_CODES.map((c) => (
+                      <option key={c.code} value={c.code}>{c.code} {c.label}</option>
+                    ))}
+                  </select>
+                  <p className="text-xs text-zinc-400 mt-1">{t('default_phone_country_code_hint')}</p>
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1" htmlFor="shop_email">{t('email')}</label>
