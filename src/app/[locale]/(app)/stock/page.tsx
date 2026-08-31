@@ -3,9 +3,15 @@ import { AddProductButton } from "@/features/stock/components/AddProductButton";
 import { StockActions } from "@/features/stock/components/StockActions";
 import { getTranslations } from "next-intl/server";
 import { createClient } from "@/utils/supabase/server";
+import { getShopSettings } from "@/features/settings/actions";
+import { Link } from "@/i18n/routing";
+import { AlertTriangle } from "lucide-react";
 
 export default async function StockPage() {
-  const t = await getTranslations("Stock");
+  const [t, shopSettings] = await Promise.all([
+    getTranslations("Stock"),
+    getShopSettings(),
+  ]);
   const supabase = await createClient();
 
   const { data: products, error } = await supabase
@@ -42,17 +48,32 @@ export default async function StockPage() {
     category: p.categories ? { name: (p.categories as any).name } : null,
   }));
 
+  const hasPublishedProducts = normalizedProducts.some((p) => p.is_published_online);
+  const showNoSlugWarning = hasPublishedProducts && !shopSettings?.shop_slug;
+
   return (
     <div className="flex flex-col gap-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold tracking-tight">{t("title")}</h1>
         <div className="flex items-center gap-4">
           <StockActions />
-          <AddProductButton label={t("add_product")} />
+          <AddProductButton label={t("add_product")} hasShopSlug={Boolean(shopSettings?.shop_slug)} />
         </div>
       </div>
 
-      <ProductList products={normalizedProducts} />
+      {showNoSlugWarning && (
+        <div className="flex items-start gap-3 rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800 dark:border-amber-900/50 dark:bg-amber-900/20 dark:text-amber-300">
+          <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0" />
+          <p>
+            {t("no_slug_warning")}{" "}
+            <Link href="/settings" className="font-medium underline">
+              {t("no_slug_warning_link")}
+            </Link>
+          </p>
+        </div>
+      )}
+
+      <ProductList products={normalizedProducts} hasShopSlug={Boolean(shopSettings?.shop_slug)} />
     </div>
   );
 }

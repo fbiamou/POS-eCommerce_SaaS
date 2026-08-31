@@ -18,7 +18,7 @@ export type Product = {
   is_published_online: boolean;
 };
 
-export default function ProductList({ products }: { products: Product[] }) {
+export default function ProductList({ products, hasShopSlug }: { products: Product[]; hasShopSlug: boolean }) {
   const t = useTranslations("Stock");
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [isPending, startTransition] = useTransition();
@@ -190,10 +190,15 @@ export default function ProductList({ products }: { products: Product[] }) {
               <label className="text-sm font-medium">{t("description")}</label>
               <textarea name="description" rows={2} defaultValue={editingProduct.description || ""} placeholder={t("optional")} className="rounded-md border border-zinc-300 p-2 text-sm dark:border-zinc-700 dark:bg-zinc-800 resize-none" />
             </div>
-            <label className="flex items-center gap-2 text-sm font-medium cursor-pointer">
-              <input type="checkbox" name="is_published_online" value="true" defaultChecked={editingProduct.is_published_online} className="rounded border-zinc-300" />
-              {t("publish_online")}
-            </label>
+            <div className="flex flex-col gap-1">
+              <label className="flex items-center gap-2 text-sm font-medium cursor-pointer">
+                <input type="checkbox" name="is_published_online" value="true" defaultChecked={editingProduct.is_published_online} className="rounded border-zinc-300" />
+                {t("publish_online")}
+              </label>
+              {!hasShopSlug && (
+                <p className="ml-6 text-xs text-amber-600 dark:text-amber-400">{t("publish_online_no_slug_hint")}</p>
+              )}
+            </div>
 
             <div className="mt-4 flex justify-end gap-2">
               <button type="button" onClick={closeEdit} className="rounded-md border px-4 py-2 text-sm font-medium hover:bg-zinc-100 dark:hover:bg-zinc-800">
