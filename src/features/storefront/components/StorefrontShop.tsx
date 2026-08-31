@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import { Plus, Minus, Trash2, ShoppingBag, CheckCircle2 } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { LocaleSwitcher } from "@/components/LocaleSwitcher";
 import { createClient } from "@/utils/supabase/client";
 import type { PublicProduct, PublicShopProfile } from "../actions";
 
@@ -105,18 +106,21 @@ export default function StorefrontShop({
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950">
       <header className="border-b bg-white dark:bg-zinc-900 px-4 py-6">
-        <div className="mx-auto flex max-w-5xl items-center gap-4">
-          {shop.shop_logo_url ? (
-            <Image src={shop.shop_logo_url} alt={shop.shop_name || ""} width={56} height={56} className="h-14 w-14 rounded-xl object-cover" />
-          ) : (
-            <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-violet-600 text-xl font-bold text-white">
-              {(shop.shop_name || "B")[0].toUpperCase()}
+        <div className="mx-auto flex max-w-5xl items-center justify-between gap-4">
+          <div className="flex items-center gap-4">
+            {shop.shop_logo_url ? (
+              <Image src={shop.shop_logo_url} alt={shop.shop_name || ""} width={56} height={56} className="h-14 w-14 rounded-xl object-cover" />
+            ) : (
+              <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-violet-600 text-xl font-bold text-white">
+                {(shop.shop_name || "B")[0].toUpperCase()}
+              </div>
+            )}
+            <div>
+              <h1 className="text-xl font-bold">{shop.shop_name || t("default_shop_name")}</h1>
+              {shop.shop_address && <p className="text-sm text-zinc-500">{shop.shop_address}</p>}
             </div>
-          )}
-          <div>
-            <h1 className="text-xl font-bold">{shop.shop_name || t("default_shop_name")}</h1>
-            {shop.shop_address && <p className="text-sm text-zinc-500">{shop.shop_address}</p>}
           </div>
+          <LocaleSwitcher variant="pills" />
         </div>
       </header>
 
