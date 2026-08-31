@@ -1,7 +1,9 @@
 import { getCurrentProfile, getTeamMembers } from '@/features/auth/actions'
 import { getShopSettings, updateShopProfile, updateAppearance, updateOwnerProfile } from '@/features/settings/actions'
 import { inviteEmployee } from '@/features/team/actions'
+import { TeamMemberRow } from '@/features/team/components/TeamMemberRow'
 import { LogoUploadButton } from '@/features/settings/components/LogoUploadButton'
+import { ShopSlugField } from '@/features/settings/components/ShopSlugField'
 import { CurrencySelect } from '@/features/settings/components/CurrencySelect'
 import { getTranslations } from 'next-intl/server'
 import {
@@ -162,6 +164,11 @@ export default async function SettingsPage({
               </div>
             </div>
 
+            {/* Boutique en ligne */}
+            <div className="px-6 pt-4 pb-2">
+              <ShopSlugField initialSlug={shopSettings?.shop_slug ?? null} />
+            </div>
+
             <form action={updateShopProfile} className="p-6 space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
@@ -310,20 +317,12 @@ export default async function SettingsPage({
               {teamMembers.length === 0 ? (
                 <p className="p-6 text-sm text-zinc-400 text-center">{t('no_members')}</p>
               ) : teamMembers.map((member) => (
-                <div key={member.id} className="flex items-center gap-3 px-6 py-3">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-zinc-100 dark:bg-zinc-800 flex-shrink-0">
-                    <UserCircle className="h-5 w-5 text-zinc-400" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium truncate">{member.full_name || 'Sans nom'}</p>
-                  </div>
-                  {member.role && ROLE_CONFIG[member.role] && (
-                    <span className={`inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-full ${ROLE_CONFIG[member.role].color}`}>
-                      {ROLE_CONFIG[member.role].icon}
-                      {ROLE_CONFIG[member.role].label}
-                    </span>
-                  )}
-                </div>
+                <TeamMemberRow
+                  key={member.id}
+                  member={member}
+                  isSelf={member.id === currentProfile?.id}
+                  roleLabels={{ MANAGER: t('role_manager'), SELLER: t('role_cashier') }}
+                />
               ))}
             </div>
           </section>
@@ -342,9 +341,10 @@ export default async function SettingsPage({
                       className="w-full px-3 py-2 border border-zinc-200 dark:border-zinc-700 rounded-lg bg-zinc-50 dark:bg-zinc-800 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500" />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1" htmlFor="email_emp">Email</label>
-                    <input id="email_emp" name="email" type="email" required placeholder="caissier@exemple.com"
+                    <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1" htmlFor="email_emp">{t('employee_email')}</label>
+                    <input id="email_emp" name="email" type="email" placeholder={t('employee_email_placeholder')}
                       className="w-full px-3 py-2 border border-zinc-200 dark:border-zinc-700 rounded-lg bg-zinc-50 dark:bg-zinc-800 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500" />
+                    <p className="text-xs text-zinc-400 mt-1">{t('employee_email_hint')}</p>
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1" htmlFor="password_emp">{t('temp_password')}</label>

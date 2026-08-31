@@ -1,8 +1,8 @@
 "use client";
 
-import { Link, usePathname } from "@/i18n/routing";
+import { Link } from "@/i18n/routing";
 import { useTranslations } from "next-intl";
-import { Package, ShoppingCart, Users, MessageCircle, Settings, LayoutDashboard, Menu, X, LogOut, UserCircle } from "lucide-react";
+import { Package, ShoppingCart, Users, MessageCircle, Settings, LayoutDashboard, Menu, X, LogOut, UserCircle, Store } from "lucide-react";
 import { useState } from "react";
 import { logout } from "@/app/[locale]/login/actions";
 import Image from "next/image";
@@ -22,7 +22,6 @@ type SidebarProps = {
 export default function Sidebar({ profile, shopName, shopLogoUrl }: SidebarProps) {
   const t = useTranslations("Sidebar");
   const tSettings = useTranslations("Settings");
-  const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
@@ -37,11 +36,6 @@ export default function Sidebar({ profile, shopName, shopLogoUrl }: SidebarProps
     MANAGER: tSettings("role_manager"),
     SELLER: tSettings("role_cashier"),
   };
-
-  // Do not render the sidebar on the login page
-  if (pathname === "/login") {
-    return null;
-  }
 
   return (
     <>
@@ -139,6 +133,12 @@ export default function Sidebar({ profile, shopName, shopLogoUrl }: SidebarProps
               <Link href="/reminders" onClick={closeSidebar} className="flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium hover:bg-zinc-100 dark:hover:bg-zinc-800">
                 <MessageCircle className="h-4 w-4" />
                 {t("reminders")}
+              </Link>
+            </li>
+            <li>
+              <Link href="/online-orders" onClick={closeSidebar} className="flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium hover:bg-zinc-100 dark:hover:bg-zinc-800">
+                <Store className="h-4 w-4" />
+                {t("online_orders")}
               </Link>
             </li>
           </ul>

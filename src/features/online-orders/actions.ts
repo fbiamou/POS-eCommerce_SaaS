@@ -1,0 +1,103 @@
+"use server";
+
+import { createClient } from "@/utils/supabase/server";
+import { revalidatePath } from "next/cache";
+
+export type OnlineOrder = {
+  id: string;
+  customer_name: string;
+  customer_phone: string;
+  status: "PENDING" | "CONFIRMED" | "CANCELLED";
+  total_amount: number;
+  created_at: string;
+  items: { product_name: string; quantity: number; unit_price: number }[];
+};
+
+export async function getOnlineOrders(): Promise<OnlineOrder[]> {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return [];
+
+  const { data: profile } = await supabase.from("profiles").select("shop_id").eq("id", user.id).single();
+  if (!profile?.shop_id) return [];
+
+  const { data, error } = await supabase
+    .from("online_orders")
+    .select(
+      `
+      id, customer_name, customer_phone, status, total_amount, created_at,
+      online_order_items ( quantity, unit_price, products ( name ) )
+    `
+    )
+    .eq("shop_id", profile.shop_id)
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    console.error("Error fetching online orders:", error);
+    return [];
+  }
+
+  return (data ?? []).map((order: any) => ({
+    id: order.id,
+    customer_name: order.customer_name,
+    customer_phone: order.customer_phone,
+    status: order.status,
+    total_amount: order.total_amount,
+    created_at: order.created_at,
+    items: (order.online_order_items ?? []).map((item: any) => ({
+      product_name: item.products?.name ?? "—",
+      quantity: item.quantity,
+      unit_price: item.unit_price,
+    })),
+  }));
+}
+
+export async function confirmOnlineOrder(
+  orderId: string,
+  paidAmount: number
+): Promise<{ success?: true; invoiceId?: string; error?: string }> {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { error: "Non autorisé." };
+
+  const { data: profile } = await supabase.from("profiles").select("shop_id").eq("id", user.id).single();
+  if (!profile?.shop_id) return { error: "Boutique non trouvée." };
+
+  const { data, error } = await supabase.rpc("confirm_online_order", {
+    _shop_id: profile.shop_id,
+    _order_id: orderId,
+    _paid_amount: paidAmount,
+  });
+
+  if (error) {
+    console.error("Error confirming online order:", error);
+    return { error: error.message };
+  }
+
+  revalidatePath("/online-orders");
+  revalidatePath("/stock");
+  revalidatePath("/sales");
+  return { success: true, invoiceId: data as string };
+}
+
+export async function cancelOnlineOrder(orderId: string): Promise<{ success?: true; error?: string }> {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { error: "Non autorisé." };
+
+  const { data: profile } = await supabase.from("profiles").select("shop_id").eq("id", user.id).single();
+  if (!profile?.shop_id) return { error: "Boutique non trouvée." };
+
+  const { error } = await supabase.rpc("cancel_online_order", {
+    _shop_id: profile.shop_id,
+    _order_id: orderId,
+  });
+
+  if (error) {
+    console.error("Error cancelling online order:", error);
+    return { error: error.message };
+  }
+
+  revalidatePath("/online-orders");
+  return { success: true };
+}

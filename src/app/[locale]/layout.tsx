@@ -1,4 +1,3 @@
-import Sidebar from "@/components/layout/Sidebar";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "../globals.css";
@@ -6,7 +5,6 @@ import { NextIntlClientProvider } from 'next-intl';
 import { getMessages, getTranslations } from 'next-intl/server';
 import { routing } from '@/i18n/routing';
 import { notFound } from 'next/navigation';
-import { getCurrentProfile } from '@/features/auth/actions';
 import { getShopSettings } from '@/features/settings/actions';
 import { ThemeStyle } from '@/components/ThemeStyle';
 
@@ -33,6 +31,10 @@ export async function generateMetadata({
   };
 }
 
+// Bare document shell shared by every page — authenticated dashboard pages
+// (Sidebar + content layout) live in the (app) route group, while public
+// pages (login, storefront, procurement intake) render directly here with
+// no forced app chrome.
 export default async function RootLayout({
   children,
   params,
@@ -50,11 +52,9 @@ export default async function RootLayout({
   // Providing all messages to the client side
   const messages = await getMessages();
 
-  // Fetch current user profile and shop settings (null if not logged in)
-  const [profile, shopSettings] = await Promise.all([
-    getCurrentProfile(),
-    getShopSettings(),
-  ]);
+  // Theme reflects the visitor's own shop when authenticated; public pages
+  // (login, storefront) fall back to the default theme.
+  const shopSettings = await getShopSettings();
 
   return (
     <html lang={locale}>
@@ -65,13 +65,10 @@ export default async function RootLayout({
         />
       </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased h-screen w-full bg-zinc-50 dark:bg-zinc-950 overflow-hidden flex flex-col md:flex-row`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-zinc-50 dark:bg-zinc-950`}
       >
         <NextIntlClientProvider messages={messages}>
-          <Sidebar profile={profile} shopName={shopSettings?.shop_name} shopLogoUrl={shopSettings?.shop_logo_url} />
-          <main className="flex-1 overflow-y-auto bg-white dark:bg-black p-4 md:p-8 pt-16 md:pt-8 w-full">
-            {children}
-          </main>
+          {children}
         </NextIntlClientProvider>
       </body>
     </html>

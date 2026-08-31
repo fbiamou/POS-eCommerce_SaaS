@@ -15,7 +15,7 @@ export function AddProductButton({ label }: { label: string }) {
     e.preventDefault();
     setError(null);
     const formData = new FormData(e.currentTarget);
-    
+
     startTransition(async () => {
       const result = await addProduct(formData);
       if (result?.error) {
@@ -29,7 +29,7 @@ export function AddProductButton({ label }: { label: string }) {
 
   return (
     <>
-      <button 
+      <button
         onClick={() => setIsOpen(true)}
         className="rounded-md bg-black px-4 py-2 text-sm font-medium text-white hover:bg-black/90 dark:bg-white dark:text-black dark:hover:bg-white/90"
       >
@@ -50,28 +50,36 @@ export function AddProductButton({ label }: { label: string }) {
             </div>
             <div className="flex flex-col gap-1">
               <label className="text-sm font-medium">{t("type")}</label>
-              <input required type="text" name="type" className="rounded-md border border-zinc-300 p-2 text-sm dark:border-zinc-700 dark:bg-zinc-800" />
+              <input type="text" name="type" placeholder={t("optional")} className="rounded-md border border-zinc-300 p-2 text-sm dark:border-zinc-700 dark:bg-zinc-800" />
             </div>
           </div>
           <div className="flex flex-col gap-1">
             <label className="text-sm font-medium">{t("brand")}</label>
-            <input required type="text" name="brand" className="rounded-md border border-zinc-300 p-2 text-sm dark:border-zinc-700 dark:bg-zinc-800" />
+            <input type="text" name="brand" placeholder={t("optional")} className="rounded-md border border-zinc-300 p-2 text-sm dark:border-zinc-700 dark:bg-zinc-800" />
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div className="flex flex-col gap-1">
               <label className="text-sm font-medium">{t("purchase_price")}</label>
-              <input required type="number" name="purchase_price" className="rounded-md border border-zinc-300 p-2 text-sm dark:border-zinc-700 dark:bg-zinc-800" />
+              <input type="number" name="purchase_price" placeholder={t("optional")} className="rounded-md border border-zinc-300 p-2 text-sm dark:border-zinc-700 dark:bg-zinc-800" />
             </div>
             <div className="flex flex-col gap-1">
               <label className="text-sm font-medium">{t("price")}</label>
-              <input required type="number" name="price" className="rounded-md border border-zinc-300 p-2 text-sm dark:border-zinc-700 dark:bg-zinc-800" />
+              <input type="number" name="price" placeholder={t("optional")} className="rounded-md border border-zinc-300 p-2 text-sm dark:border-zinc-700 dark:bg-zinc-800" />
             </div>
           </div>
           <div className="flex flex-col gap-1">
             <label className="text-sm font-medium">{t("stock_qty")}</label>
             <input required type="number" name="stock_qty" className="rounded-md border border-zinc-300 p-2 text-sm dark:border-zinc-700 dark:bg-zinc-800" />
           </div>
-          
+          <div className="flex flex-col gap-1">
+            <label className="text-sm font-medium">{t("description")}</label>
+            <textarea name="description" rows={2} placeholder={t("optional")} className="rounded-md border border-zinc-300 p-2 text-sm dark:border-zinc-700 dark:bg-zinc-800 resize-none" />
+          </div>
+          <label className="flex items-center gap-2 text-sm font-medium cursor-pointer">
+            <input type="checkbox" name="is_published_online" value="true" className="rounded border-zinc-300" />
+            {t("publish_online")}
+          </label>
+
           <div className="mt-4 flex justify-end gap-2">
             <button type="button" onClick={() => setIsOpen(false)} className="rounded-md border px-4 py-2 text-sm font-medium hover:bg-zinc-100 dark:hover:bg-zinc-800">
               {t("cancel")}

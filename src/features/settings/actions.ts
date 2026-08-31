@@ -26,6 +26,7 @@ export type ShopSettings = {
   whatsapp_phone_number_id: string | null
   whatsapp_api_token: string | null
   whatsapp_template_name: string | null
+  shop_slug: string | null
 }
 
 export async function getShopSettings(): Promise<ShopSettings | null> {
@@ -89,6 +90,53 @@ export async function updateShopProfile(formData: FormData) {
 
   revalidatePath('/', 'layout')
   redirect('/fr/settings?tab=profil&message=Profil boutique mis à jour !')
+}
+
+function slugify(input: string): string {
+  return input
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '') // strip accents
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 60)
+}
+
+export async function updateShopSlug(formData: FormData): Promise<{ success?: true; slug?: string; error?: string }> {
+  const supabase = await createClient()
+
+  const currentProfile = await getCurrentProfile()
+  if (!currentProfile) return { error: 'Non autorisé.' }
+
+  const rawInput = (formData.get('shop_slug') as string)?.trim()
+  if (!rawInput) return { error: "L'adresse de la boutique en ligne ne peut pas être vide." }
+
+  const slug = slugify(rawInput)
+  if (!slug) return { error: 'Adresse invalide — utilisez des lettres, chiffres et tirets.' }
+
+  const { data: existing } = await supabase
+    .from('settings')
+    .select('shop_id')
+    .eq('shop_slug', slug)
+    .maybeSingle()
+
+  if (existing && existing.shop_id !== currentProfile.shop_id) {
+    return { error: 'Cette adresse est déjà utilisée par une autre boutique.' }
+  }
+
+  const { error } = await supabase
+    .from('settings')
+    .update({ shop_slug: slug })
+    .eq('shop_id', currentProfile.shop_id)
+
+  if (error) {
+    console.error('Update shop slug error:', error)
+    return { error: 'Erreur lors de la mise à jour.' }
+  }
+
+  revalidatePath('/settings')
+  revalidatePath(`/boutique/${slug}`)
+  return { success: true, slug }
 }
 
 export async function updateAppearance(formData: FormData) {

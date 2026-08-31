@@ -17,6 +17,9 @@ export default async function StockPage() {
       purchase_price,
       selling_price,
       is_active,
+      description,
+      image_url,
+      is_published_online,
       categories(name)
     `)
     .eq("is_active", true)
@@ -33,6 +36,9 @@ export default async function StockPage() {
     quantity_in_stock: p.quantity_in_stock,
     purchase_price: p.purchase_price,
     selling_price: p.selling_price,
+    description: p.description,
+    image_url: p.image_url,
+    is_published_online: p.is_published_online,
     category: p.categories ? { name: (p.categories as any).name } : null,
   }));
 

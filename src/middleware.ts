@@ -37,8 +37,13 @@ export async function middleware(request: NextRequest) {
   // Check if it's an auth-related page
   const isAuthPage = request.nextUrl.pathname.endsWith('/login')
 
+  // The public storefront (/boutique/{slug}) and the procurement intake
+  // link (/procurement/{id}, filled in by an intermediary with no account)
+  // are reachable without a session.
+  const isPublicPage = /^\/(es|fr|en)\/(boutique|procurement)(\/|$)/.test(request.nextUrl.pathname)
+
   // 3. Redirect logic
-  if (!user && !isAuthPage) {
+  if (!user && !isAuthPage && !isPublicPage) {
     const loginUrl = request.nextUrl.clone()
     loginUrl.pathname = `/${locale}/login`
     return NextResponse.redirect(loginUrl)
