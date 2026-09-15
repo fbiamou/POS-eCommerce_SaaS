@@ -1,6 +1,7 @@
 import { getCurrentProfile, getTeamMembers } from '@/features/auth/actions'
 import { getShopSettings, updateShopProfile, updateAppearance, updateOwnerProfile } from '@/features/settings/actions'
 import { inviteEmployee } from '@/features/team/actions'
+import { EmployeeAccessFields } from '@/features/team/components/EmployeeAccessFields'
 import { TeamMemberRow } from '@/features/team/components/TeamMemberRow'
 import { LogoUploadButton } from '@/features/settings/components/LogoUploadButton'
 import { ShopSlugField } from '@/features/settings/components/ShopSlugField'
@@ -362,14 +363,7 @@ export default async function SettingsPage({
                     <input id="password_emp" name="password" type="password" required minLength={6} placeholder="Min. 6 caractères"
                       className="w-full px-3 py-2 border border-zinc-200 dark:border-zinc-700 rounded-lg bg-zinc-50 dark:bg-zinc-800 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500" />
                   </div>
-                  <div>
-                    <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1" htmlFor="role_emp">{t('role')}</label>
-                    <select id="role_emp" name="role"
-                      className="w-full px-3 py-2 border border-zinc-200 dark:border-zinc-700 rounded-lg bg-zinc-50 dark:bg-zinc-800 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500">
-                      <option value="SELLER">{t('role_cashier')}</option>
-                      <option value="MANAGER">{t('role_manager')}</option>
-                    </select>
-                  </div>
+                  <EmployeeAccessFields />
                 </div>
                 <div className="flex justify-end">
                   <button type="submit" className="inline-flex items-center gap-2 px-4 py-2 bg-violet-600 text-white text-sm font-medium rounded-lg hover:bg-violet-700 transition-colors">

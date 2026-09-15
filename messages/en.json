@@ -4,6 +4,7 @@
     "dashboard": "Dashboard",
     "stock": "Stock & Products",
     "sales": "Sales & Billing",
+    "invoices": "Invoices",
     "clients": "Clients & Debts",
     "reminders": "WhatsApp Reminders",
     "online_orders": "Online Orders",
@@ -82,6 +83,7 @@
     "add_client": "+ Add New Client",
     "full_name": "Full Name",
     "phone": "Phone (WhatsApp)",
+    "phone_country_code": "Country code",
     "cancel": "Cancel",
     "empty_cart": "The cart is empty.",
     "total": "Total",
@@ -116,9 +118,14 @@
     "full_name": "Full Name",
     "full_name_placeholder": "E.g.: Marie Louise",
     "phone_whatsapp": "Phone (WhatsApp)",
-    "phone_placeholder": "E.g.: +237...",
+    "phone_placeholder": "E.g.: 699887766",
+    "phone_country_code": "Country code",
     "cancel": "Cancel",
-    "create": "Create"
+    "create": "Create",
+    "action": "Action",
+    "edit": "Edit",
+    "edit_client_modal_title": "Edit client",
+    "save": "Save"
   },
   "Reminders": {
     "title": "WhatsApp Reminders",
@@ -126,7 +133,7 @@
     "config_info": "Configuration Information:",
     "delay_first_dynamic": "Delay before 1st reminder: {days} day(s) after the invoice date.",
     "frequency_dynamic": "Frequency of subsequent reminders: every {days} day(s).",
-    "mode": "Mode: Simulation (dry-run) active. No real messages will be sent to Meta API.",
+    "mode": "Mode: Manual — a pre-filled WhatsApp link opens for each reminder, you just need to press send.",
     "mode_live": "Mode: Real sending active via your connected WhatsApp Business account.",
     "eligible_invoices": "Invoices eligible for reminders",
     "client": "Client",
@@ -141,7 +148,8 @@
     "never": "Never",
     "days_ago": "2 days ago",
     "no_invoices": "No overdue invoices require reminders.",
-    "success_alert": "Simulation successful! Message generated for {name} (Debt: {amount} FCFA). No real data sent to Meta.",
+    "success_alert": "Message sent successfully to {name} (Debt: {amount} FCFA) via your WhatsApp Business account.",
+    "manual_alert": "WhatsApp will open with the message ready for {name} (Debt: {amount} FCFA). Just press send.",
     "settings_title": "WhatsApp Reminder Settings",
     "delay_label": "Delay before 1st reminder (days)",
     "delay_hint": "Number of days after the invoice date.",
@@ -187,7 +195,8 @@
     "status": "Status",
     "received": "Received",
     "items_count": "{count} items",
-    "stock_count": "Stock: {stock} / {threshold}"
+    "stock_count": "Stock: {stock} / {threshold}",
+    "no_history": "No purchase orders yet."
   },
   "Procurement": {
     "title": "Procurement Entry",
@@ -259,6 +268,11 @@
     "back_to_shop": "Back to shop"
   },
   "Invoices": {
+    "list_title": "Invoices",
+    "search": "Search by invoice no. or client...",
+    "no_invoices": "No invoices yet.",
+    "no_results": "No invoices match this search.",
+    "view": "View",
     "title": "Invoice",
     "invoice_number": "Invoice No.",
     "date": "Date",
@@ -365,6 +379,12 @@
     "confirm_reset_password": "Generate a new password for this member? The old one will stop working immediately.",
     "new_password_label": "New password",
     "copy": "Copy",
-    "dismiss": "Dismiss"
+    "dismiss": "Dismiss",
+    "cancel": "Cancel",
+    "manage_access": "Manage access",
+    "employee_access_label": "Accessible pages",
+    "employee_access_hint": "Check the pages this employee can view. No box checked = full access.",
+    "access_unrestricted": "No box checked = full access (unrestricted).",
+    "save_access": "Save access"
   }
 }

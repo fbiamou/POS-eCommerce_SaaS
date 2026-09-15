@@ -21,6 +21,12 @@ export default function ReminderList({
     setSendingId(invoice.id);
     setErrorId(null);
 
+    // Open a blank tab synchronously, inside the click handler, so browsers
+    // don't treat the later navigation (after the server round-trip below)
+    // as a blocked popup — only the initial window.open() call counts as
+    // being "in response to a user gesture".
+    const pendingTab = window.open("", "_blank");
+
     startTransition(async () => {
       const dueAmount = invoice.total_amount - invoice.paid_amount;
       const result = await sendReminder({
@@ -34,11 +40,22 @@ export default function ReminderList({
       setSendingId(null);
 
       if (result.error) {
+        pendingTab?.close();
         setErrorId(invoice.id);
         return;
       }
 
-      alert(t("success_alert", { name: invoice.client_name, amount: dueAmount }));
+      if (result.whatsappUrl) {
+        if (pendingTab) {
+          pendingTab.location.href = result.whatsappUrl;
+        } else {
+          window.open(result.whatsappUrl, "_blank", "noopener,noreferrer");
+        }
+        alert(t("manual_alert", { name: invoice.client_name, amount: dueAmount }));
+      } else {
+        pendingTab?.close();
+        alert(t("success_alert", { name: invoice.client_name, amount: dueAmount }));
+      }
     });
   };
 

@@ -10,6 +10,7 @@ export type Profile = {
   role: 'MANAGER' | 'SELLER'
   shop_id: string
   is_active: boolean
+  allowed_pages: string[]
 }
 
 /**
@@ -23,7 +24,7 @@ export async function getCurrentProfile(): Promise<Profile | null> {
 
   const { data: profile } = await supabase
     .from('profiles')
-    .select('id, full_name, role, shop_id, is_active')
+    .select('id, full_name, role, shop_id, is_active, allowed_pages')
     .eq('id', user.id)
     .single()
 
@@ -38,7 +39,7 @@ export async function getTeamMembers(): Promise<Profile[]> {
 
   const { data, error } = await supabase
     .from('profiles')
-    .select('id, full_name, role, shop_id, is_active')
+    .select('id, full_name, role, shop_id, is_active, allowed_pages')
     .order('role', { ascending: true })
 
   if (error) {

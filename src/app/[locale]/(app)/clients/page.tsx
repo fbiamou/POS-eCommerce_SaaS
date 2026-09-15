@@ -1,10 +1,12 @@
 import ClientList from "@/features/clients/components/ClientList";
 import { getTranslations } from "next-intl/server";
 import { createClient } from "@/utils/supabase/server";
+import { getShopSettings } from "@/features/settings/actions";
 
 export default async function ClientsPage() {
   const t = await getTranslations("Clients");
   const supabase = await createClient();
+  const shopSettings = await getShopSettings();
 
   // Fetch clients with aggregated invoice data
   const { data: clientsRaw } = await supabase
@@ -71,7 +73,7 @@ export default async function ClientsPage() {
         </div>
       </div>
 
-      <ClientList clients={clients} />
+      <ClientList clients={clients} defaultPhoneCountryCode={shopSettings?.default_phone_country_code || "+237"} />
     </div>
   );
 }

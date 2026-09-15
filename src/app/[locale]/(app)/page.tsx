@@ -1,11 +1,24 @@
 import { Package, TrendingUp, Users, DollarSign } from "lucide-react";
-import { Link } from "@/i18n/routing";
+import { Link, redirect } from "@/i18n/routing";
 import { getTranslations } from "next-intl/server";
 import { createClient } from "@/utils/supabase/server";
+import { getCurrentProfile } from "@/features/auth/actions";
+import { isPageAllowed, firstAllowedPath } from "@/lib/appPages";
 
 export default async function DashboardPage() {
   const t = await getTranslations("Dashboard");
   const supabase = await createClient();
+
+  // Server actions' redirect() after login lands here via a client-side
+  // transition that skips the edge middleware, so a restricted employee
+  // without dashboard access would otherwise briefly see it — guard here too.
+  const profile = await getCurrentProfile();
+  if (profile && !isPageAllowed(profile.role, profile.allowed_pages, "/")) {
+    // firstAllowedPath always returns one of the known routes in APP_PAGES,
+    // but that list is a plain string[] so it doesn't match next-intl's
+    // generated pathname union type.
+    redirect(firstAllowedPath(profile.allowed_pages) as any);
+  }
 
   // Fetch today's date range
   const todayStart = new Date();

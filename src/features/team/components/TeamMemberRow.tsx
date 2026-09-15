@@ -1,15 +1,17 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { UserCircle, Ban, RotateCcw, KeyRound, Copy } from "lucide-react";
+import { UserCircle, Ban, RotateCcw, KeyRound, Copy, ShieldCheck } from "lucide-react";
 import { useTranslations } from "next-intl";
 import {
   suspendTeamMember,
   reactivateTeamMember,
   updateTeamMemberRole,
+  updateTeamMemberAllowedPages,
   resetTeamMemberPassword,
 } from "../actions";
 import type { Profile } from "@/features/auth/actions";
+import { APP_PAGES, type AppPageKey } from "@/lib/appPages";
 
 const ROLE_STYLES: Record<string, string> = {
   MANAGER: "bg-violet-100 text-violet-700 dark:bg-violet-900/40 dark:text-violet-300",
@@ -26,9 +28,32 @@ export function TeamMemberRow({
   roleLabels: { MANAGER: string; SELLER: string };
 }) {
   const t = useTranslations("Settings");
+  const tSidebar = useTranslations("Sidebar");
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const [revealedPassword, setRevealedPassword] = useState<string | null>(null);
+  const [showAccess, setShowAccess] = useState(false);
+  const [selectedPages, setSelectedPages] = useState<Set<AppPageKey>>(
+    new Set((member.allowed_pages ?? []) as AppPageKey[])
+  );
+
+  const togglePage = (key: AppPageKey) => {
+    setSelectedPages((prev) => {
+      const next = new Set(prev);
+      if (next.has(key)) next.delete(key);
+      else next.add(key);
+      return next;
+    });
+  };
+
+  const handleSaveAccess = () => {
+    setError(null);
+    startTransition(async () => {
+      const result = await updateTeamMemberAllowedPages(member.id, Array.from(selectedPages));
+      if (result.error) setError(result.error);
+      else setShowAccess(false);
+    });
+  };
 
   const handleRoleChange = (role: "MANAGER" | "SELLER") => {
     setError(null);
@@ -94,6 +119,18 @@ export function TeamMemberRow({
               <option value="MANAGER">{roleLabels.MANAGER}</option>
             </select>
 
+            {member.role === "SELLER" && (
+              <button
+                type="button"
+                onClick={() => setShowAccess((v) => !v)}
+                disabled={isPending}
+                title={t("manage_access")}
+                className="rounded-md p-1.5 text-zinc-400 hover:bg-zinc-100 hover:text-zinc-700 dark:hover:bg-zinc-800 dark:hover:text-zinc-200 disabled:opacity-50"
+              >
+                <ShieldCheck className="h-4 w-4" />
+              </button>
+            )}
+
             <button
               type="button"
               onClick={handleResetPassword}
@@ -122,6 +159,44 @@ export function TeamMemberRow({
       </div>
 
       {error && <p className="text-xs text-red-500">{error}</p>}
+
+      {showAccess && member.role === "SELLER" && (
+        <div className="rounded-md bg-zinc-50 dark:bg-zinc-800 p-3">
+          <p className="text-xs text-zinc-400 mb-2">
+            {selectedPages.size === 0 ? t("access_unrestricted") : t("employee_access_hint")}
+          </p>
+          <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+            {APP_PAGES.map((page) => (
+              <label key={page.key} className="flex items-center gap-2 text-xs">
+                <input
+                  type="checkbox"
+                  checked={selectedPages.has(page.key)}
+                  onChange={() => togglePage(page.key)}
+                  className="rounded"
+                />
+                {tSidebar(page.key)}
+              </label>
+            ))}
+          </div>
+          <div className="mt-3 flex justify-end gap-2">
+            <button
+              type="button"
+              onClick={() => setShowAccess(false)}
+              className="rounded-md px-3 py-1 text-xs font-medium text-zinc-500 hover:bg-zinc-100 dark:hover:bg-zinc-700"
+            >
+              {t("cancel")}
+            </button>
+            <button
+              type="button"
+              onClick={handleSaveAccess}
+              disabled={isPending}
+              className="rounded-md bg-violet-600 px-3 py-1 text-xs font-medium text-white hover:bg-violet-700 disabled:opacity-50"
+            >
+              {t("save_access")}
+            </button>
+          </div>
+        </div>
+      )}
 
       {revealedPassword && (
         <div className="flex items-center gap-2 rounded-md bg-amber-50 dark:bg-amber-900/20 p-2 text-xs text-amber-800 dark:text-amber-300">

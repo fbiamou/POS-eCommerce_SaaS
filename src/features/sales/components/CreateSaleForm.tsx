@@ -6,6 +6,7 @@ import { Plus, Minus, Trash2 } from "lucide-react";
 import { useMessages, useTranslations } from "next-intl";
 import { useCartStore } from "../store/useCartStore";
 import { createClient } from "@/utils/supabase/client";
+import { PhoneCountryCodeSelect } from "@/components/PhoneCountryCodeSelect";
 
 export type Product = {
   id: string;
@@ -25,9 +26,11 @@ export type Client = {
 export default function CreateSaleForm({
   products,
   clients,
+  defaultPhoneCountryCode = "+237",
 }: {
   products: Product[];
   clients: Client[];
+  defaultPhoneCountryCode?: string;
 }) {
   const t = useTranslations("Sales");
   const router = useRouter();
@@ -55,6 +58,7 @@ export default function CreateSaleForm({
     isCreatingClient,
     newClientName,
     newClientPhone,
+    newClientPhoneCountryCode,
     addToCart,
     updateQuantity,
     removeFromCart,
@@ -64,7 +68,16 @@ export default function CreateSaleForm({
     setIsCreatingClient,
     setNewClientName,
     setNewClientPhone,
+    setNewClientPhoneCountryCode,
   } = useCartStore();
+
+  // Seed the country code with the shop's configured default the first
+  // time it's needed, without overwriting a value the cashier already set.
+  useEffect(() => {
+    if (!newClientPhoneCountryCode) {
+      setNewClientPhoneCountryCode(defaultPhoneCountryCode);
+    }
+  }, [newClientPhoneCountryCode, defaultPhoneCountryCode, setNewClientPhoneCountryCode]);
 
   const totalAmount = cart.reduce((sum, item) => {
     const product = products.find(p => p.id === item.productId);
@@ -132,12 +145,14 @@ export default function CreateSaleForm({
 
       // Create new client if needed
       if (isCreatingClient && newClientName) {
+        const digits = newClientPhone.replace(/\D/g, "");
+        const fullPhone = digits ? `${newClientPhoneCountryCode || defaultPhoneCountryCode}${digits}` : null;
         const { data: newClient, error: clientError } = await supabase
           .from("clients")
           .insert({
             shop_id: profile.shop_id,
             name: newClientName,
-            phone: newClientPhone || null,
+            phone: fullPhone,
           })
           .select("id")
           .single();
@@ -308,13 +323,20 @@ export default function CreateSaleForm({
                   className="w-full rounded-md border border-zinc-300 p-2 text-sm dark:border-zinc-700 dark:bg-zinc-900"
                   required
                 />
-                <input
-                  type="text"
-                  placeholder={t("phone")}
-                  value={newClientPhone}
-                  onChange={(e) => setNewClientPhone(e.target.value)}
-                  className="w-full rounded-md border border-zinc-300 p-2 text-sm dark:border-zinc-700 dark:bg-zinc-900"
-                />
+                <div className="flex gap-2">
+                  <PhoneCountryCodeSelect
+                    value={newClientPhoneCountryCode || defaultPhoneCountryCode}
+                    onChange={setNewClientPhoneCountryCode}
+                    label={t("phone_country_code")}
+                  />
+                  <input
+                    type="tel"
+                    placeholder={t("phone")}
+                    value={newClientPhone}
+                    onChange={(e) => setNewClientPhone(e.target.value)}
+                    className="min-w-0 flex-1 rounded-md border border-zinc-300 p-2 text-sm dark:border-zinc-700 dark:bg-zinc-900"
+                  />
+                </div>
               </div>
             )}
           </div>

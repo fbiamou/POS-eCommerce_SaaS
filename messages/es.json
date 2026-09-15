@@ -4,6 +4,7 @@
     "dashboard": "Panel de Control",
     "stock": "Inventario y Productos",
     "sales": "Ventas y Facturación",
+    "invoices": "Facturas",
     "clients": "Clientes y Deudas",
     "reminders": "Recordatorios WhatsApp",
     "online_orders": "Pedidos en línea",
@@ -82,6 +83,7 @@
     "add_client": "+ Añadir un nuevo cliente",
     "full_name": "Nombre completo",
     "phone": "Teléfono (WhatsApp)",
+    "phone_country_code": "Código de país",
     "cancel": "Cancelar",
     "empty_cart": "El carrito está vacío.",
     "total": "Total",
@@ -116,9 +118,14 @@
     "full_name": "Nombre completo",
     "full_name_placeholder": "Ej: Marie Louise",
     "phone_whatsapp": "Teléfono (WhatsApp)",
-    "phone_placeholder": "Ej: +237...",
+    "phone_placeholder": "Ej: 699887766",
+    "phone_country_code": "Código de país",
     "cancel": "Cancelar",
-    "create": "Crear"
+    "create": "Crear",
+    "action": "Acción",
+    "edit": "Editar",
+    "edit_client_modal_title": "Editar cliente",
+    "save": "Guardar"
   },
   "Reminders": {
     "title": "Recordatorios de WhatsApp",
@@ -126,7 +133,7 @@
     "config_info": "Información de configuración:",
     "delay_first_dynamic": "Retraso antes del primer recordatorio: {days} día(s) después de la fecha de la factura.",
     "frequency_dynamic": "Frecuencia de los recordatorios siguientes: cada {days} día(s).",
-    "mode": "Modo: Simulación (dry-run) activada. No se enviarán mensajes reales a la API de Meta.",
+    "mode": "Modo: Manual — se abre un enlace de WhatsApp prellenado para cada recordatorio, solo debe pulsar enviar.",
     "mode_live": "Modo: Envío real activado a través de su cuenta de WhatsApp Business conectada.",
     "eligible_invoices": "Facturas elegibles para recordatorios",
     "client": "Cliente",
@@ -141,7 +148,8 @@
     "never": "Nunca",
     "days_ago": "Hace 2 días",
     "no_invoices": "No hay facturas atrasadas que requieran recordatorios.",
-    "success_alert": "¡Simulación exitosa! Mensaje generado para {name} (Deuda: {amount} FCFA). No se enviaron datos reales a Meta.",
+    "success_alert": "Mensaje enviado con éxito a {name} (Deuda: {amount} FCFA) a través de su cuenta de WhatsApp Business.",
+    "manual_alert": "WhatsApp se abrirá con el mensaje listo para {name} (Deuda: {amount} FCFA). Solo falta pulsar enviar.",
     "settings_title": "Configuración de Recordatorios WhatsApp",
     "delay_label": "Retraso antes del 1er recordatorio (días)",
     "delay_hint": "Número de días después de la fecha de facturación.",
@@ -187,7 +195,8 @@
     "status": "Estado",
     "received": "Recibido",
     "items_count": "{count} artículos",
-    "stock_count": "Stock: {stock} / {threshold}"
+    "stock_count": "Stock: {stock} / {threshold}",
+    "no_history": "Aún no hay órdenes de compra."
   },
   "Procurement": {
     "title": "Registro de Compras",
@@ -259,6 +268,11 @@
     "back_to_shop": "Volver a la tienda"
   },
   "Invoices": {
+    "list_title": "Facturas",
+    "search": "Buscar por n.º de factura o cliente...",
+    "no_invoices": "Todavía no hay facturas.",
+    "no_results": "Ninguna factura coincide con esta búsqueda.",
+    "view": "Ver",
     "title": "Factura",
     "invoice_number": "N.º de Factura",
     "date": "Fecha",
@@ -365,6 +379,12 @@
     "confirm_reset_password": "¿Generar una nueva contraseña para este miembro? La anterior dejará de funcionar de inmediato.",
     "new_password_label": "Nueva contraseña",
     "copy": "Copiar",
-    "dismiss": "Cerrar"
+    "dismiss": "Cerrar",
+    "cancel": "Cancelar",
+    "manage_access": "Gestionar accesos",
+    "employee_access_label": "Páginas accesibles",
+    "employee_access_hint": "Marque las páginas que este empleado podrá ver. Ninguna casilla marcada = acceso completo.",
+    "access_unrestricted": "Ninguna casilla marcada = acceso completo (sin restricciones).",
+    "save_access": "Guardar accesos"
   }
 }

@@ -4,6 +4,7 @@
     "dashboard": "Tableau de Bord",
     "stock": "Stock & Produits",
     "sales": "Ventes & Facturation",
+    "invoices": "Factures",
     "clients": "Clients & Dettes",
     "reminders": "Relances WhatsApp",
     "online_orders": "Commandes en ligne",
@@ -82,6 +83,7 @@
     "add_client": "+ Ajouter un nouveau client",
     "full_name": "Nom complet",
     "phone": "Téléphone (WhatsApp)",
+    "phone_country_code": "Indicatif du pays",
     "cancel": "Annuler",
     "empty_cart": "Le panier est vide.",
     "total": "Total",
@@ -116,9 +118,14 @@
     "full_name": "Nom complet",
     "full_name_placeholder": "Ex: Marie Louise",
     "phone_whatsapp": "Téléphone (WhatsApp)",
-    "phone_placeholder": "Ex: +237...",
+    "phone_placeholder": "Ex: 699887766",
+    "phone_country_code": "Indicatif du pays",
     "cancel": "Annuler",
-    "create": "Créer"
+    "create": "Créer",
+    "action": "Action",
+    "edit": "Modifier",
+    "edit_client_modal_title": "Modifier le client",
+    "save": "Enregistrer"
   },
   "Reminders": {
     "title": "Relances WhatsApp",
@@ -126,7 +133,7 @@
     "config_info": "Informations de configuration :",
     "delay_first_dynamic": "Délai avant 1ère relance : {days} jour(s) après la date de la facture.",
     "frequency_dynamic": "Fréquence des relances suivantes : tous les {days} jour(s).",
-    "mode": "Mode : Simulation (dry-run) activée. Aucun vrai message ne sera envoyé à l'API Meta.",
+    "mode": "Mode : Manuel — un lien WhatsApp pré-rempli s'ouvre pour chaque relance, à vous d'appuyer sur envoyer.",
     "mode_live": "Mode : Envoi réel activé via votre compte WhatsApp Business connecté.",
     "eligible_invoices": "Factures éligibles aux relances",
     "client": "Client",
@@ -141,7 +148,8 @@
     "never": "Jamais",
     "days_ago": "Il y a 2 jours",
     "no_invoices": "Aucune facture en retard ne nécessite de relance.",
-    "success_alert": "Simulation réussie ! Message généré pour {name} (Dette: {amount} FCFA). Aucune donnée réellement envoyée à Meta.",
+    "success_alert": "Message envoyé avec succès à {name} (Dette : {amount} FCFA) via votre compte WhatsApp Business.",
+    "manual_alert": "WhatsApp va s'ouvrir avec le message prêt pour {name} (Dette : {amount} FCFA). Il ne reste plus qu'à appuyer sur envoyer.",
     "settings_title": "Paramètres des relances WhatsApp",
     "delay_label": "Délai avant 1ère relance (jours)",
     "delay_hint": "Nombre de jours après la date de facturation.",
@@ -187,7 +195,8 @@
     "status": "Statut",
     "received": "Reçu",
     "items_count": "{count} articles",
-    "stock_count": "Stock: {stock} / {threshold}"
+    "stock_count": "Stock: {stock} / {threshold}",
+    "no_history": "Aucune commande fournisseur pour le moment."
   },
   "Procurement": {
     "title": "Saisie des Achats",
@@ -259,6 +268,11 @@
     "back_to_shop": "Retour à la boutique"
   },
   "Invoices": {
+    "list_title": "Factures",
+    "search": "Rechercher par n° de facture ou client...",
+    "no_invoices": "Aucune facture pour le moment.",
+    "no_results": "Aucune facture ne correspond à cette recherche.",
+    "view": "Voir",
     "title": "Facture",
     "invoice_number": "N° Facture",
     "date": "Date",
@@ -365,6 +379,12 @@
     "confirm_reset_password": "Générer un nouveau mot de passe pour ce membre ? L'ancien cessera de fonctionner immédiatement.",
     "new_password_label": "Nouveau mot de passe",
     "copy": "Copier",
-    "dismiss": "Fermer"
+    "dismiss": "Fermer",
+    "cancel": "Annuler",
+    "manage_access": "Gérer les accès",
+    "employee_access_label": "Pages accessibles",
+    "employee_access_hint": "Cochez les pages que cet employé pourra consulter. Aucune case cochée = accès complet.",
+    "access_unrestricted": "Aucune case cochée = accès complet (non restreint).",
+    "save_access": "Enregistrer les accès"
   }
 }

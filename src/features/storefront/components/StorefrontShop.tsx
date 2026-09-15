@@ -6,7 +6,7 @@ import { Plus, Minus, Trash2, ShoppingBag, CheckCircle2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { LocaleSwitcher } from "@/components/LocaleSwitcher";
 import { createClient } from "@/utils/supabase/client";
-import { PhoneCountryCodeSelect } from "./PhoneCountryCodeSelect";
+import { PhoneCountryCodeSelect } from "@/components/PhoneCountryCodeSelect";
 import type { PublicProduct, PublicShopProfile } from "../actions";
 
 type CartItem = { productId: string; quantity: number };

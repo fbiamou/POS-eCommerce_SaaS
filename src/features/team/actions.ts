@@ -5,6 +5,7 @@ import { randomBytes } from 'crypto'
 import { createClient } from '@/utils/supabase/server'
 import { createServiceRoleClient } from '@/utils/supabase/service'
 import { getCurrentProfile } from '@/features/auth/actions'
+import { APP_PAGE_KEYS, type AppPageKey } from '@/lib/appPages'
 
 async function requireManager() {
   const currentProfile = await getCurrentProfile()
@@ -42,6 +43,9 @@ export async function inviteEmployee(formData: FormData) {
   const password = formData.get('password') as string
   const fullName = formData.get('full_name') as string
   const role = formData.get('role') as 'SELLER' | 'MANAGER'
+  const allowedPages = (formData.getAll('allowed_pages') as string[]).filter((p) =>
+    APP_PAGE_KEYS.includes(p as AppPageKey)
+  )
 
   if (!password || !fullName) {
     redirect('/fr/settings?error=Le nom et le mot de passe sont requis')
@@ -77,6 +81,9 @@ export async function inviteEmployee(formData: FormData) {
       shop_id: currentProfile.shop_id,
       role: role || 'SELLER',
       full_name: fullName,
+      // A MANAGER's access is never restricted, regardless of what was
+      // submitted — the page-access checkboxes only apply to SELLER.
+      allowed_pages: role === 'MANAGER' ? [] : allowedPages,
     })
     .eq('id', newUser.user.id)
 
@@ -168,10 +175,36 @@ export async function updateTeamMemberRole(
   if (guardError) return guardError
 
   const supabase = await createClient()
-  const { error } = await supabase.from('profiles').update({ role }).eq('id', memberId)
+  const updates: Record<string, unknown> = { role }
+  // A MANAGER's access is never restricted — clear any leftover page
+  // restrictions from when they were a SELLER.
+  if (role === 'MANAGER') updates.allowed_pages = []
+  const { error } = await supabase.from('profiles').update(updates).eq('id', memberId)
   if (error) {
     console.error('Error updating team member role:', error)
     return { error: 'Erreur lors de la mise à jour du rôle.' }
+  }
+
+  return { success: true }
+}
+
+export async function updateTeamMemberAllowedPages(
+  memberId: string,
+  allowedPages: string[]
+): Promise<{ success?: true; error?: string }> {
+  const currentProfile = await requireManager()
+  if (!currentProfile) return { error: 'Accès refusé.' }
+
+  const guardError = await assertManagesTeammate(currentProfile, memberId)
+  if (guardError) return guardError
+
+  const sanitized = allowedPages.filter((p) => APP_PAGE_KEYS.includes(p as AppPageKey))
+
+  const supabase = await createClient()
+  const { error } = await supabase.from('profiles').update({ allowed_pages: sanitized }).eq('id', memberId)
+  if (error) {
+    console.error('Error updating team member access:', error)
+    return { error: 'Erreur lors de la mise à jour des accès.' }
   }
 
   return { success: true }

@@ -1,10 +1,12 @@
 import CreateSaleForm from "@/features/sales/components/CreateSaleForm";
 import { getTranslations } from "next-intl/server";
 import { createClient } from "@/utils/supabase/server";
+import { getShopSettings } from "@/features/settings/actions";
 
 export default async function SalesPage() {
   const t = await getTranslations("Sales");
   const supabase = await createClient();
+  const shopSettings = await getShopSettings();
 
   // Fetch real products from DB
   const { data: productsData } = await supabase
@@ -49,7 +51,11 @@ export default async function SalesPage() {
         <h1 className="text-2xl font-bold tracking-tight">{t("title")}</h1>
       </div>
 
-      <CreateSaleForm products={products} clients={clients} />
+      <CreateSaleForm
+        products={products}
+        clients={clients}
+        defaultPhoneCountryCode={shopSettings?.default_phone_country_code || "+237"}
+      />
     </div>
   );
 }

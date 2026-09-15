@@ -2,15 +2,17 @@
 
 import { Link } from "@/i18n/routing";
 import { useTranslations } from "next-intl";
-import { Package, ShoppingCart, Users, MessageCircle, Settings, LayoutDashboard, Menu, X, LogOut, UserCircle, Store, ExternalLink } from "lucide-react";
+import { Package, ShoppingCart, Users, MessageCircle, Settings, LayoutDashboard, Menu, X, LogOut, UserCircle, Store, ExternalLink, FileText } from "lucide-react";
 import { useState } from "react";
 import { logout } from "@/app/[locale]/login/actions";
 import Image from "next/image";
 import { LocaleSwitcher } from "@/components/LocaleSwitcher";
+import { isPageAllowed, type AppPageKey } from "@/lib/appPages";
 
 type Profile = {
   full_name: string | null;
   role: string;
+  allowed_pages?: string[];
 }
 
 type SidebarProps = {
@@ -37,6 +39,21 @@ export default function Sidebar({ profile, shopName, shopLogoUrl, shopSlug }: Si
     MANAGER: tSettings("role_manager"),
     SELLER: tSettings("role_cashier"),
   };
+
+  const canSee = (path: string) =>
+    isPageAllowed(profile?.role || "SELLER", profile?.allowed_pages ?? [], path);
+
+  const NAV_ITEMS: { key: AppPageKey; path: string; label: string; icon: typeof LayoutDashboard }[] = [
+    { key: "dashboard", path: "/", label: t("dashboard"), icon: LayoutDashboard },
+    { key: "stock", path: "/stock", label: t("stock"), icon: Package },
+    { key: "shipments", path: "/shipments", label: t("shipments"), icon: Package },
+    { key: "purchase_orders", path: "/purchase-orders", label: t("purchase_orders"), icon: ShoppingCart },
+    { key: "sales", path: "/sales", label: t("sales"), icon: ShoppingCart },
+    { key: "invoices", path: "/invoices", label: t("invoices"), icon: FileText },
+    { key: "clients", path: "/clients", label: t("clients"), icon: Users },
+    { key: "reminders", path: "/reminders", label: t("reminders"), icon: MessageCircle },
+    { key: "online_orders", path: "/online-orders", label: t("online_orders"), icon: Store },
+  ];
 
   return (
     <>
@@ -94,54 +111,14 @@ export default function Sidebar({ profile, shopName, shopLogoUrl, shopSlug }: Si
 
         <nav className="flex-1 overflow-y-auto py-4">
           <ul className="space-y-1 px-2">
-            <li>
-              <Link href="/" onClick={closeSidebar} className="flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium hover:bg-zinc-100 dark:hover:bg-zinc-800">
-                <LayoutDashboard className="h-4 w-4" />
-                {t("dashboard")}
-              </Link>
-            </li>
-            <li>
-              <Link href="/stock" onClick={closeSidebar} className="flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium hover:bg-zinc-100 dark:hover:bg-zinc-800">
-                <Package className="h-4 w-4" />
-                {t("stock")}
-              </Link>
-            </li>
-            <li>
-              <Link href="/shipments" onClick={closeSidebar} className="flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium hover:bg-zinc-100 dark:hover:bg-zinc-800">
-                <Package className="h-4 w-4" />
-                {t("shipments")}
-              </Link>
-            </li>
-            <li>
-              <Link href="/purchase-orders" onClick={closeSidebar} className="flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium hover:bg-zinc-100 dark:hover:bg-zinc-800">
-                <ShoppingCart className="h-4 w-4" />
-                {t("purchase_orders")}
-              </Link>
-            </li>
-            <li>
-              <Link href="/sales" onClick={closeSidebar} className="flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium hover:bg-zinc-100 dark:hover:bg-zinc-800">
-                <ShoppingCart className="h-4 w-4" />
-                {t("sales")}
-              </Link>
-            </li>
-            <li>
-              <Link href="/clients" onClick={closeSidebar} className="flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium hover:bg-zinc-100 dark:hover:bg-zinc-800">
-                <Users className="h-4 w-4" />
-                {t("clients")}
-              </Link>
-            </li>
-            <li>
-              <Link href="/reminders" onClick={closeSidebar} className="flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium hover:bg-zinc-100 dark:hover:bg-zinc-800">
-                <MessageCircle className="h-4 w-4" />
-                {t("reminders")}
-              </Link>
-            </li>
-            <li>
-              <Link href="/online-orders" onClick={closeSidebar} className="flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium hover:bg-zinc-100 dark:hover:bg-zinc-800">
-                <Store className="h-4 w-4" />
-                {t("online_orders")}
-              </Link>
-            </li>
+            {NAV_ITEMS.filter((item) => canSee(item.path)).map((item) => (
+              <li key={item.key}>
+                <Link href={item.path} onClick={closeSidebar} className="flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium hover:bg-zinc-100 dark:hover:bg-zinc-800">
+                  <item.icon className="h-4 w-4" />
+                  {item.label}
+                </Link>
+              </li>
+            ))}
             {shopSlug && (
               <li>
                 <Link
@@ -159,12 +136,14 @@ export default function Sidebar({ profile, shopName, shopLogoUrl, shopSlug }: Si
 
         {/* Bottom section: Settings + Profile + Logout */}
         <div className="border-t">
-          <div className="p-2">
-            <Link href="/settings" onClick={closeSidebar} className="flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium hover:bg-zinc-100 dark:hover:bg-zinc-800">
-              <Settings className="h-4 w-4" />
-              {t("settings")}
-            </Link>
-          </div>
+          {canSee("/settings") && (
+            <div className="p-2">
+              <Link href="/settings" onClick={closeSidebar} className="flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium hover:bg-zinc-100 dark:hover:bg-zinc-800">
+                <Settings className="h-4 w-4" />
+                {t("settings")}
+              </Link>
+            </div>
+          )}
 
           {/* User Profile card */}
           <div className="border-t p-3">

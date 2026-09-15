@@ -71,3 +71,25 @@ export function hasWhatsAppCredentials(shop: {
 }): boolean {
   return Boolean(shop.whatsapp_phone_number_id && shop.whatsapp_api_token && shop.whatsapp_template_name);
 }
+
+// Fallback used while a shop has no Cloud API credentials connected: instead
+// of a silent dry-run, build a free-text message and a wa.me "click to chat"
+// link so a staff member opens their own WhatsApp and sends it by hand. This
+// isn't the Business API, so the "approved template" rule doesn't apply —
+// it's the same as a person typing the message themselves.
+export function buildManualReminderMessage({
+  clientName,
+  amountDue,
+  shopName,
+}: {
+  clientName: string;
+  amountDue: number;
+  shopName: string;
+}): string {
+  return `Bonjour ${clientName}, nous vous rappelons que votre facture de ${amountDue.toLocaleString("fr-FR")} FCFA chez ${shopName} reste à régler. Merci de nous contacter pour convenir du règlement. — ${shopName}`;
+}
+
+export function buildWhatsAppClickToChatUrl(phone: string, message: string): string {
+  const digits = phone.replace(/\D/g, "");
+  return `https://wa.me/${digits}?text=${encodeURIComponent(message)}`;
+}

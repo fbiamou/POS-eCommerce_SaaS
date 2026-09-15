@@ -2,6 +2,7 @@ import createMiddleware from 'next-intl/middleware';
 import { routing } from './i18n/routing';
 import { NextRequest, NextResponse } from 'next/server';
 import { createServerClient } from '@supabase/ssr';
+import { isPageAllowed, firstAllowedPath } from './lib/appPages';
  
 const intlMiddleware = createMiddleware(routing);
 
@@ -53,6 +54,27 @@ export async function middleware(request: NextRequest) {
     const homeUrl = request.nextUrl.clone()
     homeUrl.pathname = `/${locale}/`
     return NextResponse.redirect(homeUrl)
+  }
+
+  // Per-employee page access: a MANAGER always has full access; a SELLER is
+  // unrestricted until a manager explicitly configures allowed_pages for
+  // them (empty array = unrestricted, see the migration comment).
+  if (user && !isAuthPage && !isPublicPage) {
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('role, allowed_pages')
+      .eq('id', user.id)
+      .single()
+
+    if (profile) {
+      const pathWithoutLocale = request.nextUrl.pathname.replace(/^\/(es|fr|en)/, '') || '/'
+      const allowed = isPageAllowed(profile.role, profile.allowed_pages ?? [], pathWithoutLocale)
+      if (!allowed) {
+        const redirectUrl = request.nextUrl.clone()
+        redirectUrl.pathname = `/${locale}${firstAllowedPath(profile.allowed_pages ?? [])}`
+        return NextResponse.redirect(redirectUrl)
+      }
+    }
   }
 
   return response;

@@ -1,5 +1,39 @@
 import { createClient } from "@/utils/supabase/server";
 
+export type InvoiceListItem = {
+  id: string;
+  invoice_number: string | null;
+  total_amount: number;
+  paid_amount: number;
+  status: "PAID" | "PARTIAL" | "UNPAID";
+  created_at: string;
+  client_name: string | null;
+};
+
+export async function getInvoices(): Promise<InvoiceListItem[]> {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from("invoices")
+    .select("id, invoice_number, total_amount, paid_amount, status, created_at, clients ( name )")
+    .order("created_at", { ascending: false });
+
+  if (error || !data) {
+    if (error) console.error("Error fetching invoices:", error);
+    return [];
+  }
+
+  return data.map((row) => ({
+    id: row.id,
+    invoice_number: row.invoice_number,
+    total_amount: row.total_amount,
+    paid_amount: row.paid_amount,
+    status: row.status,
+    created_at: row.created_at,
+    client_name: (row.clients as unknown as { name: string } | null)?.name ?? null,
+  }));
+}
+
 export type InvoiceDetail = {
   id: string;
   invoice_number: string | null;

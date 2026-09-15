@@ -2,7 +2,12 @@
 
 import { createClient } from "@/utils/supabase/server";
 import { revalidatePath } from "next/cache";
-import { hasWhatsAppCredentials, sendWhatsAppTemplateMessage } from "./whatsapp";
+import {
+  buildManualReminderMessage,
+  buildWhatsAppClickToChatUrl,
+  hasWhatsAppCredentials,
+  sendWhatsAppTemplateMessage,
+} from "./whatsapp";
 
 export type OverdueInvoice = {
   id: string;
@@ -63,7 +68,7 @@ export async function sendReminder(invoice: {
   client_phone: string | null;
   total_amount: number;
   paid_amount: number;
-}): Promise<{ success?: true; error?: string }> {
+}): Promise<{ success?: true; error?: string; whatsappUrl?: string }> {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return { error: "Non autorisé." };
@@ -73,15 +78,17 @@ export async function sendReminder(invoice: {
 
   const { data: shopSettings } = await supabase
     .from("settings")
-    .select("whatsapp_phone_number_id, whatsapp_api_token, whatsapp_template_name")
+    .select("shop_name, whatsapp_phone_number_id, whatsapp_api_token, whatsapp_template_name")
     .eq("shop_id", profile.shop_id)
     .single();
 
   const amountDue = invoice.total_amount - invoice.paid_amount;
   let templateName = DRY_RUN_TEMPLATE;
-  let status: "SENT" | "FAILED" | "SIMULATED" = "SIMULATED";
+  let status: "SENT" | "FAILED" | "SIMULATED" | "MANUAL" = "SIMULATED";
+  let whatsappUrl: string | undefined;
 
   if (shopSettings && hasWhatsAppCredentials(shopSettings) && invoice.client_phone) {
+    // Real Cloud API path — shop has connected its own WhatsApp Business credentials.
     templateName = shopSettings.whatsapp_template_name!;
     const result = await sendWhatsAppTemplateMessage({
       phoneNumberId: shopSettings.whatsapp_phone_number_id!,
@@ -93,6 +100,17 @@ export async function sendReminder(invoice: {
     });
     status = result.ok ? "SENT" : "FAILED";
     if (!result.ok) console.error("WhatsApp send failed:", result.error);
+  } else if (invoice.client_phone) {
+    // No Cloud API credentials yet — open a pre-filled wa.me link so a staff
+    // member sends the message themselves from their own WhatsApp.
+    const message = buildManualReminderMessage({
+      clientName: invoice.client_name,
+      amountDue,
+      shopName: shopSettings?.shop_name || "la boutique",
+    });
+    whatsappUrl = buildWhatsAppClickToChatUrl(invoice.client_phone, message);
+    templateName = "MANUAL_CLICK_TO_CHAT";
+    status = "MANUAL";
   }
 
   const { error } = await supabase.rpc("log_reminder", {
@@ -113,7 +131,7 @@ export async function sendReminder(invoice: {
   if (status === "FAILED") {
     return { error: "L'envoi WhatsApp a échoué (voir les journaux serveur)." };
   }
-  return { success: true };
+  return { success: true, whatsappUrl };
 }
 
 export async function updateReminderSettings(

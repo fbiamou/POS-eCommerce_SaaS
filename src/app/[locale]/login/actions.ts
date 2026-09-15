@@ -3,6 +3,7 @@
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/utils/supabase/server'
+import { isPageAllowed, firstAllowedPath } from '@/lib/appPages'
 
 export async function login(formData: FormData) {
   const supabase = await createClient()
@@ -12,14 +13,31 @@ export async function login(formData: FormData) {
     password: formData.get('password') as string,
   }
 
-  const { error } = await supabase.auth.signInWithPassword(data)
+  const { data: signInData, error } = await supabase.auth.signInWithPassword(data)
 
   if (error) {
     redirect('/fr/login?error=Identifiants invalides')
   }
 
   revalidatePath('/', 'layout')
-  redirect('/fr')
+
+  // Redirect straight to the right landing page here (a real server-side
+  // redirect on this request) instead of always to "/" and relying on a
+  // second redirect from the dashboard page — that second hop happens
+  // during a client-side transition and doesn't reliably update the
+  // browser's URL bar for a restricted employee.
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('role, allowed_pages')
+    .eq('id', signInData.user.id)
+    .single()
+
+  const landingPath =
+    profile && !isPageAllowed(profile.role, profile.allowed_pages ?? [], '/')
+      ? firstAllowedPath(profile.allowed_pages ?? [])
+      : '/'
+
+  redirect(`/fr${landingPath === '/' ? '' : landingPath}`)
 }
 
 export async function signup(formData: FormData) {
