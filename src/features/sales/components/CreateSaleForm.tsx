@@ -391,11 +391,16 @@ export default function CreateSaleForm({
             )}
 
             {lastInvoiceId && (
-              <div className="mt-2 flex items-center justify-between gap-2 rounded-md bg-green-50 p-3 text-sm text-green-700 dark:bg-green-900/20 dark:text-green-400">
+              <div className="mt-2 flex flex-wrap items-center justify-between gap-2 rounded-md bg-green-50 p-3 text-sm text-green-700 dark:bg-green-900/20 dark:text-green-400">
                 <span>{t("success")}</span>
-                <Link href={`/invoices/${lastInvoiceId}`} className="shrink-0 font-medium underline">
-                  {t("view_invoice")}
-                </Link>
+                <div className="flex items-center gap-3">
+                  <Link href={`/invoices/${lastInvoiceId}/ticket`} className="shrink-0 font-medium underline">
+                    {t("print_ticket")}
+                  </Link>
+                  <Link href={`/invoices/${lastInvoiceId}`} className="shrink-0 font-medium underline">
+                    {t("view_invoice")}
+                  </Link>
+                </div>
               </div>
             )}
 

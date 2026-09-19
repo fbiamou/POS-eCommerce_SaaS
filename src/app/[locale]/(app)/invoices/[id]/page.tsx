@@ -1,6 +1,7 @@
 import { getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
-import { Download } from "lucide-react";
+import { Download, Printer } from "lucide-react";
+import { Link } from "@/i18n/routing";
 import { getInvoiceDetail, extractVat } from "@/features/invoices/actions";
 import { getShopSettings } from "@/features/settings/actions";
 
@@ -41,14 +42,22 @@ export default async function InvoicePage({
           {t("title")}
           {invoice.invoice_number ? ` — ${invoice.invoice_number}` : ""}
         </h1>
-        <a
-          href={`/api/invoices/${invoice.id}/pdf?locale=${locale}`}
-          target="_blank"
-          rel="noreferrer"
-          className="flex items-center gap-2 rounded-md bg-black px-4 py-2 text-sm font-medium text-white hover:bg-black/90 dark:bg-white dark:text-black"
-        >
-          <Download className="h-4 w-4" /> {t("download_pdf")}
-        </a>
+        <div className="flex items-center gap-2">
+          <Link
+            href={`/invoices/${invoice.id}/ticket`}
+            className="flex items-center gap-2 rounded-md border px-4 py-2 text-sm font-medium hover:bg-zinc-100 dark:hover:bg-zinc-800"
+          >
+            <Printer className="h-4 w-4" /> {t("print_ticket")}
+          </Link>
+          <a
+            href={`/api/invoices/${invoice.id}/pdf?locale=${locale}`}
+            target="_blank"
+            rel="noreferrer"
+            className="flex items-center gap-2 rounded-md bg-black px-4 py-2 text-sm font-medium text-white hover:bg-black/90 dark:bg-white dark:text-black"
+          >
+            <Download className="h-4 w-4" /> {t("download_pdf")}
+          </a>
+        </div>
       </div>
 
       <div className="flex flex-col gap-6 rounded-lg border bg-card p-6 shadow-sm">
