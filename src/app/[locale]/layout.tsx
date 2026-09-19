@@ -1,20 +1,23 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Familjen_Grotesk, IBM_Plex_Mono } from "next/font/google";
 import "../globals.css";
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages, getTranslations } from 'next-intl/server';
 import { routing } from '@/i18n/routing';
 import { notFound } from 'next/navigation';
-import { getShopSettings } from '@/features/settings/actions';
-import { ThemeStyle } from '@/components/ThemeStyle';
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+// Fixed app-wide typography per the design charter — the admin app keeps a
+// single, coherent identity. Only the public storefront (boutique/[slug])
+// still lets a shop customize its own accent color and font; see ThemeStyle,
+// which is now rendered from that route instead of here.
+const appSans = Familjen_Grotesk({
+  variable: "--font-app-sans",
   subsets: ["latin"],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const appMono = IBM_Plex_Mono({
+  variable: "--font-app-mono",
+  weight: ["400", "500", "600"],
   subsets: ["latin"],
 });
 
@@ -52,21 +55,9 @@ export default async function RootLayout({
   // Providing all messages to the client side
   const messages = await getMessages();
 
-  // Theme reflects the visitor's own shop when authenticated; public pages
-  // (login, storefront) fall back to the default theme.
-  const shopSettings = await getShopSettings();
-
   return (
-    <html lang={locale}>
-      <head>
-        <ThemeStyle
-          accentColor={shopSettings?.theme_accent_color}
-          fontFamily={shopSettings?.theme_font}
-        />
-      </head>
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-zinc-50 dark:bg-zinc-950`}
-      >
+    <html lang={locale} className={`${appSans.variable} ${appMono.variable}`}>
+      <body className="antialiased bg-zinc-50 dark:bg-zinc-950">
         <NextIntlClientProvider messages={messages}>
           {children}
         </NextIntlClientProvider>

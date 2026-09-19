@@ -1,30 +1,36 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Warm-biased neutrals per the design charter, not flat zinc. */
+  --background: #F6F3EF;
+  --foreground: #1C1A22;
+  --elevation-card: 0 1px 2px rgba(28,26,34,0.03), 0 6px 16px -10px rgba(28,26,34,0.14);
 
-  /* Accent color defaults (violet) — overridden dynamically par ThemeStyle */
+  /* Accent — fixed app-wide identity (violet). The public storefront
+     (boutique/[slug]) overrides these same variables per-shop via
+     ThemeStyle, rendered from that route only — the admin app never does. */
   --accent-bg: #7c3aed;
   --accent-bg-hover: #6d28d9;
   --accent-light: #ede9fe;
   --accent-text: #6d28d9;
   --accent-ring: #8b5cf6;
   --accent-dark-text: #a78bfa;
-  --theme-font: var(--font-geist-sans), system-ui, sans-serif;
+  --theme-font: var(--font-app-sans), system-ui, sans-serif;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-app-sans);
+  --font-mono: var(--font-app-mono);
+  --shadow-card: var(--elevation-card);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #16141B;
+    --foreground: #F2EFEA;
+    --elevation-card: 0 1px 2px rgba(0,0,0,0.3), 0 6px 16px -10px rgba(0,0,0,0.5);
   }
 }
 
@@ -93,4 +99,33 @@ body {
 /* Checkbox / radio checked */
 [class~="group-has-\[\:checked\]\:ring-current"] {
   ring-color: var(--accent-bg);
+}
+
+/* ============================================================
+   IMPRESSION — ticket de caisse thermique (80mm)
+   Isole le contenu marqué .printable-ticket de tout le reste de
+   l'app (sidebar, boutons "no-print", etc.) quand on imprime,
+   quelle que soit la mise en page qui l'entoure.
+   ============================================================ */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  .printable-ticket,
+  .printable-ticket * {
+    visibility: visible;
+  }
+  .printable-ticket {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 80mm;
+  }
+  .no-print {
+    display: none !important;
+  }
+  @page {
+    size: 80mm auto;
+    margin: 0;
+  }
 }

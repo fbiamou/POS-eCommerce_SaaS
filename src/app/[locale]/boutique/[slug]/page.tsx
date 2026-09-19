@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { getPublicShopProfile, getPublicShopCatalog } from "@/features/storefront/actions";
 import StorefrontShop from "@/features/storefront/components/StorefrontShop";
+import { ThemeStyle } from "@/components/ThemeStyle";
 
 export default async function StorefrontPage({
   params,
@@ -14,5 +15,12 @@ export default async function StorefrontPage({
 
   const products = await getPublicShopCatalog(slug);
 
-  return <StorefrontShop shop={shop} products={products} />;
+  return (
+    <>
+      {/* Only the storefront lets a shop customize its own look — the admin
+          app keeps a fixed identity, set in globals.css. */}
+      <ThemeStyle accentColor={shop.theme_accent_color} fontFamily={shop.theme_font} />
+      <StorefrontShop shop={shop} products={products} />
+    </>
+  );
 }

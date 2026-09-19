@@ -2,7 +2,7 @@
 
 import { Link } from "@/i18n/routing";
 import { useTranslations } from "next-intl";
-import { Package, ShoppingCart, Users, MessageCircle, Settings, LayoutDashboard, Menu, X, LogOut, UserCircle, Store, ExternalLink, FileText } from "lucide-react";
+import { Package, ShoppingCart, Users, MessageCircle, Settings, LayoutDashboard, Menu, X, LogOut, Store, ExternalLink, FileText } from "lucide-react";
 import { useState } from "react";
 import { logout } from "@/app/[locale]/login/actions";
 import Image from "next/image";
@@ -20,6 +20,13 @@ type SidebarProps = {
   shopName?: string | null;
   shopLogoUrl?: string | null;
   shopSlug?: string | null;
+}
+
+function getInitials(fullName?: string | null): string {
+  if (!fullName?.trim()) return "U";
+  const parts = fullName.trim().split(/\s+/);
+  const initials = parts.length > 1 ? parts[0][0] + parts[1][0] : parts[0].slice(0, 2);
+  return initials.toUpperCase();
 }
 
 export default function Sidebar({ profile, shopName, shopLogoUrl, shopSlug }: SidebarProps) {
@@ -148,8 +155,8 @@ export default function Sidebar({ profile, shopName, shopLogoUrl, shopSlug }: Si
           {/* User Profile card */}
           <div className="border-t p-3">
             <div className="flex items-center gap-3 px-1 py-2">
-              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-violet-100 dark:bg-violet-900">
-                <UserCircle className="h-5 w-5 text-violet-600 dark:text-violet-400" />
+              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-violet-300 to-violet-600 text-xs font-bold text-white shrink-0">
+                {getInitials(profile?.full_name)}
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium truncate">

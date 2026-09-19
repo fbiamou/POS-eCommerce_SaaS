@@ -50,7 +50,7 @@ export function ThemeStyle({ accentColor, fontFamily }: Props) {
       --accent-text: ${accent.text};
       --accent-ring: ${accent.ring};
       --accent-dark-text: ${accent.darkText};
-      --theme-font: ${googleFontName ? `'${googleFontName}'` : 'var(--font-geist-sans)'}, system-ui, sans-serif;
+      --theme-font: ${googleFontName ? `'${googleFontName}'` : 'var(--font-app-sans)'}, system-ui, sans-serif;
     }
     body {
       font-family: var(--theme-font);

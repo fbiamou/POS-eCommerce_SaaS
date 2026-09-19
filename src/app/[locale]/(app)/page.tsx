@@ -79,40 +79,40 @@ export default async function DashboardPage() {
 
       {/* KPI Cards */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <div className="rounded-lg border bg-card p-6 shadow-sm">
+        <div className="rounded-xl border bg-card p-6 shadow-card">
           <div className="flex items-center gap-2 text-sm font-medium text-zinc-500">
             <DollarSign className="h-4 w-4" />
             {t("today_ca")}
           </div>
-          <div className="mt-2 text-2xl font-bold">
+          <div className="mt-2 font-mono text-2xl font-bold tabular-nums">
             {todayCA.toLocaleString("fr-FR")} FCFA
           </div>
         </div>
 
-        <div className="rounded-lg border bg-card p-6 shadow-sm">
+        <div className="rounded-xl border bg-card p-6 shadow-card">
           <div className="flex items-center gap-2 text-sm font-medium text-zinc-500">
             <TrendingUp className="h-4 w-4 text-green-500" />
             {t("sales_count")}
           </div>
-          <div className="mt-2 text-2xl font-bold">{salesCount}</div>
+          <div className="mt-2 font-mono text-2xl font-bold tabular-nums">{salesCount}</div>
         </div>
 
-        <div className="rounded-lg border bg-card p-6 shadow-sm">
+        <div className="rounded-xl border bg-card p-6 shadow-card">
           <div className="flex items-center gap-2 text-sm font-medium text-zinc-500">
             <Users className="h-4 w-4" />
             {t("debts")}
           </div>
-          <div className="mt-2 text-2xl font-bold text-red-500">
+          <div className="mt-2 font-mono text-2xl font-bold tabular-nums text-red-500">
             {totalDebt.toLocaleString("fr-FR")} FCFA
           </div>
         </div>
 
-        <div className="rounded-lg border bg-card p-6 shadow-sm">
+        <div className="rounded-xl border bg-card p-6 shadow-card">
           <div className="flex items-center gap-2 text-sm font-medium text-zinc-500">
             <Package className="h-4 w-4" />
             {t("low_stock")}
           </div>
-          <div className="mt-2 text-2xl font-bold text-orange-500">
+          <div className="mt-2 font-mono text-2xl font-bold tabular-nums text-orange-500">
             {lowStockCount ?? 0}
           </div>
         </div>
@@ -120,7 +120,7 @@ export default async function DashboardPage() {
 
       <div className="grid gap-4 md:grid-cols-2">
         {/* Top Articles */}
-        <div className="rounded-lg border bg-card p-6 shadow-sm">
+        <div className="rounded-xl border bg-card p-6 shadow-card">
           <h2 className="text-lg font-semibold mb-4">{t("top_sales")}</h2>
           <div className="space-y-4">
             {topProducts.length === 0 ? (
@@ -137,7 +137,7 @@ export default async function DashboardPage() {
                       {p.qty} {t("sold")}
                     </span>
                   </div>
-                  <span className="font-bold text-sm">
+                  <span className="font-mono text-sm font-bold tabular-nums">
                     {p.total.toLocaleString("fr-FR")} FCFA
                   </span>
                 </div>
@@ -147,7 +147,7 @@ export default async function DashboardPage() {
         </div>
 
         {/* Actions rapides */}
-        <div className="rounded-lg border bg-card p-6 shadow-sm">
+        <div className="rounded-xl border bg-card p-6 shadow-card">
           <h2 className="text-lg font-semibold mb-4">{t("quick_actions")}</h2>
           <div className="flex flex-col gap-3">
             <Link
