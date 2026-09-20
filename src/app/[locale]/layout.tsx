@@ -57,7 +57,17 @@ export default async function RootLayout({
 
   return (
     <html lang={locale} className={`${appSans.variable} ${appMono.variable}`}>
-      <body className="antialiased bg-zinc-50 dark:bg-zinc-950">
+      <head>
+        {/* Applies a saved dark-theme choice before paint, so there's no
+            flash of the (default) light theme on reload. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html:
+              "try{if(localStorage.getItem('theme')==='dark'){document.documentElement.setAttribute('data-theme','dark')}}catch(e){}",
+          }}
+        />
+      </head>
+      <body className="antialiased">
         <NextIntlClientProvider messages={messages}>
           {children}
         </NextIntlClientProvider>

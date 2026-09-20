@@ -1,9 +1,16 @@
 @import "tailwindcss";
 
+/* The admin app's dark mode is a deliberate, user-chosen variant (toggle in
+   the Sidebar via ThemeToggle) rather than something that follows the
+   OS/browser preference — so every `dark:` utility in the codebase keys off
+   this attribute instead of `prefers-color-scheme`. */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
 :root {
   /* Warm-biased neutrals per the design charter, not flat zinc. */
   --background: #F6F3EF;
   --foreground: #1C1A22;
+  --card: #FFFFFF;
   --elevation-card: 0 1px 2px rgba(28,26,34,0.03), 0 6px 16px -10px rgba(28,26,34,0.14);
 
   /* Accent — fixed app-wide identity (violet). The public storefront
@@ -21,17 +28,40 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-card: var(--card);
   --font-sans: var(--font-app-sans);
   --font-mono: var(--font-app-mono);
   --shadow-card: var(--elevation-card);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #16141B;
-    --foreground: #F2EFEA;
-    --elevation-card: 0 1px 2px rgba(0,0,0,0.3), 0 6px 16px -10px rgba(0,0,0,0.5);
-  }
+:root[data-theme="dark"] {
+  /* A violet-tinted ink scale, not flat zinc — each step is a deliberate
+     elevation, not a naive invert of the light palette. */
+  --surface-0: #14121a; /* deepest layer: page background */
+  --surface-1: #201c29; /* cards, panels, sidebar */
+  --surface-2: #2a2534; /* hover states, inputs, badges */
+  --surface-3: #362f42; /* active/pressed, strong emphasis */
+  --line: #3c3548;      /* borders */
+  --muted-600: #6f697c;
+  --muted-500: #9b94a8;
+  --muted-400: #b3adc0;
+  --muted-300: #d6d1de;
+  --muted-200: #ede9f2;
+
+  --background: var(--surface-0);
+  --foreground: #f5f2fa;
+  --card: var(--surface-1);
+  --elevation-card: 0 1px 2px rgba(0,0,0,0.45), 0 14px 28px -14px rgba(124,58,237,0.35);
+
+  /* Accent retuned for a dark ground: brighter fill, and — critically —
+     accent-text/accent-light get their own dark values instead of reusing
+     the light ones, which were dark violets meant to sit on a pale
+     background and became nearly unreadable on a dark card. */
+  --accent-bg: #8b5cf6;
+  --accent-bg-hover: #7c3aed;
+  --accent-light: color-mix(in srgb, var(--accent-bg) 22%, transparent);
+  --accent-text: #c4b5fd;
+  --accent-ring: #a78bfa;
 }
 
 body {
@@ -100,6 +130,64 @@ body {
 [class~="group-has-\[\:checked\]\:ring-current"] {
   ring-color: var(--accent-bg);
 }
+
+/* Boutons primaires noir/blanc (motif historique pré-charte : bg-black +
+   dark:bg-white + dark:text-black) — alignés sur l'accent violet plutôt
+   que sur une inversion monochrome. Repérage par classe littérale, donc
+   sans impact sur les overlays (bg-black/50) ni sur le ticket imprimable
+   (text-black / bg-white sans préfixe dark:). */
+[class~="bg-black"] { background-color: var(--accent-bg) !important; }
+[class~="hover\:bg-black\/90"]:hover { background-color: var(--accent-bg-hover) !important; }
+[class~="dark\:bg-white"] { background-color: var(--accent-bg) !important; }
+[class~="dark\:text-black"] { color: #ffffff !important; }
+[class~="dark\:hover\:bg-white\/90"]:hover,
+[class~="dark\:hover\:bg-zinc-200"]:hover { background-color: var(--accent-bg-hover) !important; }
+
+/* ============================================================
+   MODE SOMBRE — reskin des neutres zinc
+   Le reste de l'app utilise le dégradé de gris zinc de Tailwind pour
+   les fonds, bordures et textes secondaires. En clair il reste tel
+   quel ; en sombre on le remplace par notre échelle encre/violette
+   (--surface-*, --line, --muted-*) pour éviter un noir plat et un
+   texte qui se fond dans le fond.
+   ============================================================ */
+:root[data-theme="dark"] [class~="bg-zinc-50"],
+:root[data-theme="dark"] [class~="bg-zinc-100"] { background-color: var(--surface-2) !important; }
+
+:root[data-theme="dark"] [class~="dark\:bg-zinc-900"],
+:root[data-theme="dark"] [class~="dark\:bg-zinc-900\/50"],
+:root[data-theme="dark"] [class~="bg-zinc-900"] { background-color: var(--surface-1) !important; }
+:root[data-theme="dark"] [class~="dark\:bg-zinc-950"] { background-color: var(--surface-0) !important; }
+:root[data-theme="dark"] [class~="dark\:bg-zinc-800"],
+:root[data-theme="dark"] [class~="dark\:bg-zinc-800\/80"] { background-color: var(--surface-2) !important; }
+:root[data-theme="dark"] [class~="dark\:bg-zinc-700"] { background-color: var(--surface-3) !important; }
+
+:root[data-theme="dark"] [class~="hover\:bg-zinc-50"]:hover,
+:root[data-theme="dark"] [class~="hover\:bg-zinc-100"]:hover,
+:root[data-theme="dark"] [class~="hover\:bg-zinc-200"]:hover,
+:root[data-theme="dark"] [class~="dark\:hover\:bg-zinc-700"]:hover,
+:root[data-theme="dark"] [class~="hover\:bg-zinc-700"]:hover { background-color: var(--surface-3) !important; }
+:root[data-theme="dark"] [class~="dark\:hover\:bg-zinc-800"]:hover { background-color: var(--surface-2) !important; }
+:root[data-theme="dark"] [class~="dark\:hover\:bg-zinc-900\/50"]:hover { background-color: var(--surface-1) !important; }
+
+:root[data-theme="dark"] [class~="border-zinc-200"],
+:root[data-theme="dark"] [class~="border-zinc-300"],
+:root[data-theme="dark"] [class~="dark\:border-zinc-600"],
+:root[data-theme="dark"] [class~="dark\:border-zinc-700"],
+:root[data-theme="dark"] [class~="dark\:border-zinc-800"] { border-color: var(--line) !important; }
+
+:root[data-theme="dark"] [class~="text-zinc-600"],
+:root[data-theme="dark"] [class~="text-zinc-700"] { color: var(--muted-600) !important; }
+:root[data-theme="dark"] [class~="text-zinc-500"] { color: var(--muted-500) !important; }
+:root[data-theme="dark"] [class~="text-zinc-400"],
+:root[data-theme="dark"] [class~="dark\:text-zinc-400"] { color: var(--muted-400) !important; }
+:root[data-theme="dark"] [class~="dark\:text-zinc-300"] { color: var(--muted-300) !important; }
+:root[data-theme="dark"] [class~="text-zinc-800"],
+:root[data-theme="dark"] [class~="dark\:text-zinc-200"] { color: var(--muted-200) !important; }
+
+:root[data-theme="dark"] [class~="hover\:text-zinc-700"]:hover,
+:root[data-theme="dark"] [class~="dark\:hover\:text-zinc-200"]:hover,
+:root[data-theme="dark"] [class~="dark\:hover\:text-zinc-300"]:hover { color: var(--muted-200) !important; }
 
 /* ============================================================
    IMPRESSION — ticket de caisse thermique (80mm)

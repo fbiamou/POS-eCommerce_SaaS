@@ -10,7 +10,9 @@
     "online_orders": "Commandes en ligne",
     "shipments": "Arrivages",
     "purchase_orders": "Commandes",
-    "settings": "Paramètres"
+    "settings": "Paramètres",
+    "switch_to_light": "Passer au thème clair",
+    "switch_to_dark": "Passer au thème sombre"
   },
   "Dashboard": {
     "title": "Tableau de Bord",

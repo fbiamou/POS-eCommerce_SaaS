@@ -7,6 +7,7 @@ import { useState } from "react";
 import { logout } from "@/app/[locale]/login/actions";
 import Image from "next/image";
 import { LocaleSwitcher } from "@/components/LocaleSwitcher";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { isPageAllowed, type AppPageKey } from "@/lib/appPages";
 
 type Profile = {
@@ -111,9 +112,13 @@ export default function Sidebar({ profile, shopName, shopLogoUrl, shopSlug }: Si
           </button>
         </div>
         
-        {/* Sélecteur de langue */}
-        <div className="border-b p-3">
+        {/* Sélecteur de langue + thème */}
+        <div className="border-b p-3 flex items-center justify-between gap-2">
           <LocaleSwitcher variant="dropdown" />
+          <ThemeToggle
+            switchToLightLabel={t("switch_to_light")}
+            switchToDarkLabel={t("switch_to_dark")}
+          />
         </div>
 
         <nav className="flex-1 overflow-y-auto py-4">

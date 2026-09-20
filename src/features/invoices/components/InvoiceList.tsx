@@ -82,7 +82,7 @@ export default function InvoiceList({
                     <td className="p-4 text-right">
                       <Link
                         href={`/invoices/${invoice.id}`}
-                        className="inline-flex items-center gap-1.5 rounded-md bg-zinc-900 px-3 py-1.5 text-xs font-semibold text-white hover:bg-zinc-700 dark:bg-white dark:text-black dark:hover:bg-zinc-200"
+                        className="inline-flex items-center gap-1.5 rounded-md bg-violet-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-violet-700"
                       >
                         <FileText className="h-3.5 w-3.5" /> {t("view")}
                       </Link>

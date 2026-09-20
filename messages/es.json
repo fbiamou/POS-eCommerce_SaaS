@@ -10,7 +10,9 @@
     "online_orders": "Pedidos en línea",
     "shipments": "Envíos",
     "purchase_orders": "Pedidos",
-    "settings": "Configuración"
+    "settings": "Configuración",
+    "switch_to_light": "Cambiar al tema claro",
+    "switch_to_dark": "Cambiar al tema oscuro"
   },
   "Dashboard": {
     "title": "Panel de Control",
