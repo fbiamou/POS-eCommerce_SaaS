@@ -309,7 +309,7 @@
     "remaining_due": "Saldo pendiente",
     "status": "Estado",
     "status_paid": "Pagada",
-    "status_partial": "Parcialmente pagada",
+    "status_partial": "Parcial",
     "status_unpaid": "Impagada",
     "download_pdf": "Descargar el PDF",
     "print_ticket": "Imprimir el ticket",

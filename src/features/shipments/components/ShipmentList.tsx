@@ -193,8 +193,8 @@ export default function ShipmentList() {
               onClick={copyToClipboard}
               className="flex items-center justify-center gap-2 border rounded-md py-2 hover:bg-accent text-sm font-medium"
             >
-              <Copy className="h-4 w-4" />
-              {t("copy_link")}
+              <Copy className="h-4 w-4 shrink-0" />
+              <span className="hidden sm:inline">{t("copy_link")}</span>
             </button>
             <a 
               href={`https://wa.me/?text=${t("whatsapp_msg")} ${generatedLink}`}
@@ -202,8 +202,8 @@ export default function ShipmentList() {
               rel="noreferrer"
               className="flex items-center justify-center gap-2 bg-[#25D366] text-white rounded-md py-2 hover:bg-[#25D366]/90 text-sm font-medium"
             >
-              <MessageCircle className="h-4 w-4" />
-              {t("share_whatsapp")}
+              <MessageCircle className="h-4 w-4 shrink-0" />
+              <span className="hidden sm:inline">{t("share_whatsapp")}</span>
             </a>
           </div>
         </div>

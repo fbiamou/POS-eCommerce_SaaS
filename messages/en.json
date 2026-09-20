@@ -309,7 +309,7 @@
     "remaining_due": "Remaining due",
     "status": "Status",
     "status_paid": "Paid",
-    "status_partial": "Partially paid",
+    "status_partial": "Partial",
     "status_unpaid": "Unpaid",
     "download_pdf": "Download PDF",
     "print_ticket": "Print receipt",

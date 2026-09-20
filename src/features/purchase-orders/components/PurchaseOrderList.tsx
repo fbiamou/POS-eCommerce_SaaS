@@ -19,7 +19,7 @@ export default function PurchaseOrderList() {
     <div className="space-y-6">
       {/* Alert zone for pending PO */}
       <div className="bg-orange-50 border-orange-200 border rounded-xl p-5 shadow-sm">
-        <div className="flex items-start justify-between">
+        <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
           <div className="flex gap-4 items-start">
             <div className="bg-orange-100 p-2 rounded-full mt-1">
               <AlertTriangle className="h-6 w-6 text-orange-600" />
