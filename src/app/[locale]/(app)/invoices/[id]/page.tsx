@@ -37,17 +37,17 @@ export default async function InvoicePage({
 
   return (
     <div className="mx-auto flex max-w-2xl flex-col gap-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold tracking-tight">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <h1 className="text-2xl font-bold tracking-tight whitespace-normal sm:whitespace-nowrap">
           {t("title")}
-          {invoice.invoice_number ? ` — ${invoice.invoice_number}` : ""}
+          {invoice.invoice_number ? <span className="block sm:inline text-xl sm:text-2xl text-zinc-500 sm:text-foreground"> — {invoice.invoice_number}</span> : ""}
         </h1>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <Link
             href={`/invoices/${invoice.id}/ticket`}
             className="flex items-center gap-2 rounded-md border px-4 py-2 text-sm font-medium hover:bg-zinc-100 dark:hover:bg-zinc-800"
           >
-            <Printer className="h-4 w-4" /> {t("print_ticket")}
+            <Printer className="h-4 w-4" /> <span className="hidden sm:inline">{t("print_ticket")}</span>
           </Link>
           <a
             href={`/api/invoices/${invoice.id}/pdf?locale=${locale}`}
@@ -55,7 +55,7 @@ export default async function InvoicePage({
             rel="noreferrer"
             className="flex items-center gap-2 rounded-md bg-violet-600 px-4 py-2 text-sm font-medium text-white hover:bg-violet-700 transition-colors"
           >
-            <Download className="h-4 w-4" /> {t("download_pdf")}
+            <Download className="h-4 w-4" /> <span className="hidden sm:inline">{t("download_pdf")}</span>
           </a>
         </div>
       </div>
@@ -78,26 +78,28 @@ export default async function InvoicePage({
           <p>{invoice.client?.name || t("walk_in_client")}</p>
         </div>
 
-        <table className="w-full text-left text-sm min-w-[600px]">
-          <thead className="border-b text-zinc-500">
-            <tr>
-              <th className="py-2 font-medium">{t("article")}</th>
-              <th className="py-2 text-right font-medium">{t("quantity")}</th>
-              <th className="py-2 text-right font-medium">{t("unit_price")}</th>
-              <th className="py-2 text-right font-medium">{t("total")}</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y">
-            {invoice.items.map((item) => (
-              <tr key={item.id}>
-                <td className="py-2">{item.product_name}</td>
-                <td className="py-2 text-right">{item.quantity}</td>
-                <td className="py-2 text-right">{format(item.unit_price)}</td>
-                <td className="py-2 text-right">{format(item.total_price)}</td>
+        <div className="overflow-x-auto">
+          <table className="w-full text-left text-sm min-w-[600px]">
+            <thead className="border-b text-zinc-500">
+              <tr>
+                <th className="py-2 font-medium">{t("article")}</th>
+                <th className="py-2 text-right font-medium">{t("quantity")}</th>
+                <th className="py-2 text-right font-medium">{t("unit_price")}</th>
+                <th className="py-2 text-right font-medium">{t("total")}</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody className="divide-y">
+              {invoice.items.map((item) => (
+                <tr key={item.id}>
+                  <td className="py-2">{item.product_name}</td>
+                  <td className="py-2 text-right">{item.quantity}</td>
+                  <td className="py-2 text-right">{format(item.unit_price)}</td>
+                  <td className="py-2 text-right">{format(item.total_price)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
 
         <div className="ml-auto w-full max-w-xs space-y-1 text-sm">
           {shop?.vat_registered && (

@@ -38,7 +38,7 @@
     "no_sales_today": "Aucune vente aujourd'hui.",
     "remind_client": "Relancer {name} — WhatsApp",
     "paid": "Payée",
-    "partial": "Partielle",
+    "partial": "Partiel",
     "unpaid": "Impayée",
     "unknown_product": "Produit inconnu",
     "walk_in_client": "Client de passage"
@@ -312,7 +312,7 @@
     "remaining_due": "Reste à payer",
     "status": "Statut",
     "status_paid": "Payée",
-    "status_partial": "Partiellement payée",
+    "status_partial": "Partiel",
     "status_unpaid": "Impayée",
     "download_pdf": "Télécharger le PDF",
     "print_ticket": "Imprimer le ticket",

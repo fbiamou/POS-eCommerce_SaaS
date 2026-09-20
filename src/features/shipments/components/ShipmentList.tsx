@@ -63,7 +63,7 @@ export default function ShipmentList() {
       <div className="flex justify-end">
         <button 
           onClick={handleGenerateLink}
-          className="flex items-center gap-2 bg-primary text-primary-foreground px-4 py-2 rounded-md text-sm font-medium hover:bg-primary/90 transition-colors"
+          className="flex items-center gap-2 bg-violet-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-violet-700 shadow-sm transition-colors"
         >
           <Plus className="h-4 w-4" />
           {t("generate_link")}
@@ -95,7 +95,7 @@ export default function ShipmentList() {
 
             <button 
               onClick={() => handlePointer(shipment.id)}
-              className="w-full mt-2 py-2 rounded-md bg-secondary text-secondary-foreground text-sm font-medium hover:bg-secondary/80 transition-colors"
+              className="w-full mt-2 py-2 rounded-md bg-violet-100 text-violet-700 dark:bg-violet-900/30 dark:text-violet-400 text-sm font-medium hover:bg-violet-200 dark:hover:bg-violet-900/50 transition-colors"
             >
               {t("verify")}
             </button>
