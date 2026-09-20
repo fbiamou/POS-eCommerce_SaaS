@@ -47,28 +47,28 @@ export function StockActions() {
       <div className="flex gap-2">
         <a
           href="/api/stock/csv-template"
-          className="flex items-center gap-2 rounded-xl bg-zinc-100 dark:bg-white/5 px-4 py-2.5 text-[13px] font-bold text-zinc-700 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-white/10 transition-colors"
+          className="flex items-center gap-2 rounded-xl bg-zinc-100 dark:bg-white/5 px-3 sm:px-4 py-2.5 text-[13px] font-bold text-zinc-700 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-white/10 transition-colors"
         >
-          <FileDown className="h-4 w-4" />
-          {t("download_template")}
+          <FileDown className="h-4 w-4 shrink-0" />
+          <span className="hidden sm:inline">{t("download_template")}</span>
         </a>
 
         <a
           href="/api/stock/csv-export"
-          className="flex items-center gap-2 rounded-xl border border-zinc-200 bg-white px-4 py-2.5 text-[13px] font-bold text-zinc-700 hover:bg-zinc-50 dark:border-[#2d2936] dark:bg-[#1C1A22] dark:text-zinc-300 dark:hover:bg-white/[0.02] transition-colors shadow-sm"
+          className="flex items-center gap-2 rounded-xl border border-zinc-200 bg-white px-3 sm:px-4 py-2.5 text-[13px] font-bold text-zinc-700 hover:bg-zinc-50 dark:border-[#2d2936] dark:bg-[#1C1A22] dark:text-zinc-300 dark:hover:bg-white/[0.02] transition-colors shadow-sm"
         >
-          <Download className="h-4 w-4" />
-          {t("export_csv")}
+          <Download className="h-4 w-4 shrink-0" />
+          <span className="hidden sm:inline">{t("export_csv")}</span>
         </a>
 
         <button
           type="button"
           disabled={isPending}
           onClick={() => fileInputRef.current?.click()}
-          className="flex items-center gap-2 rounded-xl border border-zinc-200 bg-white px-4 py-2.5 text-[13px] font-bold text-zinc-700 hover:bg-zinc-50 dark:border-[#2d2936] dark:bg-[#1C1A22] dark:text-zinc-300 dark:hover:bg-white/[0.02] transition-colors shadow-sm disabled:opacity-50"
+          className="flex items-center gap-2 rounded-xl border border-zinc-200 bg-white px-3 sm:px-4 py-2.5 text-[13px] font-bold text-zinc-700 hover:bg-zinc-50 dark:border-[#2d2936] dark:bg-[#1C1A22] dark:text-zinc-300 dark:hover:bg-white/[0.02] transition-colors shadow-sm disabled:opacity-50"
         >
-          <Upload className="h-4 w-4" />
-          {isPending ? t("importing") : t("import_csv")}
+          <Upload className="h-4 w-4 shrink-0" />
+          <span className="hidden sm:inline">{isPending ? t("importing") : t("import_csv")}</span>
         </button>
         <input
           ref={fileInputRef}

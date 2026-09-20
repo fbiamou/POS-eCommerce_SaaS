@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState, useTransition } from "react";
-import { Upload } from "lucide-react";
+import { Upload, Plus } from "lucide-react";
 import { Modal } from "@/components/ui/Modal";
 import { useTranslations } from "next-intl";
 import { addProduct, uploadProductImage } from "../actions";
@@ -56,9 +56,10 @@ export function AddProductButton({ label, hasShopSlug }: { label: string; hasSho
     <>
       <button
         onClick={() => setIsOpen(true)}
-        className="rounded-xl bg-violet-600 px-5 py-2.5 text-[13px] font-bold text-white hover:bg-violet-700 transition-colors shadow-sm"
+        className="flex items-center gap-2 rounded-xl bg-violet-600 px-3 sm:px-5 py-2.5 text-[13px] font-bold text-white hover:bg-violet-700 transition-colors shadow-sm"
       >
-        {label}
+        <Plus className="h-4 w-4 shrink-0" />
+        <span className="hidden sm:inline">{label}</span>
       </button>
 
       <Modal isOpen={isOpen} onClose={close} title={t("add_product")}>

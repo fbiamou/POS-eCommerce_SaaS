@@ -45,10 +45,10 @@ export default function PurchaseOrderList() {
           
           <button 
             onClick={handleGenerate}
-            className="shrink-0 flex items-center gap-2 bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded-md font-medium text-sm transition-colors"
+            className="shrink-0 flex items-center gap-2 bg-orange-600 hover:bg-orange-700 text-white px-3 sm:px-4 py-2 rounded-md font-medium text-sm transition-colors"
           >
-            <FileText className="h-4 w-4" />
-            {t("generate")}
+            <FileText className="h-4 w-4 shrink-0" />
+            <span className="hidden sm:inline">{t("generate")}</span>
           </button>
         </div>
       </div>

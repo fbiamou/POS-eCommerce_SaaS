@@ -40,10 +40,11 @@ export function ReminderSettingsButton({
     <>
       <button
         onClick={() => setIsOpen(true)}
-        className="flex items-center gap-2 rounded-xl border border-zinc-200 bg-white px-4 py-2.5 text-[13px] font-bold text-zinc-700 hover:bg-zinc-50 dark:border-[#2d2936] dark:bg-[#1C1A22] dark:text-zinc-300 dark:hover:bg-white/[0.02] transition-colors shadow-sm"
+        className="flex items-center gap-2 rounded-xl border border-zinc-200 bg-white px-3 sm:px-4 py-2.5 text-[13px] font-bold text-zinc-700 hover:bg-zinc-50 dark:border-[#2d2936] dark:bg-[#1C1A22] dark:text-zinc-300 dark:hover:bg-white/[0.02] transition-colors shadow-sm"
       >
-        <Settings className="h-4 w-4" />
-        {label}
+        <Settings className="h-4 w-4 shrink-0" />
+        <span className="hidden sm:inline">{label}</span>
+        <span className="sm:hidden">Relances</span>
       </button>
 
       <Modal isOpen={isOpen} onClose={() => setIsOpen(false)} title={t("settings_title")}>
