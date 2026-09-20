@@ -269,6 +269,9 @@
   "Storefront": {
     "default_shop_name": "Shop",
     "catalog_title": "Our items",
+    "categories_title": "Categories",
+    "products": "items",
+    "popular_this_week": "Popular this week",
     "no_products": "No items available right now.",
     "out_of_stock": "Out of stock",
     "add_to_cart": "Add to cart",
@@ -285,7 +288,8 @@
     "order_error": "Error sending the order.",
     "order_success_title": "Order sent!",
     "order_success_body": "The shop will contact you to confirm your order.",
-    "back_to_shop": "Back to shop"
+    "back_to_shop": "Back to shop",
+    "footer_rights": "All rights reserved."
   },
   "Invoices": {
     "list_title": "Invoices",

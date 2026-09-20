@@ -288,7 +288,8 @@
     "order_error": "Erreur lors de l'envoi de la commande.",
     "order_success_title": "Commande envoyée !",
     "order_success_body": "La boutique va vous contacter pour confirmer votre commande.",
-    "back_to_shop": "Retour à la boutique"
+    "back_to_shop": "Retour à la boutique",
+    "footer_rights": "Tous droits réservés."
   },
   "Invoices": {
     "list_title": "Factures",
