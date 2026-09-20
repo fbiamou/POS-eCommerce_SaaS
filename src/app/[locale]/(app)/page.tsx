@@ -80,39 +80,47 @@ export default async function DashboardPage() {
       {/* KPI Cards */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <div className="rounded-xl border bg-card p-6 shadow-card">
-          <div className="flex items-center gap-2 text-sm font-medium text-zinc-500">
-            <DollarSign className="h-4 w-4" />
-            {t("today_ca")}
+          <div className="flex items-center gap-3">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-violet-100 dark:bg-violet-900/40">
+              <DollarSign className="h-4 w-4 text-violet-600 dark:text-violet-400" />
+            </div>
+            <span className="text-sm font-medium text-zinc-500">{t("today_ca")}</span>
           </div>
-          <div className="mt-2 font-mono text-2xl font-bold tabular-nums">
+          <div className="mt-3 font-mono text-2xl font-bold tabular-nums">
             {todayCA.toLocaleString("fr-FR")} FCFA
           </div>
         </div>
 
         <div className="rounded-xl border bg-card p-6 shadow-card">
-          <div className="flex items-center gap-2 text-sm font-medium text-zinc-500">
-            <TrendingUp className="h-4 w-4 text-green-500" />
-            {t("sales_count")}
+          <div className="flex items-center gap-3">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-emerald-100 dark:bg-emerald-900/30">
+              <TrendingUp className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+            </div>
+            <span className="text-sm font-medium text-zinc-500">{t("sales_count")}</span>
           </div>
-          <div className="mt-2 font-mono text-2xl font-bold tabular-nums">{salesCount}</div>
+          <div className="mt-3 font-mono text-2xl font-bold tabular-nums">{salesCount}</div>
         </div>
 
         <div className="rounded-xl border bg-card p-6 shadow-card">
-          <div className="flex items-center gap-2 text-sm font-medium text-zinc-500">
-            <Users className="h-4 w-4" />
-            {t("debts")}
+          <div className="flex items-center gap-3">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-red-100 dark:bg-red-900/30">
+              <Users className="h-4 w-4 text-red-600 dark:text-red-400" />
+            </div>
+            <span className="text-sm font-medium text-zinc-500">{t("debts")}</span>
           </div>
-          <div className="mt-2 font-mono text-2xl font-bold tabular-nums text-red-500">
+          <div className="mt-3 font-mono text-2xl font-bold tabular-nums text-red-500">
             {totalDebt.toLocaleString("fr-FR")} FCFA
           </div>
         </div>
 
         <div className="rounded-xl border bg-card p-6 shadow-card">
-          <div className="flex items-center gap-2 text-sm font-medium text-zinc-500">
-            <Package className="h-4 w-4" />
-            {t("low_stock")}
+          <div className="flex items-center gap-3">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-orange-100 dark:bg-orange-900/30">
+              <Package className="h-4 w-4 text-orange-600 dark:text-orange-400" />
+            </div>
+            <span className="text-sm font-medium text-zinc-500">{t("low_stock")}</span>
           </div>
-          <div className="mt-2 font-mono text-2xl font-bold tabular-nums text-orange-500">
+          <div className="mt-3 font-mono text-2xl font-bold tabular-nums text-orange-500">
             {lowStockCount ?? 0}
           </div>
         </div>
