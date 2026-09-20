@@ -12,7 +12,13 @@
     "purchase_orders": "Pedidos",
     "settings": "Configuración",
     "switch_to_light": "Cambiar al tema claro",
-    "switch_to_dark": "Cambiar al tema oscuro"
+    "switch_to_dark": "Cambiar al tema oscuro",
+    "logout": "Cerrar sesión",
+    "more": "Más",
+    "tab_dashboard": "Inicio",
+    "tab_sales": "Ventas",
+    "tab_stock": "Stock",
+    "tab_invoices": "Facturas"
   },
   "Dashboard": {
     "title": "Panel de Control",

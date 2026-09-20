@@ -12,7 +12,13 @@
     "purchase_orders": "Commandes",
     "settings": "Paramètres",
     "switch_to_light": "Passer au thème clair",
-    "switch_to_dark": "Passer au thème sombre"
+    "switch_to_dark": "Passer au thème sombre",
+    "logout": "Se déconnecter",
+    "more": "Plus",
+    "tab_dashboard": "Accueil",
+    "tab_sales": "Ventes",
+    "tab_stock": "Stock",
+    "tab_invoices": "Factures"
   },
   "Dashboard": {
     "title": "Tableau de Bord",

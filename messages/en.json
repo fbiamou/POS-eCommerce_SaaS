@@ -12,7 +12,13 @@
     "purchase_orders": "Orders",
     "settings": "Settings",
     "switch_to_light": "Switch to light theme",
-    "switch_to_dark": "Switch to dark theme"
+    "switch_to_dark": "Switch to dark theme",
+    "logout": "Log out",
+    "more": "More",
+    "tab_dashboard": "Home",
+    "tab_sales": "Sales",
+    "tab_stock": "Stock",
+    "tab_invoices": "Invoices"
   },
   "Dashboard": {
     "title": "Dashboard",
