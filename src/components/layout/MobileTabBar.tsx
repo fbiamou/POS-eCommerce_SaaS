@@ -55,25 +55,34 @@ export function MobileTabBar({ profile, shopSlug }: MobileTabBarProps) {
   return (
     <>
       <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 flex items-stretch justify-around border-t bg-card pb-[env(safe-area-inset-bottom)]">
-        {primary.map((item) => (
-          <Link
-            key={item.key}
-            href={item.path}
-            className={`flex flex-1 flex-col items-center gap-1 py-2 text-[11px] font-medium ${
-              isActive(item.path) ? "text-violet-600" : "text-zinc-500"
-            }`}
-          >
-            <item.icon className="h-5 w-5" />
-            {t(TAB_LABEL_KEY[item.key])}
-          </Link>
-        ))}
+        {primary.map((item) => {
+          const active = isActive(item.path);
+          return (
+            <Link
+              key={item.key}
+              href={item.path}
+              className={`flex flex-1 flex-col items-center gap-1 py-2 text-[11px] font-medium ${
+                active ? "text-violet-600" : "text-[#7A7488] dark:text-[#A79FB0]"
+              }`}
+            >
+              <span
+                className={`flex h-7 w-7 items-center justify-center rounded-lg ${active ? "bg-violet-600" : ""}`}
+              >
+                <item.icon className={`h-4 w-4 ${active ? "text-white" : ""}`} />
+              </span>
+              {t(TAB_LABEL_KEY[item.key])}
+            </Link>
+          );
+        })}
         {hasMore && (
           <button
             type="button"
             onClick={() => setShowMore(true)}
-            className="flex flex-1 flex-col items-center gap-1 py-2 text-[11px] font-medium text-zinc-500"
+            className="flex flex-1 flex-col items-center gap-1 py-2 text-[11px] font-medium text-[#7A7488] dark:text-[#A79FB0]"
           >
-            <MoreHorizontal className="h-5 w-5" />
+            <span className="flex h-7 w-7 items-center justify-center rounded-lg">
+              <MoreHorizontal className="h-4 w-4" />
+            </span>
             {t("more")}
           </button>
         )}

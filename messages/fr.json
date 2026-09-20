@@ -22,6 +22,7 @@
   },
   "Dashboard": {
     "title": "Tableau de Bord",
+    "greeting": "Bonjour, {name} — {date}",
     "today_ca": "CA du jour",
     "sales_count": "Ventes",
     "debts": "Dettes (Impayés)",

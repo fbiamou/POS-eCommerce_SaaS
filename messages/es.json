@@ -22,6 +22,7 @@
   },
   "Dashboard": {
     "title": "Panel de Control",
+    "greeting": "Hola, {name} — {date}",
     "today_ca": "Ingresos del día",
     "sales_count": "Ventas",
     "debts": "Deudas (Impagos)",

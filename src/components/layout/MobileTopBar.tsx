@@ -58,7 +58,7 @@ export function MobileTopBar({ profile, shopName, shopLogoUrl }: MobileTopBarPro
   };
 
   return (
-    <div className="md:hidden fixed top-0 left-0 right-0 h-14 border-b bg-card z-40 flex items-center justify-between px-4">
+    <div className="md:hidden fixed top-0 left-0 right-0 h-14 bg-background z-40 flex items-center justify-between px-4">
       <div className="flex items-center gap-2 min-w-0">
         {shopLogoUrl ? (
           <Image src={shopLogoUrl} alt="Logo" width={24} height={24} className="h-6 w-6 rounded-md object-cover shrink-0" />

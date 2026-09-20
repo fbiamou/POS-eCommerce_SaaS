@@ -1,12 +1,13 @@
 import { Package, TrendingUp, Users, DollarSign } from "lucide-react";
 import { Link, redirect } from "@/i18n/routing";
-import { getTranslations } from "next-intl/server";
+import { getTranslations, getLocale } from "next-intl/server";
 import { createClient } from "@/utils/supabase/server";
 import { getCurrentProfile } from "@/features/auth/actions";
 import { isPageAllowed, firstAllowedPath } from "@/lib/appPages";
 
 export default async function DashboardPage() {
   const t = await getTranslations("Dashboard");
+  const locale = await getLocale();
   const supabase = await createClient();
 
   // Server actions' redirect() after login lands here via a client-side
@@ -73,9 +74,23 @@ export default async function DashboardPage() {
   }
   const topProducts = Array.from(productMap.values()).slice(0, 5);
 
+  const firstName = profile?.full_name?.trim().split(/\s+/)[0];
+  const today = new Date().toLocaleDateString(locale, {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+  });
+
   return (
     <div className="flex flex-col gap-6">
-      <h1 className="text-2xl font-bold tracking-tight">{t("title")}</h1>
+      <div>
+        <h1 className="text-2xl font-bold tracking-tight">{t("title")}</h1>
+        {firstName && (
+          <p className="mt-1 text-sm text-[#7A7488] dark:text-[#A79FB0]">
+            {t("greeting", { name: firstName, date: today })}
+          </p>
+        )}
+      </div>
 
       {/* KPI Cards */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">

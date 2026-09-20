@@ -22,6 +22,7 @@
   },
   "Dashboard": {
     "title": "Dashboard",
+    "greeting": "Hello, {name} — {date}",
     "today_ca": "Today's Revenue",
     "sales_count": "Sales",
     "debts": "Debts (Unpaid)",
