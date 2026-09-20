@@ -78,7 +78,7 @@ export default async function InvoicePage({
           <p>{invoice.client?.name || t("walk_in_client")}</p>
         </div>
 
-        <table className="w-full text-left text-sm">
+        <table className="w-full text-left text-sm min-w-[600px]">
           <thead className="border-b text-zinc-500">
             <tr>
               <th className="py-2 font-medium">{t("article")}</th>

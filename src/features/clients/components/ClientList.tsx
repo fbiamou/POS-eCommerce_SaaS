@@ -151,7 +151,7 @@ export default function ClientList({
           </div>
 
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-[13px]">
+            <table className="w-full text-left text-[13px] min-w-[700px]">
               <thead>
                 <tr className="border-b border-zinc-100 dark:border-[#2d2936]">
                   <th className="p-4 text-[11px] font-bold text-zinc-400 tracking-widest uppercase">{t("name")}</th>

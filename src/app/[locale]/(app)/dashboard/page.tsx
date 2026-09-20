@@ -66,7 +66,7 @@ export default async function DashboardPage() {
   topSalesData?.forEach((item) => {
     const pId = item.product_id;
     const qty = item.quantity;
-    const name = (item.products as any)?.name || "Produit inconnu";
+    const name = (item.products as any)?.name || t("unknown_product");
     if (productSales.has(pId)) {
       productSales.get(pId)!.quantity += qty;
     } else {
@@ -100,9 +100,9 @@ export default async function DashboardPage() {
 
   const getStatusLabel = (status: string) => {
     switch (status) {
-      case "PAID": return "Payée";
-      case "PARTIAL": return "Partielle";
-      case "UNPAID": return "Impayée";
+      case "PAID": return t("paid");
+      case "PARTIAL": return t("partial");
+      case "UNPAID": return t("unpaid");
       default: return status;
     }
   };
@@ -156,13 +156,12 @@ export default async function DashboardPage() {
       </div>
 
       <div className="grid gap-4 lg:grid-cols-2">
-        {/* Factures Récentes */}
         <div className="rounded-2xl border border-zinc-100 bg-white dark:border-[#2d2936] dark:bg-[#1C1A22] p-5 sm:p-6 shadow-sm">
-          <h2 className="text-[11px] font-bold text-zinc-400 tracking-widest uppercase mb-4">Factures récentes</h2>
+          <h2 className="text-[11px] font-bold text-zinc-400 tracking-widest uppercase mb-4">{t("recent_invoices")}</h2>
           
           <div className="flex flex-col gap-4">
             {recentInvoices?.map((inv) => {
-              const clientName = (inv.clients as any)?.full_name || "Client de passage";
+              const clientName = (inv.clients as any)?.full_name || t("walk_in_client");
               return (
                 <Link key={inv.id} href={`/invoices/${inv.id}`} className="flex items-center justify-between group">
                   <div className="flex flex-col">
@@ -186,7 +185,7 @@ export default async function DashboardPage() {
             })}
 
             {recentInvoices?.length === 0 && (
-              <p className="text-sm text-zinc-500">Aucune facture récente.</p>
+              <p className="text-sm text-zinc-500">{t("no_recent_invoices")}</p>
             )}
           </div>
         </div>
@@ -196,22 +195,22 @@ export default async function DashboardPage() {
           
           {/* Actions Rapides */}
           <div className="rounded-2xl border border-zinc-100 bg-white dark:border-[#2d2936] dark:bg-[#1C1A22] p-5 sm:p-6 shadow-sm">
-            <h2 className="text-[11px] font-bold text-zinc-400 tracking-widest uppercase mb-4">{t("quick_actions") || "Actions rapides"}</h2>
+            <h2 className="text-[11px] font-bold text-zinc-400 tracking-widest uppercase mb-4">{t("quick_actions")}</h2>
             {firstUnpaid ? (
               <Link 
                 href="/reminders"
                 className="flex w-full items-center justify-center rounded-xl bg-[#10B981] px-4 py-3 text-sm font-bold text-white hover:bg-[#059669] transition-colors shadow-sm"
               >
-                Relancer {(firstUnpaid.clients as any)?.full_name?.split(" ")[0] || "Client"} — WhatsApp
+                {t("remind_client", { name: (firstUnpaid.clients as any)?.full_name?.split(" ")[0] || "Client" })}
               </Link>
             ) : (
-              <p className="text-sm text-zinc-500">Aucune action urgente.</p>
+              <p className="text-sm text-zinc-500">{t("no_urgent_action")}</p>
             )}
           </div>
 
           {/* Top Articles */}
           <div className="rounded-2xl border border-zinc-100 bg-white dark:border-[#2d2936] dark:bg-[#1C1A22] p-5 sm:p-6 shadow-sm flex-1">
-            <h2 className="text-[11px] font-bold text-zinc-400 tracking-widest uppercase mb-4">{t("top_sales") || "Articles les plus vendus"}</h2>
+            <h2 className="text-[11px] font-bold text-zinc-400 tracking-widest uppercase mb-4">{t("top_sales")}</h2>
             
             <div className="flex flex-col gap-3">
               {topArticles.map((article, index) => (
@@ -220,12 +219,12 @@ export default async function DashboardPage() {
                     {article.name}
                   </span>
                   <span className="text-xs font-mono font-bold text-violet-600 dark:text-violet-400 shrink-0 tabular-nums">
-                    {article.quantity} {t("sold") || "vendus"}
+                    {article.quantity} {t("sold")}
                   </span>
                 </div>
               ))}
               {topArticles.length === 0 && (
-                <p className="text-sm text-zinc-500">Aucune vente aujourd'hui.</p>
+                <p className="text-sm text-zinc-500">{t("no_sales_today")}</p>
               )}
             </div>
           </div>

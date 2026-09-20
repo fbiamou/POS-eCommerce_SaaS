@@ -119,7 +119,7 @@ export default function ShipmentList() {
               </div>
 
               <div className="border rounded-lg overflow-x-auto">
-                <table className="w-full text-sm text-left min-w-[300px]">
+                <table className="w-full text-sm text-left min-w-[600px]">
                   <thead className="bg-muted text-muted-foreground uppercase text-xs">
                     <tr>
                       <th className="px-4 py-3">{t("shipment_column")}</th>

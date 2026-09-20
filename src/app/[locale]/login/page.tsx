@@ -16,7 +16,7 @@ export default async function LoginPage({
 
         {/* Language switcher */}
         <div className="flex justify-end">
-          <LocaleSwitcher variant="pills" />
+          <LocaleSwitcher variant="dropdown" />
         </div>
 
         {/* Logo / Header */}

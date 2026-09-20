@@ -142,7 +142,7 @@ export default function StorefrontShop({
             </div>
           </div>
           <div className="shrink-0 self-start sm:self-auto">
-            <LocaleSwitcher variant="pills" />
+            <LocaleSwitcher variant="dropdown" />
           </div>
         </div>
       </header>

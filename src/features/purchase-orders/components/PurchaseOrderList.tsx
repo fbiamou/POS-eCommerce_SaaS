@@ -57,7 +57,7 @@ export default function PurchaseOrderList() {
       <div>
         <h2 className="text-lg font-bold mb-4">{t("history")}</h2>
         <div className="rounded-xl border bg-card overflow-hidden">
-          <table className="w-full text-sm text-left">
+          <table className="w-full text-sm text-left min-w-[600px]">
             <thead className="bg-muted text-muted-foreground uppercase text-xs">
               <tr>
                 <th className="px-4 py-3">{t("ref")}</th>

@@ -52,7 +52,7 @@ export default function InvoiceList({
 
       <div className="rounded-2xl border border-zinc-100 bg-white dark:border-[#2d2936] dark:bg-[#1C1A22] shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-[13px]">
+          <table className="w-full text-left text-[13px] min-w-[800px]">
             <thead>
               <tr className="border-b border-zinc-100 dark:border-[#2d2936]">
                 <th className="p-4 text-[11px] font-bold text-zinc-400 tracking-widest uppercase">{t("invoice_number")}</th>

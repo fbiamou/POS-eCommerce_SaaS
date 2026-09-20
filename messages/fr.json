@@ -31,7 +31,17 @@
     "sold": "vendus",
     "quick_actions": "Actions rapides",
     "new_sale": "Nouvelle Vente",
-    "view_stock": "Voir le Stock"
+    "view_stock": "Voir le Stock",
+    "recent_invoices": "Factures récentes",
+    "no_recent_invoices": "Aucune facture récente.",
+    "no_urgent_action": "Aucune action urgente.",
+    "no_sales_today": "Aucune vente aujourd'hui.",
+    "remind_client": "Relancer {name} — WhatsApp",
+    "paid": "Payée",
+    "partial": "Partielle",
+    "unpaid": "Impayée",
+    "unknown_product": "Produit inconnu",
+    "walk_in_client": "Client de passage"
   },
   "Stock": {
     "title": "Stock & Produits",
