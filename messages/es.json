@@ -270,6 +270,8 @@
     "default_shop_name": "Tienda",
     "catalog_title": "Nuestros artículos",
     "categories_title": "Categorías",
+    "all_categories": "Todos",
+    "uncategorized": "Sin categoría",
     "products": "artículos",
     "popular_this_week": "Populares esta semana",
     "no_products": "Ningún artículo disponible por el momento.",

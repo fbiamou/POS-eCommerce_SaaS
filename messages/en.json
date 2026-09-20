@@ -270,6 +270,8 @@
     "default_shop_name": "Shop",
     "catalog_title": "Our items",
     "categories_title": "Categories",
+    "all_categories": "All",
+    "uncategorized": "Uncategorized",
     "products": "items",
     "popular_this_week": "Popular this week",
     "no_products": "No items available right now.",

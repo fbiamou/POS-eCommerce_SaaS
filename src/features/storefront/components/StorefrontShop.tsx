@@ -24,7 +24,7 @@ export default function StorefrontShop({
   const categories = useMemo(() => {
     const cats: Record<string, number> = {};
     products.forEach((p) => {
-      const name = p.category_name || "Sans catégorie";
+      const name = p.category_name || t("uncategorized");
       cats[name] = (cats[name] || 0) + 1;
     });
     return Object.entries(cats).map(([name, count]) => ({ name, count }));
@@ -94,7 +94,7 @@ export default function StorefrontShop({
 
   const filteredProducts = useMemo(() => {
     if (!selectedCategory) return products;
-    return products.filter((p) => (p.category_name || "Sans catégorie") === selectedCategory);
+    return products.filter((p) => (p.category_name || t("uncategorized")) === selectedCategory);
   }, [products, selectedCategory]);
 
   const format = (n: number) => `${n.toLocaleString("fr-FR")} ${shop.currency_symbol}`;
@@ -164,11 +164,14 @@ export default function StorefrontShop({
         </div>
       </header>
 
-      {/* HERO SECTION / BANNER */}
-      <div className="w-full bg-gradient-to-r from-violet-600 to-indigo-600 py-12 px-4 text-center">
+      {/* HERO SECTION / BANNER — gradient built from the shop's own accent color, not a fixed violet */}
+      <div
+        className="w-full py-12 px-4 text-center"
+        style={{ background: "linear-gradient(to right, var(--accent-bg), var(--accent-bg-hover))" }}
+      >
         <div className="mx-auto max-w-2xl">
           <h2 className="text-3xl sm:text-4xl font-extrabold text-white mb-2">{t("catalog_title")}</h2>
-          <p className="text-violet-100/80 text-sm sm:text-base">
+          <p className="text-white/80 text-sm sm:text-base">
             {shop.shop_address ? shop.shop_address : t("default_shop_name")}
           </p>
         </div>
@@ -189,7 +192,7 @@ export default function StorefrontShop({
                     : "bg-zinc-50 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 border-zinc-200 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-700"
                 }`}
               >
-                Tous / All
+                {t("all_categories")}
               </button>
               {categories.map((cat) => (
                 <button
