@@ -164,10 +164,15 @@ export default function StorefrontShop({
         </div>
       </header>
 
-      {/* HERO SECTION / BANNER — gradient built from the shop's own accent color, not a fixed violet */}
+      {/* HERO SECTION / BANNER — gradient built from the shop's own accent color, not a fixed violet.
+          bg/bgHover alone (two adjacent Tailwind shades) read as almost flat — lightened one end and
+          darkened the other via color-mix so the band stays vivid regardless of which accent is picked. */}
       <div
         className="w-full py-12 px-4 text-center"
-        style={{ background: "linear-gradient(to right, var(--accent-bg), var(--accent-bg-hover))" }}
+        style={{
+          background:
+            "linear-gradient(135deg, color-mix(in srgb, var(--accent-bg) 65%, white), color-mix(in srgb, var(--accent-bg-hover) 85%, black))",
+        }}
       >
         <div className="mx-auto max-w-2xl">
           <h2 className="text-3xl sm:text-4xl font-extrabold text-white mb-2">{t("catalog_title")}</h2>
