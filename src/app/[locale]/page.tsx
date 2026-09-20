@@ -31,8 +31,8 @@ export default async function LandingPage() {
           </span>
         </div>
         
-        <div className="flex items-center gap-6">
-          <LocaleSwitcher variant="pills" />
+        <div className="flex items-center gap-4 sm:gap-6">
+          <LocaleSwitcher variant="dropdown" />
           <Link
             href="/login"
             className="text-sm font-medium hover:text-violet-600 transition-colors"
@@ -48,8 +48,8 @@ export default async function LandingPage() {
           
           {/* Left Column: Copy */}
           <div className="max-w-xl">
-            <h1 className="font-bricolage text-5xl sm:text-6xl lg:text-[5.5rem] font-extrabold tracking-tight text-zinc-900 dark:text-white leading-[1.05]">
-              {tLanding("hero_title_1")} <br/> {tLanding("hero_title_2")}
+            <h1 className="font-bricolage text-4xl sm:text-5xl lg:text-[5.5rem] font-extrabold tracking-tight text-zinc-900 dark:text-white leading-[1.1] lg:leading-[1.05]">
+              {tLanding("hero_title_1")} <br className="hidden sm:block" /> {tLanding("hero_title_2")}
             </h1>
             <p className="mt-8 text-lg sm:text-xl text-zinc-600 dark:text-zinc-400 leading-relaxed">
               {tLanding("hero_subtitle")}
@@ -97,17 +97,17 @@ export default async function LandingPage() {
                 </div>
 
                 {/* Floating Pills */}
-                <div className="animate-float absolute -left-16 sm:-left-20 top-6 bg-white dark:bg-zinc-800 rounded-full py-2.5 px-4 shadow-xl border border-zinc-100 dark:border-zinc-700 flex items-center gap-2">
+                <div className="animate-float absolute -left-2 sm:-left-12 lg:-left-20 top-6 bg-white dark:bg-zinc-800 rounded-full py-2.5 px-4 shadow-xl border border-zinc-100 dark:border-zinc-700 flex items-center gap-2">
                    <div className="h-2.5 w-2.5 rounded-full bg-[#8B5CF6]"></div>
                    <span className="text-xs font-bold font-mono text-zinc-900 dark:text-white">FAC-2026-0005</span>
                 </div>
                 
-                <div className="animate-float animation-delay-1000 absolute -right-8 sm:-right-16 top-[45%] bg-white dark:bg-zinc-800 rounded-full py-2.5 px-4 shadow-xl border border-zinc-100 dark:border-zinc-700 flex items-center gap-2">
+                <div className="animate-float animation-delay-1000 absolute -right-2 sm:-right-8 lg:-right-16 top-[45%] bg-white dark:bg-zinc-800 rounded-full py-2.5 px-4 shadow-xl border border-zinc-100 dark:border-zinc-700 flex items-center gap-2">
                    <div className="h-2.5 w-2.5 rounded-full bg-[#FBBF24]"></div>
                    <span className="text-xs font-bold font-mono text-zinc-900 dark:text-white">84 500 FCFA</span>
                 </div>
                 
-                <div className="animate-float animation-delay-2000 absolute right-4 sm:-right-4 -bottom-5 bg-white dark:bg-zinc-800 rounded-full py-2.5 px-4 shadow-xl border border-zinc-100 dark:border-zinc-700 flex items-center gap-2">
+                <div className="animate-float animation-delay-2000 absolute right-2 sm:-right-4 -bottom-5 bg-white dark:bg-zinc-800 rounded-full py-2.5 px-4 shadow-xl border border-zinc-100 dark:border-zinc-700 flex items-center gap-2">
                    <div className="h-2.5 w-2.5 rounded-full bg-[#10B981]"></div>
                    <span className="text-xs font-bold text-zinc-900 dark:text-white">{tLanding("mock_relance")}</span>
                 </div>
