@@ -40,61 +40,61 @@ export function ReminderSettingsButton({
     <>
       <button
         onClick={() => setIsOpen(true)}
-        className="flex items-center gap-2 rounded-md border bg-white px-4 py-2 text-sm font-medium hover:bg-zinc-100 dark:bg-zinc-900 dark:hover:bg-zinc-800"
+        className="flex items-center gap-2 rounded-xl border border-zinc-200 bg-white px-4 py-2.5 text-[13px] font-bold text-zinc-700 hover:bg-zinc-50 dark:border-[#2d2936] dark:bg-[#1C1A22] dark:text-zinc-300 dark:hover:bg-white/[0.02] transition-colors shadow-sm"
       >
         <Settings className="h-4 w-4" />
         {label}
       </button>
 
       <Modal isOpen={isOpen} onClose={() => setIsOpen(false)} title={t("settings_title")}>
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-          {error && <p className="text-sm font-medium text-red-500">{error}</p>}
+        <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+          {error && <p className="text-[13px] font-medium text-red-500">{error}</p>}
 
-          <div className="flex flex-col gap-1">
-            <label className="text-sm font-medium">{t("delay_label")}</label>
+          <div className="flex flex-col gap-1.5">
+            <label className="text-[13px] font-bold text-zinc-700 dark:text-zinc-300">{t("delay_label")}</label>
             <input
               required
               name="reminder_first_delay_days"
               type="number"
               min={0}
               defaultValue={firstDelayDays}
-              className="rounded-md border border-zinc-300 p-2 text-sm dark:border-zinc-700 dark:bg-zinc-800"
+              className="rounded-xl border border-zinc-200 bg-white px-4 py-2.5 text-[13px] font-medium transition-colors focus:border-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-500 dark:border-[#2d2936] dark:bg-[#1C1A22]"
             />
-            <span className="text-xs text-zinc-500">{t("delay_hint")}</span>
+            <span className="text-[11px] text-zinc-500">{t("delay_hint")}</span>
           </div>
 
-          <div className="flex flex-col gap-1">
-            <label className="text-sm font-medium">{t("frequency_label")}</label>
+          <div className="flex flex-col gap-1.5">
+            <label className="text-[13px] font-bold text-zinc-700 dark:text-zinc-300">{t("frequency_label")}</label>
             <input
               required
               name="reminder_recurring_delay_days"
               type="number"
               min={0}
               defaultValue={recurringDelayDays}
-              className="rounded-md border border-zinc-300 p-2 text-sm dark:border-zinc-700 dark:bg-zinc-800"
+              className="rounded-xl border border-zinc-200 bg-white px-4 py-2.5 text-[13px] font-medium transition-colors focus:border-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-500 dark:border-[#2d2936] dark:bg-[#1C1A22]"
             />
           </div>
 
           <div className="flex flex-col gap-1">
-            <label className="flex cursor-pointer items-center gap-2 text-sm font-medium text-zinc-400">
-              <input type="checkbox" disabled className="rounded border-zinc-300" />
+            <label className="flex cursor-pointer items-center gap-2 text-[13px] font-bold text-zinc-400">
+              <input type="checkbox" disabled className="rounded border-zinc-300 dark:border-[#2d2936]" />
               {t("auto_send")}
             </label>
-            <span className="ml-6 text-xs text-zinc-500">{t("auto_send_hint")}</span>
+            <span className="ml-6 text-[11px] text-zinc-500">{t("auto_send_hint")}</span>
           </div>
 
-          <div className="mt-4 flex justify-end gap-2">
+          <div className="mt-4 flex justify-end gap-3">
             <button
               type="button"
               onClick={() => setIsOpen(false)}
-              className="rounded-md border px-4 py-2 text-sm font-medium hover:bg-zinc-100 dark:hover:bg-zinc-800"
+              className="rounded-xl px-5 py-2.5 text-[13px] font-bold text-zinc-700 hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-[#2d2936] transition-colors"
             >
               {t("cancel")}
             </button>
             <button
               type="submit"
               disabled={isPending}
-              className="rounded-md bg-black px-4 py-2 text-sm font-medium text-white hover:bg-black/90 disabled:opacity-50 dark:bg-white dark:text-black"
+              className="rounded-xl bg-violet-600 px-5 py-2.5 text-[13px] font-bold text-white hover:bg-violet-700 transition-colors disabled:opacity-50 shadow-sm"
             >
               {isPending ? t("sending") : t("save")}
             </button>

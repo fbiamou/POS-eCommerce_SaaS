@@ -10,9 +10,9 @@ export type NavItem = {
 
 // Shared between the desktop Sidebar and the mobile top/bottom bars so the
 // nav list (and its icons) only exists in one place.
-export function buildNavItems(t: (key: string) => string): NavItem[] {
+export function buildNavItems(t: any): NavItem[] {
   return [
-    { key: "dashboard", path: "/", label: t("dashboard"), icon: LayoutDashboard },
+    { key: "dashboard", path: "/dashboard", label: t("dashboard"), icon: LayoutDashboard },
     { key: "stock", path: "/stock", label: t("stock"), icon: Package },
     { key: "shipments", path: "/shipments", label: t("shipments"), icon: Package },
     { key: "purchase_orders", path: "/purchase-orders", label: t("purchase_orders"), icon: ShoppingCart },

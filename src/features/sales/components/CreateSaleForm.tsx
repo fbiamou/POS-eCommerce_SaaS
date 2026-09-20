@@ -196,7 +196,7 @@ export default function CreateSaleForm({
   return (
     <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
       {/* Liste des produits disponibles */}
-      <div className="col-span-1 lg:col-span-2 rounded-lg border bg-card p-6 shadow-sm">
+      <div className="col-span-1 lg:col-span-2 rounded-2xl border border-zinc-100 bg-white dark:border-[#2d2936] dark:bg-[#1C1A22] p-5 sm:p-6 shadow-sm">
         <h2 className="mb-4 text-lg font-semibold">{t("available_products")}</h2>
         
         {/* Filtres de recherche */}
@@ -206,13 +206,13 @@ export default function CreateSaleForm({
             placeholder={t("search")} 
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full rounded-md border border-zinc-300 p-2 text-sm dark:border-zinc-700 dark:bg-zinc-800"
+            className="w-full rounded-xl border border-zinc-200 bg-white px-4 py-2.5 text-[13px] font-medium transition-colors focus:border-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-500 placeholder:text-zinc-400 dark:border-[#2d2936] dark:bg-[#1C1A22]"
           />
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <select
               value={selectedCategory}
               onChange={(e) => setSelectedCategory(e.target.value)}
-              className="rounded-md border border-zinc-300 p-2 text-sm dark:border-zinc-700 dark:bg-zinc-800"
+              className="rounded-xl border border-zinc-200 bg-white px-4 py-2.5 text-[13px] font-medium transition-colors focus:border-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-500 dark:border-[#2d2936] dark:bg-[#1C1A22]"
             >
               <option value="">-- {t("category")} --</option>
               {categories.map(c => <option key={c} value={c}>{translateData(c)}</option>)}
@@ -221,7 +221,7 @@ export default function CreateSaleForm({
               value={selectedType}
               onChange={(e) => setSelectedType(e.target.value)}
               disabled={!selectedCategory}
-              className="rounded-md border border-zinc-300 p-2 text-sm disabled:opacity-50 dark:border-zinc-700 dark:bg-zinc-800"
+              className="rounded-xl border border-zinc-200 bg-white px-4 py-2.5 text-[13px] font-medium transition-colors focus:border-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-500 disabled:opacity-50 dark:border-[#2d2936] dark:bg-[#1C1A22]"
             >
               <option value="">-- {t("type")} --</option>
               {types.map(tOption => <option key={tOption} value={tOption}>{translateData(tOption)}</option>)}
@@ -230,7 +230,7 @@ export default function CreateSaleForm({
               value={selectedBrand}
               onChange={(e) => setSelectedBrand(e.target.value)}
               disabled={!selectedType}
-              className="rounded-md border border-zinc-300 p-2 text-sm disabled:opacity-50 dark:border-zinc-700 dark:bg-zinc-800"
+              className="rounded-xl border border-zinc-200 bg-white px-4 py-2.5 text-[13px] font-medium transition-colors focus:border-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-500 disabled:opacity-50 dark:border-[#2d2936] dark:bg-[#1C1A22]"
             >
               <option value="">-- {t("brand")} --</option>
               {brands.map(b => <option key={b} value={b}>{translateData(b)}</option>)}
@@ -246,21 +246,21 @@ export default function CreateSaleForm({
             const isOutOfStock = remainingStock <= 0;
 
             return (
-              <div key={product.id} className="flex flex-col rounded-md border p-4 hover:border-zinc-400 relative overflow-hidden">
-                <span className="font-medium text-sm line-clamp-2">{product.name}</span>
-                <span className="text-xs text-zinc-500 mt-1">{product.category} &gt; {product.sub_category} &gt; {product.brand}</span>
+              <div key={product.id} className="flex flex-col rounded-xl border border-zinc-100 bg-white dark:border-[#2d2936] dark:bg-[#1C1A22] p-4 hover:border-violet-200 dark:hover:border-violet-900/50 transition-colors shadow-sm relative overflow-hidden group">
+                <span className="font-bold text-sm line-clamp-2 text-zinc-900 dark:text-white">{product.name}</span>
+                <span className="text-[11px] font-bold text-zinc-400 tracking-widest uppercase mt-1.5">{product.category} &gt; {product.sub_category} &gt; {product.brand}</span>
                 
-                <span className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
-                  {t("stock")}: <span className={`font-semibold ${isOutOfStock ? 'text-red-500' : ''}`}>{remainingStock}</span>
+                <span className="mt-2 text-[13px] text-zinc-500 dark:text-zinc-400 font-medium">
+                  {t("stock")}: <span className={`font-bold tabular-nums ${isOutOfStock ? 'text-red-500' : 'text-zinc-900 dark:text-white'}`}>{remainingStock}</span>
                 </span>
                 
-                <span className="mt-2 font-bold">{product.selling_price.toLocaleString("fr-FR")} FCFA</span>
+                <span className="mt-2 font-mono text-[15px] font-bold text-violet-600 dark:text-violet-400 tabular-nums">{product.selling_price.toLocaleString("fr-FR")} FCFA</span>
                 
                 <button
                   type="button"
                   onClick={() => addToCart(product.id, product.quantity_in_stock)}
                   disabled={isOutOfStock}
-                  className="mt-4 rounded-md bg-black px-3 py-1.5 text-sm text-white disabled:opacity-50 dark:bg-white dark:text-black"
+                  className="mt-4 rounded-xl bg-zinc-100 px-3 py-2 text-sm font-bold text-zinc-900 hover:bg-violet-600 hover:text-white dark:bg-white/5 dark:text-white dark:hover:bg-violet-600 transition-colors disabled:opacity-50 disabled:hover:bg-zinc-100 dark:disabled:hover:bg-white/5 disabled:hover:text-zinc-400"
                 >
                   {isOutOfStock ? t("out_of_stock") : t("add")}
                 </button>
@@ -276,12 +276,12 @@ export default function CreateSaleForm({
       </div>
 
       {/* Panier et Validation */}
-      <div className="col-span-1 rounded-lg border bg-zinc-50 p-6 shadow-sm dark:bg-zinc-900">
+      <div className="col-span-1 rounded-2xl border border-zinc-100 bg-zinc-50/50 p-5 sm:p-6 shadow-sm dark:border-[#2d2936] dark:bg-white/[0.02]">
         <h2 className="mb-4 text-lg font-semibold">{t("cart")}</h2>
         
         <form onSubmit={handleSubmit} className="flex flex-col gap-6">
-          <div className="flex flex-col gap-2">
-            <label className="block text-sm font-medium">{t("client")}</label>
+          <div className="flex flex-col gap-1.5">
+            <label className="block text-[13px] font-bold text-zinc-700 dark:text-zinc-300">{t("client")}</label>
             <div className="flex gap-2">
               <select
                 value={isCreatingClient ? "new" : selectedClientId}
@@ -294,7 +294,7 @@ export default function CreateSaleForm({
                     setSelectedClientId(e.target.value);
                   }
                 }}
-                className="w-full rounded-md border border-zinc-300 p-2 text-sm dark:border-zinc-700 dark:bg-zinc-800"
+                className="w-full rounded-xl border border-zinc-200 bg-white px-4 py-2.5 text-[13px] font-medium transition-colors focus:border-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-500 dark:border-[#2d2936] dark:bg-[#1C1A22]"
               >
                 <option value="">{t("default_client")}</option>
                 <option value="new">{t("add_client")}</option>
@@ -306,7 +306,7 @@ export default function CreateSaleForm({
                 <button 
                   type="button" 
                   onClick={() => setIsCreatingClient(false)}
-                  className="rounded-md border px-3 text-sm hover:bg-zinc-100 dark:hover:bg-zinc-800"
+                  className="rounded-xl border border-zinc-200 bg-white px-4 py-2.5 text-[13px] font-bold text-zinc-700 hover:bg-zinc-50 dark:border-[#2d2936] dark:bg-[#1C1A22] dark:text-zinc-300 dark:hover:bg-white/[0.02] transition-colors shadow-sm"
                 >
                   {t("cancel")}
                 </button>
@@ -314,13 +314,13 @@ export default function CreateSaleForm({
             </div>
 
             {isCreatingClient && (
-              <div className="mt-2 flex flex-col gap-3 rounded-md bg-zinc-100 p-3 dark:bg-zinc-800">
+              <div className="mt-2 flex flex-col gap-3 rounded-2xl bg-white dark:bg-[#1C1A22] border border-zinc-100 dark:border-[#2d2936] p-4 shadow-sm">
                 <input
                   type="text"
                   placeholder={t("full_name")}
                   value={newClientName}
                   onChange={(e) => setNewClientName(e.target.value)}
-                  className="w-full rounded-md border border-zinc-300 p-2 text-sm dark:border-zinc-700 dark:bg-zinc-900"
+                  className="w-full rounded-xl border border-zinc-200 bg-white px-4 py-2.5 text-[13px] font-medium transition-colors focus:border-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-500 dark:border-[#2d2936] dark:bg-[#1C1A22]"
                   required
                 />
                 <div className="flex gap-2">
@@ -334,7 +334,7 @@ export default function CreateSaleForm({
                     placeholder={t("phone")}
                     value={newClientPhone}
                     onChange={(e) => setNewClientPhone(e.target.value)}
-                    className="min-w-0 flex-1 rounded-md border border-zinc-300 p-2 text-sm dark:border-zinc-700 dark:bg-zinc-900"
+                    className="min-w-0 flex-1 rounded-xl border border-zinc-200 bg-white px-4 py-2.5 text-[13px] font-medium transition-colors focus:border-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-500 dark:border-[#2d2936] dark:bg-[#1C1A22]"
                   />
                 </div>
               </div>
@@ -350,16 +350,16 @@ export default function CreateSaleForm({
                 if (!product) return null;
 
                 return (
-                  <div key={item.productId} className="flex items-center justify-between border-b pb-2">
+                  <div key={item.productId} className="flex items-center justify-between border-b border-zinc-100 dark:border-[#2d2936] pb-3 pt-1">
                     <div className="flex flex-col flex-1 min-w-0 pr-2">
-                      <span className="text-sm font-medium truncate">{product.name}</span>
-                      <span className="text-xs text-zinc-500">{(product.selling_price * item.quantity).toLocaleString("fr-FR")} FCFA</span>
+                      <span className="text-sm font-bold truncate text-zinc-900 dark:text-white">{product.name}</span>
+                      <span className="text-[13px] font-mono font-bold text-violet-600 dark:text-violet-400 mt-0.5 tabular-nums">{(product.selling_price * item.quantity).toLocaleString("fr-FR")} FCFA</span>
                     </div>
                     <div className="flex items-center gap-2 shrink-0">
-                      <button type="button" onClick={() => updateQuantity(item.productId, -1, product.quantity_in_stock)} className="rounded-full bg-zinc-200 p-1 dark:bg-zinc-700"><Minus className="h-3 w-3" /></button>
-                      <span className="text-sm w-4 text-center">{item.quantity}</span>
-                      <button type="button" onClick={() => updateQuantity(item.productId, 1, product.quantity_in_stock)} className="rounded-full bg-zinc-200 p-1 dark:bg-zinc-700"><Plus className="h-3 w-3" /></button>
-                      <button type="button" onClick={() => removeFromCart(item.productId)} className="ml-2 text-red-500"><Trash2 className="h-4 w-4" /></button>
+                      <button type="button" onClick={() => updateQuantity(item.productId, -1, product.quantity_in_stock)} className="rounded-full bg-white border border-zinc-200 p-1.5 hover:bg-zinc-100 dark:bg-[#1C1A22] dark:border-[#2d2936] dark:hover:bg-white/5 transition-colors"><Minus className="h-3 w-3" /></button>
+                      <span className="text-[13px] font-mono font-bold w-5 text-center tabular-nums">{item.quantity}</span>
+                      <button type="button" onClick={() => updateQuantity(item.productId, 1, product.quantity_in_stock)} className="rounded-full bg-white border border-zinc-200 p-1.5 hover:bg-zinc-100 dark:bg-[#1C1A22] dark:border-[#2d2936] dark:hover:bg-white/5 transition-colors"><Plus className="h-3 w-3" /></button>
+                      <button type="button" onClick={() => removeFromCart(item.productId)} className="ml-1 rounded-full p-1.5 text-zinc-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"><Trash2 className="h-4 w-4" /></button>
                     </div>
                   </div>
                 );
@@ -367,31 +367,31 @@ export default function CreateSaleForm({
             )}
           </div>
 
-          <div className="border-t pt-4">
-            <div className="flex justify-between text-lg font-bold">
-              <span>{t("total")}:</span>
-              <span>{totalAmount.toLocaleString("fr-FR")} FCFA</span>
+          <div className="border-t border-zinc-200 dark:border-[#2d2936] pt-5">
+            <div className="flex justify-between items-center text-lg font-bold">
+              <span className="text-zinc-500 dark:text-zinc-400 text-sm">{t("total")}</span>
+              <span className="font-mono text-xl tabular-nums text-zinc-900 dark:text-white">{totalAmount.toLocaleString("fr-FR")} FCFA</span>
             </div>
             
-            <div className="mt-4">
-              <label className="mb-1 block text-sm font-medium">{t("paid_amount")}</label>
+            <div className="mt-4 flex flex-col gap-1.5">
+              <label className="block text-[13px] font-bold text-zinc-700 dark:text-zinc-300">{t("paid_amount")}</label>
               <input
                 type="number"
                 value={paidAmount}
                 onChange={(e) => setPaidAmount(e.target.value)}
                 placeholder={t("paid_amount_placeholder")}
-                className="w-full rounded-md border border-zinc-300 p-2 text-sm dark:border-zinc-700 dark:bg-zinc-800"
+                className="w-full rounded-xl border border-zinc-200 bg-white px-4 py-2.5 text-[13px] font-medium transition-colors focus:border-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-500 dark:border-[#2d2936] dark:bg-[#1C1A22]"
               />
             </div>
 
             {submitError && (
-              <div className="mt-2 rounded-md bg-red-50 p-3 text-sm text-red-600 dark:bg-red-900/20 dark:text-red-400">
+              <div className="mt-2 rounded-xl border border-red-200 bg-red-50 p-3 text-[13px] font-bold text-red-600 dark:border-red-900/30 dark:bg-red-900/20 dark:text-red-400 shadow-sm">
                 {submitError}
               </div>
             )}
 
             {lastInvoiceId && (
-              <div className="mt-2 flex flex-wrap items-center justify-between gap-2 rounded-md bg-green-50 p-3 text-sm text-green-700 dark:bg-green-900/20 dark:text-green-400">
+              <div className="mt-2 flex flex-wrap items-center justify-between gap-2 rounded-xl border border-green-200 bg-green-50 p-3 text-[13px] font-bold text-green-700 dark:border-green-900/30 dark:bg-green-900/20 dark:text-green-400 shadow-sm">
                 <span>{t("success")}</span>
                 <div className="flex items-center gap-3">
                   <Link href={`/invoices/${lastInvoiceId}/ticket`} className="shrink-0 font-medium underline">
@@ -407,7 +407,7 @@ export default function CreateSaleForm({
             <button
               type="submit"
               disabled={cart.length === 0 || isSubmitting}
-              className="mt-6 w-full rounded-md bg-black py-3 text-sm font-bold text-white disabled:opacity-50 dark:bg-white dark:text-black"
+              className="mt-6 w-full rounded-xl bg-violet-600 py-3.5 text-[15px] font-bold text-white hover:bg-violet-700 transition-colors shadow-sm disabled:opacity-50"
             >
               {isSubmitting ? t("submitting") : t("submit")}
             </button>

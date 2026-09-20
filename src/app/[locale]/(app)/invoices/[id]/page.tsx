@@ -53,7 +53,7 @@ export default async function InvoicePage({
             href={`/api/invoices/${invoice.id}/pdf?locale=${locale}`}
             target="_blank"
             rel="noreferrer"
-            className="flex items-center gap-2 rounded-md bg-black px-4 py-2 text-sm font-medium text-white hover:bg-black/90 dark:bg-white dark:text-black"
+            className="flex items-center gap-2 rounded-md bg-violet-600 px-4 py-2 text-sm font-medium text-white hover:bg-violet-700 transition-colors"
           >
             <Download className="h-4 w-4" /> {t("download_pdf")}
           </a>

@@ -50,11 +50,11 @@ export function MobileTabBar({ profile, shopSlug }: MobileTabBarProps) {
   const hasMore = overflow.length > 0 || showSettings || Boolean(shopSlug);
 
   const isActive = (path: string) =>
-    path === "/" ? pathname === "/" : pathname === path || pathname.startsWith(path + "/");
+    path === "/dashboard" ? pathname === "/dashboard" : pathname === path || pathname.startsWith(path + "/");
 
   return (
     <>
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 flex items-stretch justify-around border-t bg-card pb-[env(safe-area-inset-bottom)]">
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 flex items-stretch justify-around border-t border-zinc-200 dark:border-[#2d2936] bg-white dark:bg-[#1C1A22] pb-[env(safe-area-inset-bottom)]">
         {primary.map((item) => {
           const active = isActive(item.path);
           return (
@@ -66,9 +66,9 @@ export function MobileTabBar({ profile, shopSlug }: MobileTabBarProps) {
               }`}
             >
               <span
-                className={`flex h-7 w-7 items-center justify-center rounded-lg ${active ? "bg-violet-600" : ""}`}
+                className={`flex h-9 w-9 items-center justify-center rounded-full transition-colors ${active ? "bg-violet-600" : ""}`}
               >
-                <item.icon className={`h-4 w-4 ${active ? "text-white" : ""}`} />
+                <item.icon className={`h-[18px] w-[18px] ${active ? "text-white" : ""}`} />
               </span>
               {t(TAB_LABEL_KEY[item.key])}
             </Link>
@@ -80,8 +80,8 @@ export function MobileTabBar({ profile, shopSlug }: MobileTabBarProps) {
             onClick={() => setShowMore(true)}
             className="flex flex-1 flex-col items-center gap-1 py-2 text-[11px] font-medium text-[#7A7488] dark:text-[#A79FB0]"
           >
-            <span className="flex h-7 w-7 items-center justify-center rounded-lg">
-              <MoreHorizontal className="h-4 w-4" />
+            <span className="flex h-9 w-9 items-center justify-center rounded-full transition-colors">
+              <MoreHorizontal className="h-[18px] w-[18px]" />
             </span>
             {t("more")}
           </button>
@@ -95,7 +95,7 @@ export function MobileTabBar({ profile, shopSlug }: MobileTabBarProps) {
               key={item.key}
               href={item.path}
               onClick={() => setShowMore(false)}
-              className="flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium hover:bg-zinc-100 dark:hover:bg-zinc-800"
+              className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-[13px] font-bold text-zinc-700 hover:bg-zinc-100/50 hover:text-violet-600 dark:text-zinc-300 dark:hover:bg-white/5 dark:hover:text-white transition-colors"
             >
               <item.icon className="h-4 w-4" /> {item.label}
             </Link>
@@ -104,7 +104,7 @@ export function MobileTabBar({ profile, shopSlug }: MobileTabBarProps) {
             <Link
               href="/settings"
               onClick={() => setShowMore(false)}
-              className="flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium hover:bg-zinc-100 dark:hover:bg-zinc-800"
+              className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-[13px] font-bold text-zinc-700 hover:bg-zinc-100/50 hover:text-violet-600 dark:text-zinc-300 dark:hover:bg-white/5 dark:hover:text-white transition-colors"
             >
               <SettingsIcon className="h-4 w-4" /> {t("settings")}
             </Link>
@@ -114,7 +114,7 @@ export function MobileTabBar({ profile, shopSlug }: MobileTabBarProps) {
               href={`/boutique/${shopSlug}`}
               target="_blank"
               onClick={() => setShowMore(false)}
-              className="flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-violet-600 hover:bg-violet-50 dark:text-violet-400 dark:hover:bg-violet-900/20"
+              className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-[13px] font-bold text-violet-600 hover:bg-violet-50 dark:text-violet-400 dark:hover:bg-violet-900/20 transition-colors"
             >
               <ExternalLink className="h-4 w-4" /> {tSettings("view_online_shop")}
             </Link>

@@ -19,7 +19,7 @@ export const APP_PAGE_KEYS = [
 export type AppPageKey = (typeof APP_PAGE_KEYS)[number];
 
 export const APP_PAGES: { key: AppPageKey; path: string }[] = [
-  { key: "dashboard", path: "/" },
+  { key: "dashboard", path: "/dashboard" },
   { key: "stock", path: "/stock" },
   { key: "shipments", path: "/shipments" },
   { key: "purchase_orders", path: "/purchase-orders" },
@@ -38,7 +38,7 @@ export const SELLER_DEFAULT_PAGES: AppPageKey[] = ["sales", "invoices", "online_
 
 // Matches a locale-stripped pathname (e.g. "/invoices/abc123") to a page key.
 export function matchPageKey(pathWithoutLocale: string): AppPageKey | null {
-  if (pathWithoutLocale === "/") return "dashboard";
+  if (pathWithoutLocale === "/dashboard") return "dashboard";
   const match = APP_PAGES.find(
     (p) => p.key !== "dashboard" && (pathWithoutLocale === p.path || pathWithoutLocale.startsWith(p.path + "/"))
   );
@@ -59,5 +59,5 @@ export function isPageAllowed(role: string, allowedPages: string[], pathWithoutL
 
 export function firstAllowedPath(allowedPages: string[]): string {
   const first = APP_PAGES.find((p) => allowedPages.includes(p.key));
-  return first ? first.path : "/";
+  return first ? first.path : "/dashboard";
 }

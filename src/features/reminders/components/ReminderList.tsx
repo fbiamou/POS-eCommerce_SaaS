@@ -60,61 +60,61 @@ export default function ReminderList({
   };
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-5">
       <div className="flex items-center justify-between">
-        <h2 className="text-xl font-semibold">{t("eligible_invoices")}</h2>
+        <h2 className="text-xl font-bold tracking-tight text-zinc-900 dark:text-white">{t("eligible_invoices")}</h2>
       </div>
 
-      <div className="rounded-lg border bg-card shadow-sm">
+      <div className="rounded-2xl border border-zinc-100 bg-white dark:border-[#2d2936] dark:bg-[#1C1A22] shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm">
-            <thead className="bg-zinc-50 text-zinc-500 dark:bg-zinc-900/50">
-              <tr>
-                <th className="p-4 font-medium">{t("client")}</th>
-                <th className="p-4 font-medium">{t("phone")}</th>
-                <th className="p-4 font-medium">{t("overdue_days")}</th>
-                <th className="p-4 font-medium text-right">{t("remaining_due")}</th>
-                <th className="p-4 font-medium">{t("last_reminder")}</th>
-                <th className="p-4 font-medium text-right">{t("action")}</th>
+          <table className="w-full text-left text-[13px]">
+            <thead>
+              <tr className="border-b border-zinc-100 dark:border-[#2d2936]">
+                <th className="p-4 text-[11px] font-bold text-zinc-400 tracking-widest uppercase">{t("client")}</th>
+                <th className="p-4 text-[11px] font-bold text-zinc-400 tracking-widest uppercase">{t("phone")}</th>
+                <th className="p-4 text-[11px] font-bold text-zinc-400 tracking-widest uppercase">{t("overdue_days")}</th>
+                <th className="p-4 text-[11px] font-bold text-zinc-400 tracking-widest uppercase text-right">{t("remaining_due")}</th>
+                <th className="p-4 text-[11px] font-bold text-zinc-400 tracking-widest uppercase">{t("last_reminder")}</th>
+                <th className="p-4 text-[11px] font-bold text-zinc-400 tracking-widest uppercase text-right">{t("action")}</th>
               </tr>
             </thead>
-            <tbody className="divide-y">
+            <tbody className="divide-y divide-zinc-50 dark:divide-white/5">
               {invoices.map((invoice) => {
                 const dueAmount = invoice.total_amount - invoice.paid_amount;
                 return (
-                  <tr key={invoice.id} className="hover:bg-zinc-50 dark:hover:bg-zinc-900/50">
+                  <tr key={invoice.id} className="hover:bg-zinc-50 dark:hover:bg-white/[0.02] transition-colors group">
                     <td className="p-4">
-                      <span className="font-medium">{invoice.client_name}</span>
+                      <span className="font-bold text-zinc-900 dark:text-white group-hover:text-violet-600 dark:group-hover:text-violet-400">{invoice.client_name}</span>
                       {invoice.invoice_number && (
-                        <span className="block text-xs text-zinc-400">{invoice.invoice_number}</span>
+                        <span className="block font-mono text-[11px] text-zinc-400">{invoice.invoice_number}</span>
                       )}
                     </td>
-                    <td className="p-4">{invoice.client_phone || "-"}</td>
+                    <td className="p-4 font-mono text-zinc-500">{invoice.client_phone || "-"}</td>
                     <td className="p-4">
-                      <span className="font-bold text-red-600 dark:text-red-400">
+                      <span className="font-mono font-bold text-red-500">
                         +{invoice.days_overdue}
                       </span>
                     </td>
-                    <td className="p-4 text-right font-bold">
-                      {dueAmount.toLocaleString("fr-FR")} FCFA
+                    <td className="p-4 text-right font-mono font-bold tabular-nums text-zinc-900 dark:text-white">
+                      {dueAmount.toLocaleString("fr-FR")}
                     </td>
                     <td className="p-4">
                       {invoice.last_reminder_at ? (
-                        <div className="flex items-center gap-2 text-zinc-500">
+                        <div className="flex items-center gap-2 text-[11px] text-zinc-500">
                           <History className="h-3 w-3" />
                           <span>
                             {new Date(invoice.last_reminder_at).toLocaleDateString()} ({invoice.reminder_count})
                           </span>
                         </div>
                       ) : (
-                        <span className="text-zinc-400">{t("never")}</span>
+                        <span className="text-[11px] text-zinc-400">{t("never")}</span>
                       )}
                     </td>
                     <td className="p-4 text-right">
                       <button
                         onClick={() => handleSendReminder(invoice)}
                         disabled={(isPending && sendingId === invoice.id) || !invoice.client_phone}
-                        className="inline-flex items-center gap-2 rounded-md bg-green-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-green-700 disabled:opacity-50 dark:bg-green-700 dark:hover:bg-green-600"
+                        className="inline-flex items-center gap-2 rounded-xl bg-[#25D366] px-4 py-2 text-[13px] font-bold text-white hover:bg-[#128C7E] disabled:opacity-50 transition-colors shadow-sm"
                       >
                         {isPending && sendingId === invoice.id ? (
                           t("sending")
@@ -125,7 +125,7 @@ export default function ReminderList({
                         )}
                       </button>
                       {errorId === invoice.id && (
-                        <p className="mt-1 text-xs text-red-500">{t("send_error")}</p>
+                        <p className="mt-1 text-[11px] text-red-500">{t("send_error")}</p>
                       )}
                     </td>
                   </tr>

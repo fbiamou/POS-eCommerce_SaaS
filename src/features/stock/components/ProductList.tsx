@@ -76,39 +76,43 @@ export default function ProductList({ products, hasShopSlug }: { products: Produ
 
   return (
     <>
-      <div className="rounded-lg border bg-card text-card-foreground shadow-sm">
+      <div className="rounded-2xl border border-zinc-100 bg-white dark:border-[#2d2936] dark:bg-[#1C1A22] shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
-            <thead className="bg-zinc-50 text-zinc-500 dark:bg-zinc-900/50">
+            <thead className="bg-zinc-50/50 dark:bg-white/5 border-b border-zinc-100 dark:border-[#2d2936]">
               <tr>
-                <th className="p-4 font-medium">{t("name")}</th>
-                <th className="p-4 font-medium">{t("category")}</th>
-                <th className="p-4 font-medium text-right">{t("stock_qty")}</th>
-                <th className="p-4 font-medium text-right">{t("price")}</th>
-                <th className="p-4 font-medium text-center">{t("published_online_column")}</th>
-                <th className="p-4 font-medium text-right">{t("actions")}</th>
+                <th className="p-4 text-[11px] font-bold text-zinc-400 tracking-widest uppercase">{t("name")}</th>
+                <th className="p-4 text-[11px] font-bold text-zinc-400 tracking-widest uppercase">{t("category")}</th>
+                <th className="p-4 text-[11px] font-bold text-zinc-400 tracking-widest uppercase text-right">{t("stock_qty")}</th>
+                <th className="p-4 text-[11px] font-bold text-zinc-400 tracking-widest uppercase text-right">{t("price")}</th>
+                <th className="p-4 text-[11px] font-bold text-zinc-400 tracking-widest uppercase text-center">{t("published_online_column")}</th>
+                <th className="p-4 text-[11px] font-bold text-zinc-400 tracking-widest uppercase text-right">{t("actions")}</th>
               </tr>
             </thead>
-            <tbody className="divide-y">
+            <tbody className="divide-y divide-zinc-50 dark:divide-white/5">
               {products.map((product) => (
-                <tr key={product.id} className="hover:bg-zinc-50 dark:hover:bg-zinc-900/50">
-                  <td className="p-4 font-medium">{product.name}</td>
-                  <td className="p-4 text-zinc-500">{product.category?.name || "-"}</td>
+                <tr key={product.id} className="hover:bg-zinc-50/50 dark:hover:bg-white/[0.02] transition-colors">
+                  <td className="p-4 text-sm font-bold text-zinc-900 dark:text-white">{product.name}</td>
+                  <td className="p-4 text-sm text-zinc-500 dark:text-zinc-400">{product.category?.name || "-"}</td>
                   <td className="p-4 text-right">
                     {product.quantity_in_stock <= 5 ? (
-                      <span className="inline-flex items-center rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-semibold text-red-800 dark:bg-red-900/30 dark:text-red-400">
+                      <span className="inline-flex items-center rounded-full bg-red-100 px-2 py-0.5 text-[11px] font-bold text-red-800 dark:bg-red-900/30 dark:text-red-400 tabular-nums">
                         {product.quantity_in_stock}
                       </span>
                     ) : (
-                      <span className="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-semibold text-green-800 dark:bg-green-900/30 dark:text-green-400">
+                      <span className="inline-flex items-center rounded-full bg-emerald-100 px-2 py-0.5 text-[11px] font-bold text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400 tabular-nums">
                         {product.quantity_in_stock}
                       </span>
                     )}
                   </td>
-                  <td className="p-4 text-right">{product.selling_price.toLocaleString("fr-FR")} FCFA</td>
+                  <td className="p-4 text-right">
+                    <span className="font-mono text-[13px] sm:text-sm font-bold text-zinc-900 dark:text-white tabular-nums">
+                      {product.selling_price.toLocaleString("fr-FR")} FCFA
+                    </span>
+                  </td>
                   <td className="p-4 text-center">
                     {product.is_published_online && (
-                      <span className="inline-flex items-center rounded-full bg-violet-100 px-2 py-0.5 text-xs font-semibold text-violet-800 dark:bg-violet-900/30 dark:text-violet-300">
+                      <span className="inline-flex items-center rounded-full bg-violet-100 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-violet-800 dark:bg-violet-900/30 dark:text-violet-300">
                         {t("published")}
                       </span>
                     )}
@@ -204,7 +208,7 @@ export default function ProductList({ products, hasShopSlug }: { products: Produ
               <button type="button" onClick={closeEdit} className="rounded-md border px-4 py-2 text-sm font-medium hover:bg-zinc-100 dark:hover:bg-zinc-800">
                 {t("cancel")}
               </button>
-              <button type="submit" disabled={isPending} className="rounded-md bg-black px-4 py-2 text-sm font-medium text-white hover:bg-black/90 dark:bg-white dark:text-black disabled:opacity-50">
+              <button type="submit" disabled={isPending} className="rounded-md bg-violet-600 px-4 py-2 text-sm font-medium text-white hover:bg-violet-700 transition-colors disabled:opacity-50">
                 {isPending ? "..." : t("update")}
               </button>
             </div>

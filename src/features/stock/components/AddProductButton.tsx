@@ -56,28 +56,28 @@ export function AddProductButton({ label, hasShopSlug }: { label: string; hasSho
     <>
       <button
         onClick={() => setIsOpen(true)}
-        className="rounded-md bg-black px-4 py-2 text-sm font-medium text-white hover:bg-black/90 dark:bg-white dark:text-black dark:hover:bg-white/90"
+        className="rounded-xl bg-violet-600 px-5 py-2.5 text-[13px] font-bold text-white hover:bg-violet-700 transition-colors shadow-sm"
       >
         {label}
       </button>
 
       <Modal isOpen={isOpen} onClose={close} title={t("add_product")}>
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-          {error && <p className="text-sm font-medium text-red-500">{error}</p>}
+        <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+          {error && <p className="text-[13px] font-medium text-red-500">{error}</p>}
 
           <div className="flex items-center gap-4">
-            <div className="flex h-16 w-16 flex-shrink-0 items-center justify-center overflow-hidden rounded-md bg-zinc-100 dark:bg-zinc-800">
+            <div className="flex h-16 w-16 flex-shrink-0 items-center justify-center overflow-hidden rounded-xl bg-zinc-50 dark:bg-[#14121a] border border-zinc-100 dark:border-[#2d2936]">
               {previewUrl ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img src={previewUrl} alt="" className="h-full w-full object-cover" />
               ) : (
-                <span className="text-xs text-zinc-400">{t("no_image")}</span>
+                <span className="text-[11px] font-bold text-zinc-400">{t("no_image")}</span>
               )}
             </div>
             <button
               type="button"
               onClick={() => imageInputRef.current?.click()}
-              className="flex items-center gap-2 rounded-md border border-dashed border-zinc-300 px-3 py-2 text-sm text-zinc-500 hover:border-violet-400 hover:text-violet-600 dark:border-zinc-600"
+              className="flex items-center gap-2 rounded-xl border border-dashed border-zinc-200 bg-white px-4 py-2 text-[13px] font-bold text-zinc-600 hover:border-violet-400 hover:text-violet-600 dark:border-[#2d2936] dark:bg-[#1C1A22] dark:text-zinc-400 transition-colors"
             >
               <Upload className="h-4 w-4" />
               {t("choose_image")}
@@ -85,57 +85,57 @@ export function AddProductButton({ label, hasShopSlug }: { label: string; hasSho
             <input ref={imageInputRef} type="file" accept="image/*" className="hidden" onChange={handleImagePick} />
           </div>
 
-          <div className="flex flex-col gap-1">
-            <label className="text-sm font-medium">{t("name")}</label>
-            <input required type="text" name="name" className="rounded-md border border-zinc-300 p-2 text-sm dark:border-zinc-700 dark:bg-zinc-800" />
+          <div className="flex flex-col gap-1.5">
+            <label className="text-[13px] font-bold text-zinc-700 dark:text-zinc-300">{t("name")}</label>
+            <input required type="text" name="name" className="rounded-xl border border-zinc-200 bg-white px-4 py-2.5 text-[13px] font-medium transition-colors focus:border-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-500 dark:border-[#2d2936] dark:bg-[#1C1A22]" />
           </div>
           <div className="grid grid-cols-2 gap-4">
-            <div className="flex flex-col gap-1">
-              <label className="text-sm font-medium">{t("category")}</label>
-              <input required type="text" name="category" className="rounded-md border border-zinc-300 p-2 text-sm dark:border-zinc-700 dark:bg-zinc-800" />
+            <div className="flex flex-col gap-1.5">
+              <label className="text-[13px] font-bold text-zinc-700 dark:text-zinc-300">{t("category")}</label>
+              <input required type="text" name="category" className="rounded-xl border border-zinc-200 bg-white px-4 py-2.5 text-[13px] font-medium transition-colors focus:border-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-500 dark:border-[#2d2936] dark:bg-[#1C1A22]" />
             </div>
-            <div className="flex flex-col gap-1">
-              <label className="text-sm font-medium">{t("type")}</label>
-              <input type="text" name="type" placeholder={t("optional")} className="rounded-md border border-zinc-300 p-2 text-sm dark:border-zinc-700 dark:bg-zinc-800" />
+            <div className="flex flex-col gap-1.5">
+              <label className="text-[13px] font-bold text-zinc-700 dark:text-zinc-300">{t("type")}</label>
+              <input type="text" name="type" placeholder={t("optional")} className="rounded-xl border border-zinc-200 bg-white px-4 py-2.5 text-[13px] font-medium transition-colors focus:border-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-500 dark:border-[#2d2936] dark:bg-[#1C1A22]" />
             </div>
           </div>
-          <div className="flex flex-col gap-1">
-            <label className="text-sm font-medium">{t("brand")}</label>
-            <input type="text" name="brand" placeholder={t("optional")} className="rounded-md border border-zinc-300 p-2 text-sm dark:border-zinc-700 dark:bg-zinc-800" />
+          <div className="flex flex-col gap-1.5">
+            <label className="text-[13px] font-bold text-zinc-700 dark:text-zinc-300">{t("brand")}</label>
+            <input type="text" name="brand" placeholder={t("optional")} className="rounded-xl border border-zinc-200 bg-white px-4 py-2.5 text-[13px] font-medium transition-colors focus:border-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-500 dark:border-[#2d2936] dark:bg-[#1C1A22]" />
           </div>
           <div className="grid grid-cols-2 gap-4">
-            <div className="flex flex-col gap-1">
-              <label className="text-sm font-medium">{t("purchase_price")}</label>
-              <input type="number" name="purchase_price" placeholder={t("optional")} className="rounded-md border border-zinc-300 p-2 text-sm dark:border-zinc-700 dark:bg-zinc-800" />
+            <div className="flex flex-col gap-1.5">
+              <label className="text-[13px] font-bold text-zinc-700 dark:text-zinc-300">{t("purchase_price")}</label>
+              <input type="number" name="purchase_price" placeholder={t("optional")} className="rounded-xl border border-zinc-200 bg-white px-4 py-2.5 text-[13px] font-medium transition-colors focus:border-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-500 dark:border-[#2d2936] dark:bg-[#1C1A22]" />
             </div>
-            <div className="flex flex-col gap-1">
-              <label className="text-sm font-medium">{t("price")}</label>
-              <input type="number" name="price" placeholder={t("optional")} className="rounded-md border border-zinc-300 p-2 text-sm dark:border-zinc-700 dark:bg-zinc-800" />
+            <div className="flex flex-col gap-1.5">
+              <label className="text-[13px] font-bold text-zinc-700 dark:text-zinc-300">{t("price")}</label>
+              <input type="number" name="price" placeholder={t("optional")} className="rounded-xl border border-zinc-200 bg-white px-4 py-2.5 text-[13px] font-medium transition-colors focus:border-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-500 dark:border-[#2d2936] dark:bg-[#1C1A22]" />
             </div>
           </div>
-          <div className="flex flex-col gap-1">
-            <label className="text-sm font-medium">{t("stock_qty")}</label>
-            <input required type="number" name="stock_qty" className="rounded-md border border-zinc-300 p-2 text-sm dark:border-zinc-700 dark:bg-zinc-800" />
+          <div className="flex flex-col gap-1.5">
+            <label className="text-[13px] font-bold text-zinc-700 dark:text-zinc-300">{t("stock_qty")}</label>
+            <input required type="number" name="stock_qty" className="rounded-xl border border-zinc-200 bg-white px-4 py-2.5 text-[13px] font-medium transition-colors focus:border-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-500 dark:border-[#2d2936] dark:bg-[#1C1A22]" />
+          </div>
+          <div className="flex flex-col gap-1.5">
+            <label className="text-[13px] font-bold text-zinc-700 dark:text-zinc-300">{t("description")}</label>
+            <textarea name="description" rows={2} placeholder={t("optional")} className="rounded-xl border border-zinc-200 bg-white px-4 py-2.5 text-[13px] font-medium transition-colors focus:border-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-500 dark:border-[#2d2936] dark:bg-[#1C1A22] resize-none" />
           </div>
           <div className="flex flex-col gap-1">
-            <label className="text-sm font-medium">{t("description")}</label>
-            <textarea name="description" rows={2} placeholder={t("optional")} className="rounded-md border border-zinc-300 p-2 text-sm dark:border-zinc-700 dark:bg-zinc-800 resize-none" />
-          </div>
-          <div className="flex flex-col gap-1">
-            <label className="flex items-center gap-2 text-sm font-medium cursor-pointer">
-              <input type="checkbox" name="is_published_online" value="true" className="rounded border-zinc-300" />
+            <label className="flex items-center gap-2 text-[13px] font-bold text-zinc-700 dark:text-zinc-300 cursor-pointer">
+              <input type="checkbox" name="is_published_online" value="true" className="rounded border-zinc-200 dark:border-[#2d2936]" />
               {t("publish_online")}
             </label>
             {!hasShopSlug && (
-              <p className="ml-6 text-xs text-amber-600 dark:text-amber-400">{t("publish_online_no_slug_hint")}</p>
+              <p className="ml-6 text-[11px] font-bold text-amber-600 dark:text-amber-400">{t("publish_online_no_slug_hint")}</p>
             )}
           </div>
 
-          <div className="mt-4 flex justify-end gap-2">
-            <button type="button" onClick={close} className="rounded-md border px-4 py-2 text-sm font-medium hover:bg-zinc-100 dark:hover:bg-zinc-800">
+          <div className="mt-4 flex justify-end gap-3">
+            <button type="button" onClick={close} className="rounded-xl px-5 py-2.5 text-[13px] font-bold text-zinc-700 hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-[#2d2936] transition-colors">
               {t("cancel")}
             </button>
-            <button type="submit" disabled={isPending} className="rounded-md bg-black px-4 py-2 text-sm font-medium text-white hover:bg-black/90 dark:bg-white dark:text-black disabled:opacity-50">
+            <button type="submit" disabled={isPending} className="rounded-xl bg-violet-600 px-5 py-2.5 text-[13px] font-bold text-white hover:bg-violet-700 transition-colors disabled:opacity-50 shadow-sm">
               {isPending ? "..." : t("submit")}
             </button>
           </div>

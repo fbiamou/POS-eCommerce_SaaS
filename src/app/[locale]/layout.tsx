@@ -5,6 +5,7 @@ import { NextIntlClientProvider } from 'next-intl';
 import { getMessages, getTranslations } from 'next-intl/server';
 import { routing } from '@/i18n/routing';
 import { notFound } from 'next/navigation';
+import Script from 'next/script';
 
 // Fixed app-wide typography per the design charter — the admin app keeps a
 // single, coherent identity. Only the public storefront (boutique/[slug])
@@ -56,11 +57,10 @@ export default async function RootLayout({
   const messages = await getMessages();
 
   return (
-    <html lang={locale} className={`${appSans.variable} ${appMono.variable}`}>
+    <html lang={locale} className={`${appSans.variable} ${appMono.variable}`} suppressHydrationWarning>
       <head>
-        {/* Applies a saved dark-theme choice before paint, so there's no
-            flash of the (default) light theme on reload. */}
         <script
+          id="theme-script"
           dangerouslySetInnerHTML={{
             __html:
               "try{if(localStorage.getItem('theme')==='dark'){document.documentElement.setAttribute('data-theme','dark')}}catch(e){}",

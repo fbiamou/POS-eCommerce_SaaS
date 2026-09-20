@@ -58,7 +58,7 @@ export function MobileTopBar({ profile, shopName, shopLogoUrl }: MobileTopBarPro
   };
 
   return (
-    <div className="md:hidden fixed top-0 left-0 right-0 h-14 bg-background z-40 flex items-center justify-between px-4">
+    <div className="md:hidden fixed top-0 left-0 right-0 h-14 bg-white dark:bg-[#1C1A22] border-b border-zinc-100 dark:border-[#2d2936] z-40 flex items-center justify-between px-4">
       <div className="flex items-center gap-2 min-w-0">
         {shopLogoUrl ? (
           <Image src={shopLogoUrl} alt="Logo" width={24} height={24} className="h-6 w-6 rounded-md object-cover shrink-0" />
@@ -74,7 +74,7 @@ export function MobileTopBar({ profile, shopName, shopLogoUrl }: MobileTopBarPro
         <button
           onClick={() => setOpen((v) => !v)}
           aria-label={t("app_name")}
-          className="flex items-center gap-1 rounded-full py-0.5 pl-0.5 pr-1.5 hover:bg-zinc-100 dark:hover:bg-zinc-800"
+          className="flex items-center gap-1 rounded-full py-0.5 pl-0.5 pr-1.5 hover:bg-zinc-100 dark:hover:bg-[#2d2936]"
         >
           <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-violet-300 to-violet-600 text-xs font-bold text-white">
             {getInitials(profile?.full_name)}
@@ -83,8 +83,8 @@ export function MobileTopBar({ profile, shopName, shopLogoUrl }: MobileTopBarPro
         </button>
 
         {open && (
-          <div className="absolute right-0 top-full mt-2 w-56 rounded-xl border bg-card p-2 shadow-card">
-            <div className="mb-1 border-b px-2 py-2">
+          <div className="absolute right-0 top-full mt-2 w-56 rounded-2xl border border-zinc-100 bg-white p-2 shadow-sm dark:border-[#2d2936] dark:bg-[#1C1A22]">
+            <div className="mb-1 border-b border-zinc-100 px-3 py-2 dark:border-[#2d2936]">
               <p className="truncate text-sm font-medium">{profile?.full_name || "Utilisateur"}</p>
               <p className="text-xs text-zinc-500">{roleLabel[profile?.role || ""] || profile?.role || ""}</p>
             </div>
@@ -92,19 +92,19 @@ export function MobileTopBar({ profile, shopName, shopLogoUrl }: MobileTopBarPro
               <Link
                 href="/settings"
                 onClick={() => setOpen(false)}
-                className="flex items-center gap-2 rounded-md px-2 py-2 text-sm font-medium hover:bg-zinc-100 dark:hover:bg-zinc-800"
+                className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-[13px] font-bold text-zinc-700 hover:bg-zinc-100/50 hover:text-violet-600 dark:text-zinc-300 dark:hover:bg-white/5 dark:hover:text-white transition-colors"
               >
                 <Settings className="h-4 w-4" /> {t("settings")}
               </Link>
             )}
-            <div className="flex items-center justify-between px-2 py-1.5">
+            <div className="flex items-center justify-between px-3 py-2">
               <LocaleSwitcher variant="dropdown" />
               <ThemeToggle switchToLightLabel={t("switch_to_light")} switchToDarkLabel={t("switch_to_dark")} />
             </div>
             <button
               onClick={handleLogout}
               disabled={isLoggingOut}
-              className="flex w-full items-center gap-2 rounded-md px-2 py-2 text-sm font-medium text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20"
+              className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-[13px] font-bold text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20 transition-colors"
             >
               <LogOut className="h-4 w-4" /> {t("logout")}
             </button>

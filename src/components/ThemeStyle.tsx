@@ -30,6 +30,7 @@ const GOOGLE_FONTS: Record<string, string> = {
   Roboto: 'Roboto',
   Outfit: 'Outfit',
   Poppins: 'Poppins',
+  "Bodoni Moda": 'Bodoni+Moda',
 }
 
 type Props = {

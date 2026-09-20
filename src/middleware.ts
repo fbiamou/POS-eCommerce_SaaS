@@ -38,10 +38,15 @@ export async function middleware(request: NextRequest) {
   // Check if it's an auth-related page
   const isAuthPage = request.nextUrl.pathname.endsWith('/login')
 
+  const path = request.nextUrl.pathname
   // The public storefront (/boutique/{slug}) and the procurement intake
   // link (/procurement/{id}, filled in by an intermediary with no account)
-  // are reachable without a session.
-  const isPublicPage = /^\/(es|fr|en)\/(boutique|procurement)(\/|$)/.test(request.nextUrl.pathname)
+  // and the landing page (/) are reachable without a session.
+  const isRootOrLocaleOnly = path === '/' || /^\/(es|fr|en)\/?$/.test(path)
+  const isBoutiqueOrProcurement = /^\/(es|fr|en)\/(boutique|procurement)(\/|$)/.test(path)
+  
+  const isPublicPage = isRootOrLocaleOnly || isBoutiqueOrProcurement
+  const isLandingPage = isRootOrLocaleOnly
 
   // 3. Redirect logic
   if (!user && !isAuthPage && !isPublicPage) {
@@ -50,9 +55,9 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(loginUrl)
   }
 
-  if (user && isAuthPage) {
+  if (user && (isAuthPage || isLandingPage)) {
     const homeUrl = request.nextUrl.clone()
-    homeUrl.pathname = `/${locale}/`
+    homeUrl.pathname = `/${locale}/dashboard`
     return NextResponse.redirect(homeUrl)
   }
 

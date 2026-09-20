@@ -21,6 +21,23 @@ export default function StorefrontShop({
   const t = useTranslations("Storefront");
   const cartKey = `storefront-cart-${shop.shop_id}`;
 
+  const categories = useMemo(() => {
+    const cats: Record<string, number> = {};
+    products.forEach((p) => {
+      const name = p.category_name || "Sans catégorie";
+      cats[name] = (cats[name] || 0) + 1;
+    });
+    return Object.entries(cats).map(([name, count]) => ({ name, count }));
+  }, [products]);
+
+  const CATEGORY_COLORS = [
+    "bg-[#1e293b] text-white", // slate
+    "bg-[#244f3b] text-white", // emerald/green
+    "bg-[#c99544] text-white", // gold
+    "bg-[#5c3e2e] text-white", // brown
+    "bg-[#4c1d95] text-white", // violet
+  ];
+
   const [cart, setCart] = useState<CartItem[]>([]);
   const [customerName, setCustomerName] = useState("");
   const [phoneCountryCode, setPhoneCountryCode] = useState(shop.default_phone_country_code || "+237");
@@ -111,17 +128,17 @@ export default function StorefrontShop({
     <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950">
       <header className="border-b bg-white dark:bg-zinc-900 px-4 py-4 sm:py-6">
         <div className="mx-auto flex max-w-5xl flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex min-w-0 items-center gap-4">
+          <div className="flex min-w-0 items-center gap-6">
             {shop.shop_logo_url ? (
-              <Image src={shop.shop_logo_url} alt={shop.shop_name || ""} width={56} height={56} className="h-14 w-14 shrink-0 rounded-xl object-cover" />
+              <Image src={shop.shop_logo_url} alt={shop.shop_name || ""} width={64} height={64} className="h-16 w-16 shrink-0 rounded-2xl object-cover" />
             ) : (
-              <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-violet-600 text-xl font-bold text-white">
+              <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-violet-600 text-2xl font-bold text-white shadow-sm">
                 {(shop.shop_name || "B")[0].toUpperCase()}
               </div>
             )}
             <div className="min-w-0">
-              <h1 className="truncate text-xl font-bold">{shop.shop_name || t("default_shop_name")}</h1>
-              {shop.shop_address && <p className="truncate text-sm text-zinc-500">{shop.shop_address}</p>}
+              <h1 className="truncate text-3xl font-bold tracking-tight">{shop.shop_name || t("default_shop_name")}</h1>
+              {shop.shop_address && <p className="truncate text-sm text-zinc-500 mt-1">{shop.shop_address}</p>}
             </div>
           </div>
           <div className="shrink-0 self-start sm:self-auto">
@@ -130,26 +147,42 @@ export default function StorefrontShop({
         </div>
       </header>
 
-      <div className="mx-auto grid max-w-5xl grid-cols-1 gap-6 p-4 lg:grid-cols-3">
-        <div className="lg:col-span-2">
-          <h2 className="mb-4 text-lg font-semibold">{t("catalog_title")}</h2>
-          {products.length === 0 ? (
-            <p className="rounded-lg border bg-white dark:bg-zinc-900 p-8 text-center text-sm text-zinc-500">
-              {t("no_products")}
-            </p>
-          ) : (
-            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
+      <div className="mx-auto flex max-w-7xl flex-col lg:flex-row gap-8 p-4 sm:p-8">
+        <div className="flex-1 min-w-0">
+          <div className="mb-10">
+            <h2 className="mb-6 text-sm font-bold tracking-widest text-zinc-400 uppercase">{t("categories_title")}</h2>
+            <div className="flex snap-x snap-mandatory gap-4 overflow-x-auto pb-4 hide-scrollbar" style={{ scrollbarWidth: 'none' }}>
+              {categories.map((cat, i) => {
+                const colorClass = CATEGORY_COLORS[i % CATEGORY_COLORS.length];
+                return (
+                  <div key={cat.name} className={`flex h-32 w-48 shrink-0 snap-start flex-col justify-end rounded-2xl p-4 shadow-sm ${colorClass}`}>
+                    <span className="text-lg font-medium leading-tight">{cat.name}</span>
+                    <span className="mt-1 text-xs opacity-80">{cat.count} {t("products")}</span>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          <div className="mb-10">
+            <h2 className="mb-6 text-sm font-bold tracking-widest text-zinc-400 uppercase">{t("popular_this_week")}</h2>
+            {products.length === 0 ? (
+              <p className="rounded-lg border bg-white dark:bg-zinc-900 p-8 text-center text-sm text-zinc-500">
+                {t("no_products")}
+              </p>
+            ) : (
+              <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 xl:grid-cols-4">
               {products.map((product) => (
-                <div key={product.product_id} className="flex flex-col rounded-lg border bg-white dark:bg-zinc-900 p-3 shadow-sm">
-                  <div className="mb-2 flex h-28 items-center justify-center overflow-hidden rounded-md bg-zinc-100 dark:bg-zinc-800">
+                <div key={product.product_id} className="group flex flex-col rounded-2xl border bg-white dark:bg-zinc-900 p-3 shadow-sm transition-all hover:shadow-md">
+                  <div className="mb-4 flex aspect-[4/5] w-full items-center justify-center overflow-hidden rounded-xl bg-zinc-100 dark:bg-zinc-800 relative">
                     {product.image_url ? (
-                      <Image src={product.image_url} alt={product.name} width={160} height={112} className="h-full w-full object-cover" />
+                      <Image src={product.image_url} alt={product.name} fill className="object-cover transition-transform duration-500 group-hover:scale-105" />
                     ) : (
                       <ShoppingBag className="h-8 w-8 text-zinc-300" />
                     )}
                   </div>
-                  <span className="line-clamp-2 text-sm font-medium">{product.name}</span>
-                  {product.category_name && <span className="text-xs text-zinc-400">{product.category_name}</span>}
+                  <span className="line-clamp-2 text-sm font-medium leading-tight">{product.name}</span>
+                  {product.category_name && <span className="mt-1 text-xs text-zinc-400">{product.category_name}</span>}
                   <span className="mt-1 font-bold">{format(product.selling_price)}</span>
                   {!product.in_stock ? (
                     <span className="mt-2 text-xs font-medium text-red-500">{t("out_of_stock")}</span>
@@ -157,7 +190,7 @@ export default function StorefrontShop({
                     <button
                       type="button"
                       onClick={() => addToCart(product.product_id)}
-                      className="mt-2 rounded-md bg-black px-3 py-1.5 text-xs font-medium text-white hover:bg-black/90 dark:bg-white dark:text-black"
+                      className="mt-2 rounded-md bg-violet-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-violet-700 transition-colors"
                     >
                       {t("add_to_cart")}
                     </button>
@@ -166,9 +199,11 @@ export default function StorefrontShop({
               ))}
             </div>
           )}
+          </div>
         </div>
 
-        <div className="rounded-lg border bg-white dark:bg-zinc-900 p-4 shadow-sm h-fit">
+        <div className="w-full lg:w-80 shrink-0">
+          <div className="rounded-2xl border bg-white dark:bg-zinc-900 p-6 shadow-sm sticky top-6">
           <h2 className="mb-4 flex items-center gap-2 text-lg font-semibold">
             <ShoppingBag className="h-5 w-5" /> {t("cart_title")}
           </h2>
@@ -258,12 +293,13 @@ export default function StorefrontShop({
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="rounded-md bg-black py-2.5 text-sm font-bold text-white hover:bg-black/90 disabled:opacity-50 dark:bg-white dark:text-black"
+                className="rounded-md bg-violet-600 py-2.5 text-sm font-bold text-white hover:bg-violet-700 transition-colors disabled:opacity-50"
               >
                 {isSubmitting ? t("submitting") : t("place_order")}
               </button>
             </form>
           )}
+        </div>
         </div>
       </div>
     </div>

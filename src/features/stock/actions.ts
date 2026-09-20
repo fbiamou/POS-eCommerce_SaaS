@@ -92,7 +92,7 @@ export async function addProduct(formData: FormData) {
 
     revalidatePath("/stock");
     revalidatePath("/sales");
-    revalidatePath("/");
+    revalidatePath("/dashboard");
 
     return { success: true, productId: newProduct.id };
   } catch (err: any) {
@@ -162,7 +162,7 @@ export async function updateProduct(formData: FormData): Promise<{ success?: tru
 
     revalidatePath("/stock");
     revalidatePath("/sales");
-    revalidatePath("/");
+    revalidatePath("/dashboard");
 
     return { success: true };
   } catch (err: any) {
@@ -312,7 +312,7 @@ export async function importProductsCsv(formData: FormData): Promise<{ summary?:
 
   revalidatePath("/stock");
   revalidatePath("/sales");
-  revalidatePath("/");
+  revalidatePath("/dashboard");
 
   return { summary: { created, restocked, errors } };
 }

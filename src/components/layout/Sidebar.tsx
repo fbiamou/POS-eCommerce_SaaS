@@ -56,8 +56,8 @@ export default function Sidebar({ profile, shopName, shopLogoUrl, shopSlug }: Si
   const NAV_ITEMS = buildNavItems(t);
 
   return (
-    <div className="hidden md:flex h-full w-64 flex-col border-r bg-zinc-50 dark:bg-zinc-900">
-      <div className="flex h-14 items-center border-b px-4">
+    <div className="hidden md:flex h-full w-64 flex-col border-r border-zinc-100 bg-white dark:border-[#2d2936] dark:bg-[#1C1A22]">
+      <div className="flex h-14 items-center border-b border-zinc-100 px-4 dark:border-[#2d2936]">
         {shopLogoUrl ? (
           <Image src={shopLogoUrl} alt="Logo" width={28} height={28} className="h-7 w-7 rounded-lg object-cover" />
         ) : (
@@ -69,7 +69,7 @@ export default function Sidebar({ profile, shopName, shopLogoUrl, shopSlug }: Si
       </div>
 
       {/* Sélecteur de langue + thème */}
-      <div className="border-b p-3 flex items-center justify-between gap-2">
+      <div className="border-b border-zinc-100 p-3 flex items-center justify-between gap-2 dark:border-[#2d2936]">
         <LocaleSwitcher variant="dropdown" />
         <ThemeToggle
           switchToLightLabel={t("switch_to_light")}
@@ -81,7 +81,7 @@ export default function Sidebar({ profile, shopName, shopLogoUrl, shopSlug }: Si
         <ul className="space-y-1 px-2">
           {NAV_ITEMS.filter((item) => canSee(item.path)).map((item) => (
             <li key={item.key}>
-              <Link href={item.path} className="flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium hover:bg-zinc-100 dark:hover:bg-zinc-800">
+              <Link href={item.path} className="flex items-center gap-3 rounded-md px-3 py-2 text-[13px] font-medium text-zinc-700 hover:bg-zinc-50 hover:text-violet-600 dark:text-zinc-300 dark:hover:bg-[#2d2936] dark:hover:text-white transition-colors">
                 <item.icon className="h-4 w-4" />
                 {item.label}
               </Link>
@@ -92,7 +92,7 @@ export default function Sidebar({ profile, shopName, shopLogoUrl, shopSlug }: Si
               <Link
                 href={`/boutique/${shopSlug}`}
                 target="_blank"
-                className="flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-violet-600 hover:bg-violet-50 dark:text-violet-400 dark:hover:bg-violet-900/20"
+                className="flex items-center gap-3 rounded-md px-3 py-2 text-[13px] font-medium text-violet-600 hover:bg-violet-50 dark:text-violet-400 dark:hover:bg-violet-900/20 transition-colors"
               >
                 <ExternalLink className="h-4 w-4" />
                 {tSettings("view_online_shop")}
@@ -103,10 +103,10 @@ export default function Sidebar({ profile, shopName, shopLogoUrl, shopSlug }: Si
       </nav>
 
       {/* Bottom section: Settings + Profile + Logout */}
-      <div className="border-t">
+      <div className="border-t border-zinc-100 dark:border-[#2d2936]">
         {canSee("/settings") && (
           <div className="p-2">
-            <Link href="/settings" className="flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium hover:bg-zinc-100 dark:hover:bg-zinc-800">
+            <Link href="/settings" className="flex items-center gap-3 rounded-md px-3 py-2 text-[13px] font-medium text-zinc-700 hover:bg-zinc-50 hover:text-violet-600 dark:text-zinc-300 dark:hover:bg-[#2d2936] dark:hover:text-white transition-colors">
               <Settings className="h-4 w-4" />
               {t("settings")}
             </Link>
@@ -114,7 +114,7 @@ export default function Sidebar({ profile, shopName, shopLogoUrl, shopSlug }: Si
         )}
 
         {/* User Profile card */}
-        <div className="border-t p-3">
+        <div className="border-t border-zinc-100 p-3 dark:border-[#2d2936]">
           <div className="flex items-center gap-3 px-1 py-2">
             <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-violet-300 to-violet-600 text-xs font-bold text-white shrink-0">
               {getInitials(profile?.full_name)}

@@ -11,8 +11,8 @@ export default async function LoginPage({
   const { error, message } = await searchParams
 
   return (
-    <div className="flex h-screen w-full items-center justify-center bg-gradient-to-br from-violet-50 to-zinc-100 dark:from-zinc-950 dark:to-zinc-900 p-4">
-      <div className="w-full max-w-md space-y-6">
+    <div className="flex min-h-screen w-full items-center justify-center bg-zinc-50 dark:bg-[#14121a] p-4">
+      <div className="w-full max-w-[400px] space-y-6">
 
         {/* Language switcher */}
         <div className="flex justify-end">
@@ -29,8 +29,8 @@ export default async function LoginPage({
         </div>
 
         {/* Card */}
-        <div className="bg-white dark:bg-zinc-900 rounded-2xl shadow-xl p-8 space-y-6">
-          <h2 className="text-xl font-semibold text-zinc-900 dark:text-white">{t('sign_in')}</h2>
+        <div className="bg-white dark:bg-[#1C1A22] rounded-2xl border border-zinc-100 dark:border-[#2d2936] shadow-sm p-6 sm:p-8 space-y-6">
+          <h2 className="text-xl font-bold text-zinc-900 dark:text-white">{t('sign_in')}</h2>
 
           {/* Error message */}
           {error && (
@@ -48,9 +48,9 @@ export default async function LoginPage({
             </div>
           )}
 
-          <form className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1" htmlFor="email">
+          <form className="space-y-5">
+            <div className="flex flex-col gap-1.5">
+              <label className="text-[13px] font-bold text-zinc-700 dark:text-zinc-300" htmlFor="email">
                 {t('email')}
               </label>
               <input
@@ -59,11 +59,11 @@ export default async function LoginPage({
                 type="email"
                 required
                 placeholder={t('email_placeholder')}
-                className="w-full px-3 py-2.5 border border-zinc-200 dark:border-zinc-700 rounded-lg bg-zinc-50 dark:bg-zinc-800 text-zinc-900 dark:text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent transition"
+                className="w-full rounded-xl border border-zinc-200 bg-white px-4 py-2.5 text-[13px] font-medium transition-colors focus:border-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-500 dark:border-[#2d2936] dark:bg-[#1C1A22]"
               />
             </div>
-            <div>
-              <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1" htmlFor="password">
+            <div className="flex flex-col gap-1.5">
+              <label className="text-[13px] font-bold text-zinc-700 dark:text-zinc-300" htmlFor="password">
                 {t('password')}
               </label>
               <input
@@ -72,24 +72,24 @@ export default async function LoginPage({
                 type="password"
                 required
                 placeholder="••••••••"
-                className="w-full px-3 py-2.5 border border-zinc-200 dark:border-zinc-700 rounded-lg bg-zinc-50 dark:bg-zinc-800 text-zinc-900 dark:text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent transition"
+                className="w-full rounded-xl border border-zinc-200 bg-white px-4 py-2.5 text-[13px] font-medium transition-colors focus:border-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-500 dark:border-[#2d2936] dark:bg-[#1C1A22]"
               />
             </div>
             <div className="flex flex-col gap-3 pt-2">
               <button
                 formAction={login}
-                className="w-full px-4 py-2.5 text-white bg-violet-600 rounded-lg hover:bg-violet-700 font-medium transition-colors"
+                className="w-full rounded-xl bg-violet-600 px-5 py-2.5 text-[13px] font-bold text-white hover:bg-violet-700 transition-colors shadow-sm"
               >
                 {t('sign_in')}
               </button>
               <div className="relative flex items-center gap-3">
-                <div className="flex-1 border-t border-zinc-200 dark:border-zinc-700" />
-                <span className="text-xs text-zinc-400">{t('or')}</span>
-                <div className="flex-1 border-t border-zinc-200 dark:border-zinc-700" />
+                <div className="flex-1 border-t border-zinc-100 dark:border-[#2d2936]" />
+                <span className="text-[11px] font-bold text-zinc-400">{t('or')}</span>
+                <div className="flex-1 border-t border-zinc-100 dark:border-[#2d2936]" />
               </div>
               <button
                 formAction={signup}
-                className="w-full px-4 py-2.5 text-zinc-700 dark:text-zinc-300 bg-zinc-100 dark:bg-zinc-800 rounded-lg hover:bg-zinc-200 dark:hover:bg-zinc-700 font-medium transition-colors"
+                className="w-full rounded-xl border border-zinc-200 bg-white dark:border-[#2d2936] dark:bg-white/5 px-5 py-2.5 text-[13px] font-bold text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-white/10 transition-colors shadow-sm"
               >
                 {t('sign_up')}
               </button>

@@ -33,11 +33,11 @@ export async function login(formData: FormData) {
     .single()
 
   const landingPath =
-    profile && !isPageAllowed(profile.role, profile.allowed_pages ?? [], '/')
+    profile && !isPageAllowed(profile.role, profile.allowed_pages ?? [], '/dashboard')
       ? firstAllowedPath(profile.allowed_pages ?? [])
-      : '/'
+      : '/dashboard'
 
-  redirect(`/fr${landingPath === '/' ? '' : landingPath}`)
+  redirect(`/fr${landingPath}`)
 }
 
 export async function signup(formData: FormData) {
@@ -63,5 +63,5 @@ export async function logout() {
   const supabase = await createClient()
   await supabase.auth.signOut()
   revalidatePath('/', 'layout')
-  redirect('/fr/login')
+  redirect('/')
 }
