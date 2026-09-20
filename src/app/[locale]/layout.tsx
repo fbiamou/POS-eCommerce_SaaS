@@ -66,6 +66,13 @@ export default async function RootLayout({
               "try{if(localStorage.getItem('theme')==='dark'){document.documentElement.setAttribute('data-theme','dark')}}catch(e){}",
           }}
         />
+        <script
+          id="unregister-sw"
+          dangerouslySetInnerHTML={{
+            __html:
+              "try{if('serviceWorker' in navigator){navigator.serviceWorker.getRegistrations().then(function(r){for(var i=0;i<r.length;i++){r[i].unregister()}})}}catch(e){}",
+          }}
+        />
       </head>
       <body className="antialiased">
         <NextIntlClientProvider messages={messages}>
