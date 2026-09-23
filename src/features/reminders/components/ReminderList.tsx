@@ -3,6 +3,8 @@
 import { useTransition, useState } from "react";
 import { MessageCircle, CheckCircle2, History } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { useShopFormat } from "@/components/ShopFormatProvider";
+import type { FeedbackCode } from "@/lib/feedback";
 import { sendReminder, type OverdueInvoice } from "../actions";
 
 export type { OverdueInvoice };
@@ -13,13 +15,15 @@ export default function ReminderList({
   invoices: OverdueInvoice[];
 }) {
   const t = useTranslations("Reminders");
+  const tFeedback = useTranslations("Feedback");
+  const format = useShopFormat();
   const [isPending, startTransition] = useTransition();
   const [sendingId, setSendingId] = useState<string | null>(null);
-  const [errorId, setErrorId] = useState<string | null>(null);
+  const [failure, setFailure] = useState<{ id: string; code: FeedbackCode } | null>(null);
 
   const handleSendReminder = (invoice: OverdueInvoice) => {
     setSendingId(invoice.id);
-    setErrorId(null);
+    setFailure(null);
 
     // Open a blank tab synchronously, inside the click handler, so browsers
     // don't treat the later navigation (after the server round-trip below)
@@ -28,22 +32,15 @@ export default function ReminderList({
     const pendingTab = window.open("", "_blank");
 
     startTransition(async () => {
-      const dueAmount = invoice.total_amount - invoice.paid_amount;
-      const result = await sendReminder({
-        id: invoice.id,
-        client_id: invoice.client_id,
-        client_name: invoice.client_name,
-        client_phone: invoice.client_phone,
-        total_amount: invoice.total_amount,
-        paid_amount: invoice.paid_amount,
-      });
+      const result = await sendReminder(invoice.id);
       setSendingId(null);
 
       if (result.error) {
         pendingTab?.close();
-        setErrorId(invoice.id);
+        setFailure({ id: invoice.id, code: result.error });
         return;
       }
+      const amount = format.money(result.amountDue ?? invoice.total_amount - invoice.paid_amount);
 
       if (result.whatsappUrl) {
         if (pendingTab) {
@@ -51,10 +48,10 @@ export default function ReminderList({
         } else {
           window.open(result.whatsappUrl, "_blank", "noopener,noreferrer");
         }
-        alert(t("manual_alert", { name: invoice.client_name, amount: dueAmount }));
+        alert(t("manual_alert", { name: invoice.client_name, amount }));
       } else {
         pendingTab?.close();
-        alert(t("success_alert", { name: invoice.client_name, amount: dueAmount }));
+        alert(t("success_alert", { name: invoice.client_name, amount }));
       }
     });
   };
@@ -95,15 +92,15 @@ export default function ReminderList({
                         +{invoice.days_overdue}
                       </span>
                     </td>
-                    <td className="p-4 text-right font-mono font-bold tabular-nums text-zinc-900 dark:text-white">
-                      {dueAmount.toLocaleString("fr-FR")}
+                    <td className="p-4 text-right font-mono font-bold tabular-nums whitespace-nowrap text-zinc-900 dark:text-white">
+                      {format.money(dueAmount)}
                     </td>
                     <td className="p-4">
                       {invoice.last_reminder_at ? (
                         <div className="flex items-center gap-2 text-[11px] text-zinc-500">
                           <History className="h-3 w-3" />
                           <span>
-                            {new Date(invoice.last_reminder_at).toLocaleDateString()} ({invoice.reminder_count})
+                            {format.date(invoice.last_reminder_at)} ({invoice.reminder_count})
                           </span>
                         </div>
                       ) : (
@@ -124,8 +121,8 @@ export default function ReminderList({
                           </>
                         )}
                       </button>
-                      {errorId === invoice.id && (
-                        <p className="mt-1 text-[11px] text-red-500">{t("send_error")}</p>
+                      {failure?.id === invoice.id && (
+                        <p className="mt-1 text-[11px] text-red-500">{tFeedback(failure.code)}</p>
                       )}
                     </td>
                   </tr>

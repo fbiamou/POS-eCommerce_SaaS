@@ -2,14 +2,32 @@
 
 import { createClient } from "@/utils/supabase/server";
 import { revalidatePath } from "next/cache";
+import type { FeedbackCode } from "@/lib/feedback";
 import { parseImportCsv, type ImportRowError } from "./csv";
 
 type SupabaseServerClient = Awaited<ReturnType<typeof createClient>>;
 
+const optionalText = (value: FormDataEntryValue | null) => (typeof value === "string" && value.trim()) || null;
+const integerOrZero = (value: FormDataEntryValue | null) => {
+  const parsed = parseInt((value as string) || "0", 10);
+  return Number.isNaN(parsed) ? 0 : parsed;
+};
+
+async function getShopId(supabase: SupabaseServerClient): Promise<{ shopId?: string; error?: FeedbackCode }> {
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { error: "unauthorized" };
+
+  const { data: profile } = await supabase.from("profiles").select("shop_id").eq("id", user.id).single();
+  if (!profile?.shop_id) return { error: "shop_not_found" };
+  return { shopId: profile.shop_id };
+}
+
 async function findOrCreateCategory(
   supabase: SupabaseServerClient,
   shopId: string,
-  categoryText: string
+  categoryText: string | null
 ): Promise<string | null> {
   if (!categoryText) return null;
 
@@ -32,168 +50,148 @@ async function findOrCreateCategory(
   return null;
 }
 
-export async function addProduct(formData: FormData) {
+// A product is always created with zero stock, then its opening quantity
+// goes through adjust_product_stock so it is recorded as a stock movement
+// like every other change (AGENTS.md: stock writes go through one RPC).
+async function setOpeningStock(
+  supabase: SupabaseServerClient,
+  shopId: string,
+  productId: string,
+  quantity: number
+): Promise<boolean> {
+  if (quantity <= 0) return true;
+  const { error } = await supabase.rpc("adjust_product_stock", {
+    _shop_id: shopId,
+    _product_id: productId,
+    _new_quantity: quantity,
+  });
+  if (error) console.error("Opening stock error:", error);
+  return !error;
+}
+
+function revalidateStockPages() {
+  revalidatePath("/stock");
+  revalidatePath("/sales");
+  revalidatePath("/dashboard");
+}
+
+export async function addProduct(
+  formData: FormData
+): Promise<{ success?: true; productId?: string; error?: FeedbackCode }> {
   const supabase = await createClient();
+  const { shopId, error: shopError } = await getShopId(supabase);
+  if (!shopId) return { error: shopError };
 
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) {
-    return { error: "Non autorisé. Veuillez vous connecter." };
-  }
+  const name = optionalText(formData.get("name"));
+  if (!name) return { error: "required_fields_missing" };
 
-  // Obtenir le shop_id
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("shop_id")
-    .eq("id", user.id)
-    .single();
-
-  if (!profile?.shop_id) {
-    return { error: "Boutique non trouvée." };
-  }
-
-  // Retrieve fields
-  const name = formData.get("name") as string;
-  const categoryText = formData.get("category") as string;
-  const type = formData.get("type") as string;
-  const brand = formData.get("brand") as string;
-
-  const purchasePrice = parseInt(formData.get("purchase_price") as string || "0");
-  const sellingPrice = parseInt(formData.get("price") as string || "0");
-  const stockQty = parseInt(formData.get("stock_qty") as string || "0");
-  const description = (formData.get("description") as string) || null;
-  const isPublishedOnline = formData.get("is_published_online") === "true";
-
-  let finalName = name;
-  if (type) finalName += ` - ${type}`;
-  if (brand) finalName += ` - ${brand}`;
+  const stockQty = Math.max(0, integerOrZero(formData.get("stock_qty")));
 
   try {
-    const categoryId = await findOrCreateCategory(supabase, profile.shop_id, categoryText);
+    const categoryId = await findOrCreateCategory(supabase, shopId, optionalText(formData.get("category")));
 
     const { data: newProduct, error: insertError } = await supabase
       .from("products")
       .insert({
-        shop_id: profile.shop_id,
-        name: finalName,
+        shop_id: shopId,
+        name,
+        brand: optionalText(formData.get("brand")),
+        product_type: optionalText(formData.get("type")),
         category_id: categoryId,
-        purchase_price: purchasePrice,
-        selling_price: sellingPrice,
-        quantity_in_stock: stockQty,
-        description,
-        is_published_online: isPublishedOnline,
+        purchase_price: Math.max(0, integerOrZero(formData.get("purchase_price"))),
+        selling_price: Math.max(0, integerOrZero(formData.get("price"))),
+        quantity_in_stock: 0,
+        description: optionalText(formData.get("description")),
+        is_published_online: formData.get("is_published_online") === "true",
       })
       .select("id")
       .single();
 
-    if (insertError) {
+    if (insertError || !newProduct) {
       console.error("Product insert error:", insertError);
-      return { error: "Erreur lors de l'enregistrement du produit." };
+      return { error: "product_save_failed" };
     }
 
-    revalidatePath("/stock");
-    revalidatePath("/sales");
-    revalidatePath("/dashboard");
+    const stockSet = await setOpeningStock(supabase, shopId, newProduct.id, stockQty);
+    revalidateStockPages();
+    if (!stockSet) return { error: "stock_adjust_failed", productId: newProduct.id };
 
     return { success: true, productId: newProduct.id };
-  } catch (err: any) {
+  } catch (err) {
     console.error("Add product failed:", err);
-    return { error: "Erreur interne." };
+    return { error: "generic_error" };
   }
 }
 
-export async function updateProduct(formData: FormData): Promise<{ success?: true; error?: string }> {
+export async function updateProduct(formData: FormData): Promise<{ success?: true; error?: FeedbackCode }> {
   const supabase = await createClient();
-
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return { error: "Non autorisé. Veuillez vous connecter." };
-
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("shop_id")
-    .eq("id", user.id)
-    .single();
-  if (!profile?.shop_id) return { error: "Boutique non trouvée." };
+  const { shopId, error: shopError } = await getShopId(supabase);
+  if (!shopId) return { error: shopError };
 
   const productId = formData.get("id") as string;
-  const name = formData.get("name") as string;
-  const categoryText = formData.get("category") as string;
-  const purchasePrice = parseInt((formData.get("purchase_price") as string) || "0");
-  const sellingPrice = parseInt((formData.get("selling_price") as string) || "0");
-  const newQuantity = parseInt((formData.get("quantity_in_stock") as string) || "0");
-  const description = (formData.get("description") as string) || null;
-  const isPublishedOnline = formData.get("is_published_online") === "true";
+  const name = optionalText(formData.get("name"));
+  if (!productId || !name) return { error: "required_fields_missing" };
 
-  if (!productId || !name) {
-    return { error: "Champs requis manquants." };
-  }
+  const newQuantity = integerOrZero(formData.get("quantity_in_stock"));
+  if (newQuantity < 0) return { error: "invalid_quantity" };
 
   try {
-    const categoryId = await findOrCreateCategory(supabase, profile.shop_id, categoryText);
+    const categoryId = await findOrCreateCategory(supabase, shopId, optionalText(formData.get("category")));
 
     const { error: updateError } = await supabase
       .from("products")
       .update({
         name,
+        brand: optionalText(formData.get("brand")),
+        product_type: optionalText(formData.get("type")),
         category_id: categoryId,
-        purchase_price: purchasePrice,
-        selling_price: sellingPrice,
-        description,
-        is_published_online: isPublishedOnline,
+        purchase_price: Math.max(0, integerOrZero(formData.get("purchase_price"))),
+        selling_price: Math.max(0, integerOrZero(formData.get("selling_price"))),
+        description: optionalText(formData.get("description")),
+        is_published_online: formData.get("is_published_online") === "true",
       })
       .eq("id", productId)
-      .eq("shop_id", profile.shop_id);
+      .eq("shop_id", shopId);
 
     if (updateError) {
       console.error("Product update error:", updateError);
-      return { error: "Erreur lors de la mise à jour du produit." };
+      return { error: "product_update_failed" };
     }
 
     // Stock quantity changes go through the centralized RPC so the
     // adjustment is logged as a stock movement, never a bare UPDATE.
     const { error: rpcError } = await supabase.rpc("adjust_product_stock", {
-      _shop_id: profile.shop_id,
+      _shop_id: shopId,
       _product_id: productId,
       _new_quantity: newQuantity,
     });
     if (rpcError) {
       console.error("Stock adjustment error:", rpcError);
-      return { error: "Produit mis à jour, mais erreur lors de l'ajustement du stock." };
+      return { error: "stock_adjust_failed" };
     }
 
-    revalidatePath("/stock");
-    revalidatePath("/sales");
-    revalidatePath("/dashboard");
-
+    revalidateStockPages();
     return { success: true };
-  } catch (err: any) {
+  } catch (err) {
     console.error("Update product failed:", err);
-    return { error: "Erreur interne." };
+    return { error: "generic_error" };
   }
 }
 
 export async function uploadProductImage(
   productId: string,
   formData: FormData
-): Promise<{ success?: true; imageUrl?: string; error?: string }> {
+): Promise<{ success?: true; imageUrl?: string; error?: FeedbackCode }> {
   const supabase = await createClient();
-
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return { error: "Non autorisé." };
-
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("shop_id")
-    .eq("id", user.id)
-    .single();
-  if (!profile?.shop_id) return { error: "Boutique non trouvée." };
+  const { shopId, error: shopError } = await getShopId(supabase);
+  if (!shopId) return { error: shopError };
 
   const file = formData.get("image") as File | null;
-  if (!file || file.size === 0) return { error: "Aucune image sélectionnée." };
+  if (!file || file.size === 0) return { error: "no_file_selected" };
 
   const ext = file.name.split(".").pop();
-  const filePath = `${profile.shop_id}/${productId}.${ext}`;
-  const arrayBuffer = await file.arrayBuffer();
-  const bytes = new Uint8Array(arrayBuffer);
+  const filePath = `${shopId}/${productId}.${ext}`;
+  const bytes = new Uint8Array(await file.arrayBuffer());
 
   const { error: uploadError } = await supabase.storage
     .from("product-images")
@@ -201,20 +199,22 @@ export async function uploadProductImage(
 
   if (uploadError) {
     console.error("Product image upload error:", uploadError);
-    return { error: "Erreur lors du téléversement de l'image." };
+    return { error: "image_upload_failed" };
   }
 
-  const { data: { publicUrl } } = supabase.storage.from("product-images").getPublicUrl(filePath);
+  const {
+    data: { publicUrl },
+  } = supabase.storage.from("product-images").getPublicUrl(filePath);
 
   const { error: updateError } = await supabase
     .from("products")
     .update({ image_url: publicUrl })
     .eq("id", productId)
-    .eq("shop_id", profile.shop_id);
+    .eq("shop_id", shopId);
 
   if (updateError) {
     console.error("Product image_url update error:", updateError);
-    return { error: "Image téléversée, mais erreur de mise à jour du produit." };
+    return { error: "image_saved_update_failed" };
   }
 
   revalidatePath("/stock");
@@ -227,28 +227,20 @@ export type ImportSummary = {
   errors: ImportRowError[];
 };
 
-export async function importProductsCsv(formData: FormData): Promise<{ summary?: ImportSummary; error?: string }> {
+export async function importProductsCsv(formData: FormData): Promise<{ summary?: ImportSummary; error?: FeedbackCode }> {
   const supabase = await createClient();
-
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return { error: "Non autorisé. Veuillez vous connecter." };
-
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("shop_id")
-    .eq("id", user.id)
-    .single();
-  if (!profile?.shop_id) return { error: "Boutique non trouvée." };
+  const { shopId, error: shopError } = await getShopId(supabase);
+  if (!shopId) return { error: shopError };
 
   const file = formData.get("file") as File | null;
-  if (!file || file.size === 0) return { error: "Aucun fichier sélectionné." };
+  if (!file || file.size === 0) return { error: "csv_file_missing" };
 
-  const text = await file.text();
   let parsed: ReturnType<typeof parseImportCsv>;
   try {
-    parsed = parseImportCsv(text);
-  } catch (err: any) {
-    return { error: "Fichier CSV invalide: " + (err.message ?? "format illisible") };
+    parsed = parseImportCsv(await file.text());
+  } catch (err) {
+    console.error("CSV parse error:", err);
+    return { error: "csv_invalid" };
   }
 
   const { rows, errors } = parsed;
@@ -256,27 +248,23 @@ export async function importProductsCsv(formData: FormData): Promise<{ summary?:
   let restocked = 0;
 
   for (const row of rows) {
-    let finalName = row.name;
-    if (row.type) finalName += ` - ${row.type}`;
-    if (row.brand) finalName += ` - ${row.brand}`;
-
-    const { data: existingProduct } = await supabase
-      .from("products")
-      .select("id")
-      .eq("shop_id", profile.shop_id)
-      .eq("name", finalName)
-      .maybeSingle();
+    // The same product is the same name, brand and type: "Fond de teint
+    // NC45" from Mac and from Fenty are two different products.
+    let lookup = supabase.from("products").select("id").eq("shop_id", shopId).eq("name", row.name);
+    lookup = row.brand ? lookup.eq("brand", row.brand) : lookup.is("brand", null);
+    lookup = row.type ? lookup.eq("product_type", row.type) : lookup.is("product_type", null);
+    const { data: existingProduct } = await lookup.maybeSingle();
 
     if (existingProduct) {
       const { error: rpcError } = await supabase.rpc("restock_product", {
-        _shop_id: profile.shop_id,
+        _shop_id: shopId,
         _product_id: existingProduct.id,
         _quantity: row.quantity,
         _new_purchase_price: row.purchase_price || null,
         _new_selling_price: row.selling_price || null,
       });
       if (rpcError) {
-        errors.push({ line: 0, message: `"${finalName}": ${rpcError.message}` });
+        errors.push({ line: row.line, code: "restock_failed", value: row.name });
         continue;
       }
 
@@ -286,33 +274,40 @@ export async function importProductsCsv(formData: FormData): Promise<{ summary?:
       if (row.image_url) catalogUpdates.image_url = row.image_url;
       if (row.is_published_online !== undefined) catalogUpdates.is_published_online = row.is_published_online;
       if (Object.keys(catalogUpdates).length > 0) {
-        await supabase.from("products").update(catalogUpdates).eq("id", existingProduct.id);
+        await supabase.from("products").update(catalogUpdates).eq("id", existingProduct.id).eq("shop_id", shopId);
       }
 
       restocked++;
     } else {
-      const categoryId = await findOrCreateCategory(supabase, profile.shop_id, row.category);
-      const { error: insertError } = await supabase.from("products").insert({
-        shop_id: profile.shop_id,
-        name: finalName,
-        category_id: categoryId,
-        purchase_price: row.purchase_price,
-        selling_price: row.selling_price,
-        quantity_in_stock: row.quantity,
-        image_url: row.image_url || null,
-        is_published_online: row.is_published_online ?? false,
-      });
-      if (insertError) {
-        errors.push({ line: 0, message: `"${finalName}": ${insertError.message}` });
+      const categoryId = await findOrCreateCategory(supabase, shopId, row.category || null);
+      const { data: newProduct, error: insertError } = await supabase
+        .from("products")
+        .insert({
+          shop_id: shopId,
+          name: row.name,
+          brand: row.brand || null,
+          product_type: row.type || null,
+          category_id: categoryId,
+          purchase_price: row.purchase_price,
+          selling_price: row.selling_price,
+          quantity_in_stock: 0,
+          image_url: row.image_url || null,
+          is_published_online: row.is_published_online ?? false,
+        })
+        .select("id")
+        .single();
+      if (insertError || !newProduct) {
+        errors.push({ line: row.line, code: "create_failed", value: row.name });
         continue;
+      }
+      const stockSet = await setOpeningStock(supabase, shopId, newProduct.id, row.quantity);
+      if (!stockSet) {
+        errors.push({ line: row.line, code: "restock_failed", value: row.name });
       }
       created++;
     }
   }
 
-  revalidatePath("/stock");
-  revalidatePath("/sales");
-  revalidatePath("/dashboard");
-
+  revalidateStockPages();
   return { summary: { created, restocked, errors } };
 }

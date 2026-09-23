@@ -3,6 +3,7 @@
 import { revalidatePath } from 'next/cache'
 import { createClient } from '@/utils/supabase/server'
 import { getCurrentProfile } from '@/features/auth/actions'
+import type { FeedbackCode } from '@/lib/feedback'
 
 function buildPhone(formData: FormData): string | null {
   const countryCode = (formData.get('phone_country_code') as string) || ''
@@ -10,13 +11,13 @@ function buildPhone(formData: FormData): string | null {
   return digits ? `${countryCode}${digits}` : null
 }
 
-export async function addClient(formData: FormData): Promise<{ success?: true; error?: string }> {
+export async function addClient(formData: FormData): Promise<{ success?: true; error?: FeedbackCode }> {
   const supabase = await createClient()
   const currentProfile = await getCurrentProfile()
-  if (!currentProfile) return { error: 'Non autorisé.' }
+  if (!currentProfile) return { error: 'unauthorized' }
 
   const name = (formData.get('name') as string)?.trim()
-  if (!name) return { error: 'Le nom est requis.' }
+  if (!name) return { error: 'name_required' }
 
   const { error } = await supabase.from('clients').insert({
     shop_id: currentProfile.shop_id,
@@ -26,7 +27,7 @@ export async function addClient(formData: FormData): Promise<{ success?: true; e
 
   if (error) {
     console.error('Error creating client:', error)
-    return { error: 'Erreur lors de la création du client.' }
+    return { error: 'client_save_failed' }
   }
 
   revalidatePath('/clients')
@@ -36,13 +37,13 @@ export async function addClient(formData: FormData): Promise<{ success?: true; e
 export async function updateClient(
   clientId: string,
   formData: FormData
-): Promise<{ success?: true; error?: string }> {
+): Promise<{ success?: true; error?: FeedbackCode }> {
   const supabase = await createClient()
   const currentProfile = await getCurrentProfile()
-  if (!currentProfile) return { error: 'Non autorisé.' }
+  if (!currentProfile) return { error: 'unauthorized' }
 
   const name = (formData.get('name') as string)?.trim()
-  if (!name) return { error: 'Le nom est requis.' }
+  if (!name) return { error: 'name_required' }
 
   const { error } = await supabase
     .from('clients')
@@ -52,7 +53,7 @@ export async function updateClient(
 
   if (error) {
     console.error('Error updating client:', error)
-    return { error: 'Erreur lors de la mise à jour du client.' }
+    return { error: 'client_save_failed' }
   }
 
   revalidatePath('/clients')

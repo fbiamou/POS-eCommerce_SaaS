@@ -2,6 +2,17 @@
 
 import { createClient } from "@/utils/supabase/server";
 import { revalidatePath } from "next/cache";
+import { feedbackFromError, type FeedbackCode } from "@/lib/feedback";
+
+type OnlineOrderRow = {
+  id: string;
+  customer_name: string;
+  customer_phone: string;
+  status: OnlineOrder["status"];
+  total_amount: number;
+  created_at: string;
+  online_order_items: { quantity: number; unit_price: number; products: { name: string } | null }[] | null;
+};
 
 export type OnlineOrder = {
   id: string;
@@ -37,14 +48,14 @@ export async function getOnlineOrders(): Promise<OnlineOrder[]> {
     return [];
   }
 
-  return (data ?? []).map((order: any) => ({
+  return ((data ?? []) as unknown as OnlineOrderRow[]).map((order) => ({
     id: order.id,
     customer_name: order.customer_name,
     customer_phone: order.customer_phone,
     status: order.status,
     total_amount: order.total_amount,
     created_at: order.created_at,
-    items: (order.online_order_items ?? []).map((item: any) => ({
+    items: (order.online_order_items ?? []).map((item) => ({
       product_name: item.products?.name ?? "—",
       quantity: item.quantity,
       unit_price: item.unit_price,
@@ -55,13 +66,13 @@ export async function getOnlineOrders(): Promise<OnlineOrder[]> {
 export async function confirmOnlineOrder(
   orderId: string,
   paidAmount: number
-): Promise<{ success?: true; invoiceId?: string; error?: string }> {
+): Promise<{ success?: true; invoiceId?: string; error?: FeedbackCode }> {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return { error: "Non autorisé." };
+  if (!user) return { error: "unauthorized" };
 
   const { data: profile } = await supabase.from("profiles").select("shop_id").eq("id", user.id).single();
-  if (!profile?.shop_id) return { error: "Boutique non trouvée." };
+  if (!profile?.shop_id) return { error: "shop_not_found" };
 
   const { data, error } = await supabase.rpc("confirm_online_order", {
     _shop_id: profile.shop_id,
@@ -71,7 +82,7 @@ export async function confirmOnlineOrder(
 
   if (error) {
     console.error("Error confirming online order:", error);
-    return { error: error.message };
+    return { error: feedbackFromError(error) };
   }
 
   revalidatePath("/online-orders");
@@ -80,13 +91,13 @@ export async function confirmOnlineOrder(
   return { success: true, invoiceId: data as string };
 }
 
-export async function cancelOnlineOrder(orderId: string): Promise<{ success?: true; error?: string }> {
+export async function cancelOnlineOrder(orderId: string): Promise<{ success?: true; error?: FeedbackCode }> {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return { error: "Non autorisé." };
+  if (!user) return { error: "unauthorized" };
 
   const { data: profile } = await supabase.from("profiles").select("shop_id").eq("id", user.id).single();
-  if (!profile?.shop_id) return { error: "Boutique non trouvée." };
+  if (!profile?.shop_id) return { error: "shop_not_found" };
 
   const { error } = await supabase.rpc("cancel_online_order", {
     _shop_id: profile.shop_id,
@@ -95,7 +106,7 @@ export async function cancelOnlineOrder(orderId: string): Promise<{ success?: tr
 
   if (error) {
     console.error("Error cancelling online order:", error);
-    return { error: error.message };
+    return { error: feedbackFromError(error) };
   }
 
   revalidatePath("/online-orders");

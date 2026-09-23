@@ -1,12 +1,14 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useSyncExternalStore } from "react";
 import { Link, useRouter } from "@/i18n/routing";
 import { Plus, Minus, Trash2 } from "lucide-react";
 import { useMessages, useTranslations } from "next-intl";
 import { useCartStore } from "../store/useCartStore";
 import { createClient } from "@/utils/supabase/client";
 import { PhoneCountryCodeSelect } from "@/components/PhoneCountryCodeSelect";
+import { useShopFormat } from "@/components/ShopFormatProvider";
+import { feedbackFromError, type FeedbackCode } from "@/lib/feedback";
 
 export type Product = {
   id: string;
@@ -33,6 +35,8 @@ export default function CreateSaleForm({
   defaultPhoneCountryCode?: string;
 }) {
   const t = useTranslations("Sales");
+  const tFeedback = useTranslations("Feedback");
+  const format = useShopFormat();
   const router = useRouter();
   const messages = useMessages();
   const dataMessages = (messages.Data ?? {}) as Record<string, string>;
@@ -44,11 +48,13 @@ export default function CreateSaleForm({
   const [selectedType, setSelectedType] = useState<string>("");
   const [selectedBrand, setSelectedBrand] = useState<string>("");
 
-  // Hydration check for Zustand
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  // The cart is persisted in localStorage (Zustand): render it only in the
+  // browser, never during server rendering, to avoid a hydration mismatch.
+  const mounted = useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false
+  );
 
   // Zustand state
   const {
@@ -79,33 +85,29 @@ export default function CreateSaleForm({
     }
   }, [newClientPhoneCountryCode, defaultPhoneCountryCode, setNewClientPhoneCountryCode]);
 
+  const paidValue = Math.max(0, parseInt(paidAmount, 10) || 0);
+
   const totalAmount = cart.reduce((sum, item) => {
     const product = products.find(p => p.id === item.productId);
     return sum + (product?.selling_price || 0) * item.quantity;
   }, 0);
 
   // Derive filter options based on current selection
-  const categories = useMemo(() => Array.from(new Set(products.map(p => p.category))), [products]);
+  const categories = useMemo(() => Array.from(new Set(products.map(p => p.category).filter(Boolean))).sort(), [products]);
   
+  // Type and brand are optional product fields: only offer the values that
+  // actually exist for the current selection, and never an empty option.
   const types = useMemo(() => {
-    if (!selectedCategory) return [];
-    return Array.from(new Set(products.filter(p => p.category === selectedCategory).map(p => p.sub_category)));
+    const scope = selectedCategory ? products.filter(p => p.category === selectedCategory) : products;
+    return Array.from(new Set(scope.map(p => p.sub_category).filter(Boolean))).sort();
   }, [products, selectedCategory]);
 
   const brands = useMemo(() => {
-    if (!selectedType) return [];
-    return Array.from(new Set(products.filter(p => p.category === selectedCategory && p.sub_category === selectedType).map(p => p.brand)));
+    const scope = products.filter(
+      p => (!selectedCategory || p.category === selectedCategory) && (!selectedType || p.sub_category === selectedType)
+    );
+    return Array.from(new Set(scope.map(p => p.brand).filter(Boolean))).sort();
   }, [products, selectedCategory, selectedType]);
-
-  // Handle cascaded filter resets
-  useEffect(() => {
-    setSelectedType("");
-    setSelectedBrand("");
-  }, [selectedCategory]);
-
-  useEffect(() => {
-    setSelectedBrand("");
-  }, [selectedType]);
 
   // Filtered products list
   const filteredProducts = useMemo(() => {
@@ -119,7 +121,7 @@ export default function CreateSaleForm({
   }, [products, searchTerm, selectedCategory, selectedType, selectedBrand]);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [submitError, setSubmitError] = useState<FeedbackCode | null>(null);
   const [lastInvoiceId, setLastInvoiceId] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -138,7 +140,8 @@ export default function CreateSaleForm({
         .single();
 
       if (!profile?.shop_id) {
-        throw new Error(t("error_no_shop"));
+        setSubmitError("shop_not_found");
+        return;
       }
 
       let finalClientId: string | null = selectedClientId || null;
@@ -157,7 +160,11 @@ export default function CreateSaleForm({
           .select("id")
           .single();
 
-        if (clientError) throw new Error(t("error_client_create", { message: clientError.message }));
+        if (clientError) {
+          console.error("Client creation failed:", clientError);
+          setSubmitError("client_save_failed");
+          return;
+        }
         finalClientId = newClient.id;
       }
 
@@ -176,16 +183,21 @@ export default function CreateSaleForm({
         _shop_id: profile.shop_id,
         _client_id: finalClientId,
         _items: items,
-        _paid_amount: paidAmount ? parseInt(paidAmount) : 0,
+        _paid_amount: paidValue,
       });
 
-      if (rpcError) throw new Error(t("error_record_sale", { message: rpcError.message }));
+      if (rpcError) {
+        console.error("record_sale failed:", rpcError);
+        setSubmitError(feedbackFromError(rpcError));
+        return;
+      }
 
       setLastInvoiceId(invoiceId as string);
       clearCart();
       router.refresh();
-    } catch (err: any) {
-      setSubmitError(err.message ?? t("error_unknown"));
+    } catch (err) {
+      console.error("Sale failed:", err);
+      setSubmitError("generic_error");
     } finally {
       setIsSubmitting(false);
     }
@@ -211,7 +223,12 @@ export default function CreateSaleForm({
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <select
               value={selectedCategory}
-              onChange={(e) => setSelectedCategory(e.target.value)}
+              onChange={(e) => {
+                // Narrowing the category invalidates the type and brand picks.
+                setSelectedCategory(e.target.value);
+                setSelectedType("");
+                setSelectedBrand("");
+              }}
               className="rounded-xl border border-zinc-200 bg-white px-4 py-2.5 text-[13px] font-medium transition-colors focus:border-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-500 dark:border-[#2d2936] dark:bg-[#1C1A22]"
             >
               <option value="">-- {t("category")} --</option>
@@ -219,8 +236,11 @@ export default function CreateSaleForm({
             </select>
             <select
               value={selectedType}
-              onChange={(e) => setSelectedType(e.target.value)}
-              disabled={!selectedCategory}
+              onChange={(e) => {
+                setSelectedType(e.target.value);
+                setSelectedBrand("");
+              }}
+              disabled={types.length === 0}
               className="rounded-xl border border-zinc-200 bg-white px-4 py-2.5 text-[13px] font-medium transition-colors focus:border-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-500 disabled:opacity-50 dark:border-[#2d2936] dark:bg-[#1C1A22]"
             >
               <option value="">-- {t("type")} --</option>
@@ -229,7 +249,7 @@ export default function CreateSaleForm({
             <select
               value={selectedBrand}
               onChange={(e) => setSelectedBrand(e.target.value)}
-              disabled={!selectedType}
+              disabled={brands.length === 0}
               className="rounded-xl border border-zinc-200 bg-white px-4 py-2.5 text-[13px] font-medium transition-colors focus:border-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-500 disabled:opacity-50 dark:border-[#2d2936] dark:bg-[#1C1A22]"
             >
               <option value="">-- {t("brand")} --</option>
@@ -248,13 +268,17 @@ export default function CreateSaleForm({
             return (
               <div key={product.id} className="flex flex-col rounded-xl border border-zinc-100 bg-white dark:border-[#2d2936] dark:bg-[#1C1A22] p-4 hover:border-violet-200 dark:hover:border-violet-900/50 transition-colors shadow-sm relative overflow-hidden group">
                 <span className="font-bold text-sm line-clamp-2 text-zinc-900 dark:text-white">{product.name}</span>
-                <span className="text-[11px] font-bold text-zinc-400 tracking-widest uppercase mt-1.5">{product.category} &gt; {product.sub_category} &gt; {product.brand}</span>
+                {(product.category || product.sub_category || product.brand) && (
+                  <span className="text-[11px] font-bold text-zinc-500 tracking-widest uppercase mt-1.5">
+                    {[product.category, product.sub_category, product.brand].filter(Boolean).map(translateData).join(" · ")}
+                  </span>
+                )}
                 
                 <span className="mt-2 text-[13px] text-zinc-500 dark:text-zinc-400 font-medium">
                   {t("stock")}: <span className={`font-bold tabular-nums ${isOutOfStock ? 'text-red-500' : 'text-zinc-900 dark:text-white'}`}>{remainingStock}</span>
                 </span>
                 
-                <span className="mt-2 font-mono text-[15px] font-bold text-violet-600 dark:text-violet-400 tabular-nums">{product.selling_price.toLocaleString("fr-FR")} FCFA</span>
+                <span className="mt-2 font-mono text-[15px] font-bold text-violet-600 dark:text-violet-400 tabular-nums">{format.money(product.selling_price)}</span>
                 
                 <button
                   type="button"
@@ -353,7 +377,7 @@ export default function CreateSaleForm({
                   <div key={item.productId} className="flex items-center justify-between border-b border-zinc-100 dark:border-[#2d2936] pb-3 pt-1">
                     <div className="flex flex-col flex-1 min-w-0 pr-2">
                       <span className="text-sm font-bold truncate text-zinc-900 dark:text-white">{product.name}</span>
-                      <span className="text-[13px] font-mono font-bold text-violet-600 dark:text-violet-400 mt-0.5 tabular-nums">{(product.selling_price * item.quantity).toLocaleString("fr-FR")} FCFA</span>
+                      <span className="text-[13px] font-mono font-bold text-violet-600 dark:text-violet-400 mt-0.5 tabular-nums">{format.money(product.selling_price * item.quantity)}</span>
                     </div>
                     <div className="flex items-center gap-2 shrink-0">
                       <button type="button" onClick={() => updateQuantity(item.productId, -1, product.quantity_in_stock)} className="rounded-full bg-white border border-zinc-200 p-1.5 hover:bg-zinc-100 dark:bg-[#1C1A22] dark:border-[#2d2936] dark:hover:bg-white/5 transition-colors"><Minus className="h-3 w-3" /></button>
@@ -370,23 +394,36 @@ export default function CreateSaleForm({
           <div className="border-t border-zinc-200 dark:border-[#2d2936] pt-5">
             <div className="flex justify-between items-center text-lg font-bold">
               <span className="text-zinc-500 dark:text-zinc-400 text-sm">{t("total")}</span>
-              <span className="font-mono text-xl tabular-nums text-zinc-900 dark:text-white">{totalAmount.toLocaleString("fr-FR")} FCFA</span>
+              <span className="font-mono text-xl tabular-nums text-zinc-900 dark:text-white">{format.money(totalAmount)}</span>
             </div>
             
             <div className="mt-4 flex flex-col gap-1.5">
-              <label className="block text-[13px] font-bold text-zinc-700 dark:text-zinc-300">{t("paid_amount")}</label>
+              <label className="block text-[13px] font-bold text-zinc-700 dark:text-zinc-300">{t("paid_amount", { currency: format.currencySymbol })}</label>
               <input
                 type="number"
+                min="0"
+                inputMode="numeric"
                 value={paidAmount}
                 onChange={(e) => setPaidAmount(e.target.value)}
                 placeholder={t("paid_amount_placeholder")}
                 className="w-full rounded-xl border border-zinc-200 bg-white px-4 py-2.5 text-[13px] font-medium transition-colors focus:border-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-500 dark:border-[#2d2936] dark:bg-[#1C1A22]"
               />
+              {/* An empty amount records the whole sale as a debt: say it out loud. */}
+              {cart.length > 0 && paidValue < totalAmount && (
+                <p className="text-[13px] font-bold text-amber-700 dark:text-amber-400">
+                  {t("balance_due", { amount: format.money(totalAmount - paidValue) })}
+                </p>
+              )}
+              {cart.length > 0 && paidValue > totalAmount && (
+                <p className="text-[13px] font-bold text-emerald-700 dark:text-emerald-400">
+                  {t("change_due", { amount: format.money(paidValue - totalAmount) })}
+                </p>
+              )}
             </div>
 
             {submitError && (
               <div className="mt-2 rounded-xl border border-red-200 bg-red-50 p-3 text-[13px] font-bold text-red-600 dark:border-red-900/30 dark:bg-red-900/20 dark:text-red-400 shadow-sm">
-                {submitError}
+                {tFeedback(submitError)}
               </div>
             )}
 

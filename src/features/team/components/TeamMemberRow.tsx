@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import { UserCircle, Ban, RotateCcw, KeyRound, Copy, ShieldCheck } from "lucide-react";
 import { useTranslations } from "next-intl";
+import type { FeedbackCode } from "@/lib/feedback";
 import {
   suspendTeamMember,
   reactivateTeamMember,
@@ -28,9 +29,10 @@ export function TeamMemberRow({
   roleLabels: { MANAGER: string; SELLER: string };
 }) {
   const t = useTranslations("Settings");
+  const tFeedback = useTranslations("Feedback");
   const tSidebar = useTranslations("Sidebar");
   const [isPending, startTransition] = useTransition();
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<FeedbackCode | null>(null);
   const [revealedPassword, setRevealedPassword] = useState<string | null>(null);
   const [showAccess, setShowAccess] = useState(false);
   const [selectedPages, setSelectedPages] = useState<Set<AppPageKey>>(
@@ -158,7 +160,7 @@ export function TeamMemberRow({
         )}
       </div>
 
-      {error && <p className="text-xs text-red-500">{error}</p>}
+      {error && <p className="text-xs text-red-600">{tFeedback(error)}</p>}
 
       {showAccess && member.role === "SELLER" && (
         <div className="rounded-md bg-zinc-50 dark:bg-zinc-800 p-3">

@@ -1,6 +1,7 @@
 import { Document, Page, View, Text, Image, StyleSheet } from "@react-pdf/renderer";
 import type { InvoiceDetail } from "../actions";
-import type { ShopSettings } from "@/features/settings/actions";
+import type { ShopSettings } from "@/features/settings/queries";
+import { DEFAULT_TIME_ZONE, formatDate, formatMoney } from "@/lib/format";
 import { extractVat } from "../actions";
 
 const styles = StyleSheet.create({
@@ -49,6 +50,7 @@ export type InvoiceLabels = {
   status_unpaid: string;
   tax_id_label: string;
   trade_register_label: string;
+  shop_fallback: string;
 };
 
 const STATUS_KEY = {
@@ -57,12 +59,12 @@ const STATUS_KEY = {
   UNPAID: "status_unpaid",
 } as const;
 
-function formatAmount(value: number, symbol: string) {
-  // toLocaleString("fr-FR") uses a narrow no-break space (U+202F) as the
-  // thousands separator, which the PDF's base Helvetica font can't render
-  // (it falls back to a stray glyph). Use a plain space instead.
-  const grouped = value.toLocaleString("fr-FR").replace(/[  ]/g, " ");
-  return `${grouped} ${symbol}`;
+// Same formatting as the screens (lib/format), with one adaptation: French
+// digit grouping uses a narrow no-break space (U+202F) that the PDF's base
+// Helvetica font cannot render (it shows a stray glyph). It becomes a regular
+// no-break space (U+00A0), which Helvetica has and which still never breaks.
+function pdfSafe(text: string) {
+  return text.replace(/ /g, " ");
 }
 
 export function InvoiceDocument({
@@ -76,17 +78,14 @@ export function InvoiceDocument({
   labels: InvoiceLabels;
   locale: string;
 }) {
-  const currencySymbol = shop?.currency_symbol || "FCFA";
+  const currencySymbol = shop?.currency_symbol ?? "";
+  const formatAmount = (value: number) => pdfSafe(formatMoney(value, currencySymbol, locale));
   const vatRateBps = shop?.vat_rate_bps ?? 1925;
   const { excludingVat, vatAmount } = shop?.vat_registered
     ? extractVat(invoice.total_amount, vatRateBps)
     : { excludingVat: invoice.total_amount, vatAmount: 0 };
   const remaining = invoice.total_amount - invoice.paid_amount;
-  const invoiceDate = new Date(invoice.created_at).toLocaleDateString(locale, {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
-  });
+  const invoiceDate = formatDate(invoice.created_at, locale, shop?.timezone ?? DEFAULT_TIME_ZONE);
 
   return (
     <Document>
@@ -94,7 +93,7 @@ export function InvoiceDocument({
         <View style={styles.headerRow}>
           <View>
             {shop?.shop_logo_url && <Image src={shop.shop_logo_url} style={styles.logo} />}
-            <Text style={styles.shopName}>{shop?.shop_name || "Boutique"}</Text>
+            <Text style={styles.shopName}>{shop?.shop_name || labels.shop_fallback}</Text>
             {shop?.shop_address && <Text style={styles.muted}>{shop.shop_address}</Text>}
             {shop?.shop_phone && <Text style={styles.muted}>{shop.shop_phone}</Text>}
             {shop?.shop_email && <Text style={styles.muted}>{shop.shop_email}</Text>}
@@ -125,8 +124,8 @@ export function InvoiceDocument({
             <View key={item.id} style={styles.tableRow}>
               <Text style={[styles.td, styles.colArticle]}>{item.product_name}</Text>
               <Text style={[styles.td, styles.colQty]}>{item.quantity}</Text>
-              <Text style={[styles.td, styles.colPrice]}>{formatAmount(item.unit_price, currencySymbol)}</Text>
-              <Text style={[styles.td, styles.colTotal]}>{formatAmount(item.total_price, currencySymbol)}</Text>
+              <Text style={[styles.td, styles.colPrice]}>{formatAmount(item.unit_price)}</Text>
+              <Text style={[styles.td, styles.colTotal]}>{formatAmount(item.total_price)}</Text>
             </View>
           ))}
         </View>
@@ -136,25 +135,25 @@ export function InvoiceDocument({
             <>
               <View style={styles.totalRow}>
                 <Text>{labels.subtotal_ht}</Text>
-                <Text>{formatAmount(excludingVat, currencySymbol)}</Text>
+                <Text>{formatAmount(excludingVat)}</Text>
               </View>
               <View style={styles.totalRow}>
                 <Text>{labels.vat} ({(vatRateBps / 100).toFixed(2)}%)</Text>
-                <Text>{formatAmount(vatAmount, currencySymbol)}</Text>
+                <Text>{formatAmount(vatAmount)}</Text>
               </View>
             </>
           )}
           <View style={styles.totalRowStrong}>
             <Text>{labels.total_ttc}</Text>
-            <Text>{formatAmount(invoice.total_amount, currencySymbol)}</Text>
+            <Text>{formatAmount(invoice.total_amount)}</Text>
           </View>
           <View style={styles.totalRow}>
             <Text>{labels.paid_amount}</Text>
-            <Text>{formatAmount(invoice.paid_amount, currencySymbol)}</Text>
+            <Text>{formatAmount(invoice.paid_amount)}</Text>
           </View>
           <View style={styles.totalRow}>
             <Text>{labels.remaining_due}</Text>
-            <Text>{formatAmount(remaining, currencySymbol)}</Text>
+            <Text>{formatAmount(remaining)}</Text>
           </View>
           <View style={styles.totalRow}>
             <Text>{labels.status}</Text>
@@ -163,7 +162,7 @@ export function InvoiceDocument({
         </View>
 
         <Text style={styles.footer} fixed>
-          {shop?.shop_name || "Boutique"}{shop?.shop_phone ? ` · ${shop.shop_phone}` : ""}
+          {shop?.shop_name || labels.shop_fallback}{shop?.shop_phone ? ` · ${shop.shop_phone}` : ""}
         </Text>
       </Page>
     </Document>

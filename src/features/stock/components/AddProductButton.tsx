@@ -13,6 +13,7 @@ export function AddProductButton({ label, hasShopSlug }: { label: string; hasSho
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const imageInputRef = useRef<HTMLInputElement>(null);
   const t = useTranslations("Stock");
+  const tFeedback = useTranslations("Feedback");
 
   const close = () => {
     setIsOpen(false);
@@ -32,9 +33,13 @@ export function AddProductButton({ label, hasShopSlug }: { label: string; hasSho
 
     startTransition(async () => {
       const result = await addProduct(formData);
-      if (result?.error || !result?.productId) {
-        setError(result?.error ?? "Erreur lors de l'enregistrement du produit.");
+      if (!result?.productId) {
+        setError(tFeedback(result?.error ?? "product_save_failed"));
         return;
+      }
+      if (result.error) {
+        // Product created, but its opening stock could not be recorded.
+        setError(tFeedback(result.error));
       }
 
       if (imageFile) {
@@ -42,11 +47,13 @@ export function AddProductButton({ label, hasShopSlug }: { label: string; hasSho
         imageFormData.append("image", imageFile);
         const uploadResult = await uploadProductImage(result.productId, imageFormData);
         if (uploadResult.error) {
-          setError(uploadResult.error);
+          setError(tFeedback(uploadResult.error));
           return;
         }
       }
 
+      // Keep the dialog open on a partial failure so the message stays visible.
+      if (result.error) return;
       alert(t("add_success"));
       close();
     });
@@ -93,7 +100,7 @@ export function AddProductButton({ label, hasShopSlug }: { label: string; hasSho
           <div className="grid grid-cols-2 gap-4">
             <div className="flex flex-col gap-1.5">
               <label className="text-[13px] font-bold text-zinc-700 dark:text-zinc-300">{t("category")}</label>
-              <input required type="text" name="category" className="rounded-xl border border-zinc-200 bg-white px-4 py-2.5 text-[13px] font-medium transition-colors focus:border-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-500 dark:border-[#2d2936] dark:bg-[#1C1A22]" />
+              <input type="text" name="category" placeholder={t("optional")} className="rounded-xl border border-zinc-200 bg-white px-4 py-2.5 text-[13px] font-medium transition-colors focus:border-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-500 dark:border-[#2d2936] dark:bg-[#1C1A22]" />
             </div>
             <div className="flex flex-col gap-1.5">
               <label className="text-[13px] font-bold text-zinc-700 dark:text-zinc-300">{t("type")}</label>
@@ -116,7 +123,7 @@ export function AddProductButton({ label, hasShopSlug }: { label: string; hasSho
           </div>
           <div className="flex flex-col gap-1.5">
             <label className="text-[13px] font-bold text-zinc-700 dark:text-zinc-300">{t("stock_qty")}</label>
-            <input required type="number" name="stock_qty" className="rounded-xl border border-zinc-200 bg-white px-4 py-2.5 text-[13px] font-medium transition-colors focus:border-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-500 dark:border-[#2d2936] dark:bg-[#1C1A22]" />
+            <input required type="number" min="0" name="stock_qty" defaultValue={0} className="rounded-xl border border-zinc-200 bg-white px-4 py-2.5 text-[13px] font-medium transition-colors focus:border-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-500 dark:border-[#2d2936] dark:bg-[#1C1A22]" />
           </div>
           <div className="flex flex-col gap-1.5">
             <label className="text-[13px] font-bold text-zinc-700 dark:text-zinc-300">{t("description")}</label>

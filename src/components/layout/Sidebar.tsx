@@ -1,6 +1,6 @@
 "use client";
 
-import { Link } from "@/i18n/routing";
+import { Link, usePathname } from "@/i18n/routing";
 import { useTranslations } from "next-intl";
 import { Settings, LogOut, ExternalLink } from "lucide-react";
 import { useState } from "react";
@@ -39,6 +39,8 @@ export default function Sidebar({ profile, shopName, shopLogoUrl, shopSlug }: Si
   const t = useTranslations("Sidebar");
   const tSettings = useTranslations("Settings");
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const pathname = usePathname();
+  const isActive = (path: string) => pathname === path || pathname.startsWith(path + "/");
 
   const handleLogout = async () => {
     setIsLoggingOut(true);
@@ -81,7 +83,15 @@ export default function Sidebar({ profile, shopName, shopLogoUrl, shopSlug }: Si
         <ul className="space-y-1 px-2">
           {NAV_ITEMS.filter((item) => canSee(item.path)).map((item) => (
             <li key={item.key}>
-              <Link href={item.path} className="flex items-center gap-3 rounded-md px-3 py-2 text-[13px] font-medium text-zinc-700 hover:bg-zinc-50 hover:text-violet-600 dark:text-zinc-300 dark:hover:bg-[#2d2936] dark:hover:text-white transition-colors">
+              <Link
+                href={item.path}
+                aria-current={isActive(item.path) ? "page" : undefined}
+                className={`flex items-center gap-3 rounded-md px-3 py-2 text-[13px] font-medium transition-colors ${
+                  isActive(item.path)
+                    ? "bg-violet-50 text-violet-700 dark:bg-violet-950/30 dark:text-violet-300"
+                    : "text-zinc-700 hover:bg-zinc-50 hover:text-violet-600 dark:text-zinc-300 dark:hover:bg-[#2d2936] dark:hover:text-white"
+                }`}
+              >
                 <item.icon className="h-4 w-4" />
                 {item.label}
               </Link>
@@ -121,7 +131,7 @@ export default function Sidebar({ profile, shopName, shopLogoUrl, shopSlug }: Si
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-sm font-medium truncate">
-                {profile?.full_name || "Utilisateur"}
+                {profile?.full_name || tSettings("no_name")}
               </p>
               <p className="text-xs text-zinc-500">
                 {roleLabel[profile?.role || ""] || profile?.role || ""}

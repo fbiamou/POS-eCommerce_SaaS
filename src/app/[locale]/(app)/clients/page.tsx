@@ -1,12 +1,21 @@
 import ClientList from "@/features/clients/components/ClientList";
 import { getTranslations } from "next-intl/server";
 import { createClient } from "@/utils/supabase/server";
-import { getShopSettings } from "@/features/settings/actions";
+import { getFormatters, getShopSettings } from "@/features/settings/queries";
+import { computeClientStats, isLoyalClient, type ClientInvoice } from "@/features/clients/stats";
+
+export async function generateMetadata() {
+  const t = await getTranslations("Clients");
+  return { title: t("title") };
+}
 
 export default async function ClientsPage() {
-  const t = await getTranslations("Clients");
-  const supabase = await createClient();
-  const shopSettings = await getShopSettings();
+  const [t, supabase, shopSettings, format] = await Promise.all([
+    getTranslations("Clients"),
+    createClient(),
+    getShopSettings(),
+    getFormatters(),
+  ]);
 
   // Fetch clients with aggregated invoice data
   const { data: clientsRaw } = await supabase
@@ -23,28 +32,13 @@ export default async function ClientsPage() {
 
   // Compute stats per client
   const clients = (clientsRaw ?? []).map((c) => {
-    const invoices: any[] = (c.invoices as any[]) ?? [];
-    const total_purchases = invoices.length;
-    const total_spent = invoices.reduce((s, inv) => s + inv.total_amount, 0);
-    const total_debt = invoices.reduce(
-      (s, inv) => s + Math.max(0, inv.total_amount - inv.paid_amount),
-      0
-    );
-    // Oldest invoice date = first purchase date
-    const dates = invoices
-      .map((inv) => inv.created_at)
-      .filter(Boolean)
-      .sort();
-    const first_purchase_date = dates[0] ?? c.created_at;
-
+    const stats = computeClientStats((c.invoices ?? []) as ClientInvoice[]);
     return {
       id: c.id,
       name: c.name,
-      phone: c.phone,
-      total_purchases,
-      total_spent,
-      total_debt,
-      first_purchase_date,
+      phone: c.phone as string | null,
+      ...stats,
+      is_loyal: isLoyalClient(stats),
     };
   });
 
@@ -63,7 +57,7 @@ export default async function ClientsPage() {
             {t("total_debts")}
           </div>
           <div className="mt-2 text-2xl font-bold text-red-600 dark:text-red-500">
-            {totalDebt.toLocaleString("fr-FR")} FCFA
+            {format.money(totalDebt)}
           </div>
         </div>
 

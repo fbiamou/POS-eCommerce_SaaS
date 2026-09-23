@@ -3,9 +3,14 @@ import { AddProductButton } from "@/features/stock/components/AddProductButton";
 import { StockActions } from "@/features/stock/components/StockActions";
 import { getTranslations } from "next-intl/server";
 import { createClient } from "@/utils/supabase/server";
-import { getShopSettings } from "@/features/settings/actions";
+import { getShopSettings } from "@/features/settings/queries";
 import { Link } from "@/i18n/routing";
 import { AlertTriangle } from "lucide-react";
+
+export async function generateMetadata() {
+  const t = await getTranslations("Stock");
+  return { title: t("title") };
+}
 
 export default async function StockPage() {
   const [t, shopSettings] = await Promise.all([
@@ -19,6 +24,8 @@ export default async function StockPage() {
     .select(`
       id,
       name,
+      brand,
+      product_type,
       quantity_in_stock,
       purchase_price,
       selling_price,
@@ -39,13 +46,15 @@ export default async function StockPage() {
   const normalizedProducts = (products ?? []).map((p) => ({
     id: p.id,
     name: p.name,
+    brand: p.brand,
+    product_type: p.product_type,
     quantity_in_stock: p.quantity_in_stock,
     purchase_price: p.purchase_price,
     selling_price: p.selling_price,
     description: p.description,
     image_url: p.image_url,
     is_published_online: p.is_published_online,
-    category: p.categories ? { name: (p.categories as any).name } : null,
+    category: (p.categories as unknown as { name: string } | null) ?? null,
   }));
 
   const hasPublishedProducts = normalizedProducts.some((p) => p.is_published_online);

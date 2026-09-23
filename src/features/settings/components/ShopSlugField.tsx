@@ -2,16 +2,18 @@
 
 import { useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
+import type { FeedbackCode } from "@/lib/feedback";
 import { Link } from "@/i18n/routing";
 import { ExternalLink } from "lucide-react";
 import { updateShopSlug } from "../actions";
 
 export function ShopSlugField({ initialSlug }: { initialSlug: string | null }) {
   const t = useTranslations("Settings");
+  const tFeedback = useTranslations("Feedback");
   const [slug, setSlug] = useState(initialSlug);
   const [inputValue, setInputValue] = useState(initialSlug || "");
   const [isPending, startTransition] = useTransition();
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<FeedbackCode | null>(null);
   const [saved, setSaved] = useState(false);
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -61,7 +63,7 @@ export function ShopSlugField({ initialSlug }: { initialSlug: string | null }) {
           {isPending ? t("saving") : t("save")}
         </button>
       </form>
-      {error && <p className="text-xs text-red-500 mt-1">{error}</p>}
+      {error && <p className="text-xs text-red-600 mt-1">{tFeedback(error)}</p>}
       {saved && !error && <p className="text-xs text-green-600 mt-1">{t("shop_slug_saved")}</p>}
       {slug && (
         <Link

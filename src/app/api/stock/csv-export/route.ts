@@ -7,16 +7,19 @@ export async function GET() {
 
   const { data: products, error } = await supabase
     .from("products")
-    .select("name, purchase_price, selling_price, quantity_in_stock, image_url, is_published_online, categories(name)")
+    .select("name, brand, product_type, purchase_price, selling_price, quantity_in_stock, image_url, is_published_online, categories(name)")
     .eq("is_active", true)
     .order("name", { ascending: true });
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    console.error("CSV export failed:", error);
+    return NextResponse.json({ error: "generic_error" }, { status: 500 });
   }
 
   const rows = (products ?? []).map((p) => ({
     name: p.name,
+    brand: p.brand,
+    product_type: p.product_type,
     category: (p.categories as unknown as { name: string } | null)?.name ?? "",
     purchase_price: p.purchase_price,
     selling_price: p.selling_price,

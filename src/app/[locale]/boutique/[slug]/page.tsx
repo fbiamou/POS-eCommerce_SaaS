@@ -3,6 +3,14 @@ import { getPublicShopProfile, getPublicShopCatalog } from "@/features/storefron
 import StorefrontShop from "@/features/storefront/components/StorefrontShop";
 import { ThemeStyle } from "@/components/ThemeStyle";
 
+// A shop's storefront is its own site for its own customers: it carries the
+// shop's name alone, never the platform's.
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+  const shop = await getPublicShopProfile(slug);
+  return { title: { absolute: shop?.shop_name || slug } };
+}
+
 export default async function StorefrontPage({
   params,
 }: {

@@ -1,63 +1,41 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
-import { redirect } from 'next/navigation'
 import { createClient } from '@/utils/supabase/server'
 import { getCurrentProfile } from '@/features/auth/actions'
+import { redirectLocalized } from '@/lib/navigation'
+import type { FeedbackCode } from '@/lib/feedback'
+import { SHOP_TIME_ZONES } from '@/lib/timeZones'
+import { DEFAULT_TIME_ZONE } from '@/lib/format'
 
-export type ShopSettings = {
-  id: string
-  shop_id: string
-  shop_name: string | null
-  shop_phone: string | null
-  shop_address: string | null
-  shop_email: string | null
-  shop_logo_url: string | null
-  currency_code: string
-  currency_symbol: string
-  theme_accent_color: string
-  theme_font: string
-  reminder_first_delay_days: number
-  reminder_recurring_delay_days: number
-  tax_id: string | null
-  trade_register: string | null
-  vat_registered: boolean
-  vat_rate_bps: number
-  whatsapp_phone_number_id: string | null
-  whatsapp_api_token: string | null
-  whatsapp_template_name: string | null
-  shop_slug: string | null
-  default_phone_country_code: string
-}
-
-export async function getShopSettings(): Promise<ShopSettings | null> {
-  const supabase = await createClient()
-
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return null
-
-  const { data, error } = await supabase
-    .from('settings')
-    .select('*')
-    .single()
-
-  if (error) {
-    console.error('Error fetching settings:', error)
-    return null
+// Every settings write is reserved to the shop's Propriétaire. The database
+// enforces it too (RLS on `settings`, migration security_hardening); checking
+// here first gives a clear message instead of a silent no-op.
+async function requireManagerOrRedirect(tab: string) {
+  const currentProfile = await getCurrentProfile()
+  if (!currentProfile) return redirectLocalized('/login')
+  if (currentProfile.role !== 'MANAGER') {
+    return redirectLocalized('/settings', { tab, error: 'access_denied' })
   }
-
-  return data
+  return currentProfile
 }
 
 export async function updateShopProfile(formData: FormData) {
+  const currentProfile = await requireManagerOrRedirect('profil')
   const supabase = await createClient()
-
-  const currentProfile = await getCurrentProfile()
-  if (!currentProfile) redirect('/fr/login')
 
   const vatRegistered = formData.get('vat_registered') === 'true'
   const vatRateInput = formData.get('vat_rate') as string
   const vatRateBps = vatRateInput ? Math.round(parseFloat(vatRateInput) * 100) : 1925
+
+  const thresholdInput = (formData.get('low_stock_threshold') as string)?.trim()
+  const lowStockThreshold = thresholdInput ? Number(thresholdInput) : 5
+  if (!Number.isInteger(lowStockThreshold) || lowStockThreshold < 0) {
+    return redirectLocalized('/settings', { tab: 'profil', error: 'threshold_invalid' })
+  }
+
+  const timeZoneInput = formData.get('timezone') as string
+  const timeZone = SHOP_TIME_ZONES.some((z) => z.value === timeZoneInput) ? timeZoneInput : DEFAULT_TIME_ZONE
 
   const updates: Record<string, string | number | boolean | null> = {
     shop_name: formData.get('shop_name') as string || null,
@@ -73,6 +51,8 @@ export async function updateShopProfile(formData: FormData) {
     vat_rate_bps: vatRegistered ? vatRateBps : 1925,
     whatsapp_phone_number_id: (formData.get('whatsapp_phone_number_id') as string)?.trim() || null,
     whatsapp_template_name: (formData.get('whatsapp_template_name') as string)?.trim() || null,
+    low_stock_threshold: lowStockThreshold,
+    timezone: timeZone,
   }
 
   // The token field is masked client-side and left blank when unchanged —
@@ -87,11 +67,11 @@ export async function updateShopProfile(formData: FormData) {
 
   if (error) {
     console.error('Update shop profile error:', error)
-    redirect('/fr/settings?tab=profil&error=Erreur lors de la mise à jour')
+    return redirectLocalized('/settings', { tab: 'profil', error: 'update_failed' })
   }
 
   revalidatePath('/', 'layout')
-  redirect('/fr/settings?tab=profil&message=Profil boutique mis à jour !')
+  return redirectLocalized('/settings', { tab: 'profil', message: 'shop_profile_updated' })
 }
 
 function slugify(input: string): string {
@@ -104,26 +84,25 @@ function slugify(input: string): string {
     .slice(0, 60)
 }
 
-export async function updateShopSlug(formData: FormData): Promise<{ success?: true; slug?: string; error?: string }> {
+export async function updateShopSlug(formData: FormData): Promise<{ success?: true; slug?: string; error?: FeedbackCode }> {
   const supabase = await createClient()
 
   const currentProfile = await getCurrentProfile()
-  if (!currentProfile) return { error: 'Non autorisé.' }
+  if (!currentProfile) return { error: 'unauthorized' }
+  if (currentProfile.role !== 'MANAGER') return { error: 'access_denied' }
 
   const rawInput = (formData.get('shop_slug') as string)?.trim()
-  if (!rawInput) return { error: "L'adresse de la boutique en ligne ne peut pas être vide." }
+  if (!rawInput) return { error: 'slug_empty' }
 
   const slug = slugify(rawInput)
-  if (!slug) return { error: 'Adresse invalide — utilisez des lettres, chiffres et tirets.' }
+  if (!slug) return { error: 'slug_invalid' }
 
-  const { data: existing } = await supabase
-    .from('settings')
-    .select('shop_id')
-    .eq('shop_slug', slug)
-    .maybeSingle()
-
-  if (existing && existing.shop_id !== currentProfile.shop_id) {
-    return { error: 'Cette adresse est déjà utilisée par une autre boutique.' }
+  // Another shop's settings row is invisible under RLS: a taken slug is
+  // detected through the public lookup instead.
+  const { data: existing } = await supabase.rpc('get_public_shop_profile', { _shop_slug: slug })
+  const owner = (existing as { shop_id: string }[] | null)?.[0]
+  if (owner && owner.shop_id !== currentProfile.shop_id) {
+    return { error: 'slug_taken' }
   }
 
   const { error } = await supabase
@@ -133,7 +112,7 @@ export async function updateShopSlug(formData: FormData): Promise<{ success?: tr
 
   if (error) {
     console.error('Update shop slug error:', error)
-    return { error: 'Erreur lors de la mise à jour.' }
+    return { error: error.code === '23505' ? 'slug_taken' : 'update_failed' }
   }
 
   revalidatePath('/settings')
@@ -142,10 +121,8 @@ export async function updateShopSlug(formData: FormData): Promise<{ success?: tr
 }
 
 export async function updateAppearance(formData: FormData) {
+  const currentProfile = await requireManagerOrRedirect('boutique')
   const supabase = await createClient()
-
-  const currentProfile = await getCurrentProfile()
-  if (!currentProfile) redirect('/fr/login')
 
   const updates = {
     theme_accent_color: formData.get('theme_accent_color') as string || '#7c3aed',
@@ -159,21 +136,21 @@ export async function updateAppearance(formData: FormData) {
 
   if (error) {
     console.error('Update appearance error:', error)
-    redirect('/fr/settings?tab=boutique&error=Erreur lors de la mise à jour')
+    return redirectLocalized('/settings', { tab: 'boutique', error: 'update_failed' })
   }
 
   revalidatePath('/', 'layout')
-  redirect('/fr/settings?tab=boutique&message=Apparence mise à jour !')
+  return redirectLocalized('/settings', { tab: 'boutique', message: 'appearance_updated' })
 }
 
 export async function updateOwnerProfile(formData: FormData) {
   const supabase = await createClient()
   const currentProfile = await getCurrentProfile()
-  if (!currentProfile) redirect('/fr/login')
+  if (!currentProfile) return redirectLocalized('/login')
 
   const fullName = formData.get('full_name') as string
   if (!fullName?.trim()) {
-    redirect('/fr/settings?tab=profil&error=Le nom est requis')
+    return redirectLocalized('/settings', { tab: 'profil', error: 'name_required' })
   }
 
   const { error } = await supabase
@@ -183,21 +160,20 @@ export async function updateOwnerProfile(formData: FormData) {
 
   if (error) {
     console.error('Update owner profile error:', error)
-    redirect('/fr/settings?tab=profil&error=Erreur lors de la mise à jour')
+    return redirectLocalized('/settings', { tab: 'profil', error: 'update_failed' })
   }
 
   revalidatePath('/', 'layout')
-  redirect('/fr/settings?tab=profil&message=Profil mis à jour !')
+  return redirectLocalized('/settings', { tab: 'profil', message: 'profile_updated' })
 }
 
 export async function uploadShopLogo(formData: FormData) {
+  const currentProfile = await requireManagerOrRedirect('profil')
   const supabase = await createClient()
-  const currentProfile = await getCurrentProfile()
-  if (!currentProfile) redirect('/fr/login')
 
   const file = formData.get('logo') as File
   if (!file || file.size === 0) {
-    redirect('/fr/settings?tab=profil&error=Aucun fichier sélectionné')
+    return redirectLocalized('/settings', { tab: 'profil', error: 'no_file_selected' })
   }
 
   const ext = file.name.split('.').pop()
@@ -214,7 +190,7 @@ export async function uploadShopLogo(formData: FormData) {
 
   if (uploadError) {
     console.error('Logo upload error:', uploadError)
-    redirect(`/fr/settings?tab=profil&error=Erreur upload: ${uploadError.message}`)
+    return redirectLocalized('/settings', { tab: 'profil', error: 'logo_upload_failed' })
   }
 
   const { data: { publicUrl } } = supabase.storage
@@ -227,9 +203,9 @@ export async function uploadShopLogo(formData: FormData) {
     .eq('shop_id', currentProfile.shop_id)
 
   if (updateError) {
-    redirect('/fr/settings?tab=profil&error=Logo uploadé mais erreur de mise à jour')
+    return redirectLocalized('/settings', { tab: 'profil', error: 'logo_saved_update_failed' })
   }
 
   revalidatePath('/', 'layout')
-  redirect('/fr/settings?tab=profil&message=Logo mis à jour avec succès !')
+  return redirectLocalized('/settings', { tab: 'profil', message: 'logo_updated' })
 }

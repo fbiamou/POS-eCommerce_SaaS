@@ -6,16 +6,19 @@ import { useTranslations } from "next-intl";
 import { Modal } from "@/components/ui/Modal";
 import { PhoneCountryCodeSelect } from "@/components/PhoneCountryCodeSelect";
 import { PHONE_COUNTRY_CODES } from "@/lib/phoneCountryCodes";
+import { useShopFormat } from "@/components/ShopFormatProvider";
 import { addClient, updateClient } from "../actions";
 
 export type ClientData = {
   id: string;
   name: string;
-  phone: string;
+  phone: string | null;
   total_purchases: number;
+  recent_purchases: number;
   total_spent: number;
   total_debt: number;
-  first_purchase_date: string;
+  first_purchase_date: string | null;
+  is_loyal: boolean;
 };
 
 // Existing clients created before the country-code selector existed may have
@@ -36,6 +39,8 @@ export default function ClientList({
   defaultPhoneCountryCode?: string;
 }) {
   const t = useTranslations("Clients");
+  const tFeedback = useTranslations("Feedback");
+  const format = useShopFormat();
   const [searchTerm, setSearchTerm] = useState("");
   const [isPending, startTransition] = useTransition();
 
@@ -51,21 +56,11 @@ export default function ClientList({
   const [editCountryCode, setEditCountryCode] = useState(defaultPhoneCountryCode);
   const [editError, setEditError] = useState<string | null>(null);
 
-  const filteredClients = clients.filter(c =>
-    c.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    c.phone.includes(searchTerm)
+  // A client may have no phone number: searching must not crash on it.
+  const term = searchTerm.trim().toLowerCase();
+  const filteredClients = clients.filter(
+    (c) => c.name.toLowerCase().includes(term) || (c.phone ?? "").includes(term)
   );
-
-  const isRecurring = (client: ClientData) => {
-    // Règle : > 5 achats OU inscrit depuis plus de 3 mois
-    if (client.total_purchases > 5) return true;
-
-    const firstPurchase = new Date(client.first_purchase_date);
-    const threeMonthsAgo = new Date();
-    threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
-
-    return firstPurchase <= threeMonthsAgo;
-  };
 
   const closeNewClientModal = () => {
     setIsNewClientModalOpen(false);
@@ -85,7 +80,7 @@ export default function ClientList({
       formData.set("phone_country_code", newCountryCode);
       const result = await addClient(formData);
       if (result.error) {
-        setCreateError(result.error);
+        setCreateError(tFeedback(result.error));
         return;
       }
       alert(t("new_client_success"));
@@ -118,7 +113,7 @@ export default function ClientList({
       formData.set("phone_country_code", editCountryCode);
       const result = await updateClient(editingClient.id, formData);
       if (result.error) {
-        setEditError(result.error);
+        setEditError(tFeedback(result.error));
         return;
       }
       closeEditModal();
@@ -164,7 +159,7 @@ export default function ClientList({
               </thead>
               <tbody className="divide-y divide-zinc-50 dark:divide-white/5">
                 {filteredClients.map((client) => {
-                  const recurring = isRecurring(client);
+                  const recurring = client.is_loyal;
                   return (
                     <tr key={client.id} className="hover:bg-zinc-50 dark:hover:bg-white/[0.02] transition-colors group">
                       <td className="p-4 font-bold text-zinc-900 dark:text-white">{client.name}</td>
@@ -183,9 +178,9 @@ export default function ClientList({
                       <td className="p-4 text-right font-mono font-bold text-zinc-900 tabular-nums dark:text-white">{client.total_purchases}</td>
                       <td className="p-4 text-right">
                         {client.total_debt > 0 ? (
-                          <span className="inline-flex items-center gap-1 font-mono font-bold tabular-nums text-red-500">
+                          <span className="inline-flex items-center gap-1 whitespace-nowrap font-mono font-bold tabular-nums text-red-600">
                             <AlertCircle className="h-4 w-4" />
-                            {client.total_debt.toLocaleString("fr-FR")}
+                            {format.money(client.total_debt)}
                           </span>
                         ) : (
                           <span className="font-mono text-zinc-400 dark:text-zinc-500 tabular-nums">0</span>

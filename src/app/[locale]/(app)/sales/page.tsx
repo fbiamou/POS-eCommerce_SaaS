@@ -1,7 +1,12 @@
 import CreateSaleForm from "@/features/sales/components/CreateSaleForm";
 import { getTranslations } from "next-intl/server";
 import { createClient } from "@/utils/supabase/server";
-import { getShopSettings } from "@/features/settings/actions";
+import { getShopSettings } from "@/features/settings/queries";
+
+export async function generateMetadata() {
+  const t = await getTranslations("Sales");
+  return { title: t("title") };
+}
 
 export default async function SalesPage() {
   const t = await getTranslations("Sales");
@@ -14,6 +19,8 @@ export default async function SalesPage() {
     .select(`
       id,
       name,
+      brand,
+      product_type,
       selling_price,
       quantity_in_stock,
       categories(name)
@@ -33,9 +40,9 @@ export default async function SalesPage() {
   const products = (productsData ?? []).map((p) => ({
     id: p.id,
     name: p.name,
-    category: (p.categories as any)?.name ?? "",
-    sub_category: "",
-    brand: "",
+    category: (p.categories as unknown as { name: string } | null)?.name ?? "",
+    sub_category: p.product_type ?? "",
+    brand: p.brand ?? "",
     selling_price: p.selling_price,
     quantity_in_stock: p.quantity_in_stock,
   }));

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServiceRoleClient } from "@/utils/supabase/service";
-import { hasWhatsAppCredentials, sendWhatsAppTemplateMessage } from "@/features/reminders/whatsapp";
+import { sendWhatsAppTemplateMessage } from "@/features/reminders/whatsapp";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -34,7 +34,9 @@ export async function GET(request: NextRequest) {
 
   for (const shop of shops ?? []) {
     shopsProcessed++;
-    const shopHasCredentials = hasWhatsAppCredentials(shop);
+    const shopHasCredentials = Boolean(
+      shop.whatsapp_phone_number_id && shop.whatsapp_api_token && shop.whatsapp_template_name
+    );
 
     const { data: overdueInvoices, error: rpcError } = await supabase.rpc(
       "get_overdue_invoices_for_reminders",

@@ -1,9 +1,9 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
-import { redirect } from 'next/navigation'
 import { createClient } from '@/utils/supabase/server'
 import { isPageAllowed, firstAllowedPath } from '@/lib/appPages'
+import { redirectLocalized } from '@/lib/navigation'
 
 export async function login(formData: FormData) {
   const supabase = await createClient()
@@ -16,7 +16,7 @@ export async function login(formData: FormData) {
   const { data: signInData, error } = await supabase.auth.signInWithPassword(data)
 
   if (error) {
-    redirect('/fr/login?error=Identifiants invalides')
+    return redirectLocalized('/login', { error: 'invalid_credentials' })
   }
 
   revalidatePath('/', 'layout')
@@ -37,7 +37,7 @@ export async function login(formData: FormData) {
       ? firstAllowedPath(profile.allowed_pages ?? [])
       : '/dashboard'
 
-  redirect(`/fr${landingPath}`)
+  return redirectLocalized(landingPath)
 }
 
 export async function signup(formData: FormData) {
@@ -52,16 +52,16 @@ export async function signup(formData: FormData) {
 
   if (error) {
     console.error("Signup error:", error);
-    redirect(`/fr/login?error=Erreur: ${error.message}`);
+    return redirectLocalized('/login', { error: 'signup_failed' })
   }
 
-  // Show confirmation message after signup (email confirmation required)
-  redirect('/fr/login?message=Compte créé ! Vérifiez votre email pour confirmer votre compte.')
+  // Email confirmation is required before the first sign-in.
+  return redirectLocalized('/login', { message: 'signup_check_email' })
 }
 
 export async function logout() {
   const supabase = await createClient()
   await supabase.auth.signOut()
   revalidatePath('/', 'layout')
-  redirect('/')
+  return redirectLocalized('/')
 }

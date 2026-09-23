@@ -4,16 +4,12 @@ import { useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/routing";
 import { FileText } from "lucide-react";
+import { useShopFormat } from "@/components/ShopFormatProvider";
 import type { InvoiceListItem } from "../actions";
 
-export default function InvoiceList({
-  invoices,
-  currencySymbol,
-}: {
-  invoices: InvoiceListItem[];
-  currencySymbol: string;
-}) {
+export default function InvoiceList({ invoices }: { invoices: InvoiceListItem[] }) {
   const t = useTranslations("Invoices");
+  const format = useShopFormat();
   const [searchTerm, setSearchTerm] = useState("");
 
   const filtered = useMemo(() => {
@@ -38,7 +34,6 @@ export default function InvoiceList({
     UNPAID: "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400",
   };
 
-  const format = (n: number) => `${n.toLocaleString("fr-FR")}`;
 
   return (
     <div className="flex flex-col gap-5">
@@ -58,7 +53,7 @@ export default function InvoiceList({
                 <th className="p-4 text-[11px] font-bold text-zinc-400 tracking-widest uppercase">{t("invoice_number")}</th>
                 <th className="p-4 text-[11px] font-bold text-zinc-400 tracking-widest uppercase">{t("client")}</th>
                 <th className="p-4 text-[11px] font-bold text-zinc-400 tracking-widest uppercase">{t("date")}</th>
-                <th className="p-4 text-[11px] font-bold text-zinc-400 tracking-widest uppercase text-right">{t("total_ttc")} ({currencySymbol})</th>
+                <th className="p-4 text-[11px] font-bold text-zinc-400 tracking-widest uppercase text-right">{t("total_ttc")}</th>
                 <th className="p-4 text-[11px] font-bold text-zinc-400 tracking-widest uppercase text-right">{t("remaining_due")}</th>
                 <th className="p-4 text-[11px] font-bold text-zinc-400 tracking-widest uppercase">{t("status")}</th>
                 <th className="p-4 text-[11px] font-bold text-zinc-400 tracking-widest uppercase text-right">{t("view")}</th>
@@ -71,9 +66,9 @@ export default function InvoiceList({
                   <tr key={invoice.id} className="hover:bg-zinc-50 dark:hover:bg-white/[0.02] transition-colors group">
                     <td className="p-4 font-mono font-medium text-zinc-500 group-hover:text-violet-600 dark:group-hover:text-violet-400">{invoice.invoice_number || "—"}</td>
                     <td className="p-4 font-bold text-zinc-900 dark:text-white">{invoice.client_name || t("walk_in_client")}</td>
-                    <td className="p-4 text-zinc-500">{new Date(invoice.created_at).toLocaleDateString("fr-FR")}</td>
-                    <td className="p-4 text-right font-mono font-bold text-zinc-900 dark:text-white tabular-nums">{format(invoice.total_amount)}</td>
-                    <td className="p-4 text-right font-mono font-bold text-red-500 tabular-nums">{remaining > 0 ? format(remaining) : "—"}</td>
+                    <td className="p-4 text-zinc-500">{format.date(invoice.created_at)}</td>
+                    <td className="p-4 text-right font-mono font-bold text-zinc-900 dark:text-white tabular-nums whitespace-nowrap">{format.money(invoice.total_amount)}</td>
+                    <td className="p-4 text-right font-mono font-bold text-red-500 tabular-nums whitespace-nowrap">{remaining > 0 ? format.money(remaining) : "—"}</td>
                     <td className="p-4">
                       <span className={`rounded-full px-2.5 py-1 text-[10px] font-bold ${statusClass[invoice.status]}`}>
                         {statusLabel[invoice.status]}

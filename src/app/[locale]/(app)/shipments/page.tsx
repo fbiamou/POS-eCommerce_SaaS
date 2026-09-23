@@ -1,6 +1,11 @@
 import ShipmentList from "@/features/shipments/components/ShipmentList";
 import { getTranslations } from "next-intl/server";
 
+export async function generateMetadata() {
+  const t = await getTranslations("Shipments");
+  return { title: t("title") };
+}
+
 export default async function ShipmentsPage() {
   const t = await getTranslations("Shipments");
 

@@ -1,6 +1,12 @@
 import { login, signup } from './actions'
 import { getTranslations } from 'next-intl/server'
 import { LocaleSwitcher } from '@/components/LocaleSwitcher'
+import { readFeedbackParam } from '@/lib/feedback'
+
+export async function generateMetadata() {
+  const t = await getTranslations('Auth')
+  return { title: t('sign_in') }
+}
 
 export default async function LoginPage({
   searchParams,
@@ -8,7 +14,12 @@ export default async function LoginPage({
   searchParams: Promise<{ error?: string; message?: string }>
 }) {
   const t = await getTranslations('Auth')
-  const { error, message } = await searchParams
+  const tFeedback = await getTranslations('Feedback')
+  const params = await searchParams
+  // Only known feedback codes are displayed: a crafted link cannot make this
+  // page show arbitrary text.
+  const error = readFeedbackParam(params.error)
+  const message = readFeedbackParam(params.message)
 
   return (
     <div className="flex min-h-screen w-full items-center justify-center bg-zinc-50 dark:bg-[#14121a] p-4">
@@ -36,7 +47,7 @@ export default async function LoginPage({
           {error && (
             <div className="flex items-start gap-3 p-3 text-sm text-red-700 bg-red-50 dark:bg-red-900/20 dark:text-red-400 border border-red-200 dark:border-red-800 rounded-lg">
               <span>⚠️</span>
-              <span>{error}</span>
+              <span>{tFeedback(error)}</span>
             </div>
           )}
 
@@ -44,7 +55,7 @@ export default async function LoginPage({
           {message && (
             <div className="flex items-start gap-3 p-3 text-sm text-emerald-700 bg-emerald-50 dark:bg-emerald-900/20 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 rounded-lg">
               <span>✅</span>
-              <span>{message}</span>
+              <span>{tFeedback(message)}</span>
             </div>
           )}
 

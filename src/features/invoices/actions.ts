@@ -49,6 +49,7 @@ export type InvoiceDetail = {
     total_price: number;
     product_name: string;
   }[];
+  payments: { id: string; amount: number; payment_date: string }[];
 };
 
 export async function getInvoiceDetail(id: string): Promise<InvoiceDetail | null> {
@@ -60,7 +61,8 @@ export async function getInvoiceDetail(id: string): Promise<InvoiceDetail | null
       `
       id, invoice_number, total_amount, paid_amount, status, created_at,
       clients ( name, phone ),
-      invoice_items ( id, quantity, unit_price, total_price, products ( name ) )
+      invoice_items ( id, quantity, unit_price, total_price, products ( name ) ),
+      payments ( id, amount, payment_date )
     `
     )
     .eq("id", id)
@@ -76,6 +78,7 @@ export async function getInvoiceDetail(id: string): Promise<InvoiceDetail | null
     total_price: number;
     products: { name: string } | null;
   }[];
+  const payments = (data.payments ?? []) as unknown as { id: string; amount: number; payment_date: string }[];
 
   return {
     id: data.id,
@@ -92,6 +95,7 @@ export async function getInvoiceDetail(id: string): Promise<InvoiceDetail | null
       total_price: item.total_price,
       product_name: item.products?.name ?? "—",
     })),
+    payments: [...payments].sort((a, b) => a.payment_date.localeCompare(b.payment_date)),
   };
 }
 

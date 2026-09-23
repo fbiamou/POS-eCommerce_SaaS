@@ -49,10 +49,15 @@ export function matchPageKey(pathWithoutLocale: string): AppPageKey | null {
 // for every existing account (including all SELLERs before this feature
 // existed), so introducing it never silently locks anyone out. Restriction
 // only applies once a manager explicitly configures a non-empty page set.
+// Pages only a Propriétaire (MANAGER) may open, whatever the employee's
+// configured access: the shop profile, WhatsApp credentials and team.
+export const MANAGER_ONLY_PAGES: AppPageKey[] = ["settings"];
+
 export function isPageAllowed(role: string, allowedPages: string[], pathWithoutLocale: string): boolean {
   if (role === "MANAGER") return true;
-  if (!allowedPages || allowedPages.length === 0) return true;
   const key = matchPageKey(pathWithoutLocale);
+  if (key && MANAGER_ONLY_PAGES.includes(key)) return false;
+  if (!allowedPages || allowedPages.length === 0) return true;
   if (!key) return true;
   return allowedPages.includes(key);
 }

@@ -2,88 +2,100 @@ import { Link, redirect } from "@/i18n/routing";
 import { getTranslations, getLocale } from "next-intl/server";
 import { createClient } from "@/utils/supabase/server";
 import { getCurrentProfile } from "@/features/auth/actions";
+import { getFormatters } from "@/features/settings/queries";
 import { isPageAllowed, firstAllowedPath } from "@/lib/appPages";
+import { dayRangeInTimeZone } from "@/lib/format";
+import { rankTopProducts, TOP_SALES_PERIODS, type TopSalesPeriod } from "@/features/sales/stats";
 
-export default async function DashboardPage() {
+export async function generateMetadata() {
   const t = await getTranslations("Dashboard");
-  const locale = await getLocale();
-  const supabase = await createClient();
+  return { title: t("title") };
+}
 
-  const profile = await getCurrentProfile();
+type InvoiceWithClient = {
+  id: string;
+  invoice_number: string | null;
+  total_amount: number;
+  status: "PAID" | "PARTIAL" | "UNPAID";
+  clients: { name: string } | null;
+};
+
+export default async function DashboardPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ period?: string }>;
+}) {
+  const [t, locale, format, profile, supabase, params] = await Promise.all([
+    getTranslations("Dashboard"),
+    getLocale(),
+    getFormatters(),
+    getCurrentProfile(),
+    createClient(),
+    searchParams,
+  ]);
+
   if (profile && !isPageAllowed(profile.role, profile.allowed_pages, "/dashboard")) {
-    redirect(firstAllowedPath(profile.allowed_pages) as any);
+    redirect({ href: firstAllowedPath(profile.allowed_pages), locale });
   }
 
-  // Fetch today's date range
-  const todayStart = new Date();
-  todayStart.setHours(0, 0, 0, 0);
-  const todayEnd = new Date();
-  todayEnd.setHours(23, 59, 59, 999);
+  const period: TopSalesPeriod = TOP_SALES_PERIODS.includes(params.period as TopSalesPeriod)
+    ? (params.period as TopSalesPeriod)
+    : "day";
 
-  // KPI: Today's revenue + sales count
-  const { data: todayInvoices } = await supabase
-    .from("invoices")
-    .select("total_amount, paid_amount")
-    .gte("created_at", todayStart.toISOString())
-    .lte("created_at", todayEnd.toISOString());
+  // "Today" is the shop's calendar day, not the server's (UTC).
+  const now = new Date();
+  const today = dayRangeInTimeZone(now, format.timeZone);
+  const periodDays = period === "day" ? 1 : period === "week" ? 7 : 30;
+  const periodStart = new Date(today.start.getTime() - (periodDays - 1) * 24 * 60 * 60 * 1000);
 
-  const todayCA = todayInvoices?.reduce((sum, inv) => sum + inv.total_amount, 0) ?? 0;
-  const salesCount = todayInvoices?.length ?? 0;
+  const [todayInvoicesRes, debtRes, lowStockRes, recentRes, oldestDebtRes, soldItemsRes] = await Promise.all([
+    supabase
+      .from("invoices")
+      .select("total_amount")
+      .gte("created_at", today.start.toISOString())
+      .lt("created_at", today.end.toISOString()),
+    supabase.from("invoices").select("total_amount, paid_amount").in("status", ["UNPAID", "PARTIAL"]),
+    supabase
+      .from("products")
+      .select("id", { count: "exact", head: true })
+      .lte("quantity_in_stock", format.lowStockThreshold)
+      .eq("is_active", true),
+    supabase
+      .from("invoices")
+      .select("id, invoice_number, total_amount, status, clients(name)")
+      .order("created_at", { ascending: false })
+      .limit(5),
+    // The oldest unpaid invoice with a client is the most urgent reminder.
+    supabase
+      .from("invoices")
+      .select("id, clients!inner(name)")
+      .in("status", ["UNPAID", "PARTIAL"])
+      .order("created_at", { ascending: true })
+      .limit(1),
+    supabase
+      .from("invoice_items")
+      .select("product_id, quantity, products(name)")
+      .gte("created_at", periodStart.toISOString())
+      .lt("created_at", today.end.toISOString()),
+  ]);
 
-  // KPI: Total outstanding debt
-  const { data: debtData } = await supabase
-    .from("invoices")
-    .select("total_amount, paid_amount")
-    .in("status", ["UNPAID", "PARTIAL"]);
-  const totalDebt =
-    debtData?.reduce((sum, inv) => sum + (inv.total_amount - inv.paid_amount), 0) ?? 0;
+  for (const res of [todayInvoicesRes, debtRes, lowStockRes, recentRes, oldestDebtRes, soldItemsRes]) {
+    if (res.error) console.error("Dashboard query failed:", res.error);
+  }
 
-  // KPI: Low stock count (quantity <= 3)
-  const { count: lowStockCount } = await supabase
-    .from("products")
-    .select("*", { count: "exact", head: true })
-    .lte("quantity_in_stock", 3)
-    .eq("is_active", true);
-
-  // Recent Invoices
-  const { data: recentInvoices } = await supabase
-    .from("invoices")
-    .select("id, invoice_number, total_amount, status, client_id, clients(full_name)")
-    .order("created_at", { ascending: false })
-    .limit(3);
-
-  // First unpaid invoice for quick reminder
-  const firstUnpaid = recentInvoices?.find((inv) => inv.status === "PARTIAL" || inv.status === "UNPAID");
-
-  // Top Articles (Today)
-  const { data: topSalesData } = await supabase
-    .from("invoice_items")
-    .select("product_id, quantity, products(name)")
-    .gte("created_at", todayStart.toISOString())
-    .lte("created_at", todayEnd.toISOString());
-
-  const productSales = new Map<string, { name: string, quantity: number }>();
-  topSalesData?.forEach((item) => {
-    const pId = item.product_id;
-    const qty = item.quantity;
-    const name = (item.products as any)?.name || t("unknown_product");
-    if (productSales.has(pId)) {
-      productSales.get(pId)!.quantity += qty;
-    } else {
-      productSales.set(pId, { name, quantity: qty });
-    }
-  });
-
-  const topArticles = Array.from(productSales.values())
-    .sort((a, b) => b.quantity - a.quantity)
-    .slice(0, 3);
+  const todayRevenue = (todayInvoicesRes.data ?? []).reduce((sum, inv) => sum + inv.total_amount, 0);
+  const salesCount = todayInvoicesRes.data?.length ?? 0;
+  const totalDebt = (debtRes.data ?? []).reduce((sum, inv) => sum + (inv.total_amount - inv.paid_amount), 0);
+  const lowStockCount = lowStockRes.count ?? 0;
+  const recentInvoices = (recentRes.data ?? []) as unknown as InvoiceWithClient[];
+  const oldestDebt = oldestDebtRes.data?.[0] as unknown as { id: string; clients: { name: string } } | undefined;
+  const topArticles = rankTopProducts(
+    (soldItemsRes.data ?? []) as unknown as { product_id: string; quantity: number; products: { name: string } | null }[],
+    t("unknown_product"),
+    5
+  );
 
   const firstName = profile?.full_name?.trim().split(/\s+/)[0];
-  const today = new Date().toLocaleDateString(locale, {
-    weekday: "long",
-    day: "numeric",
-    month: "long",
-  });
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -113,23 +125,20 @@ export default async function DashboardPage() {
         <h1 className="text-2xl font-bold tracking-tight">{t("title")}</h1>
         {firstName && (
           <p className="mt-1 text-sm text-[#7A7488] dark:text-[#A79FB0]">
-            {t("greeting", { name: firstName, date: today })}
+            {t("greeting", { name: firstName, date: format.date(now, "weekday") })}
           </p>
         )}
       </div>
 
       {/* KPI Cards - Dense, 2 columns on mobile */}
       <div className="grid grid-cols-2 gap-3 md:gap-4 lg:grid-cols-4">
-        
-        {/* CA du jour */}
         <div className="rounded-2xl border border-zinc-100 bg-white dark:border-[#2d2936] dark:bg-[#1C1A22] p-4 sm:p-5 shadow-sm flex flex-col justify-between min-h-[100px]">
           <span className="text-xs font-medium text-zinc-500 dark:text-zinc-400">{t("today_ca")}</span>
           <span className="mt-2 font-mono text-[17px] sm:text-xl font-bold text-zinc-900 dark:text-white leading-tight tabular-nums">
-            {todayCA.toLocaleString("fr-FR")} <br className="sm:hidden" />FCFA
+            {format.money(todayRevenue)}
           </span>
         </div>
 
-        {/* Ventes */}
         <div className="rounded-2xl border border-zinc-100 bg-white dark:border-[#2d2936] dark:bg-[#1C1A22] p-4 sm:p-5 shadow-sm flex flex-col justify-between min-h-[100px]">
           <span className="text-xs font-medium text-zinc-500 dark:text-zinc-400">{t("sales_count")}</span>
           <span className="mt-2 font-mono text-[17px] sm:text-xl font-bold text-zinc-900 dark:text-white leading-tight tabular-nums">
@@ -137,98 +146,97 @@ export default async function DashboardPage() {
           </span>
         </div>
 
-        {/* Dettes */}
-        <div className="rounded-2xl border border-zinc-100 bg-white dark:border-[#2d2936] dark:bg-[#1C1A22] p-4 sm:p-5 shadow-sm flex flex-col justify-between min-h-[100px]">
+        <Link href="/clients" className="rounded-2xl border border-zinc-100 bg-white dark:border-[#2d2936] dark:bg-[#1C1A22] p-4 sm:p-5 shadow-sm flex flex-col justify-between min-h-[100px]">
           <span className="text-xs font-medium text-zinc-500 dark:text-zinc-400">{t("debts")}</span>
-          <span className="mt-2 font-mono text-[17px] sm:text-xl font-bold text-[#F87171] leading-tight tabular-nums">
-            {totalDebt.toLocaleString("fr-FR")} <br className="sm:hidden" />FCFA
+          <span className="mt-2 font-mono text-[17px] sm:text-xl font-bold text-red-600 dark:text-red-400 leading-tight tabular-nums">
+            {format.money(totalDebt)}
           </span>
-        </div>
+        </Link>
 
-        {/* Stock bas */}
-        <div className="rounded-2xl border border-zinc-100 bg-white dark:border-[#2d2936] dark:bg-[#1C1A22] p-4 sm:p-5 shadow-sm flex flex-col justify-between min-h-[100px]">
+        <Link href="/stock" className="rounded-2xl border border-zinc-100 bg-white dark:border-[#2d2936] dark:bg-[#1C1A22] p-4 sm:p-5 shadow-sm flex flex-col justify-between min-h-[100px]">
           <span className="text-xs font-medium text-zinc-500 dark:text-zinc-400">{t("low_stock")}</span>
-          <span className="mt-2 font-mono text-[17px] sm:text-xl font-bold text-[#FBBF24] leading-tight tabular-nums">
-            {lowStockCount ?? 0} <br className="sm:hidden" /><span className="font-sans text-sm sm:text-base font-medium">articles</span>
+          <span className="mt-2 text-[17px] sm:text-xl font-bold text-amber-700 dark:text-amber-400 leading-tight tabular-nums">
+            {t("articles_count", { count: lowStockCount })}
           </span>
-        </div>
-
+        </Link>
       </div>
 
       <div className="grid gap-4 lg:grid-cols-2">
         <div className="rounded-2xl border border-zinc-100 bg-white dark:border-[#2d2936] dark:bg-[#1C1A22] p-5 sm:p-6 shadow-sm">
-          <h2 className="text-[11px] font-bold text-zinc-400 tracking-widest uppercase mb-4">{t("recent_invoices")}</h2>
-          
-          <div className="flex flex-col gap-4">
-            {recentInvoices?.map((inv) => {
-              const clientName = (inv.clients as any)?.full_name || t("walk_in_client");
-              return (
-                <Link key={inv.id} href={`/invoices/${inv.id}`} className="flex items-center justify-between group">
-                  <div className="flex flex-col">
-                    <span className="text-sm font-bold text-zinc-900 dark:text-white group-hover:text-violet-600 dark:group-hover:text-violet-400 transition-colors">
-                      {clientName}
-                    </span>
-                    <span className="text-[11px] font-mono text-zinc-500 mt-0.5">
-                      {inv.invoice_number}
-                    </span>
-                  </div>
-                  <div className="flex flex-col items-end gap-1">
-                    <span className="text-sm font-mono font-bold text-zinc-900 dark:text-white tabular-nums">
-                      {inv.total_amount.toLocaleString("fr-FR")} FCFA
-                    </span>
-                    <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${getStatusColor(inv.status)}`}>
-                      {getStatusLabel(inv.status)}
-                    </span>
-                  </div>
-                </Link>
-              );
-            })}
+          <h2 className="text-[11px] font-bold text-zinc-500 tracking-widest uppercase mb-4">{t("recent_invoices")}</h2>
 
-            {recentInvoices?.length === 0 && (
-              <p className="text-sm text-zinc-500">{t("no_recent_invoices")}</p>
-            )}
+          <div className="flex flex-col gap-4">
+            {recentInvoices.map((inv) => (
+              <Link key={inv.id} href={`/invoices/${inv.id}`} className="flex items-center justify-between gap-3 group">
+                <div className="flex min-w-0 flex-col">
+                  <span className="truncate text-sm font-bold text-zinc-900 dark:text-white group-hover:text-violet-600 dark:group-hover:text-violet-400 transition-colors">
+                    {inv.clients?.name || t("walk_in_client")}
+                  </span>
+                  <span className="text-[11px] font-mono text-zinc-500 mt-0.5">{inv.invoice_number}</span>
+                </div>
+                <div className="flex shrink-0 flex-col items-end gap-1">
+                  <span className="text-sm font-mono font-bold text-zinc-900 dark:text-white tabular-nums">
+                    {format.money(inv.total_amount)}
+                  </span>
+                  <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${getStatusColor(inv.status)}`}>
+                    {getStatusLabel(inv.status)}
+                  </span>
+                </div>
+              </Link>
+            ))}
+
+            {recentInvoices.length === 0 && <p className="text-sm text-zinc-500">{t("no_recent_invoices")}</p>}
           </div>
         </div>
 
-        {/* Colonne de droite: Actions Rapides + Top Articles */}
         <div className="flex flex-col gap-4">
-          
-          {/* Actions Rapides */}
           <div className="rounded-2xl border border-zinc-100 bg-white dark:border-[#2d2936] dark:bg-[#1C1A22] p-5 sm:p-6 shadow-sm">
-            <h2 className="text-[11px] font-bold text-zinc-400 tracking-widest uppercase mb-4">{t("quick_actions")}</h2>
-            {firstUnpaid ? (
-              <Link 
+            <h2 className="text-[11px] font-bold text-zinc-500 tracking-widest uppercase mb-4">{t("quick_actions")}</h2>
+            {oldestDebt ? (
+              <Link
                 href="/reminders"
-                className="flex w-full items-center justify-center rounded-xl bg-[#10B981] px-4 py-3 text-sm font-bold text-white hover:bg-[#059669] transition-colors shadow-sm"
+                className="flex w-full items-center justify-center rounded-xl bg-[#047857] px-4 py-3 text-sm font-bold text-white hover:bg-[#065f46] transition-colors shadow-sm"
               >
-                {t("remind_client", { name: (firstUnpaid.clients as any)?.full_name?.split(" ")[0] || "Client" })}
+                {t("remind_client", { name: oldestDebt.clients.name.split(" ")[0] })}
               </Link>
             ) : (
               <p className="text-sm text-zinc-500">{t("no_urgent_action")}</p>
             )}
           </div>
 
-          {/* Top Articles */}
           <div className="rounded-2xl border border-zinc-100 bg-white dark:border-[#2d2936] dark:bg-[#1C1A22] p-5 sm:p-6 shadow-sm flex-1">
-            <h2 className="text-[11px] font-bold text-zinc-400 tracking-widest uppercase mb-4">{t("top_sales")}</h2>
-            
+            <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
+              <h2 className="text-[11px] font-bold text-zinc-500 tracking-widest uppercase">{t("top_sales")}</h2>
+              <nav className="flex gap-1" aria-label={t("top_sales")}>
+                {TOP_SALES_PERIODS.map((p) => (
+                  <Link
+                    key={p}
+                    href={{ pathname: "/dashboard", query: { period: p } }}
+                    aria-current={p === period ? "page" : undefined}
+                    className={`rounded-full px-2.5 py-1 text-[11px] font-bold transition-colors ${
+                      p === period
+                        ? "bg-violet-600 text-white"
+                        : "text-zinc-500 hover:bg-zinc-100 dark:hover:bg-white/5"
+                    }`}
+                  >
+                    {t(`period_${p}`)}
+                  </Link>
+                ))}
+              </nav>
+            </div>
+
             <div className="flex flex-col gap-3">
-              {topArticles.map((article, index) => (
-                <div key={index} className="flex items-center justify-between border-b border-zinc-50 dark:border-white/5 pb-2 last:border-0 last:pb-0">
-                  <span className="text-sm font-medium text-zinc-900 dark:text-zinc-100 truncate pr-4">
-                    {article.name}
-                  </span>
+              {topArticles.map((article) => (
+                <div key={article.productId} className="flex items-center justify-between border-b border-zinc-50 dark:border-white/5 pb-2 last:border-0 last:pb-0">
+                  <span className="text-sm font-medium text-zinc-900 dark:text-zinc-100 truncate pr-4">{article.name}</span>
                   <span className="text-xs font-mono font-bold text-violet-600 dark:text-violet-400 shrink-0 tabular-nums">
-                    {article.quantity} {t("sold")}
+                    {t("sold_count", { count: article.quantity })}
                   </span>
                 </div>
               ))}
-              {topArticles.length === 0 && (
-                <p className="text-sm text-zinc-500">{t("no_sales_today")}</p>
-              )}
+              {topArticles.length === 0 && <p className="text-sm text-zinc-500">{t(`no_sales_${period}`)}</p>}
             </div>
           </div>
-
         </div>
       </div>
     </div>

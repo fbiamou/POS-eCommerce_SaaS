@@ -2,12 +2,11 @@
 
 import { createClient } from "@/utils/supabase/server";
 import { revalidatePath } from "next/cache";
-import {
-  buildManualReminderMessage,
-  buildWhatsAppClickToChatUrl,
-  hasWhatsAppCredentials,
-  sendWhatsAppTemplateMessage,
-} from "./whatsapp";
+import { getLocale, getTranslations } from "next-intl/server";
+import type { FeedbackCode } from "@/lib/feedback";
+import { formatMoney } from "@/lib/format";
+import { getWhatsAppCredentials } from "./credentials";
+import { buildWhatsAppClickToChatUrl, sendWhatsAppTemplateMessage } from "./whatsapp";
 
 export type OverdueInvoice = {
   id: string;
@@ -23,16 +22,24 @@ export type OverdueInvoice = {
   reminder_count: number;
 };
 
-export async function getOverdueInvoices(): Promise<OverdueInvoice[]> {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return [];
+type OverdueInvoiceRow = Omit<OverdueInvoice, "id"> & { invoice_id: string };
 
+async function getShopId() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { supabase, shopId: null };
   const { data: profile } = await supabase.from("profiles").select("shop_id").eq("id", user.id).single();
-  if (!profile?.shop_id) return [];
+  return { supabase, shopId: (profile?.shop_id as string | undefined) ?? null };
+}
+
+export async function getOverdueInvoices(): Promise<OverdueInvoice[]> {
+  const { supabase, shopId } = await getShopId();
+  if (!shopId) return [];
 
   const { data, error } = await supabase.rpc("get_overdue_invoices_for_reminders", {
-    _shop_id: profile.shop_id,
+    _shop_id: shopId,
   });
 
   if (error) {
@@ -40,19 +47,7 @@ export async function getOverdueInvoices(): Promise<OverdueInvoice[]> {
     return [];
   }
 
-  return (data ?? []).map((row: any) => ({
-    id: row.invoice_id,
-    invoice_number: row.invoice_number,
-    client_id: row.client_id,
-    client_name: row.client_name,
-    client_phone: row.client_phone,
-    total_amount: row.total_amount,
-    paid_amount: row.paid_amount,
-    created_at: row.created_at,
-    days_overdue: row.days_overdue,
-    last_reminder_at: row.last_reminder_at,
-    reminder_count: row.reminder_count,
-  }));
+  return ((data ?? []) as OverdueInvoiceRow[]).map(({ invoice_id, ...row }) => ({ id: invoice_id, ...row }));
 }
 
 // Used when a shop hasn't connected its own WhatsApp credentials yet — per
@@ -61,60 +56,66 @@ export async function getOverdueInvoices(): Promise<OverdueInvoice[]> {
 // approved template and API credentials in the Reminders settings.
 const DRY_RUN_TEMPLATE = "DRY_RUN_NO_APPROVED_TEMPLATE";
 
-export async function sendReminder(invoice: {
-  id: string;
-  client_id: string;
-  client_name: string;
-  client_phone: string | null;
-  total_amount: number;
-  paid_amount: number;
-}): Promise<{ success?: true; error?: string; whatsappUrl?: string }> {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return { error: "Non autorisé." };
+// Only the invoice id comes from the browser: the client's name, phone and
+// the amount due are re-read from the database, so a crafted call cannot
+// make the shop's WhatsApp account message an arbitrary number.
+export async function sendReminder(
+  invoiceId: string
+): Promise<{ success?: true; error?: FeedbackCode; whatsappUrl?: string; amountDue?: number }> {
+  const { supabase, shopId } = await getShopId();
+  if (!shopId) return { error: "unauthorized" };
 
-  const { data: profile } = await supabase.from("profiles").select("shop_id").eq("id", user.id).single();
-  if (!profile?.shop_id) return { error: "Boutique non trouvée." };
-
-  const { data: shopSettings } = await supabase
-    .from("settings")
-    .select("shop_name, whatsapp_phone_number_id, whatsapp_api_token, whatsapp_template_name")
-    .eq("shop_id", profile.shop_id)
+  const { data: invoice } = await supabase
+    .from("invoices")
+    .select("id, total_amount, paid_amount, status, client_id, clients(name, phone)")
+    .eq("id", invoiceId)
     .single();
+
+  const client = invoice?.clients as unknown as { name: string; phone: string | null } | null;
+  if (!invoice || !invoice.client_id || !client) return { error: "invoice_not_found" };
+  if (invoice.status === "PAID") return { error: "invoice_already_paid" };
+
+  const [{ data: shop }, credentials, locale] = await Promise.all([
+    supabase.from("settings").select("shop_name, currency_symbol").single(),
+    getWhatsAppCredentials(shopId),
+    getLocale(),
+  ]);
 
   const amountDue = invoice.total_amount - invoice.paid_amount;
   let templateName = DRY_RUN_TEMPLATE;
   let status: "SENT" | "FAILED" | "SIMULATED" | "MANUAL" = "SIMULATED";
   let whatsappUrl: string | undefined;
 
-  if (shopSettings && hasWhatsAppCredentials(shopSettings) && invoice.client_phone) {
+  if (credentials && client.phone) {
     // Real Cloud API path — shop has connected its own WhatsApp Business credentials.
-    templateName = shopSettings.whatsapp_template_name!;
+    templateName = credentials.templateName;
     const result = await sendWhatsAppTemplateMessage({
-      phoneNumberId: shopSettings.whatsapp_phone_number_id!,
-      apiToken: shopSettings.whatsapp_api_token!,
+      phoneNumberId: credentials.phoneNumberId,
+      apiToken: credentials.apiToken,
       templateName,
-      to: invoice.client_phone,
-      clientName: invoice.client_name,
+      to: client.phone,
+      clientName: client.name,
       amountDue,
     });
     status = result.ok ? "SENT" : "FAILED";
     if (!result.ok) console.error("WhatsApp send failed:", result.error);
-  } else if (invoice.client_phone) {
+  } else if (client.phone) {
     // No Cloud API credentials yet — open a pre-filled wa.me link so a staff
     // member sends the message themselves from their own WhatsApp.
-    const message = buildManualReminderMessage({
-      clientName: invoice.client_name,
-      amountDue,
-      shopName: shopSettings?.shop_name || "la boutique",
+    const t = await getTranslations("Reminders");
+    const shopName = shop?.shop_name || t("manual_message_shop_fallback");
+    const message = t("manual_message", {
+      name: client.name,
+      amount: formatMoney(amountDue, shop?.currency_symbol ?? "", locale),
+      shop: shopName,
     });
-    whatsappUrl = buildWhatsAppClickToChatUrl(invoice.client_phone, message);
+    whatsappUrl = buildWhatsAppClickToChatUrl(client.phone, message);
     templateName = "MANUAL_CLICK_TO_CHAT";
     status = "MANUAL";
   }
 
   const { error } = await supabase.rpc("log_reminder", {
-    _shop_id: profile.shop_id,
+    _shop_id: shopId,
     _client_id: invoice.client_id,
     _invoice_id: invoice.id,
     _template_name: templateName,
@@ -123,46 +124,44 @@ export async function sendReminder(invoice: {
 
   if (error) {
     console.error("Error logging reminder:", error);
-    return { error: "Erreur lors de l'enregistrement de la relance." };
+    return { error: "reminder_failed" };
   }
 
   revalidatePath("/reminders");
 
-  if (status === "FAILED") {
-    return { error: "L'envoi WhatsApp a échoué (voir les journaux serveur)." };
-  }
-  return { success: true, whatsappUrl };
+  if (status === "FAILED") return { error: "reminder_failed" };
+  return { success: true, whatsappUrl, amountDue };
 }
 
 export async function updateReminderSettings(
   formData: FormData
-): Promise<{ success?: true; error?: string }> {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return { error: "Non autorisé." };
+): Promise<{ success?: true; error?: FeedbackCode }> {
+  const { supabase, shopId } = await getShopId();
+  if (!shopId) return { error: "unauthorized" };
 
-  const { data: profile } = await supabase.from("profiles").select("shop_id").eq("id", user.id).single();
-  if (!profile?.shop_id) return { error: "Boutique non trouvée." };
-
-  const firstDelay = parseInt((formData.get("reminder_first_delay_days") as string) || "7");
-  const recurringDelay = parseInt((formData.get("reminder_recurring_delay_days") as string) || "3");
+  const firstDelay = parseInt((formData.get("reminder_first_delay_days") as string) || "7", 10);
+  const recurringDelay = parseInt((formData.get("reminder_recurring_delay_days") as string) || "3", 10);
 
   if (Number.isNaN(firstDelay) || firstDelay < 0 || Number.isNaN(recurringDelay) || recurringDelay < 0) {
-    return { error: "Les délais doivent être des nombres positifs." };
+    return { error: "delays_invalid" };
   }
 
-  const { error } = await supabase
+  // Settings are writable by the Propriétaire only (RLS): for anyone else the
+  // update matches no row, which is reported instead of a silent success.
+  const { data, error } = await supabase
     .from("settings")
     .update({
       reminder_first_delay_days: firstDelay,
       reminder_recurring_delay_days: recurringDelay,
     })
-    .eq("shop_id", profile.shop_id);
+    .eq("shop_id", shopId)
+    .select("shop_id");
 
   if (error) {
     console.error("Error updating reminder settings:", error);
-    return { error: "Erreur lors de la mise à jour." };
+    return { error: "update_failed" };
   }
+  if (!data || data.length === 0) return { error: "access_denied" };
 
   revalidatePath("/reminders");
   return { success: true };

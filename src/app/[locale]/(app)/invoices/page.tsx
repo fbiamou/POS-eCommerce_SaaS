@@ -1,14 +1,14 @@
 import InvoiceList from "@/features/invoices/components/InvoiceList";
 import { getTranslations } from "next-intl/server";
 import { getInvoices } from "@/features/invoices/actions";
-import { getShopSettings } from "@/features/settings/actions";
+
+export async function generateMetadata() {
+  const t = await getTranslations("Invoices");
+  return { title: t("list_title") };
+}
 
 export default async function InvoicesPage() {
-  const [t, invoices, shopSettings] = await Promise.all([
-    getTranslations("Invoices"),
-    getInvoices(),
-    getShopSettings(),
-  ]);
+  const [t, invoices] = await Promise.all([getTranslations("Invoices"), getInvoices()]);
 
   return (
     <div className="flex flex-col gap-6">
@@ -16,7 +16,7 @@ export default async function InvoicesPage() {
         <h1 className="text-2xl font-bold tracking-tight">{t("list_title")}</h1>
       </div>
 
-      <InvoiceList invoices={invoices} currencySymbol={shopSettings?.currency_symbol || "FCFA"} />
+      <InvoiceList invoices={invoices} />
     </div>
   );
 }

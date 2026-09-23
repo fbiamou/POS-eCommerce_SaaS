@@ -28,10 +28,12 @@ export async function generateMetadata({
   params: Promise<{ locale: string }>;
 }): Promise<Metadata> {
   const { locale } = await params;
-  const t = await getTranslations({ locale, namespace: 'Sidebar' });
+  const t = await getTranslations({ locale, namespace: 'Auth' });
+  // Each page sets its own title ("Stock & Produits · Boutique POS"); every
+  // page used to be titled "Tableau de Bord", including the public ones.
   return {
-    title: t('dashboard') + " - Boutique POS",
-    description: "Application de gestion pour boutique",
+    title: { default: t('title'), template: `%s · ${t('title')}` },
+    description: t('subtitle'),
   };
 }
 
@@ -49,7 +51,7 @@ export default async function RootLayout({
   const { locale } = await params;
 
   // Ensure that the incoming `locale` is valid
-  if (!routing.locales.includes(locale as any)) {
+  if (!routing.locales.includes(locale as (typeof routing.locales)[number])) {
     notFound();
   }
 

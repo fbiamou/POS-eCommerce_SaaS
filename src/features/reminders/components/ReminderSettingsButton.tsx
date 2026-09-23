@@ -4,21 +4,25 @@ import { useState, useTransition } from "react";
 import { Settings } from "lucide-react";
 import { Modal } from "@/components/ui/Modal";
 import { useTranslations } from "next-intl";
+import type { FeedbackCode } from "@/lib/feedback";
 import { updateReminderSettings } from "../actions";
 
 export function ReminderSettingsButton({
   label,
+  shortLabel,
   firstDelayDays,
   recurringDelayDays,
 }: {
   label: string;
+  shortLabel: string;
   firstDelayDays: number;
   recurringDelayDays: number;
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<FeedbackCode | null>(null);
   const t = useTranslations("Reminders");
+  const tFeedback = useTranslations("Feedback");
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -44,12 +48,12 @@ export function ReminderSettingsButton({
       >
         <Settings className="h-4 w-4 shrink-0" />
         <span className="hidden sm:inline">{label}</span>
-        <span className="sm:hidden">Relances</span>
+        <span className="sm:hidden">{shortLabel}</span>
       </button>
 
       <Modal isOpen={isOpen} onClose={() => setIsOpen(false)} title={t("settings_title")}>
         <form onSubmit={handleSubmit} className="flex flex-col gap-5">
-          {error && <p className="text-[13px] font-medium text-red-500">{error}</p>}
+          {error && <p className="text-[13px] font-medium text-red-500">{tFeedback(error)}</p>}
 
           <div className="flex flex-col gap-1.5">
             <label className="text-[13px] font-bold text-zinc-700 dark:text-zinc-300">{t("delay_label")}</label>

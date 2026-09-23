@@ -1,6 +1,11 @@
 import PurchaseOrderList from "@/features/purchase-orders/components/PurchaseOrderList";
 import { getTranslations } from "next-intl/server";
 
+export async function generateMetadata() {
+  const t = await getTranslations("PurchaseOrders");
+  return { title: t("title") };
+}
+
 export default async function PurchaseOrdersPage() {
   const t = await getTranslations("PurchaseOrders");
 

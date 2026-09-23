@@ -6,7 +6,8 @@ import { isPageAllowed, firstAllowedPath } from './lib/appPages';
  
 const intlMiddleware = createMiddleware(routing);
 
-export async function middleware(request: NextRequest) {
+// Next.js 16 renamed Middleware to Proxy (same behavior, new file name).
+export async function proxy(request: NextRequest) {
   // 1. Run next-intl middleware
   const response = intlMiddleware(request);
 
@@ -33,7 +34,7 @@ export async function middleware(request: NextRequest) {
 
   // Extract locale from pathname (e.g. /fr/login -> fr)
   const localeMatch = request.nextUrl.pathname.match(/^\/(es|fr|en)/)
-  const locale = localeMatch ? localeMatch[1] : 'es'
+  const locale = localeMatch ? localeMatch[1] : routing.defaultLocale
   
   // Check if it's an auth-related page
   const isAuthPage = request.nextUrl.pathname.endsWith('/login')

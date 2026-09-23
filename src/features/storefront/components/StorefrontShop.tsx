@@ -3,10 +3,12 @@
 import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import { Plus, Minus, Trash2, ShoppingBag, CheckCircle2, X, ShoppingCart } from "lucide-react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { LocaleSwitcher } from "@/components/LocaleSwitcher";
 import { createClient } from "@/utils/supabase/client";
 import { PhoneCountryCodeSelect } from "@/components/PhoneCountryCodeSelect";
+import { formatMoney } from "@/lib/format";
+import { feedbackFromError, type FeedbackCode } from "@/lib/feedback";
 import type { PublicProduct, PublicShopProfile } from "../actions";
 
 type CartItem = { productId: string; quantity: number };
@@ -19,6 +21,8 @@ export default function StorefrontShop({
   products: PublicProduct[];
 }) {
   const t = useTranslations("Storefront");
+  const tFeedback = useTranslations("Feedback");
+  const locale = useLocale();
   const cartKey = `storefront-cart-${shop.shop_id}`;
 
   const categories = useMemo(() => {
@@ -28,14 +32,14 @@ export default function StorefrontShop({
       cats[name] = (cats[name] || 0) + 1;
     });
     return Object.entries(cats).map(([name, count]) => ({ name, count }));
-  }, [products]);
+  }, [products, t]);
 
 
   const [customerName, setCustomerName] = useState("");
   const [phoneCountryCode, setPhoneCountryCode] = useState(shop.default_phone_country_code || "+237");
   const [customerPhone, setCustomerPhone] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<FeedbackCode | null>(null);
   const [orderPlaced, setOrderPlaced] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
@@ -95,9 +99,9 @@ export default function StorefrontShop({
   const filteredProducts = useMemo(() => {
     if (!selectedCategory) return products;
     return products.filter((p) => (p.category_name || t("uncategorized")) === selectedCategory);
-  }, [products, selectedCategory]);
+  }, [products, selectedCategory, t]);
 
-  const format = (n: number) => `${n.toLocaleString("fr-FR")} ${shop.currency_symbol}`;
+  const format = (n: number) => formatMoney(n, shop.currency_symbol, locale);
 
   const handleCheckout = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -117,12 +121,17 @@ export default function StorefrontShop({
         _items: items,
       });
 
-      if (rpcError) throw new Error(rpcError.message);
+      if (rpcError) {
+        console.error("place_online_order failed:", rpcError);
+        setError(feedbackFromError(rpcError));
+        return;
+      }
 
       setCart([]);
       setOrderPlaced(true);
-    } catch (err: any) {
-      setError(err.message ?? t("order_error"));
+    } catch (err) {
+      console.error("Online order failed:", err);
+      setError("generic_error");
     } finally {
       setIsSubmitting(false);
     }
@@ -414,7 +423,7 @@ export default function StorefrontShop({
 
                     <p className="text-[11px] text-center text-zinc-500 bg-zinc-100 dark:bg-zinc-800 p-2 rounded-lg">{t("pickup_notice")}</p>
 
-                    {error && <p className="text-sm text-red-500 text-center font-medium">{error}</p>}
+                    {error && <p className="text-sm text-red-600 text-center font-medium">{tFeedback(error)}</p>}
 
                     <button
                       type="submit"

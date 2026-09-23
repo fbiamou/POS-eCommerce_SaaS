@@ -2,7 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { renderToBuffer } from "@react-pdf/renderer";
 import { getTranslations } from "next-intl/server";
 import { getInvoiceDetail } from "@/features/invoices/actions";
-import { getShopSettings } from "@/features/settings/actions";
+import { getShopSettings } from "@/features/settings/queries";
+import { routing } from "@/i18n/routing";
 import { InvoiceDocument, type InvoiceLabels } from "@/features/invoices/components/InvoiceDocument";
 
 export const runtime = "nodejs";
@@ -15,12 +16,13 @@ export async function GET(
 
   const invoice = await getInvoiceDetail(id);
   if (!invoice) {
-    return NextResponse.json({ error: "Invoice not found" }, { status: 404 });
+    return NextResponse.json({ error: "invoice_not_found" }, { status: 404 });
   }
 
   const shop = await getShopSettings();
 
-  const locale = request.nextUrl.searchParams.get("locale") || "fr";
+  const requestedLocale = request.nextUrl.searchParams.get("locale");
+  const locale = routing.locales.find((l) => l === requestedLocale) ?? routing.defaultLocale;
   const t = await getTranslations({ locale, namespace: "Invoices" });
 
   const labels: InvoiceLabels = {
@@ -44,6 +46,7 @@ export async function GET(
     status_unpaid: t("status_unpaid"),
     tax_id_label: t("tax_id_label"),
     trade_register_label: t("trade_register_label"),
+    shop_fallback: t("shop_fallback"),
   };
 
   const buffer = await renderToBuffer(

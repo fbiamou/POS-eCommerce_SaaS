@@ -4,6 +4,8 @@ import { useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/routing";
 import { Check, X, Package } from "lucide-react";
+import { useShopFormat } from "@/components/ShopFormatProvider";
+import type { FeedbackCode } from "@/lib/feedback";
 import { confirmOnlineOrder, cancelOnlineOrder, type OnlineOrder } from "../actions";
 
 const STATUS_STYLES: Record<string, string> = {
@@ -12,20 +14,24 @@ const STATUS_STYLES: Record<string, string> = {
   CANCELLED: "bg-zinc-100 text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400",
 };
 
-export default function OnlineOrderList({ orders, currencySymbol }: { orders: OnlineOrder[]; currencySymbol: string }) {
+export default function OnlineOrderList({ orders }: { orders: OnlineOrder[] }) {
   const t = useTranslations("OnlineOrders");
+  const tFeedback = useTranslations("Feedback");
+  const shopFormat = useShopFormat();
   const [isPending, startTransition] = useTransition();
   const [processingId, setProcessingId] = useState<string | null>(null);
   const [confirmedInvoiceId, setConfirmedInvoiceId] = useState<{ orderId: string; invoiceId: string } | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<FeedbackCode | null>(null);
 
-  const format = (n: number) => `${n.toLocaleString("fr-FR")} ${currencySymbol}`;
+  const format = shopFormat.money;
 
   const handleConfirm = (order: OnlineOrder) => {
     setError(null);
     setProcessingId(order.id);
     startTransition(async () => {
-      const result = await confirmOnlineOrder(order.id, order.total_amount);
+      // The customer pays at pickup: the invoice starts unpaid, and the
+      // payment is recorded on it when she collects her order.
+      const result = await confirmOnlineOrder(order.id, 0);
       if (result.error) {
         setError(result.error);
       } else if (result.invoiceId) {
@@ -54,14 +60,14 @@ export default function OnlineOrderList({ orders, currencySymbol }: { orders: On
 
   return (
     <div className="flex flex-col gap-4">
-      {error && <p className="text-sm text-red-500">{error}</p>}
+      {error && <p className="text-sm text-red-600">{tFeedback(error)}</p>}
       {orders.map((order) => (
         <div key={order.id} className="rounded-lg border bg-card p-4 shadow-sm">
           <div className="flex flex-wrap items-start justify-between gap-2">
             <div>
               <p className="font-medium">{order.customer_name}</p>
               <p className="text-sm text-zinc-500">{order.customer_phone}</p>
-              <p className="text-xs text-zinc-400">{new Date(order.created_at).toLocaleString()}</p>
+              <p className="text-xs text-zinc-500">{shopFormat.date(order.created_at, "dateTime")}</p>
             </div>
             <span className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${STATUS_STYLES[order.status]}`}>
               {t(`status_${order.status.toLowerCase()}`)}

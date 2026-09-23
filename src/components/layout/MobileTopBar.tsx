@@ -85,7 +85,7 @@ export function MobileTopBar({ profile, shopName, shopLogoUrl }: MobileTopBarPro
         {open && (
           <div className="absolute right-0 top-full mt-2 w-56 rounded-2xl border border-zinc-100 bg-white p-2 shadow-sm dark:border-[#2d2936] dark:bg-[#1C1A22]">
             <div className="mb-1 border-b border-zinc-100 px-3 py-2 dark:border-[#2d2936]">
-              <p className="truncate text-sm font-medium">{profile?.full_name || "Utilisateur"}</p>
+              <p className="truncate text-sm font-medium">{profile?.full_name || tSettings("no_name")}</p>
               <p className="text-xs text-zinc-500">{roleLabel[profile?.role || ""] || profile?.role || ""}</p>
             </div>
             {canSeeSettings && (

@@ -1,5 +1,8 @@
 import { getCurrentProfile, getTeamMembers } from '@/features/auth/actions'
-import { getShopSettings, updateShopProfile, updateAppearance, updateOwnerProfile } from '@/features/settings/actions'
+import { updateShopProfile, updateAppearance, updateOwnerProfile } from '@/features/settings/actions'
+import { getShopSettings } from '@/features/settings/queries'
+import { readFeedbackParam } from '@/lib/feedback'
+import { SHOP_TIME_ZONES } from '@/lib/timeZones'
 import { inviteEmployee } from '@/features/team/actions'
 import { EmployeeAccessFields } from '@/features/team/components/EmployeeAccessFields'
 import { TeamMemberRow } from '@/features/team/components/TeamMemberRow'
@@ -15,33 +18,38 @@ import {
 import Image from 'next/image'
 
 const ACCENT_COLORS = [
-  { value: '#7c3aed', label: 'Violet', className: 'bg-violet-600' },
-  { value: '#2563eb', label: 'Bleu', className: 'bg-blue-600' },
-  { value: '#16a34a', label: 'Vert', className: 'bg-green-600' },
-  { value: '#dc2626', label: 'Rouge', className: 'bg-red-600' },
-  { value: '#d97706', label: 'Orange', className: 'bg-amber-600' },
-  { value: '#db2777', label: 'Rose', className: 'bg-pink-600' },
-  { value: '#0891b2', label: 'Cyan', className: 'bg-cyan-600' },
-  { value: '#374151', label: 'Gris', className: 'bg-gray-700' },
-]
+  { value: '#7c3aed', key: 'color_violet', className: 'bg-violet-600' },
+  { value: '#2563eb', key: 'color_blue', className: 'bg-blue-600' },
+  { value: '#16a34a', key: 'color_green', className: 'bg-green-600' },
+  { value: '#dc2626', key: 'color_red', className: 'bg-red-600' },
+  { value: '#d97706', key: 'color_orange', className: 'bg-amber-600' },
+  { value: '#db2777', key: 'color_pink', className: 'bg-pink-600' },
+  { value: '#0891b2', key: 'color_cyan', className: 'bg-cyan-600' },
+  { value: '#374151', key: 'color_grey', className: 'bg-gray-700' },
+] as const
 
-const FONTS = [
-  { value: 'Geist', label: 'Geist (défaut)' },
-  { value: 'Inter', label: 'Inter' },
-  { value: 'Roboto', label: 'Roboto' },
-  { value: 'Outfit', label: 'Outfit' },
-  { value: 'Poppins', label: 'Poppins' },
-]
+const FONTS = ['Geist', 'Inter', 'Roboto', 'Outfit', 'Poppins']
+
+export async function generateMetadata() {
+  const t = await getTranslations('Settings')
+  return { title: t('title') }
+}
 
 export default async function SettingsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ error?: string; message?: string; tab?: string }>
+  searchParams: Promise<{ error?: string; message?: string; tab?: string; login?: string }>
 }) {
-  const { error, message, tab: activeTab = 'profil' } = await searchParams
+  const params = await searchParams
+  const activeTab = params.tab ?? 'profil'
+  // Only known feedback codes are displayed: a crafted link cannot make this
+  // page show arbitrary text.
+  const error = readFeedbackParam(params.error)
+  const message = readFeedbackParam(params.message)
 
-  const [t, currentProfile, teamMembers, shopSettings] = await Promise.all([
+  const [t, tFeedback, currentProfile, teamMembers, shopSettings] = await Promise.all([
     getTranslations('Settings'),
+    getTranslations('Feedback'),
     getCurrentProfile(),
     getTeamMembers(),
     getShopSettings(),
@@ -75,12 +83,12 @@ export default async function SettingsPage({
       {/* Feedback */}
       {error && (
         <div className="flex items-start gap-3 p-3 text-sm text-red-700 bg-red-50 dark:bg-red-900/20 dark:text-red-400 border border-red-200 dark:border-red-800 rounded-lg">
-          <span>⚠️</span><span>{error}</span>
+          <span>⚠️</span><span>{tFeedback(error)}</span>
         </div>
       )}
       {message && (
         <div className="flex items-start gap-3 p-3 text-sm text-emerald-700 bg-emerald-50 dark:bg-emerald-900/20 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 rounded-lg">
-          <span>✅</span><span>{message}</span>
+          <span>✅</span><span>{tFeedback(message, { login: params.login ?? '' })}</span>
         </div>
       )}
 
@@ -118,7 +126,7 @@ export default async function SettingsPage({
                   <UserCircle className="h-8 w-8 text-violet-600 dark:text-violet-400" />
                 </div>
                 <div>
-                  <p className="font-bold text-zinc-900 dark:text-white">{currentProfile?.full_name || 'Utilisateur'}</p>
+                  <p className="font-bold text-zinc-900 dark:text-white">{currentProfile?.full_name || t('no_name')}</p>
                   {currentProfile?.role && ROLE_CONFIG[currentProfile.role] && (
                     <span className={`inline-flex items-center gap-1 text-[10px] font-bold px-2.5 py-1 rounded-full mt-1 ${ROLE_CONFIG[currentProfile.role].color}`}>
                       {ROLE_CONFIG[currentProfile.role].icon}
@@ -155,7 +163,7 @@ export default async function SettingsPage({
               <div className="flex items-center gap-4">
                 <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-violet-50 dark:bg-violet-900/20 overflow-hidden flex-shrink-0">
                   {shopSettings?.shop_logo_url ? (
-                    <Image src={shopSettings.shop_logo_url} alt="Logo boutique" width={64} height={64} className="object-cover w-full h-full" />
+                    <Image src={shopSettings.shop_logo_url} alt={t('shop_logo')} width={64} height={64} className="object-cover w-full h-full" />
                   ) : (
                     <span className="text-2xl font-bold text-violet-600 dark:text-violet-400">
                       {shopSettings?.shop_name?.[0]?.toUpperCase() || 'B'}
@@ -204,6 +212,22 @@ export default async function SettingsPage({
                     defaultCode={shopSettings?.currency_code || 'XAF'}
                     defaultSymbol={shopSettings?.currency_symbol || 'FCFA'}
                   />
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-[13px] font-bold text-zinc-700 dark:text-zinc-300" htmlFor="timezone">{t('timezone')}</label>
+                  <select id="timezone" name="timezone" defaultValue={shopSettings?.timezone || 'Africa/Douala'}
+                    className="w-full rounded-xl border border-zinc-200 bg-white px-4 py-2.5 text-[13px] font-medium transition-colors focus:border-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-500 dark:border-[#2d2936] dark:bg-[#1C1A22]">
+                    {SHOP_TIME_ZONES.map((z) => (
+                      <option key={z.value} value={z.value}>{z.label}</option>
+                    ))}
+                  </select>
+                  <p className="text-[11px] text-zinc-500 mt-0.5">{t('timezone_hint')}</p>
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-[13px] font-bold text-zinc-700 dark:text-zinc-300" htmlFor="low_stock_threshold">{t('low_stock_threshold')}</label>
+                  <input id="low_stock_threshold" name="low_stock_threshold" type="number" min="0" step="1" defaultValue={shopSettings?.low_stock_threshold ?? 5}
+                    className="w-full rounded-xl border border-zinc-200 bg-white px-4 py-2.5 text-[13px] font-medium transition-colors focus:border-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-500 dark:border-[#2d2936] dark:bg-[#1C1A22]" />
+                  <p className="text-[11px] text-zinc-500 mt-0.5">{t('low_stock_threshold_hint')}</p>
                 </div>
                 <div className="md:col-span-2 flex flex-col gap-1.5">
                   <label className="text-[13px] font-bold text-zinc-700 dark:text-zinc-300" htmlFor="shop_address">{t('address')}</label>
@@ -261,7 +285,7 @@ export default async function SettingsPage({
                   <div className="md:col-span-2 flex flex-col gap-1.5">
                     <label className="text-[13px] font-bold text-zinc-700 dark:text-zinc-300" htmlFor="whatsapp_api_token">{t('whatsapp_api_token')}</label>
                     <input id="whatsapp_api_token" name="whatsapp_api_token" type="password" autoComplete="off"
-                      placeholder={shopSettings?.whatsapp_api_token ? t('whatsapp_token_configured') : ''}
+                      placeholder={shopSettings?.whatsapp_token_set ? t('whatsapp_token_configured') : ''}
                       className="w-full rounded-xl border border-zinc-200 bg-white px-4 py-2.5 text-[13px] font-medium transition-colors focus:border-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-500 dark:border-[#2d2936] dark:bg-[#1C1A22]" />
                     <p className="text-[11px] text-zinc-500 mt-0.5">{t('whatsapp_token_hint')}</p>
                   </div>
@@ -290,7 +314,7 @@ export default async function SettingsPage({
               <label className="text-[13px] font-bold text-zinc-700 dark:text-zinc-300 mb-3">{t('accent_color')}</label>
               <div className="flex flex-wrap gap-3">
                 {ACCENT_COLORS.map((color) => (
-                  <label key={color.value} className="cursor-pointer group" title={color.label}>
+                  <label key={color.value} className="cursor-pointer group" title={t(color.key)}>
                     <input type="radio" name="theme_accent_color" value={color.value}
                       defaultChecked={shopSettings?.theme_accent_color === color.value || (!shopSettings?.theme_accent_color && color.value === '#7c3aed')}
                       className="sr-only" />
@@ -305,7 +329,7 @@ export default async function SettingsPage({
               <label className="text-[13px] font-bold text-zinc-700 dark:text-zinc-300" htmlFor="theme_font">{t('font')}</label>
               <select id="theme_font" name="theme_font" defaultValue={shopSettings?.theme_font || 'Geist'}
                 className="w-full md:w-64 rounded-xl border border-zinc-200 bg-white px-4 py-2.5 text-[13px] font-medium transition-colors focus:border-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-500 dark:border-[#2d2936] dark:bg-[#1C1A22]">
-                {FONTS.map(f => <option key={f.value} value={f.value}>{f.label}</option>)}
+                {FONTS.map(f => <option key={f} value={f}>{f === 'Geist' ? t('font_default', { name: f }) : f}</option>)}
               </select>
             </div>
             <div className="flex justify-end pt-2">
@@ -323,7 +347,7 @@ export default async function SettingsPage({
           <section className="rounded-2xl border border-zinc-100 bg-white dark:border-[#2d2936] dark:bg-[#1C1A22] shadow-sm overflow-hidden">
             <div className="px-6 py-4 border-b border-zinc-100 dark:border-[#2d2936] bg-transparent flex items-center justify-between">
               <h2 className="font-bold text-zinc-900 dark:text-white flex items-center gap-2"><Users className="h-4 w-4" /> {t('team')}</h2>
-              <span className="text-[11px] font-bold text-zinc-400 bg-zinc-100 dark:bg-white/5 px-2 py-0.5 rounded-full">{teamMembers.length} membre(s)</span>
+              <span className="text-[11px] font-bold text-zinc-400 bg-zinc-100 dark:bg-white/5 px-2 py-0.5 rounded-full">{t('members_count', { count: teamMembers.length })}</span>
             </div>
             <div className="divide-y divide-zinc-100 dark:divide-[#2d2936]">
               {teamMembers.length === 0 ? (
@@ -349,7 +373,7 @@ export default async function SettingsPage({
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                   <div className="flex flex-col gap-1.5">
                     <label className="text-[13px] font-bold text-zinc-700 dark:text-zinc-300" htmlFor="full_name_emp">{t('full_name')}</label>
-                    <input id="full_name_emp" name="full_name" type="text" required placeholder="Prénom Nom"
+                    <input id="full_name_emp" name="full_name" type="text" required placeholder={t('employee_name_placeholder')}
                       className="w-full rounded-xl border border-zinc-200 bg-white px-4 py-2.5 text-[13px] font-medium transition-colors focus:border-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-500 dark:border-[#2d2936] dark:bg-[#1C1A22]" />
                   </div>
                   <div className="flex flex-col gap-1.5">
@@ -360,7 +384,7 @@ export default async function SettingsPage({
                   </div>
                   <div className="flex flex-col gap-1.5">
                     <label className="text-[13px] font-bold text-zinc-700 dark:text-zinc-300" htmlFor="password_emp">{t('temp_password')}</label>
-                    <input id="password_emp" name="password" type="password" required minLength={6} placeholder="Min. 6 caractères"
+                    <input id="password_emp" name="password" type="password" required minLength={6} placeholder={t('password_min_hint')}
                       className="w-full rounded-xl border border-zinc-200 bg-white px-4 py-2.5 text-[13px] font-medium transition-colors focus:border-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-500 dark:border-[#2d2936] dark:bg-[#1C1A22]" />
                   </div>
                   <EmployeeAccessFields />

@@ -3,34 +3,33 @@ import { notFound } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import { Link } from "@/i18n/routing";
 import { getInvoiceDetail } from "@/features/invoices/actions";
-import { getShopSettings } from "@/features/settings/actions";
+import { getFormatters, getShopSettings } from "@/features/settings/queries";
 import { PrintButton } from "@/features/invoices/components/PrintButton";
+
+export async function generateMetadata() {
+  const t = await getTranslations("Invoices");
+  return { title: t("ticket_title") };
+}
 
 export default async function InvoiceTicketPage({
   params,
 }: {
-  params: Promise<{ id: string; locale: string }>;
+  params: Promise<{ id: string }>;
 }) {
-  const { id, locale } = await params;
+  const { id } = await params;
 
-  const [t, invoice, shop] = await Promise.all([
+  const [t, invoice, shop, fmt] = await Promise.all([
     getTranslations("Invoices"),
     getInvoiceDetail(id),
     getShopSettings(),
+    getFormatters(),
   ]);
 
   if (!invoice) notFound();
 
-  const currencySymbol = shop?.currency_symbol || "FCFA";
   const remaining = invoice.total_amount - invoice.paid_amount;
-  const invoiceDate = new Date(invoice.created_at).toLocaleString(locale, {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-  const format = (n: number) => `${n.toLocaleString("fr-FR")} ${currencySymbol}`;
+  const invoiceDate = fmt.date(invoice.created_at, "dateTime");
+  const format = fmt.money;
 
   const statusLabel = {
     PAID: t("status_paid"),
@@ -49,7 +48,7 @@ export default async function InvoiceTicketPage({
 
       <div className="printable-ticket mx-auto w-[80mm] bg-white p-3 font-mono text-[11px] leading-tight text-black">
         <div className="text-center">
-          <p className="text-sm font-bold">{shop?.shop_name || "Boutique"}</p>
+          <p className="text-sm font-bold">{shop?.shop_name || t("shop_fallback")}</p>
           {shop?.shop_address && <p>{shop.shop_address}</p>}
           {shop?.shop_phone && <p>{shop.shop_phone}</p>}
           {shop?.tax_id && <p>NIU: {shop.tax_id}</p>}

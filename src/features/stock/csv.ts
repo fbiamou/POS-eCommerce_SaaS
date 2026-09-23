@@ -13,6 +13,7 @@ export const CSV_HEADERS = [
 ] as const;
 
 export type ImportRow = {
+  line: number;
   name: string;
   category: string;
   type: string;
@@ -26,9 +27,20 @@ export type ImportRow = {
   is_published_online: boolean | undefined;
 };
 
+// A code rather than a sentence: the interface translates it (Stock.import_row_*),
+// with `value` being the offending cell or product name.
+export type ImportRowErrorCode =
+  | "missing_name"
+  | "invalid_selling_price"
+  | "invalid_quantity"
+  | "invalid_purchase_price"
+  | "create_failed"
+  | "restock_failed";
+
 export type ImportRowError = {
   line: number;
-  message: string;
+  code: ImportRowErrorCode;
+  value?: string;
 };
 
 function csvField(value: string | number): string {
@@ -46,13 +58,15 @@ function toCsv(rows: (string | number)[][]): string {
 export function buildCsvTemplate(): string {
   return toCsv([
     [...CSV_HEADERS],
-    ["Fond de teint Mac NC45", "Cosmétiques", "", "Mac", 3000, 6000, 10, "", "non"],
+    ["Fond de teint NC45", "Cosmétiques", "Fond de teint", "Mac", 3000, 6000, 10, "", "non"],
   ]);
 }
 
 export function productsToCsv(
   products: {
     name: string;
+    brand?: string | null;
+    product_type?: string | null;
     category: string;
     purchase_price: number;
     selling_price: number;
@@ -66,8 +80,8 @@ export function productsToCsv(
     rows.push([
       p.name,
       p.category,
-      "",
-      "",
+      p.product_type || "",
+      p.brand || "",
       p.purchase_price,
       p.selling_price,
       p.quantity_in_stock,
@@ -97,29 +111,30 @@ export function parseImportCsv(text: string): { rows: ImportRow[]; errors: Impor
     const quantityRaw = record.quantite?.trim();
 
     if (!name) {
-      errors.push({ line, message: "Nom manquant" });
+      errors.push({ line, code: "missing_name" });
       return;
     }
     const sellingPrice = sellingPriceRaw ? Number(sellingPriceRaw) : 0;
     if (sellingPriceRaw && (Number.isNaN(sellingPrice) || sellingPrice < 0)) {
-      errors.push({ line, message: `Prix de vente invalide: "${sellingPriceRaw}"` });
+      errors.push({ line, code: "invalid_selling_price", value: sellingPriceRaw });
       return;
     }
     const quantity = Number(quantityRaw);
     if (!quantityRaw || Number.isNaN(quantity) || quantity <= 0 || !Number.isInteger(quantity)) {
-      errors.push({ line, message: `Quantité invalide: "${quantityRaw}"` });
+      errors.push({ line, code: "invalid_quantity", value: quantityRaw ?? "" });
       return;
     }
     const purchasePriceRaw = record.prix_achat?.trim();
     const purchasePrice = purchasePriceRaw ? Number(purchasePriceRaw) : 0;
-    if (purchasePriceRaw && Number.isNaN(purchasePrice)) {
-      errors.push({ line, message: `Prix d'achat invalide: "${purchasePriceRaw}"` });
+    if (purchasePriceRaw && (Number.isNaN(purchasePrice) || purchasePrice < 0)) {
+      errors.push({ line, code: "invalid_purchase_price", value: purchasePriceRaw });
       return;
     }
 
     const enLigneRaw = record.en_ligne?.trim().toLowerCase();
 
     rows.push({
+      line,
       name,
       category: record.categorie?.trim() || "",
       type: record.type?.trim() || "",

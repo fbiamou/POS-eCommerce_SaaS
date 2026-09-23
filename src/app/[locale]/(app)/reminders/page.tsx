@@ -3,8 +3,13 @@ import { ReminderSettingsButton } from "@/features/reminders/components/Reminder
 import { Link } from "@/i18n/routing";
 import { getTranslations } from "next-intl/server";
 import { getOverdueInvoices } from "@/features/reminders/actions";
-import { getShopSettings } from "@/features/settings/actions";
+import { getShopSettings } from "@/features/settings/queries";
 import { hasWhatsAppCredentials } from "@/features/reminders/whatsapp";
+
+export async function generateMetadata() {
+  const t = await getTranslations("Reminders");
+  return { title: t("title") };
+}
 
 export default async function RemindersPage() {
   const [t, invoices, shopSettings] = await Promise.all([
@@ -21,6 +26,7 @@ export default async function RemindersPage() {
         <h1 className="text-2xl font-bold tracking-tight">{t("title")}</h1>
         <ReminderSettingsButton
           label={t("settings")}
+          shortLabel={t("settings_short")}
           firstDelayDays={shopSettings?.reminder_first_delay_days ?? 7}
           recurringDelayDays={shopSettings?.reminder_recurring_delay_days ?? 3}
         />
