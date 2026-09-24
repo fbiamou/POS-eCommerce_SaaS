@@ -74,7 +74,12 @@ export async function proxy(request: NextRequest) {
     return withSession(NextResponse.redirect(loginUrl))
   }
 
-  if (user && (isAuthPage || isLandingPage)) {
+  // A signed-in visitor clicking "Créer ma boutique" (/login?mode=signup)
+  // sees the form's "you are already signed in" choice instead of being
+  // sent silently to their own shop.
+  const isSignupForm = isAuthPage && request.nextUrl.searchParams.get('mode') === 'signup'
+
+  if (user && (isAuthPage || isLandingPage) && !isSignupForm) {
     const homeUrl = request.nextUrl.clone()
     homeUrl.pathname = `/${locale}/dashboard`
     return withSession(NextResponse.redirect(homeUrl))

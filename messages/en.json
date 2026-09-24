@@ -503,7 +503,10 @@
     "password_hint": "At least 6 characters.",
     "accept_terms": "I accept the <link>terms of use and the privacy policy</link>.",
     "free_note": "The Standard plan is free, with no time limit.",
-    "no_account": "No account yet?"
+    "no_account": "No account yet?",
+    "already_signed_in": "You're already signed in to <strong>{shop}</strong>.",
+    "open_my_shop": "Open my shop",
+    "sign_out_create_other": "Sign out to create another shop"
   },
   "Settings": {
     "title": "Settings",

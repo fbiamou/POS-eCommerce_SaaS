@@ -1,4 +1,6 @@
-import { login, signup } from './actions'
+import { login, logoutToSignup, signup } from './actions'
+import { getCurrentProfile } from '@/features/auth/actions'
+import { getShopSettings } from '@/features/settings/queries'
 import { getTranslations } from 'next-intl/server'
 import { Link } from '@/i18n/routing'
 import { LocaleSwitcher } from '@/components/LocaleSwitcher'
@@ -31,6 +33,9 @@ export default async function LoginPage({
   const error = readFeedbackParam(params.error)
   const message = readFeedbackParam(params.message)
   const isSignup = params.mode === 'signup'
+  // Only reachable signed in through ?mode=signup (see proxy.ts).
+  const profile = isSignup ? await getCurrentProfile() : null
+  const currentShop = profile ? await getShopSettings() : null
 
   const tabClass = (active: boolean) =>
     `flex-1 rounded-lg py-2 text-center text-[14px] font-semibold transition-colors ${
@@ -98,7 +103,24 @@ export default async function LoginPage({
             </p>
           )}
 
-          {isSignup ? (
+          {isSignup && profile ? (
+            <div className="mt-6 flex flex-col gap-3 rounded-2xl bg-[var(--surface-1)] p-5 shadow-card">
+              <p className="text-[15px]">
+                {t.rich('already_signed_in', {
+                  shop: currentShop?.shop_name || t('title'),
+                  strong: (chunks) => <strong className="font-semibold">{chunks}</strong>,
+                })}
+              </p>
+              <Link href="/dashboard" className="w-full rounded-xl bg-violet-600 py-3.5 text-center text-[15px] font-bold text-white transition-colors hover:bg-violet-700">
+                {t('open_my_shop')}
+              </Link>
+              <form action={logoutToSignup}>
+                <button type="submit" className="w-full rounded-xl py-3 text-[14px] font-semibold text-zinc-600 hover:bg-zinc-100 dark:text-zinc-300">
+                  {t('sign_out_create_other')}
+                </button>
+              </form>
+            </div>
+          ) : isSignup ? (
             <form action={signup} className="mt-6 flex flex-col gap-4">
               <div className="flex flex-col gap-1.5">
                 <label className={labelClass} htmlFor="full_name">{t('full_name')}</label>

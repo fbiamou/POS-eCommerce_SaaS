@@ -503,7 +503,10 @@
     "password_hint": "6 caractères minimum.",
     "accept_terms": "J'accepte les <link>conditions d'utilisation et la politique de confidentialité</link>.",
     "free_note": "Formule Standard gratuite, sans limite de durée.",
-    "no_account": "Pas encore de compte ?"
+    "no_account": "Pas encore de compte ?",
+    "already_signed_in": "Vous êtes déjà connecté(e) à la boutique <strong>{shop}</strong>.",
+    "open_my_shop": "Ouvrir ma boutique",
+    "sign_out_create_other": "Me déconnecter pour créer une autre boutique"
   },
   "Settings": {
     "title": "Paramètres",

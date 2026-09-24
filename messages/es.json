@@ -503,7 +503,10 @@
     "password_hint": "6 caracteres como mínimo.",
     "accept_terms": "Acepto las <link>condiciones de uso y la política de privacidad</link>.",
     "free_note": "El plan Standard es gratis, sin límite de tiempo.",
-    "no_account": "¿Todavía no tienes cuenta?"
+    "no_account": "¿Todavía no tienes cuenta?",
+    "already_signed_in": "Ya has iniciado sesión en la tienda <strong>{shop}</strong>.",
+    "open_my_shop": "Abrir mi tienda",
+    "sign_out_create_other": "Cerrar sesión para crear otra tienda"
   },
   "Settings": {
     "title": "Configuración",

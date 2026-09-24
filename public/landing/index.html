@@ -378,7 +378,7 @@ main{display:block}
 .faq{max-width:900px;margin-inline:auto;display:grid;gap:36px}
 .faq h2{font-size:clamp(34px,4.4vw,58px)}
 .faq-list{border-top:1.5px solid var(--mist)}
-.faq details{border-bottom:1.5px solid var(--mist)}
+.faq details{border-bottom:1.5px solid var(--mist);scroll-margin-top:calc(var(--nav-h) + 20px)}
 .faq summary{list-style:none;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:20px;padding:22px 4px;font-family:var(--f-display);font-weight:600;font-size:clamp(19px,1.8vw,23px);letter-spacing:-.01em}
 .faq summary::-webkit-details-marker{display:none}
 .faq summary .pm{flex:none;width:28px;height:28px;border-radius:50%;box-shadow:inset 0 0 0 1.5px var(--line-strong);position:relative;transition:transform .35s var(--ease-out),background-color .35s}
@@ -1277,7 +1277,16 @@ demoReset.addEventListener('click', function(){ demoP = 2/3; demoDone = false; d
 /* ---------------- FAQ: one open at a time ---------------- */
 var faqs = [].slice.call(document.querySelectorAll('#faq-list details'));
 faqs.forEach(function(d){ d.addEventListener('toggle', function(){ if (d.open) faqs.forEach(function(o){ if (o !== d) o.open = false; }); }); });
-[].forEach.call(document.querySelectorAll('[data-faq]'), function(a){ a.addEventListener('click', function(){ var d = document.getElementById(a.getAttribute('data-faq')); if (d) d.open = true; }); });
+/* Links to an answer open it. Delegated: translated text is re-rendered
+   with innerHTML, so a listener bound to the first link would be lost. */
+function openAnswer(id){ var d = document.getElementById(id); if (d && d.tagName === 'DETAILS') d.open = true; }
+document.addEventListener('click', function(e){
+  var a = e.target.closest ? e.target.closest('[data-faq], a[href^="#q-"]') : null;
+  if (a) openAnswer(a.getAttribute('data-faq') || a.getAttribute('href').slice(1));
+});
+function openFromHash(){ if (location.hash.indexOf('#q-') === 0) openAnswer(location.hash.slice(1)); }
+addEventListener('hashchange', openFromHash);
+openFromHash();
 
 /* ---------------- reduced motion, live, both directions ---------------- */
 function pinToFinalStates(){ spine.style.setProperty('--sp', 0); [].forEach.call(document.querySelectorAll('.reveal, .seam'), function(el){ el.classList.add('in','done'); }); }

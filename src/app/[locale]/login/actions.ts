@@ -74,6 +74,15 @@ export async function signup(formData: FormData) {
   return redirectLocalized('/login', { message: 'signup_check_email' })
 }
 
+// "Create another shop" from a signed-in session: close it first, then open
+// the sign-up form (a new account always creates a new shop).
+export async function logoutToSignup() {
+  const supabase = await createClient()
+  await supabase.auth.signOut()
+  revalidatePath('/', 'layout')
+  return redirectLocalized('/login', { mode: 'signup' })
+}
+
 export async function logout() {
   const supabase = await createClient()
   await supabase.auth.signOut()
