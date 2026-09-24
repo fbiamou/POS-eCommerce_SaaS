@@ -1,0 +1,277 @@
+<title>Cadre légal WISHOP</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Figtree:wght@400;600&family=Spline+Sans+Mono:wght@500&display=swap">
+<style>
+:root{
+  --bg:#F2F3F8; --panel:#FBFBFE; --ink:#141C45; --ink-2:#4F5780; --brand:#2B44A0; --mist:#D7DBEA; --line:#C9CEE2;
+  --accent:#F4B63F; --on-accent:#141C45; --ok:#1E7F4F; --late:#C2412D; --soft:#E7EAF4; --warn-bg:#FBEFD6;
+  --f-display:"Bricolage Grotesque","Segoe UI",system-ui,sans-serif;
+  --f-body:"Figtree","Segoe UI",system-ui,sans-serif;
+  --f-mono:"Spline Sans Mono",ui-monospace,Consolas,monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0F1538;--panel:#161E4A;--ink:#EEF0F8;--ink-2:#AEB6D8;--brand:#9FB2F2;--mist:#28326C;--line:#34408A;--soft:#1B2458;--ok:#7FD6A6;--late:#F08A74;--warn-bg:#3A3320;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0F1538;--panel:#161E4A;--ink:#EEF0F8;--ink-2:#AEB6D8;--brand:#9FB2F2;--mist:#28326C;--line:#34408A;--soft:#1B2458;--ok:#7FD6A6;--late:#F08A74;--warn-bg:#3A3320;color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16.5px;line-height:1.6;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1040px;margin:0 auto;padding-inline:clamp(16px,4vw,40px);padding-block:40px 96px}
+h1,h2,h3{font-family:var(--f-display);font-weight:800;letter-spacing:-.022em;line-height:1.08;text-wrap:balance;margin:0}
+h1{font-size:clamp(38px,6vw,64px)}
+h2{font-size:clamp(26px,3.4vw,38px);margin-bottom:14px}
+h3{font-size:20px;font-weight:600;letter-spacing:-.01em;margin-bottom:6px}
+p{margin:0 0 12px;max-width:70ch;text-wrap:pretty}
+a{color:var(--brand)}
+ul,ol{max-width:74ch}
+.kicker{font-family:var(--f-mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-2);margin-bottom:12px}
+.lead{font-size:clamp(17px,1.6vw,19px);max-width:64ch}
+.fil{display:block;width:180px;height:auto;margin:18px 0 26px}
+section{padding-block:44px;border-top:1.5px solid var(--mist)}
+header{padding-bottom:36px}
+.num,.mono{font-family:var(--f-mono);font-weight:500;font-variant-numeric:tabular-nums}
+.muted{color:var(--ink-2)}
+.small{font-size:14px}
+.note{font-size:15px;background:var(--soft);border-radius:14px;padding:14px 16px;max-width:none}
+.note b{font-weight:600}
+.warn{background:var(--warn-bg)}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+
+/* Verdicts */
+.verdicts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-top:20px}
+.verdict{background:var(--panel);border-radius:20px;padding:20px;display:grid;gap:8px;align-content:start;box-shadow:inset 0 0 0 1.5px var(--mist)}
+.verdict.main{box-shadow:inset 0 0 0 2px var(--brand)}
+.verdict .label{font-family:var(--f-mono);font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-2)}
+.verdict .answer{font-family:var(--f-display);font-weight:800;font-size:26px;letter-spacing:-.02em;line-height:1.1}
+.verdict p{font-size:15px;margin:0}
+@media (max-width:860px){.verdicts{grid-template-columns:1fr}}
+
+/* Tables */
+.tbl{overflow-x:auto;margin:16px 0;border-radius:16px;background:var(--panel);box-shadow:inset 0 0 0 1.5px var(--mist)}
+table{border-collapse:collapse;width:100%;min-width:720px;font-size:14.5px}
+th,td{text-align:left;vertical-align:top;padding:11px 13px;border-bottom:1px solid var(--mist)}
+th{font-family:var(--f-mono);font-weight:500;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-2);white-space:nowrap}
+tr:last-child td{border-bottom:0}
+td.r,th.r{text-align:right;white-space:nowrap}
+td b{font-weight:600}
+tr.us td{background:var(--soft)}
+.tag{display:inline-block;font-family:var(--f-mono);font-size:10.5px;letter-spacing:.06em;padding:1px 7px;border-radius:6px;white-space:nowrap;background:var(--soft);color:var(--ink-2)}
+.tag.now{background:rgba(194,65,45,.14);color:var(--late)}
+.tag.cgu{background:rgba(43,68,160,.14);color:var(--brand)}
+.tag.app{background:rgba(244,182,63,.25);color:var(--ink)}
+.tag.dem{background:rgba(30,127,79,.14);color:var(--ok)}
+.unk{color:var(--ink-2);font-style:italic}
+
+/* Steps of the unpaid policy: a real sequence in time */
+.steps{list-style:none;margin:18px 0 0;padding:0;display:grid;gap:0;max-width:880px}
+.steps li{display:grid;grid-template-columns:110px minmax(0,1fr);gap:18px;padding:14px 0 14px 20px;border-left:2px solid var(--mist);margin-left:10px;position:relative}
+.steps li::before{content:"";position:absolute;left:-7px;top:20px;width:12px;height:12px;border-radius:50%;background:var(--panel);box-shadow:inset 0 0 0 2px var(--brand)}
+.steps li.hard::before{background:var(--late);box-shadow:none}
+.steps .when{font-family:var(--f-mono);font-size:13px;color:var(--ink-2);padding-top:3px}
+.steps b{font-weight:600}
+.steps p{margin:4px 0 0;font-size:15px}
+.law{display:block;margin-top:6px;font-size:14px;color:var(--ink-2)}
+.law::before{content:"Base légale : ";font-family:var(--f-mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--brand)}
+@media (max-width:560px){.steps li{grid-template-columns:1fr;gap:4px}}
+
+/* Todo */
+.todo{margin:14px 0 0;padding-left:1.3em;display:grid;gap:12px;max-width:78ch}
+.todo li::marker{font-family:var(--f-mono);color:var(--brand)}
+.todo b{font-weight:600}
+.two{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px 32px;margin-top:10px}
+.two ul{margin:8px 0 0;padding-left:1.1em;display:grid;gap:8px}
+@media (max-width:820px){.two{grid-template-columns:1fr}}
+.sources{font-size:14px;display:grid;gap:6px;padding-left:1.1em;max-width:none}
+</style>
+
+<div class="wrap">
+<header>
+  <p class="kicker">WISHOP · note juridique et fiscale · 24 septembre 2026</p>
+  <h1>Cadre légal WISHOP</h1>
+  <svg class="fil" viewBox="0 0 180 26" aria-hidden="true"><polyline points="2,18 11,6 20,18 29,6 38,18 47,6 56,18 65,6 74,18 83,6 92,18 101,6 110,18 119,6 128,18 137,6 146,18 155,6 164,18 173,6" fill="none" stroke="#2B44A0" stroke-width="3"/><path d="M119 -2.5 L124 2.5 L119 7.5 L114 2.5Z" fill="#F4B63F"/></svg>
+  <p class="lead">Les lois de la zone CEMAC qui touchent WISHOP, en partant de la Guinée équatoriale : la TVA sur les abonnements, la politique d'impayés à écrire dans les conditions d'utilisation, et tous les autres thèmes de loi que l'application rencontre (données personnelles, relances, factures, vitrine, paiements, marque).</p>
+  <p class="note warn"><b>À lire avant tout.</b> Je ne suis pas avocat. Cette note rassemble les textes trouvés et vérifiés en ligne (liens en bas de page) pour préparer un rendez-vous avec un juriste OHADA et un comptable à Malabo. Les cases marquées <span class="unk">à vérifier</span> sont des points que je n'ai pas pu confirmer sur une source fiable.</p>
+</header>
+
+<section aria-labelledby="bref">
+  <p class="kicker">En bref</p>
+  <h2 id="bref">Les réponses</h2>
+  <div class="verdicts">
+    <div class="verdict main">
+      <span class="label">TVA sur les abonnements</span>
+      <span class="answer">Prix affichés TTC, tout compris</span>
+      <p>5&#8239;000, 12&#8239;500 et 25&#8239;000&nbsp;FCFA restent les montants payés, dans tous les pays. Vos clientes ne récupèrent pas la TVA : seul le montant final compte pour elles. Si une TVA est due, elle est prise sur votre marge, pas ajoutée au prix.</p>
+    </div>
+    <div class="verdict">
+      <span class="label">Impayés</span>
+      <span class="answer">Chaque étape a sa base légale</span>
+      <p>Lecture seule, archivage, pénalité de reprise et suppression tiennent juridiquement, à condition d'être écrits dans les conditions d'utilisation acceptées à l'inscription. Le détail étape par étape est plus bas.</p>
+    </div>
+    <div class="verdict">
+      <span class="label">Mode hors ligne (V3)</span>
+      <span class="answer">Dans les 4 formules</span>
+      <p>Votre décision est notée, et l'étude des tarifs est mise à jour : le mode hors ligne est inclus partout, Standard gratuit compris.</p>
+    </div>
+  </div>
+  <p class="note" style="margin-top:18px"><b>Le point qui décide de tout le reste :</b> le pays où WISHOP est enregistrée (entreprise individuelle ou société, et où). C'est lui qui dit si la TVA est collectée, où elle est payée, et si vos clientes en Guinée équatoriale doivent faire une retenue à la source. À régler avec un comptable avant le premier abonnement payant.</p>
+</section>
+
+<section aria-labelledby="tva">
+  <p class="kicker">Verdict fiscal</p>
+  <h2 id="tva">TVA : afficher des prix tout compris</h2>
+  <div class="two">
+    <div>
+      <h3>Pourquoi TTC</h3>
+      <ul>
+        <li><b>Vos cibles ne récupèrent pas la TVA.</b> En Guinée équatoriale, une commerçante en nom propre sous 15 millions de FCFA de chiffre d'affaires par an relève du <i>régimen de destajo</i> (patente libératoire), et la déduction de l'IVA est réservée au régime réel. Boss MaMa B, autour de 12 millions par an, est dans ce cas. Au Cameroun, les entreprises sous 50 millions paient l'IGS et ne collectent ni ne déduisent la TVA. Pour elles, toute TVA est un coût.</li>
+        <li><b>Pas de mauvaise surprise.</b> Un prix affiché hors taxe devient 15 à 19&#8239;% plus cher au moment de payer, exactement ce que vous voulez éviter avec une grille visible.</li>
+        <li><b>Le même prix partout.</b> Les taux varient de 15&#8239;% à 19,25&#8239;% selon le pays. Un prix TTC fixe absorbe ces écarts sans changer la grille.</li>
+      </ul>
+    </div>
+    <div>
+      <h3>Ce que ça vous coûte au pire</h3>
+      <p>Si WISHOP devient redevable de la TVA, la part de taxe contenue dans chaque prix. C'est le montant que vous reversez à l'État sur chaque abonnement mensuel.</p>
+      <div class="tbl" style="margin-top:8px">
+        <table style="min-width:520px">
+          <thead><tr><th>Pays · taux</th><th class="r">Essentiel</th><th class="r">Pro</th><th class="r">Pro Plus</th></tr></thead>
+          <tbody>
+            <tr class="us"><td>Guinée équatoriale · 15&#8239;%</td><td class="r num">652</td><td class="r num">1&#8239;630</td><td class="r num">3&#8239;261</td></tr>
+            <tr><td>Gabon, Tchad · 18&#8239;%</td><td class="r num">763</td><td class="r num">1&#8239;907</td><td class="r num">3&#8239;814</td></tr>
+            <tr><td>Congo · 18,9&#8239;%</td><td class="r num">795</td><td class="r num">1&#8239;987</td><td class="r num">3&#8239;974</td></tr>
+            <tr><td>Centrafrique · 19&#8239;%</td><td class="r num">798</td><td class="r num">1&#8239;996</td><td class="r num">3&#8239;992</td></tr>
+            <tr><td>Cameroun · 19,25&#8239;%</td><td class="r num">807</td><td class="r num">2&#8239;018</td><td class="r num">4&#8239;036</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="small muted">En FCFA par mois. Exemple : un Pro à 12&#8239;500&nbsp;FCFA en Guinée équatoriale, c'est 10&#8239;870 de prix hors taxe et 1&#8239;630 d'IVA.</p>
+    </div>
+  </div>
+
+  <h3 style="margin-top:28px">Ce qui change selon l'endroit où WISHOP est enregistrée</h3>
+  <div class="tbl">
+    <table>
+      <thead><tr><th>Cas</th><th>TVA sur l'abonnement</th><th>Autres effets</th><th>Mention sur la facture WISHOP</th></tr></thead>
+      <tbody>
+        <tr class="us"><td><b>A. WISHOP enregistrée en Guinée équatoriale</b>, en nom propre</td><td>Sous 30 millions de FCFA par an pour une personne physique qui vend des services : régime de destajo, patente libératoire. <span class="unk">À vérifier avec le comptable : IVA due ou non dans ce régime.</span> Au régime réel : IVA 15&#8239;% incluse dans le prix.</td><td>Patente annuelle selon la ville et la catégorie (à Malabo, de l'ordre de 100&#8239;000 à 800&#8239;000&nbsp;FCFA).</td><td>Prix TTC ; IVA détaillée seulement au régime réel, avec le NIF de WISHOP.</td></tr>
+        <tr><td><b>B. Société en Guinée équatoriale</b> (SL, SA)</td><td>Comme A, au régime réel dès que les seuils sont dépassés.</td><td><b>Cuota mínima fiscal</b> : 3&#8239;% du chiffre d'affaires, au minimum 800&#8239;000&nbsp;FCFA par an, même sans bénéfice (art. 168 de la loi fiscale). Lourd au démarrage.</td><td>Prix TTC, IVA 15&#8239;% détaillée, NIF.</td></tr>
+        <tr><td><b>C. WISHOP facture depuis un autre pays</b> (Cameroun, France...)</td><td>Un service utilisé en Guinée équatoriale y est taxé ; le prestataire étranger doit nommer un représentant fiscal résidant sur place, solidaire du paiement (art. 278).</td><td><b>Retenue à la source</b> : la boutique qui paie un prestataire non résident doit retenir 15&#8239;% (société) ou 20&#8239;% (personne physique) et les reverser au fisc chaque mois. Irréaliste pour de petites boutiques, et c'est elles qui risquent l'amende.</td><td>À définir avec le comptable des deux pays.</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="note"><b>Ma recommandation :</b> pour le lancement en Guinée équatoriale, facturer depuis une présence enregistrée sur place (cas A en priorité, B quand le chiffre d'affaires le justifie). Le cas C met la retenue à la source sur le dos de vos clientes. Pour la suite : le Gabon taxe déjà à 18&#8239;% les logiciels et services en ligne vendus depuis l'étranger, sans seuil, avec une inscription simplifiée ; le Cameroun taxe les plateformes de commerce en ligne depuis 2020 et a renforcé les règles pour les entreprises numériques étrangères en 2026. Le prix TTC absorbe tout ça.</p>
+
+  <h3 style="margin-top:28px">Et la TVA des boutiques, dans l'application ?</h3>
+  <p>L'application sait déjà le faire : un réglage « Assujetti à la TVA » avec un taux, les prix sont saisis tout compris et la facture détaille hors taxe, TVA et TTC quand la boutique est assujettie. Deux défauts, à corriger pendant la refonte :</p>
+  <ul>
+    <li><b>Les réglages par défaut sont camerounais</b> : taux 19,25&#8239;%, indicatif +237, fuseau Douala, et l'identifiant fiscal s'appelle « NIU » même en espagnol. En Guinée équatoriale c'est 15&#8239;%, +240, Malabo et « NIF ». Je propose un champ <b>Pays de la boutique</b> qui préremplit les quatre.</li>
+    <li><b>Les boutiques non assujetties</b> (la majorité) : le ticket ne montre aucune TVA, c'est correct. Rien d'autre à ajouter.</li>
+  </ul>
+</section>
+
+<section aria-labelledby="impayes">
+  <p class="kicker">Conditions d'utilisation</p>
+  <h2 id="impayes">Politique d'impayés : les lois à citer</h2>
+  <p>La politique que vous avez validée, étape par étape, avec la base légale à citer dans les conditions d'utilisation. Deux règles pour toutes les étapes : chaque délai et chaque montant doit être écrit à l'avance dans les conditions d'utilisation, et ces conditions doivent être lisibles et téléchargeables avant l'inscription (loi équato-guinéenne 1/2017, art. 28). L'acceptation par un clic vaut un écrit (même loi, art. 27.4).</p>
+  <ol class="steps">
+    <li><span class="when">Échéance</span><div><b>Rappel, puis demande de renouvellement.</b><p>Message dans l'application et sur WhatsApp, ton clair et respectueux.</p><span class="law">le contrat d'abonnement lui-même (conditions d'utilisation acceptées) ; les rappels de paiement sont des messages de gestion, pas de la publicité.</span></div></li>
+    <li><span class="when">Impayé</span><div><b>Compte en lecture seule.</b><p>Toutes les données restent visibles et exportables, aucun bouton d'écriture.</p><span class="law">l'exception d'inexécution du droit des contrats (Code civil applicable en Guinée équatoriale et au Cameroun) : le service payé peut être suspendu quand le paiement ne suit pas, si le contrat le prévoit.</span></div></li>
+    <li><span class="when">Environ 1 mois</span><div><b>Avis d'archivage : « exportez vos données ».</b><p>C'est l'étape la plus importante juridiquement. La boutique doit pouvoir récupérer ses données, et elle reste seule responsable de garder ses livres.</p><span class="law">droit à la portabilité (Cameroun, loi 2024/017, art. 43 al. 4) ; droit d'accès (Guinée équatoriale, loi 1/2016, art. 13) ; obligation de la boutique de garder son livre des recettes 5 ans (OHADA, Acte uniforme de droit commercial général, art. 31) et ses pièces comptables 10 ans (OHADA, Acte uniforme de droit comptable, art. 24).</span></div></li>
+    <li><span class="when">Archivage</span><div><b>Plus d'accès, même en lecture.</b><p>Les données sont conservées à l'écart, sans utilisation.</p><span class="law">WISHOP traite ces données pour le compte de la boutique : à la fin du contrat, elles doivent être rendues ou détruites (Guinée équatoriale, loi 1/2016, art. 8.2).</span></div></li>
+    <li><span class="when">Retour</span><div><b>Reprise payante avec pénalité.</b><p>Arriérés plus une pénalité fixe, écrite à l'avance et proportionnée (par exemple un mois d'abonnement). Une pénalité non prévue au contrat ne peut pas être réclamée.</p><span class="law">clause pénale du contrat ; la dette d'abonnement se prescrit par 5 ans (OHADA, droit commercial général, art. 16) et se recouvre au besoin par injonction de payer (OHADA, Acte uniforme sur le recouvrement, révisé en 2023).</span></div></li>
+    <li class="hard"><span class="when">Environ 6 mois</span><div><b>Suppression du compte et des données.</b><p>WISHOP ne garde que ses propres factures d'abonnement, 10 ans.</p><span class="law">les données ne se gardent pas plus longtemps que nécessaire (Guinée équatoriale, loi 1/2016, art. 7.2 ; même principe au Cameroun, loi 2024/017) ; conservation des factures de WISHOP (OHADA, droit comptable, art. 24).</span></div></li>
+  </ol>
+  <p class="note" style="margin-top:18px"><b>Langue :</b> en Guinée équatoriale, les conditions d'utilisation doivent exister en espagnol, avec les versions française et anglaise à côté. Elles passeront dans la relecture groupée de fin de design, puis chez le juriste.</p>
+</section>
+
+<section aria-labelledby="themes">
+  <p class="kicker">Vue d'ensemble</p>
+  <h2 id="themes">Tous les thèmes de loi que WISHOP touche</h2>
+  <p>Chaque ligne dit ce que la loi demande et ce que ça change pour WISHOP. Les étiquettes disent où agir : <span class="tag now">urgent</span> <span class="tag cgu">CGU</span> (conditions d'utilisation et politique de confidentialité), <span class="tag app">app</span> (à construire ou corriger), <span class="tag dem">démarche</span> (auprès d'une autorité).</p>
+  <div class="tbl">
+    <table>
+      <thead><tr><th>Thème</th><th>Ce que dit la loi</th><th>Ce que ça change pour WISHOP</th><th>Où</th></tr></thead>
+      <tbody>
+        <tr><td><b>Données personnelles : qui est responsable</b></td><td>Celui qui traite des données pour le compte d'un autre doit le faire sur contrat écrit, seulement selon ses instructions, sans les réutiliser, et les rendre ou les détruire à la fin (Guinée équatoriale, loi 1/2016, art. 8).</td><td>Pour les fiches des clientes des boutiques (noms, téléphones, dettes), la boutique est responsable et WISHOP est sous-traitant. Les CGU doivent contenir cette clause. Pour les comptes des boutiques elles-mêmes, WISHOP est responsable.</td><td><span class="tag cgu">CGU</span></td></tr>
+        <tr><td><b>Données personnelles : déclarations</b></td><td>Guinée équatoriale : tout fichier privé est notifié à l'avance à l'Órgano Rector (art. 20), qui n'était pas encore en fonctionnement selon les sources consultées. Cameroun : autorisation préalable de l'autorité de protection, obligatoire pour les entreprises depuis le <b>23 juin 2026</b> ; amende de 5 à 50 millions de FCFA sans autorisation.</td><td>Guinée équatoriale : préparer le dossier et le déposer dès que l'autorité reçoit, garder une trace. Cameroun : demander l'autorisation <b>avant</b> de vendre au Cameroun.</td><td><span class="tag now">urgent</span> <span class="tag dem">démarche</span></td></tr>
+        <tr><td><b>Transfert des données hors du pays</b></td><td>Guinée équatoriale : seulement vers un pays qui protège autant, sinon autorisation préalable ou accord clair de la personne (art. 27 et 28). Cameroun : autorisation préalable pour tout transfert à l'étranger (art. 32).</td><td>La base de données est en Irlande (Union européenne, protection RGPD), ce qui se défend. Mais le serveur de l'application tourne aux États-Unis (Washington) : les données y transitent. Le déplacer à Dublin règle la question et accélère l'application (voir « À faire »).</td><td><span class="tag now">urgent</span> <span class="tag app">app</span> <span class="tag cgu">CGU</span></td></tr>
+        <tr><td><b>Sécurité des données</b></td><td>Le responsable prend les mesures techniques qui garantissent la sécurité des données (Guinée équatoriale, loi 1/2016, art. 11) ; la loi camerounaise 2024/017 prévoit aussi des obligations en cas de faille de sécurité.</td><td>Déjà en place : cloisonnement par boutique dans la base (RLS). À écrire : sauvegardes, qui accède aux données chez WISHOP, procédure en cas de fuite.</td><td><span class="tag cgu">CGU</span> <span class="tag app">app</span></td></tr>
+        <tr><td><b>Dettes des clientes</b></td><td>Les services qui partagent des informations sur les dettes des personnes suivent des règles strictes, dont l'avertissement de la personne sous 15 jours (Guinée équatoriale, loi 1/2016, art. 24).</td><td>Chaque boutique voit seulement ses propres débitrices. <b>Ne jamais</b> créer de liste de mauvaises payeuses partagée entre boutiques : WISHOP deviendrait un fichier de crédit.</td><td><span class="tag app">app</span></td></tr>
+        <tr><td><b>Relances et messages WhatsApp</b></td><td>La publicité électronique demande l'accord préalable et exprès du destinataire, commence par « Publicidad » ou « pub », et offre un moyen simple et gratuit de refuser (Guinée équatoriale, loi 1/2017, art. 23 à 25). Cameroun : prospection soumise à consentement préalable (loi 2024/017, art. 41).</td><td>Les relances de dette ne sont pas de la publicité : pas d'accord préalable, mais fréquence raisonnable, ton correct, jamais d'information envoyée à quelqu'un d'autre. Si WISHOP permet un jour des messages promotionnels (nouveautés, soldes), il faudra une case d'accord sur la fiche cliente et un lien de désinscription.</td><td><span class="tag app">app</span> <span class="tag cgu">CGU</span></td></tr>
+        <tr><td><b>Comptabilité des boutiques</b></td><td>OHADA : le petit commerçant (entreprenant) tient au jour le jour un livre des recettes et des dépenses, gardé 5 ans (art. 31), et un registre des achats s'il vend des marchandises (art. 32). Sous 60 millions de FCFA de chiffre d'affaires, un commerce peut tenir une comptabilité de trésorerie simplifiée (Système minimal de trésorerie).</td><td>Une occasion : faire sortir de WISHOP le livre des recettes et le registre des achats au format OHADA. À prévoir avec « Dépenses et bénéfice net » en V2 : WISHOP devient l'outil qui tient la boutique en règle.</td><td><span class="tag app">app</span></td></tr>
+        <tr><td><b>Factures électroniques obligatoires</b></td><td>Gabon : depuis janvier 2026, factures par dispositifs agréés par le fisc, y compris pour les petites entreprises à l'impôt synthétique, progressivement (Code général des impôts, art. P-832 ter). Congo : facture normalisée avec machines homologuées. Cameroun : facture électronique certifiée prévue par la loi de finances 2026, d'abord entre entreprises assujetties à la TVA. Guinée équatoriale : rien trouvé.</td><td>Aucun effet pour le lancement en Guinée équatoriale. Avant d'ouvrir le Gabon ou le Congo, vérifier si le ticket WISHOP doit être homologué ou relié à la plateforme du fisc.</td><td><span class="tag dem">démarche</span></td></tr>
+        <tr><td><b>Contrat en ligne et preuve</b></td><td>Un contrat conclu en ligne est valable, l'écrit électronique vaut l'écrit papier, il est admis comme preuve (Guinée équatoriale, loi 1/2017, art. 27 et 29 ; loi 2/2017 sur la signature électronique). Avant l'inscription : étapes, correction des erreurs, archivage et CGU téléchargeables (art. 28).</td><td>Case « J'accepte les conditions d'utilisation » à l'inscription, avec lien, version datée et conservée. Les factures et tickets de WISHOP servent de preuve en cas de litige avec une cliente.</td><td><span class="tag app">app</span> <span class="tag cgu">CGU</span></td></tr>
+        <tr><td><b>Vitrine en ligne des boutiques</b></td><td>Envers les consommateurs : prix affichés toutes taxes comprises, identité du vendeur, confirmation de commande (Guinée équatoriale, loi 1/2017 ; Cameroun, loi 2010/021 sur le commerce électronique et loi-cadre 2011/012 sur la protection du consommateur). L'hébergeur répond d'un contenu illicite s'il le connaît et ne le retire pas (Guinée équatoriale, loi 1/2017, art. 38).</td><td>Les prix de la vitrine sont déjà saisis tout compris. À ajouter : le nom et le contact de la boutique sur chaque vitrine, et un bouton « Signaler » (contrefaçon de marques de cosmétiques ou de sacs, par exemple), avec retrait rapide écrit dans les CGU.</td><td><span class="tag app">app</span> <span class="tag cgu">CGU</span></td></tr>
+        <tr><td><b>Paiements (Mobile Money V2, abonnements)</b></td><td>Encaisser de l'argent pour le compte d'autrui est un service de paiement soumis à agrément dans la CEMAC (Règlement n°&nbsp;04/18/CEMAC/UMAC/COBAC).</td><td>WISHOP ne doit jamais faire transiter l'argent des ventes : il va directement de la cliente à la boutique, via un opérateur ou un agrégateur agréé. Même chose pour encaisser les abonnements.</td><td><span class="tag app">app</span></td></tr>
+        <tr><td><b>Marque WISHOP</b></td><td>Un dépôt à l'OAPI (Accord de Bangui) protège la marque dans ses 17 États membres, dont les 6 pays de la CEMAC.</td><td>Déposer le nom et le logo WISHOP avant le lancement public, pour éviter qu'un autre ne le dépose.</td><td><span class="tag dem">démarche</span></td></tr>
+        <tr><td><b>Cookies et traceurs</b></td><td>Enregistrer quelque chose sur l'appareil demande l'accord, sauf ce qui est strictement nécessaire au service demandé (Guinée équatoriale, loi 1/2017, art. 25.4 et 25.5).</td><td>La page d'accueil ne garde que la langue choisie : c'est permis sans bandeau. Tout outil de mesure d'audience ajouté plus tard demandera un accord.</td><td><span class="tag cgu">CGU</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section aria-labelledby="pays">
+  <p class="kicker">Pays par pays</p>
+  <h2 id="pays">Les textes dans les six pays de la CEMAC</h2>
+  <h3>Données personnelles</h3>
+  <div class="tbl">
+    <table>
+      <thead><tr><th>Pays</th><th>Loi</th><th>Autorité</th><th>Points utiles pour WISHOP</th></tr></thead>
+      <tbody>
+        <tr class="us"><td><b>Guinée équatoriale</b></td><td>Ley 1/2016 du 22 juillet 2016 ; Ley 1/2017 sur les communications par Internet ; Ley 2/2017 sur la signature et les documents électroniques</td><td>Órgano Rector de Protección de Datos Personales (pas encore en fonctionnement selon les sources)</td><td>Sous-traitance (art. 8), sécurité (art. 11), droits (art. 13), fichiers privés notifiés (art. 20), transferts (art. 27-28). Amendes de 200&#8239;000 à 15 millions de FCFA (art. 42).</td></tr>
+        <tr><td><b>Cameroun</b></td><td>Loi n°&nbsp;2024/017 du 23 décembre 2024</td><td>Autorité de protection des données prévue par la loi</td><td>Autorisation préalable pour traiter et pour transférer, obligatoire depuis le 23 juin 2026. S'applique aussi à une entreprise étrangère qui sert des résidents camerounais.</td></tr>
+        <tr><td><b>Gabon</b></td><td>Loi n°&nbsp;001/2011, modifiée par la loi n°&nbsp;025/2023 du 9 juillet 2023</td><td>APDPVP</td><td class="unk">Règles de transfert et formalités à vérifier.</td></tr>
+        <tr><td><b>Congo</b></td><td>Loi n°&nbsp;29-2019 du 10 octobre 2019</td><td class="unk">À vérifier</td><td class="unk">Formalités à vérifier. Le Congo a ratifié la Convention de Malabo de l'Union africaine.</td></tr>
+        <tr><td><b>Tchad</b></td><td>Loi n°&nbsp;007/PR/2015</td><td>ANSICE</td><td class="unk">Formalités à vérifier. Le Tchad a ratifié la Convention de Malabo.</td></tr>
+        <tr><td><b>Centrafrique</b></td><td>Pas de loi spécifique trouvée (projet en cours)</td><td>·</td><td>Appliquer par prudence les mêmes règles qu'ailleurs.</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="small muted">Commerce électronique et cybersécurité au Cameroun : lois n°&nbsp;2010/021 (commerce électronique) et 2010/012 (cybersécurité et cybercriminalité), loi-cadre n°&nbsp;2011/012 (protection du consommateur).</p>
+
+  <h3 style="margin-top:26px">TVA, petits commerces et factures</h3>
+  <div class="tbl">
+    <table>
+      <thead><tr><th>Pays</th><th>TVA</th><th>Petits commerces</th><th>Facture électronique</th></tr></thead>
+      <tbody>
+        <tr class="us"><td><b>Guinée équatoriale</b></td><td>IVA 15&#8239;%, réduit 6&#8239;%, 0&#8239;% sur certains produits de base (art. 294)</td><td>Destajo sous 15 millions (commerce) ou 30 millions (services), personnes physiques ; patente libératoire ; déduction de l'IVA réservée au régime réel</td><td>Rien trouvé</td></tr>
+        <tr><td><b>Cameroun</b></td><td>19,25&#8239;% (17,5&#8239;% plus 10&#8239;% de centimes communaux)</td><td>IGS sous 50 millions : ni collecte ni déduction de TVA (loi de finances 2025)</td><td>Facture électronique certifiée, loi de finances 2026, d'abord entre entreprises assujetties</td></tr>
+        <tr><td><b>Gabon</b></td><td>18&#8239;%, réduits 10&#8239;% et 5&#8239;%</td><td>Régime de base sous 20 millions ; TVA obligatoire à partir de 40 à 80 millions selon l'activité</td><td>Obligatoire depuis janvier 2026, dispositifs agréés, petites entreprises comprises, progressivement</td></tr>
+        <tr><td><b>Congo</b></td><td>18&#8239;% plus 5&#8239;% de centimes additionnels, soit 18,9&#8239;%</td><td class="unk">Seuils à vérifier</td><td>Facture normalisée, machines homologuées</td></tr>
+        <tr><td><b>Tchad</b></td><td>18&#8239;%</td><td class="unk">À vérifier</td><td class="unk">À vérifier</td></tr>
+        <tr><td><b>Centrafrique</b></td><td>19&#8239;% <span class="unk">(à confirmer)</span></td><td class="unk">À vérifier</td><td class="unk">À vérifier</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="small muted">Cadre commun : la TVA est harmonisée dans la CEMAC par la directive n°&nbsp;1/99/CEMAC-028-CM-03 ; le droit des affaires et la comptabilité suivent l'OHADA dans les six pays.</p>
+</section>
+
+<section aria-labelledby="faire">
+  <p class="kicker">Suite</p>
+  <h2 id="faire">À faire, dans l'ordre</h2>
+  <ol class="todo">
+    <li><b>Serveur de l'application à Dublin.</b> Une ligne dans la configuration Vercel, gratuite, réversible. Les données ne transitent plus par les États-Unis et chaque page parle à une base de données voisine au lieu de traverser l'Atlantique (aujourd'hui, la page de connexion met 1,4 à 2,4&nbsp;s). J'attends votre accord pour publier ce changement.</li>
+    <li><b>Rendez-vous avec un comptable à Malabo</b> avant le premier abonnement payant : où et sous quelle forme enregistrer WISHOP (cas A, B ou C plus haut), IVA due ou non au régime de destajo, montant de la patente.</li>
+    <li><b>Déposer la marque WISHOP à l'OAPI.</b></li>
+    <li><b>Rédiger les conditions d'utilisation et la politique de confidentialité</b> (espagnol, français, anglais) avec : la clause de sous-traitance des données, la politique d'impayés et ses bases légales, le lieu d'hébergement, le signalement des contenus illicites de la vitrine. Faire relire par un juriste OHADA.</li>
+    <li><b>Dans l'application, pendant la refonte :</b> case d'acceptation des CGU à l'inscription ; champ Pays de la boutique qui règle TVA, indicatif, fuseau et nom de l'identifiant fiscal ; export complet des données avant archivage ; identité de la boutique et bouton Signaler sur la vitrine.</li>
+    <li><b>Guinée équatoriale :</b> préparer la notification du fichier à l'Órgano Rector et la déposer dès qu'il fonctionne.</li>
+    <li><b>Avant d'ouvrir le Cameroun :</b> demander l'autorisation de traitement et de transfert à l'autorité de protection des données. Avant le Gabon ou le Congo : vérifier les règles de facture électronique.</li>
+    <li><b>V2 :</b> sortir le livre des recettes et le registre des achats au format OHADA avec « Dépenses et bénéfice net ».</li>
+  </ol>
+</section>
+
+<section aria-labelledby="sources">
+  <p class="kicker">Sources</p>
+  <h2 id="sources">Textes et analyses consultés</h2>
+  <ul class="sources">
+    <li>Guinée équatoriale, recueil des lois électroniques (lois 3/2015, 1/2016, 2/2016, 1/2017, 2/2017) : <a href="https://palaciodelpueblo.com/wp-content/uploads/2022/02/LEYES-ELECTRONICAS.pdf">palaciodelpueblo.com</a></li>
+    <li>Guinée équatoriale, guide des impôts de la Direction générale des impôts (IVA, retenue, destajo, cuota mínima) : <a href="https://www.guineainfomarket.com/wp-content/uploads/2020/10/GUIA-DETALLADA-DE-IMPUESTOS-Final.pdf">guineainfomarket.com</a></li>
+    <li>Guinée équatoriale, état de l'autorité de protection des données : <a href="https://www.dataguidance.com/jurisdictions/equatorial-guinea">DataGuidance</a></li>
+    <li>Cameroun, loi n°&nbsp;2024/017 : <a href="https://prc.cm/fr/multimedia/documents/10258-loi-n-2024-017-du-23-12-2024-web">Présidence de la République</a> ; analyses : <a href="https://www.village-justice.com/articles/cameroun-comprendre-questions-nouvelle-loi-sur-protection-des-donnees-caractere,52122.html">Village de la Justice</a>, <a href="https://cio-mag.com/la-protection-des-donnees-a-caractere-personnel-au-cameroun-a-la-lecture-de-la-loi-du-23-decembre-2024/">CIO Mag</a>, <a href="https://cabinetnkoyokngoue.com/loi-2024-017-cameroun">Cabinet Nkoyok Ngoue</a></li>
+    <li>Cameroun, IGS et TVA : <a href="https://lefisk.cm/blog/igs-regime-reel-cameroun-classes-montants-obligations-guide">LeFisk</a>, <a href="https://blog.avocats.deloitte.fr/cameroun-les-principales-mesures-importantes-de-la-loi-de-finances-pour-2025/">Deloitte, loi de finances 2025</a> ; TVA du commerce en ligne : <a href="https://www.agenceecofin.com/finance/0701-72506-le-commerce-en-ligne-est-desormais-assujetti-a-la-tva-au-cameroun">Agence Ecofin</a>, <a href="https://www.digitalbusiness.africa/loi-de-finances-2026-comment-le-cameroun-encadre-et-taxe-desormais-les-entreprises-du-numerique-operant-depuis-letranger/">Digital Business Africa, loi de finances 2026</a> ; facture électronique : <a href="https://edicomgroup.com/fr/blog/facturation-electronique-obligatoire-au-cameroun">Edicom</a></li>
+    <li>Gabon : <a href="https://directinfosgabon.com/tva-a-18-les-plateformes-numeriques-etrangeres-desormais-dans-le-viseur-du-fisc-gabonais/">TVA des plateformes étrangères</a>, <a href="https://www.atekbot.space/blog/nif-tva-gabon-assujettissement-seuils-obligations">seuils de TVA</a>, <a href="https://gabonmediatime.com/gabon-facturation-tva-sanctions-tout-ce-qui-change-pour-les-pme-avec-la-lfr-2026/">facture électronique</a>, <a href="https://journal-officiel.ga/20085-025-2023-/">loi n°&nbsp;025/2023</a></li>
+    <li>Congo : <a href="https://blog.avocats.deloitte.fr/congo-brazzaville-les-principales-mesures-importantes-de-la-loi-de-finances-pour-2025/">Deloitte, loi de finances 2025</a>, <a href="https://www.finances.gouv.cg/fr/facture-normalisee-electronique_151018">facture normalisée</a>, <a href="https://www.digitalbusiness.africa/congo-une-loi-adoptee-pour-garantir-la-protection-des-donnees-personnelles/">loi sur les données</a></li>
+    <li>Afrique centrale, lois sur les données et Convention de Malabo : <a href="https://cybersecuritymag.africa/index.php/etats-des-lieux-des-legislations-sur-protection-donnees-personnelles-afrique">Africa Cybersecurity Mag</a> ; taux de TVA : <a href="https://blog.avocats.deloitte.fr/afrique-cameroun-panorama-fiscal-et-juridique-2022/">Deloitte</a>, <a href="https://export.agence-adocc.com/fr/fiches-pays/tchad/environnement-des-affaires">fiche Tchad</a></li>
+    <li>OHADA : <a href="http://www.actualitesdroitohada.com/legislation/acte-uniforme-relatif-au-droit-commercial-general/articles-031-et-032---obligations-comptables-de-l-entreprenant/article-31">obligations de l'entreprenant (art. 31-32)</a>, <a href="https://www.ohada.org/en/uniform-act-relating-to-accounting-law-and-financial-information-audcif/">Acte uniforme de droit comptable</a>, <a href="https://biblio.ohada.org/doc_num.php?explnum_id=6">Acte uniforme de droit commercial général</a></li>
+  </ul>
+</section>
+</div>
