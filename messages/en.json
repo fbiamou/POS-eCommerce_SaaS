@@ -455,7 +455,13 @@
     "saving": "Saving...",
     "cancel": "Cancel",
     "payments_history": "Payments received",
-    "shop_fallback": "Shop"
+    "shop_fallback": "Shop",
+    "filter_all": "All",
+    "filter_due": "To collect",
+    "filter_paid": "Paid",
+    "summary_due": "Left to collect",
+    "remaining_short": "{amount} left",
+    "paid_progress": "{paid} paid out of {total}"
   },
   "Auth": {
     "title": "WISHOP",

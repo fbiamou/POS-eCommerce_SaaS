@@ -43,7 +43,7 @@ export function RecordPaymentButton({ invoiceId, remaining }: { invoiceId: strin
       <button
         type="button"
         onClick={open}
-        className="flex items-center gap-2 rounded-md bg-emerald-700 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-800 transition-colors"
+        className="flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-700 px-4 py-3 text-[15px] font-bold text-white transition-colors hover:bg-emerald-800 sm:w-auto"
       >
         <Banknote className="h-4 w-4" /> {t("record_payment")}
       </button>
@@ -54,7 +54,7 @@ export function RecordPaymentButton({ invoiceId, remaining }: { invoiceId: strin
             {t("remaining_due")} : <span className="font-bold tabular-nums">{format.money(remaining)}</span>
           </p>
           <div className="flex flex-col gap-1">
-            <label htmlFor="payment_amount" className="text-sm font-medium">
+            <label htmlFor="payment_amount" className="text-[13px] font-semibold text-zinc-700 dark:text-zinc-300">
               {t("payment_amount", { currency: format.currencySymbol })}
             </label>
             <input
@@ -66,7 +66,7 @@ export function RecordPaymentButton({ invoiceId, remaining }: { invoiceId: strin
               required
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
-              className="rounded-md border border-zinc-300 p-2 text-sm dark:border-zinc-700 dark:bg-zinc-800"
+              className="rounded-xl border border-zinc-200 bg-[var(--surface-1)] px-4 py-3 font-mono text-[16px] focus:border-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-500 dark:border-[var(--line)]"
             />
             {value > 0 && value < remaining && (
               <p className="text-xs text-zinc-500">{t("remaining_after", { amount: format.money(remaining - value) })}</p>
@@ -74,13 +74,13 @@ export function RecordPaymentButton({ invoiceId, remaining }: { invoiceId: strin
           </div>
           {error && <p className="text-sm font-medium text-red-600">{tFeedback(error)}</p>}
           <div className="flex justify-end gap-2">
-            <button type="button" onClick={() => setIsOpen(false)} className="rounded-md border px-4 py-2 text-sm font-medium hover:bg-zinc-100 dark:hover:bg-zinc-800">
+            <button type="button" onClick={() => setIsOpen(false)} className="rounded-xl px-4 py-2.5 text-[14px] font-semibold text-zinc-600 hover:bg-zinc-100 dark:text-zinc-300">
               {t("cancel")}
             </button>
             <button
               type="submit"
               disabled={isPending || value <= 0 || value > remaining}
-              className="rounded-md bg-emerald-700 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-800 disabled:opacity-50"
+              className="rounded-xl bg-emerald-700 px-5 py-2.5 text-[14px] font-bold text-white hover:bg-emerald-800 disabled:opacity-50"
             >
               {isPending ? t("saving") : t("confirm_payment")}
             </button>

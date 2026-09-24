@@ -1,16 +1,21 @@
 import { getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
-import { Download, Printer } from "lucide-react";
+import { ArrowLeft, Download, Printer } from "lucide-react";
 import { Link } from "@/i18n/routing";
 import { getInvoiceDetail, extractVat } from "@/features/invoices/actions";
 import { getFormatters, getShopSettings } from "@/features/settings/queries";
 import { RecordPaymentButton } from "@/features/invoices/components/RecordPaymentButton";
+import { INVOICE_STATUS_CLASS } from "@/features/invoices/status";
+import { DebtProgress } from "@/components/ui/DebtProgress";
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const [t, invoice] = await Promise.all([getTranslations("Invoices"), getInvoiceDetail(id)]);
   return { title: invoice?.invoice_number ? `${t("title")} ${invoice.invoice_number}` : t("title") };
 }
+
+const secondaryButton =
+  "flex items-center gap-2 rounded-xl bg-[var(--surface-1)] px-4 py-2.5 text-[14px] font-semibold text-zinc-800 shadow-[inset_0_0_0_1px_var(--line)] transition-colors hover:bg-zinc-100 dark:text-zinc-200";
 
 export default async function InvoicePage({
   params,
@@ -40,121 +45,118 @@ export default async function InvoicePage({
     UNPAID: t("status_unpaid"),
   }[invoice.status];
 
-
   return (
-    <div className="mx-auto flex max-w-2xl flex-col gap-6">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <h1 className="text-2xl font-bold tracking-tight whitespace-normal sm:whitespace-nowrap">
-          {t("title")}
-          {invoice.invoice_number ? <span className="block sm:inline text-xl sm:text-2xl text-zinc-500 sm:text-foreground"> — {invoice.invoice_number}</span> : ""}
-        </h1>
-        <div className="flex flex-wrap items-center gap-2">
-          {remaining > 0 && <RecordPaymentButton invoiceId={invoice.id} remaining={remaining} />}
-          <Link
-            href={`/invoices/${invoice.id}/ticket`}
-            className="flex items-center gap-2 rounded-md border px-4 py-2 text-sm font-medium hover:bg-zinc-100 dark:hover:bg-zinc-800"
-          >
-            <Printer className="h-4 w-4" /> <span className="hidden sm:inline">{t("print_ticket")}</span>
-          </Link>
-          <a
-            href={`/api/invoices/${invoice.id}/pdf?locale=${locale}`}
-            target="_blank"
-            rel="noreferrer"
-            className="flex items-center gap-2 rounded-md bg-violet-600 px-4 py-2 text-sm font-medium text-white hover:bg-violet-700 transition-colors"
-          >
-            <Download className="h-4 w-4" /> <span className="hidden sm:inline">{t("download_pdf")}</span>
-          </a>
+    <div className="mx-auto flex max-w-2xl flex-col gap-5">
+      <Link href="/invoices" className="flex w-fit items-center gap-1.5 text-[14px] font-semibold text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200">
+        <ArrowLeft className="h-4 w-4" /> {t("list_title")}
+      </Link>
+
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight md:text-3xl">{invoice.client?.name || t("walk_in_client")}</h1>
+          <p className="mt-1 flex items-center gap-2 font-mono text-[13px] text-zinc-500">
+            {invoice.invoice_number || t("title")} · {format.date(invoice.created_at)}
+            <span className={`rounded-full px-2 py-0.5 font-sans text-[11px] font-semibold ${INVOICE_STATUS_CLASS[invoice.status]}`}>{statusLabel}</span>
+          </p>
         </div>
       </div>
 
-      <div className="flex flex-col gap-6 rounded-lg border bg-card p-6 shadow-sm">
-        <div className="flex justify-between text-sm">
+      {remaining > 0 && (
+        <section aria-label={t("remaining_due")} className="rounded-2xl bg-[var(--surface-1)] p-5 shadow-card">
+          <div className="flex items-baseline justify-between gap-3">
+            <span className="text-[13px] font-semibold text-zinc-500">{t("remaining_due")}</span>
+            <span className="font-mono text-2xl font-semibold tabular-nums text-red-700 dark:text-red-400">{format.money(remaining)}</span>
+          </div>
+          <DebtProgress
+            className="mt-3"
+            paid={invoice.paid_amount}
+            total={invoice.total_amount}
+            label={t("paid_progress", { paid: format.money(invoice.paid_amount), total: format.money(invoice.total_amount) })}
+          />
+          <div className="mt-4">
+            <RecordPaymentButton invoiceId={invoice.id} remaining={remaining} />
+          </div>
+        </section>
+      )}
+
+      <div className="flex flex-wrap gap-2">
+        <Link href={`/invoices/${invoice.id}/ticket`} className={secondaryButton}>
+          <Printer className="h-4 w-4" /> {t("print_ticket")}
+        </Link>
+        <a href={`/api/invoices/${invoice.id}/pdf?locale=${locale}`} target="_blank" rel="noreferrer" className={secondaryButton}>
+          <Download className="h-4 w-4" /> {t("download_pdf")}
+        </a>
+      </div>
+
+      <article className="flex flex-col gap-5 rounded-2xl bg-[var(--surface-1)] p-5 shadow-card sm:p-6">
+        <div className="flex flex-wrap justify-between gap-4 text-[14px]">
           <div>
-            <p className="font-semibold">{shop?.shop_name || t("shop_fallback")}</p>
+            <p className="font-display text-[17px] font-bold">{shop?.shop_name || t("shop_fallback")}</p>
             {shop?.shop_address && <p className="text-zinc-500">{shop.shop_address}</p>}
             {shop?.shop_phone && <p className="text-zinc-500">{shop.shop_phone}</p>}
           </div>
           <div className="text-right">
-            <p className="text-zinc-500">{t("date")}</p>
-            <p>{format.date(invoice.created_at)}</p>
+            <p className="text-[12px] font-semibold uppercase tracking-wider text-zinc-500">{t("client")}</p>
+            <p className="font-semibold">{invoice.client?.name || t("walk_in_client")}</p>
+            {invoice.client?.phone && <p className="font-mono text-[13px] text-zinc-500">{invoice.client.phone}</p>}
           </div>
         </div>
 
-        <div>
-          <p className="text-sm font-medium text-zinc-500">{t("client")}</p>
-          <p>{invoice.client?.name || t("walk_in_client")}</p>
-        </div>
+        <ul className="divide-y divide-zinc-200 border-y border-zinc-200 dark:divide-[var(--line)] dark:border-[var(--line)]">
+          {invoice.items.map((item) => (
+            <li key={item.id} className="flex items-start justify-between gap-3 py-3 text-[14px]">
+              <div className="min-w-0">
+                <p className="font-semibold">{item.product_name}</p>
+                <p className="font-mono text-[12.5px] text-zinc-500 tabular-nums">
+                  {item.quantity} × {format.money(item.unit_price)}
+                </p>
+              </div>
+              <span className="shrink-0 font-mono font-semibold tabular-nums">{format.money(item.total_price)}</span>
+            </li>
+          ))}
+        </ul>
 
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm">
-            <thead className="border-b text-zinc-500">
-              <tr>
-                <th className="py-2 font-medium">{t("article")}</th>
-                <th className="py-2 text-right font-medium">{t("quantity")}</th>
-                <th className="py-2 text-right font-medium">{t("unit_price")}</th>
-                <th className="py-2 text-right font-medium">{t("total")}</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y">
-              {invoice.items.map((item) => (
-                <tr key={item.id}>
-                  <td className="py-2">{item.product_name}</td>
-                  <td className="py-2 text-right">{item.quantity}</td>
-                  <td className="py-2 text-right whitespace-nowrap tabular-nums">{format.money(item.unit_price)}</td>
-                  <td className="py-2 text-right whitespace-nowrap tabular-nums">{format.money(item.total_price)}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-
-        <div className="ml-auto w-full max-w-xs space-y-1 text-sm">
+        <dl className="ml-auto w-full max-w-xs space-y-1.5 text-[14px]">
           {shop?.vat_registered && (
             <>
               <div className="flex justify-between text-zinc-500">
-                <span>{t("subtotal_ht")}</span>
-                <span>{format.money(excludingVat)}</span>
+                <dt>{t("subtotal_ht")}</dt>
+                <dd className="font-mono tabular-nums">{format.money(excludingVat)}</dd>
               </div>
               <div className="flex justify-between text-zinc-500">
-                <span>
-                  {t("vat")} ({(vatRateBps / 100).toFixed(2)}%)
-                </span>
-                <span>{format.money(vatAmount)}</span>
+                <dt>{t("vat")} ({(vatRateBps / 100).toFixed(2)}%)</dt>
+                <dd className="font-mono tabular-nums">{format.money(vatAmount)}</dd>
               </div>
             </>
           )}
-          <div className="flex justify-between border-t pt-1 font-bold">
-            <span>{t("total_ttc")}</span>
-            <span>{format.money(invoice.total_amount)}</span>
+          <div className="flex justify-between border-t border-zinc-200 pt-2 text-[16px] font-bold dark:border-[var(--line)]">
+            <dt>{t("total_ttc")}</dt>
+            <dd className="font-mono tabular-nums">{format.money(invoice.total_amount)}</dd>
           </div>
           <div className="flex justify-between text-zinc-500">
-            <span>{t("paid_amount")}</span>
-            <span>{format.money(invoice.paid_amount)}</span>
+            <dt>{t("paid_amount")}</dt>
+            <dd className="font-mono tabular-nums">{format.money(invoice.paid_amount)}</dd>
           </div>
           <div className="flex justify-between text-zinc-500">
-            <span>{t("remaining_due")}</span>
-            <span>{format.money(remaining)}</span>
+            <dt>{t("remaining_due")}</dt>
+            <dd className="font-mono tabular-nums">{format.money(remaining)}</dd>
           </div>
-          <div className="flex justify-between text-zinc-500">
-            <span>{t("status")}</span>
-            <span>{statusLabel}</span>
-          </div>
-        </div>
+        </dl>
 
         {invoice.payments.length > 0 && (
-          <div className="border-t pt-4 text-sm">
-            <p className="mb-2 font-medium text-zinc-500">{t("payments_history")}</p>
-            <ul className="space-y-1">
+          <div className="border-t border-zinc-200 pt-4 text-[14px] dark:border-[var(--line)]">
+            <p className="mb-2 text-[12px] font-semibold uppercase tracking-wider text-zinc-500">{t("payments_history")}</p>
+            <ul className="space-y-1.5">
               {invoice.payments.map((payment) => (
-                <li key={payment.id} className="flex justify-between">
+                <li key={payment.id} className="flex justify-between gap-3">
                   <span className="text-zinc-500">{format.date(payment.payment_date, "dateTime")}</span>
-                  <span className="tabular-nums">{format.money(payment.amount)}</span>
+                  <span className="font-mono font-semibold tabular-nums text-emerald-700 dark:text-emerald-400">{format.money(payment.amount)}</span>
                 </li>
               ))}
             </ul>
           </div>
         )}
-      </div>
+      </article>
     </div>
   );
 }

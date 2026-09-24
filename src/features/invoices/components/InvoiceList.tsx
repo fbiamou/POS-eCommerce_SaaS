@@ -3,24 +3,35 @@
 import { useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/routing";
-import { FileText } from "lucide-react";
+import { ChevronRight, Search } from "lucide-react";
 import { useShopFormat } from "@/components/ShopFormatProvider";
 import type { InvoiceListItem } from "../actions";
+import { INVOICE_STATUS_CLASS } from "../status";
+
+type Filter = "all" | "due" | "paid";
 
 export default function InvoiceList({ invoices }: { invoices: InvoiceListItem[] }) {
   const t = useTranslations("Invoices");
   const format = useShopFormat();
   const [searchTerm, setSearchTerm] = useState("");
+  const [filter, setFilter] = useState<Filter>("all");
+
+  const dueCount = invoices.filter((inv) => inv.status !== "PAID").length;
+  const paidCount = invoices.length - dueCount;
+  const totalDue = invoices.reduce((sum, inv) => sum + (inv.total_amount - inv.paid_amount), 0);
 
   const filtered = useMemo(() => {
     const term = searchTerm.trim().toLowerCase();
-    if (!term) return invoices;
-    return invoices.filter(
-      (inv) =>
+    return invoices.filter((inv) => {
+      if (filter === "due" && inv.status === "PAID") return false;
+      if (filter === "paid" && inv.status !== "PAID") return false;
+      if (!term) return true;
+      return (
         (inv.invoice_number ?? "").toLowerCase().includes(term) ||
         (inv.client_name ?? "").toLowerCase().includes(term)
-    );
-  }, [invoices, searchTerm]);
+      );
+    });
+  }, [invoices, searchTerm, filter]);
 
   const statusLabel = {
     PAID: t("status_paid"),
@@ -28,75 +39,88 @@ export default function InvoiceList({ invoices }: { invoices: InvoiceListItem[] 
     UNPAID: t("status_unpaid"),
   };
 
-  const statusClass = {
-    PAID: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400",
-    PARTIAL: "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400",
-    UNPAID: "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400",
-  };
-
+  const chipClass = (active: boolean) =>
+    `shrink-0 rounded-full px-3.5 py-1.5 text-[13px] font-semibold transition-colors ${
+      active
+        ? "bg-night text-white dark:bg-violet-500"
+        : "bg-[var(--surface-1)] text-zinc-700 shadow-[inset_0_0_0_1px_var(--line)] hover:bg-zinc-100 dark:text-zinc-300"
+    }`;
 
   return (
-    <div className="flex flex-col gap-5">
-      <input
-        type="text"
-        placeholder={t("search")}
-        value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)}
-        className="w-full max-w-sm rounded-xl border border-zinc-200 bg-white dark:border-[var(--line)] dark:bg-[var(--surface-1)] px-4 py-2.5 text-[13px] font-medium transition-colors focus:border-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-500 placeholder:text-zinc-400"
-      />
-
-      <div className="rounded-2xl border border-zinc-100 bg-white dark:border-[var(--line)] dark:bg-[var(--surface-1)] shadow-sm overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-[13px] min-w-[800px]">
-            <thead>
-              <tr className="border-b border-zinc-100 dark:border-[var(--line)]">
-                <th className="p-4 text-[11px] font-bold text-zinc-400 tracking-widest uppercase">{t("invoice_number")}</th>
-                <th className="p-4 text-[11px] font-bold text-zinc-400 tracking-widest uppercase">{t("client")}</th>
-                <th className="p-4 text-[11px] font-bold text-zinc-400 tracking-widest uppercase">{t("date")}</th>
-                <th className="p-4 text-[11px] font-bold text-zinc-400 tracking-widest uppercase text-right">{t("total_ttc")}</th>
-                <th className="p-4 text-[11px] font-bold text-zinc-400 tracking-widest uppercase text-right">{t("remaining_due")}</th>
-                <th className="p-4 text-[11px] font-bold text-zinc-400 tracking-widest uppercase">{t("status")}</th>
-                <th className="p-4 text-[11px] font-bold text-zinc-400 tracking-widest uppercase text-right">{t("view")}</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-zinc-50 dark:divide-white/5">
-              {filtered.map((invoice) => {
-                const remaining = invoice.total_amount - invoice.paid_amount;
-                return (
-                  <tr key={invoice.id} className="hover:bg-zinc-50 dark:hover:bg-white/[0.02] transition-colors group">
-                    <td className="p-4 font-mono font-medium text-zinc-500 group-hover:text-violet-600 dark:group-hover:text-violet-400">{invoice.invoice_number || "—"}</td>
-                    <td className="p-4 font-bold text-zinc-900 dark:text-white">{invoice.client_name || t("walk_in_client")}</td>
-                    <td className="p-4 text-zinc-500">{format.date(invoice.created_at)}</td>
-                    <td className="p-4 text-right font-mono font-bold text-zinc-900 dark:text-white tabular-nums whitespace-nowrap">{format.money(invoice.total_amount)}</td>
-                    <td className="p-4 text-right font-mono font-bold text-red-500 tabular-nums whitespace-nowrap">{remaining > 0 ? format.money(remaining) : "—"}</td>
-                    <td className="p-4">
-                      <span className={`rounded-full px-2.5 py-1 text-[10px] font-bold ${statusClass[invoice.status]}`}>
-                        {statusLabel[invoice.status]}
-                      </span>
-                    </td>
-                    <td className="p-4 text-right">
-                      <Link
-                        href={`/invoices/${invoice.id}`}
-                        className="inline-flex items-center justify-center h-8 w-8 rounded-full bg-zinc-100 text-zinc-600 hover:bg-violet-600 hover:text-white dark:bg-[var(--line)] dark:text-zinc-300 dark:hover:bg-violet-600 transition-colors"
-                        title={t("view")}
-                      >
-                        <FileText className="h-4 w-4" />
-                      </Link>
-                    </td>
-                  </tr>
-                );
-              })}
-              {filtered.length === 0 && (
-                <tr>
-                  <td colSpan={7} className="p-8 text-center text-zinc-500">
-                    {invoices.length === 0 ? t("no_invoices") : t("no_results")}
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+    <div className="flex flex-col gap-3">
+      {totalDue > 0 && (
+        <div className="flex items-baseline justify-between gap-3 rounded-2xl bg-[var(--surface-1)] p-4 shadow-card">
+          <span className="text-[13px] font-semibold text-zinc-500">{t("summary_due")}</span>
+          <span className="font-mono text-xl font-semibold tabular-nums text-red-700 dark:text-red-400">{format.money(totalDue)}</span>
         </div>
+      )}
+
+      <div className="relative">
+        <label htmlFor="invoice-search" className="sr-only">{t("search")}</label>
+        <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4.5 w-4.5 -translate-y-1/2 text-zinc-400" />
+        <input
+          id="invoice-search"
+          type="search"
+          placeholder={t("search")}
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="h-12 w-full rounded-xl border border-zinc-200 bg-[var(--surface-1)] pl-11 pr-4 text-[15px] font-medium transition-colors placeholder:text-zinc-400 focus:border-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-500 dark:border-[var(--line)]"
+        />
       </div>
+
+      <div className="flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none]">
+        <button type="button" onClick={() => setFilter("all")} className={chipClass(filter === "all")}>
+          {t("filter_all")} <span className="ml-1 font-mono tabular-nums opacity-70">{invoices.length}</span>
+        </button>
+        <button type="button" onClick={() => setFilter("due")} className={chipClass(filter === "due")}>
+          {t("filter_due")} <span className="ml-1 font-mono tabular-nums opacity-70">{dueCount}</span>
+        </button>
+        <button type="button" onClick={() => setFilter("paid")} className={chipClass(filter === "paid")}>
+          {t("filter_paid")} <span className="ml-1 font-mono tabular-nums opacity-70">{paidCount}</span>
+        </button>
+      </div>
+
+      <ul className="divide-y divide-zinc-200 overflow-hidden rounded-2xl bg-[var(--surface-1)] shadow-card dark:divide-[var(--line)]">
+        {filtered.map((invoice) => {
+          const remaining = invoice.total_amount - invoice.paid_amount;
+          return (
+            <li key={invoice.id}>
+              <Link
+                href={`/invoices/${invoice.id}`}
+                className="flex items-center gap-3 px-4 py-3 transition-colors hover:bg-zinc-50 dark:hover:bg-[var(--surface-2)]"
+              >
+                <span className="min-w-0 flex-1">
+                  <span className="flex items-center gap-2">
+                    <span className="truncate text-[14px] font-semibold text-zinc-900 dark:text-white">
+                      {invoice.client_name || t("walk_in_client")}
+                    </span>
+                    <span className={`shrink-0 rounded-full px-2 py-0.5 text-[11px] font-semibold ${INVOICE_STATUS_CLASS[invoice.status]}`}>
+                      {statusLabel[invoice.status]}
+                    </span>
+                  </span>
+                  <span className="mt-0.5 block truncate font-mono text-[12px] text-zinc-500">
+                    {invoice.invoice_number || "—"} · {format.date(invoice.created_at)}
+                  </span>
+                </span>
+                <span className="flex shrink-0 flex-col items-end">
+                  <span className="font-mono text-[14px] font-semibold tabular-nums">{format.money(invoice.total_amount)}</span>
+                  {remaining > 0 && (
+                    <span className="font-mono text-[12px] font-semibold tabular-nums text-red-700 dark:text-red-400">
+                      {t("remaining_short", { amount: format.money(remaining) })}
+                    </span>
+                  )}
+                </span>
+                <ChevronRight className="h-4 w-4 shrink-0 text-zinc-400" />
+              </Link>
+            </li>
+          );
+        })}
+        {filtered.length === 0 && (
+          <li className="px-4 py-10 text-center text-zinc-500">
+            {invoices.length === 0 ? t("no_invoices") : t("no_results")}
+          </li>
+        )}
+      </ul>
     </div>
   );
 }

@@ -455,7 +455,13 @@
     "saving": "Enregistrement...",
     "cancel": "Annuler",
     "payments_history": "Paiements reçus",
-    "shop_fallback": "Boutique"
+    "shop_fallback": "Boutique",
+    "filter_all": "Toutes",
+    "filter_due": "À encaisser",
+    "filter_paid": "Payées",
+    "summary_due": "Reste à encaisser",
+    "remaining_short": "reste {amount}",
+    "paid_progress": "{paid} payés sur {total}"
   },
   "Auth": {
     "title": "WISHOP",

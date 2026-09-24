@@ -455,7 +455,13 @@
     "saving": "Guardando...",
     "cancel": "Cancelar",
     "payments_history": "Pagos recibidos",
-    "shop_fallback": "Tienda"
+    "shop_fallback": "Tienda",
+    "filter_all": "Todas",
+    "filter_due": "Por cobrar",
+    "filter_paid": "Pagadas",
+    "summary_due": "Pendiente de cobro",
+    "remaining_short": "faltan {amount}",
+    "paid_progress": "{paid} pagados de {total}"
   },
   "Auth": {
     "title": "WISHOP",
