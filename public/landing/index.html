@@ -949,8 +949,10 @@ function requestSeek(tm){
   if (seekBusy) { pendingTime = tm; return; }
   seekBusy = true; video.currentTime = tm;
 }
-video.addEventListener('seeked', function(){ seekBusy = false; if (pendingTime !== null) { var tm = pendingTime; pendingTime = null; requestSeek(tm); } });
-video.addEventListener('error', function(){ seekBusy = false; pendingTime = null; stage.classList.remove('video-ready'); video.style.display = 'none'; });
+function onSeeked(){ seekBusy = false; if (pendingTime !== null) { var tm = pendingTime; pendingTime = null; requestSeek(tm); } }
+video.addEventListener('seeked', onSeeked);
+video.addEventListener('error', function(){ if (videoReady) giveUpVideo(); });
+function giveUpVideo(){ seekBusy = false; pendingTime = null; stage.classList.remove('video-ready'); video.style.display = 'none'; }
 
 function tick(now){
   var dt = Math.min(100, now - (lastTick || now)); lastTick = now;
@@ -972,33 +974,49 @@ if ('IntersectionObserver' in window) {
 var videoReady = false, heroInit = false;
 function initHeroOnce(){
   if (heroInit) return; heroInit = true;
-  posterEl.style.backgroundImage = VIDEO_URL.indexOf('-2k') > 0 ? "url('/landing/assets/hero-poster-2k.jpg')" : "url('/landing/assets/hero-poster.jpg')";
+  posterEl.style.backgroundImage = "url('/landing/assets/hero-poster.jpg')";
   streamVideo();
 }
 /* The host answers byte-range requests (checked: HTTP 206 on Vercel), so the
-   video streams: the first frames arrive in well under a second and the rest
-   downloads while the visitor reads the first caption. The whole-file Blob
-   loader stays as the fallback for a host that would not serve ranges. */
-/* Computer screens from about 1800 px of physical width get the 2K upscale (4.2 MB); everyone else, and slow or
-   data-saving connections, keep the 1080p file (3.4 MB) that starts faster. */
-var VIDEO_URL = (function(){
+   1080p video streams: the first frames arrive quickly and the rest downloads
+   while the visitor reads the first caption. The whole-file Blob loader stays
+   as the fallback for a host that would not serve ranges. */
+var VIDEO_URL = '/landing/assets/hero-scrub.mp4';
+/* Computer screens from about 1800 physical pixels wide then upgrade to the 2K
+   upscale, downloaded in the background and swapped in without a cut once it is
+   ready. Measured at 4 Mbit/s on a 1920 screen, loading the 2K first delayed the
+   start from 4-5 s to 6-9 s; this way the start stays fast. Data-saving and
+   2G/3G connections never download it. */
+var VIDEO_2K_URL = '/landing/assets/hero-scrub-2k.mp4';
+var WANT_2K = (function(){
   var px = Math.max(innerWidth, innerHeight * 16 / 9) * (window.devicePixelRatio || 1);
   var c = navigator.connection || {};
-  var slow = !!c.saveData || /(^|-)2g|3g/.test(c.effectiveType || '') || (c.downlink > 0 && c.downlink < 5);
-  return px > 1800 && !slow ? '/landing/assets/hero-scrub-2k.mp4' : '/landing/assets/hero-scrub.mp4';
+  return px > 1800 && !c.saveData && !/(^|-)2g|3g/.test(c.effectiveType || '');
 })();
+var upgraded = false;
 function markReady(){
   if (videoReady) return;
   videoReady = true;
   requestSeek(heroProgress() * video.duration);
   stage.classList.add('video-ready');
+  if (WANT_2K) afterFullBuffer(upgradeTo2k);
+}
+/* The 2K download waits until the 1080p file is fully buffered, so the two never
+   share the bandwidth while the visitor scrolls. */
+function afterFullBuffer(cb){
+  var tries = 0;
+  (function check(){
+    var b = video.buffered;
+    if ((b.length && b.end(b.length - 1) >= video.duration - 0.2) || ++tries > 40) cb();
+    else setTimeout(check, 1000);
+  })();
 }
 function streamVideo(){
   var fellBack = false;
   function fallback(){
     if (fellBack || videoReady) return; fellBack = true;
     video.removeAttribute('src'); video.load();
-    loadVideoBlob().catch(function(){ video.style.display = 'none'; });
+    loadVideoBlob().catch(giveUpVideo);
   }
   video.preload = 'auto';
   video.addEventListener('loadeddata', markReady, { once:true });
@@ -1012,7 +1030,36 @@ function loadVideoBlob(){
     video.src = URL.createObjectURL(blob);
     video.load();
     video.addEventListener('canplay', markReady, { once:true });
+    video.addEventListener('error', giveUpVideo, { once:true });
   });
+}
+function upgradeTo2k(){
+  if (upgraded || !scrubOn) return; upgraded = true;
+  var ctrl = ('AbortController' in window) ? new AbortController() : null;
+  var timer = setTimeout(function(){ if (ctrl) ctrl.abort(); }, 45000);
+  fetch(VIDEO_2K_URL, ctrl ? { signal: ctrl.signal } : {}).then(function(res){ if (!res.ok) throw new Error('2k'); return res.blob(); }).then(function(blob){
+    clearTimeout(timer);
+    var v2 = video.cloneNode(false);
+    v2.removeAttribute('src');
+    v2.muted = true;
+    v2.preload = 'auto';
+    v2.style.visibility = 'hidden';
+    v2.addEventListener('loadeddata', function(){
+      v2.addEventListener('seeked', function(){
+        var old = video;
+        v2.addEventListener('seeked', onSeeked);
+        video = v2; seekBusy = false; pendingTime = null;
+        v2.style.visibility = '';
+        if (old.parentNode) old.parentNode.removeChild(old);
+        requestSeek(shown * video.duration);
+      }, { once:true });
+      v2.currentTime = Math.min(shown * v2.duration, v2.duration - 0.04);
+    }, { once:true });
+    v2.addEventListener('error', function(){ if (v2.parentNode) v2.parentNode.removeChild(v2); }, { once:true });
+    video.parentNode.insertBefore(v2, video.nextSibling);
+    v2.src = URL.createObjectURL(blob);
+    v2.load();
+  }).catch(function(){ clearTimeout(timer); });
 }
 
 var GATES = [
