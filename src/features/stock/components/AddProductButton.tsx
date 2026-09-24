@@ -6,7 +6,15 @@ import { Modal } from "@/components/ui/Modal";
 import { useTranslations } from "next-intl";
 import { addProduct, uploadProductImage } from "../actions";
 
-export function AddProductButton({ label, hasShopSlug }: { label: string; hasShopSlug: boolean }) {
+export function AddProductButton({
+  label,
+  hasShopSlug,
+  suppliers,
+}: {
+  label: string;
+  hasShopSlug: boolean;
+  suppliers: { id: string; name: string }[];
+}) {
   const [isOpen, setIsOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
@@ -110,6 +118,21 @@ export function AddProductButton({ label, hasShopSlug }: { label: string; hasSho
           <div className="flex flex-col gap-1.5">
             <label className="text-[13px] font-bold text-zinc-700 dark:text-zinc-300">{t("brand")}</label>
             <input type="text" name="brand" placeholder={t("optional")} className="rounded-xl border border-zinc-200 bg-white px-4 py-2.5 text-[13px] font-medium transition-colors focus:border-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-500 dark:border-[#2d2936] dark:bg-[#1C1A22]" />
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="flex flex-col gap-1.5">
+              <label className="text-[13px] font-bold text-zinc-700 dark:text-zinc-300">{t("supplier")}</label>
+              <select name="supplier_id" defaultValue={""} className="rounded-xl border border-zinc-200 bg-white px-4 py-2.5 text-[13px] font-medium dark:border-[#2d2936] dark:bg-[#1C1A22]">
+                <option value="">{t("no_supplier")}</option>
+                {suppliers.map((s) => (
+                  <option key={s.id} value={s.id}>{s.name}</option>
+                ))}
+              </select>
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <label className="text-[13px] font-bold text-zinc-700 dark:text-zinc-300">{t("origin_country")}</label>
+              <input type="text" name="origin_country" defaultValue={""} placeholder={t("optional")} className="rounded-xl border border-zinc-200 bg-white px-4 py-2.5 text-[13px] font-medium dark:border-[#2d2936] dark:bg-[#1C1A22]" />
+            </div>
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div className="flex flex-col gap-1.5">

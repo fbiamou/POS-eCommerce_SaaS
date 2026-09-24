@@ -7,7 +7,7 @@ export async function GET() {
 
   const { data: products, error } = await supabase
     .from("products")
-    .select("name, brand, product_type, purchase_price, selling_price, quantity_in_stock, image_url, is_published_online, categories(name)")
+    .select("name, brand, product_type, origin_country, purchase_price, selling_price, quantity_in_stock, image_url, is_published_online, categories(name), suppliers(name)")
     .eq("is_active", true)
     .order("name", { ascending: true });
 
@@ -20,6 +20,8 @@ export async function GET() {
     name: p.name,
     brand: p.brand,
     product_type: p.product_type,
+    origin_country: p.origin_country,
+    supplier: (p.suppliers as unknown as { name: string } | null)?.name ?? "",
     category: (p.categories as unknown as { name: string } | null)?.name ?? "",
     purchase_price: p.purchase_price,
     selling_price: p.selling_price,

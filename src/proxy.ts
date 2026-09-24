@@ -1,17 +1,23 @@
 import createMiddleware from 'next-intl/middleware';
 import { routing } from './i18n/routing';
 import { NextRequest, NextResponse } from 'next/server';
-import { createServerClient } from '@supabase/ssr';
+import { createServerClient, type CookieOptions } from '@supabase/ssr';
 import { isPageAllowed, firstAllowedPath } from './lib/appPages';
- 
+
 const intlMiddleware = createMiddleware(routing);
+
+type CookieToSet = { name: string; value: string; options: CookieOptions };
 
 // Next.js 16 renamed Middleware to Proxy (same behavior, new file name).
 export async function proxy(request: NextRequest) {
-  // 1. Run next-intl middleware
-  const response = intlMiddleware(request);
-
-  // 2. Setup Supabase client to refresh session and update cookies on the intl response
+  // 1. Refresh the Supabase session FIRST. The refreshed cookies are written
+  //    onto the request itself, so everything rendered after the proxy (the
+  //    layout, the page, server actions) sees the new access token.
+  //    The order matters: next-intl copies the request headers when it builds
+  //    its response. Running it first handed pages the expired token, and
+  //    each page then tried to refresh it with a refresh token the proxy had
+  //    already consumed: pages randomly rendered as signed out ("Sans nom").
+  const refreshedCookies: CookieToSet[] = []
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -22,9 +28,7 @@ export async function proxy(request: NextRequest) {
         },
         setAll(cookiesToSet) {
           cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value))
-          cookiesToSet.forEach(({ name, value, options }) =>
-            response.cookies.set(name, value, options)
-          )
+          refreshedCookies.push(...cookiesToSet)
         },
       },
     }
@@ -32,10 +36,24 @@ export async function proxy(request: NextRequest) {
 
   const { data: { user } } = await supabase.auth.getUser()
 
-  // Extract locale from pathname (e.g. /fr/login -> fr)
-  const localeMatch = request.nextUrl.pathname.match(/^\/(es|fr|en)/)
-  const locale = localeMatch ? localeMatch[1] : routing.defaultLocale
-  
+  // Every response leaving the proxy, redirects included, carries the
+  // refreshed cookies: otherwise the browser keeps the old refresh token,
+  // already consumed, and the session is lost on the next request.
+  const withSession = (response: NextResponse) => {
+    refreshedCookies.forEach(({ name, value, options }) => response.cookies.set(name, value, options))
+    return response
+  }
+
+  // Locale of the redirects below: the one in the path (/fr/login -> fr),
+  // otherwise the language the visitor last chose (next-intl's NEXT_LOCALE
+  // cookie), and only then the default. Without the cookie step, a signed-in
+  // French user opening "/" was sent to the Spanish dashboard.
+  const localeMatch = request.nextUrl.pathname.match(/^\/(es|fr|en)(\/|$)/)
+  const cookieLocale = request.cookies.get('NEXT_LOCALE')?.value
+  const locale = localeMatch
+    ? localeMatch[1]
+    : routing.locales.find((l) => l === cookieLocale) ?? routing.defaultLocale
+
   // Check if it's an auth-related page
   const isAuthPage = request.nextUrl.pathname.endsWith('/login')
 
@@ -45,21 +63,21 @@ export async function proxy(request: NextRequest) {
   // and the landing page (/) are reachable without a session.
   const isRootOrLocaleOnly = path === '/' || /^\/(es|fr|en)\/?$/.test(path)
   const isBoutiqueOrProcurement = /^\/(es|fr|en)\/(boutique|procurement)(\/|$)/.test(path)
-  
+
   const isPublicPage = isRootOrLocaleOnly || isBoutiqueOrProcurement
   const isLandingPage = isRootOrLocaleOnly
 
-  // 3. Redirect logic
+  // 2. Redirect logic
   if (!user && !isAuthPage && !isPublicPage) {
     const loginUrl = request.nextUrl.clone()
     loginUrl.pathname = `/${locale}/login`
-    return NextResponse.redirect(loginUrl)
+    return withSession(NextResponse.redirect(loginUrl))
   }
 
   if (user && (isAuthPage || isLandingPage)) {
     const homeUrl = request.nextUrl.clone()
     homeUrl.pathname = `/${locale}/dashboard`
-    return NextResponse.redirect(homeUrl)
+    return withSession(NextResponse.redirect(homeUrl))
   }
 
   // Per-employee page access: a MANAGER always has full access; a SELLER is
@@ -78,14 +96,15 @@ export async function proxy(request: NextRequest) {
       if (!allowed) {
         const redirectUrl = request.nextUrl.clone()
         redirectUrl.pathname = `/${locale}${firstAllowedPath(profile.allowed_pages ?? [])}`
-        return NextResponse.redirect(redirectUrl)
+        return withSession(NextResponse.redirect(redirectUrl))
       }
     }
   }
 
-  return response;
+  // 3. Locale routing, built from the request that now carries the fresh session.
+  return withSession(intlMiddleware(request))
 }
- 
+
 export const config = {
   // Match only internationalized pathnames
   matcher: ['/', '/(es|fr|en)/:path*']

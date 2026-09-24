@@ -27,6 +27,24 @@ export const PHONE_COUNTRY_CODES = [
   { code: "+32", label: "Belgique", abbr: "BE" },
   { code: "+41", label: "Suisse", abbr: "CH" },
   { code: "+1", label: "USA / Canada", abbr: "US" },
+  // Usual sourcing countries for wigs, cosmetics and clothing (suppliers
+  // and shipment intermediaries).
+  { code: "+971", label: "Émirats arabes unis", abbr: "AE" },
+  { code: "+86", label: "Chine", abbr: "CN" },
+  { code: "+90", label: "Turquie", abbr: "TR" },
 ] as const;
 
 export const DEFAULT_PHONE_COUNTRY_CODE = "+237";
+
+// Splits a stored phone ("+971501234567") into its dial code and digits. A
+// number stored without a known dial code falls back to `fallbackCode`
+// rather than guessing wrong. Longest codes are tried first so "+1" never
+// swallows a longer code starting with the same digit.
+export function splitPhone(phone: string | null | undefined, fallbackCode: string): { code: string; digits: string } {
+  if (!phone) return { code: fallbackCode, digits: "" };
+  const match = [...PHONE_COUNTRY_CODES]
+    .sort((a, b) => b.code.length - a.code.length)
+    .find((c) => phone.startsWith(c.code));
+  if (match) return { code: match.code, digits: phone.slice(match.code.length) };
+  return { code: fallbackCode, digits: phone.replace(/\D/g, "") };
+}

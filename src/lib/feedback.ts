@@ -68,6 +68,16 @@ export const FEEDBACK_CODES = [
   "client_save_failed",
   // Reminders
   "reminder_failed",
+  // Shipments and purchase orders
+  "shipment_not_found",
+  "shipment_already_submitted",
+  "shipment_not_in_transit",
+  "photo_required",
+  "too_many_items",
+  "missing_received_quantity",
+  "purchase_order_not_found",
+  "purchase_order_not_editable",
+  "invalid_status_change",
 ] as const;
 
 export type FeedbackCode = (typeof FEEDBACK_CODES)[number];

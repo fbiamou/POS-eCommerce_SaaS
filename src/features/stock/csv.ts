@@ -10,6 +10,8 @@ export const CSV_HEADERS = [
   "quantite",
   "image_url",
   "en_ligne",
+  "fournisseur",
+  "pays_origine",
 ] as const;
 
 export type ImportRow = {
@@ -22,6 +24,8 @@ export type ImportRow = {
   selling_price: number;
   quantity: number;
   image_url: string;
+  supplier: string;
+  origin_country: string;
   // undefined = column left blank / not mentioned — leave existing value
   // untouched on restock, default to "not published" only for a new product.
   is_published_online: boolean | undefined;
@@ -58,7 +62,7 @@ function toCsv(rows: (string | number)[][]): string {
 export function buildCsvTemplate(): string {
   return toCsv([
     [...CSV_HEADERS],
-    ["Fond de teint NC45", "Cosmétiques", "Fond de teint", "Mac", 3000, 6000, 10, "", "non"],
+    ["Fond de teint NC45", "Cosmétiques", "Fond de teint", "Mac", 3000, 6000, 10, "", "non", "", ""],
   ]);
 }
 
@@ -73,6 +77,8 @@ export function productsToCsv(
     quantity_in_stock: number;
     image_url?: string | null;
     is_published_online?: boolean;
+    supplier?: string | null;
+    origin_country?: string | null;
   }[]
 ): string {
   const rows: (string | number)[][] = [[...CSV_HEADERS]];
@@ -87,6 +93,8 @@ export function productsToCsv(
       p.quantity_in_stock,
       p.image_url || "",
       p.is_published_online ? "oui" : "non",
+      p.supplier || "",
+      p.origin_country || "",
     ]);
   }
   return toCsv(rows);
@@ -143,6 +151,8 @@ export function parseImportCsv(text: string): { rows: ImportRow[]; errors: Impor
       selling_price: sellingPrice,
       quantity,
       image_url: record.image_url?.trim() || "",
+      supplier: record.fournisseur?.trim() || "",
+      origin_country: record.pays_origine?.trim() || "",
       is_published_online: enLigneRaw ? TRUTHY_VALUES.has(enLigneRaw) : undefined,
     });
   });

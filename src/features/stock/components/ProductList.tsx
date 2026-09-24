@@ -12,6 +12,8 @@ export type Product = {
   name: string;
   brand: string | null;
   product_type: string | null;
+  supplier_id: string | null;
+  origin_country: string | null;
   category: { name: string } | null;
   quantity_in_stock: number;
   purchase_price: number;
@@ -21,7 +23,15 @@ export type Product = {
   is_published_online: boolean;
 };
 
-export default function ProductList({ products, hasShopSlug }: { products: Product[]; hasShopSlug: boolean }) {
+export default function ProductList({
+  products,
+  hasShopSlug,
+  suppliers,
+}: {
+  products: Product[];
+  hasShopSlug: boolean;
+  suppliers: { id: string; name: string }[];
+}) {
   const t = useTranslations("Stock");
   const tFeedback = useTranslations("Feedback");
   const format = useShopFormat();
@@ -210,6 +220,21 @@ export default function ProductList({ products, hasShopSlug }: { products: Produ
                 <input required name="quantity_in_stock" type="number" min="0" defaultValue={editingProduct.quantity_in_stock} className="rounded-md border border-zinc-300 p-2 text-sm dark:border-zinc-700 dark:bg-zinc-800" />
               </div>
             </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="flex flex-col gap-1.5">
+              <label className="text-[13px] font-bold text-zinc-700 dark:text-zinc-300">{t("supplier")}</label>
+              <select name="supplier_id" defaultValue={editingProduct.supplier_id ?? ""} className="rounded-xl border border-zinc-200 bg-white px-4 py-2.5 text-[13px] font-medium dark:border-[#2d2936] dark:bg-[#1C1A22]">
+                <option value="">{t("no_supplier")}</option>
+                {suppliers.map((s) => (
+                  <option key={s.id} value={s.id}>{s.name}</option>
+                ))}
+              </select>
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <label className="text-[13px] font-bold text-zinc-700 dark:text-zinc-300">{t("origin_country")}</label>
+              <input type="text" name="origin_country" defaultValue={editingProduct.origin_country ?? ""} placeholder={t("optional")} className="rounded-xl border border-zinc-200 bg-white px-4 py-2.5 text-[13px] font-medium dark:border-[#2d2936] dark:bg-[#1C1A22]" />
+            </div>
+          </div>
             <div className="flex flex-col gap-1">
               <label className="text-sm font-medium">{t("description")}</label>
               <textarea name="description" rows={2} defaultValue={editingProduct.description || ""} placeholder={t("optional")} className="rounded-md border border-zinc-300 p-2 text-sm dark:border-zinc-700 dark:bg-zinc-800 resize-none" />

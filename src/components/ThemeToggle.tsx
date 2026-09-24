@@ -1,23 +1,29 @@
 "use client";
 
 import { Moon, Sun } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useSyncExternalStore } from "react";
 
 type ThemeToggleProps = {
   switchToLightLabel: string;
   switchToDarkLabel: string;
 };
 
-export function ThemeToggle({ switchToLightLabel, switchToDarkLabel }: ThemeToggleProps) {
-  const [isDark, setIsDark] = useState(false);
+// The theme lives on <html data-theme>, set before paint by the inline
+// script in the root layout. Components subscribe to that attribute, so
+// every toggle on the page stays in sync without hydration mismatches.
+function subscribe(onChange: () => void) {
+  const observer = new MutationObserver(onChange);
+  observer.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+  return () => observer.disconnect();
+}
 
-  useEffect(() => {
-    setIsDark(document.documentElement.getAttribute("data-theme") === "dark");
-  }, []);
+const readIsDark = () => document.documentElement.getAttribute("data-theme") === "dark";
+
+export function ThemeToggle({ switchToLightLabel, switchToDarkLabel }: ThemeToggleProps) {
+  const isDark = useSyncExternalStore(subscribe, readIsDark, () => false);
 
   const toggle = () => {
     const next = !isDark;
-    setIsDark(next);
     document.documentElement.setAttribute("data-theme", next ? "dark" : "light");
     try {
       localStorage.setItem("theme", next ? "dark" : "light");

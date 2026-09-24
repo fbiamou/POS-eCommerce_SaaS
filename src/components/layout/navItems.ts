@@ -1,4 +1,4 @@
-import { Package, ShoppingCart, Users, MessageCircle, LayoutDashboard, Store, FileText } from "lucide-react";
+import { Package, ShoppingCart, Users, MessageCircle, LayoutDashboard, Store, FileText, Truck, ClipboardList } from "lucide-react";
 import type { AppPageKey } from "@/lib/appPages";
 
 export type NavItem = {
@@ -14,8 +14,8 @@ export function buildNavItems(t: (key: string) => string): NavItem[] {
   return [
     { key: "dashboard", path: "/dashboard", label: t("dashboard"), icon: LayoutDashboard },
     { key: "stock", path: "/stock", label: t("stock"), icon: Package },
-    { key: "shipments", path: "/shipments", label: t("shipments"), icon: Package },
-    { key: "purchase_orders", path: "/purchase-orders", label: t("purchase_orders"), icon: ShoppingCart },
+    { key: "shipments", path: "/shipments", label: t("shipments"), icon: Truck },
+    { key: "purchase_orders", path: "/purchase-orders", label: t("purchase_orders"), icon: ClipboardList },
     { key: "sales", path: "/sales", label: t("sales"), icon: ShoppingCart },
     { key: "invoices", path: "/invoices", label: t("invoices"), icon: FileText },
     { key: "clients", path: "/clients", label: t("clients"), icon: Users },

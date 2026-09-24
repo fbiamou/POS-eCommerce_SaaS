@@ -24,6 +24,32 @@ async function getShopId(supabase: SupabaseServerClient): Promise<{ shopId?: str
   return { shopId: profile.shop_id };
 }
 
+// Only a supplier of the shop itself may be linked to a product.
+async function resolveSupplierId(
+  supabase: SupabaseServerClient,
+  shopId: string,
+  supplierId: FormDataEntryValue | null
+): Promise<string | null> {
+  if (typeof supplierId !== "string" || !supplierId) return null;
+  const { data } = await supabase.from("suppliers").select("id").eq("id", supplierId).eq("shop_id", shopId).maybeSingle();
+  return data?.id ?? null;
+}
+
+// CSV import: the supplier is given by name, created on first use.
+async function findOrCreateSupplier(supabase: SupabaseServerClient, shopId: string, name: string): Promise<string | null> {
+  if (!name) return null;
+  const { data: existing } = await supabase
+    .from("suppliers")
+    .select("id")
+    .eq("shop_id", shopId)
+    .ilike("name", name)
+    .maybeSingle();
+  if (existing) return existing.id;
+  const { data: created, error } = await supabase.from("suppliers").insert({ shop_id: shopId, name }).select("id").single();
+  if (error) console.error("Supplier creation failed:", error);
+  return created?.id ?? null;
+}
+
 async function findOrCreateCategory(
   supabase: SupabaseServerClient,
   shopId: string,
@@ -97,6 +123,8 @@ export async function addProduct(
         name,
         brand: optionalText(formData.get("brand")),
         product_type: optionalText(formData.get("type")),
+        supplier_id: await resolveSupplierId(supabase, shopId, formData.get("supplier_id")),
+        origin_country: optionalText(formData.get("origin_country")),
         category_id: categoryId,
         purchase_price: Math.max(0, integerOrZero(formData.get("purchase_price"))),
         selling_price: Math.max(0, integerOrZero(formData.get("price"))),
@@ -144,6 +172,8 @@ export async function updateProduct(formData: FormData): Promise<{ success?: tru
         name,
         brand: optionalText(formData.get("brand")),
         product_type: optionalText(formData.get("type")),
+        supplier_id: await resolveSupplierId(supabase, shopId, formData.get("supplier_id")),
+        origin_country: optionalText(formData.get("origin_country")),
         category_id: categoryId,
         purchase_price: Math.max(0, integerOrZero(formData.get("purchase_price"))),
         selling_price: Math.max(0, integerOrZero(formData.get("selling_price"))),
@@ -273,6 +303,11 @@ export async function importProductsCsv(formData: FormData): Promise<{ summary?:
       const catalogUpdates: Record<string, string | boolean> = {};
       if (row.image_url) catalogUpdates.image_url = row.image_url;
       if (row.is_published_online !== undefined) catalogUpdates.is_published_online = row.is_published_online;
+      if (row.origin_country) catalogUpdates.origin_country = row.origin_country;
+      if (row.supplier) {
+        const supplierId = await findOrCreateSupplier(supabase, shopId, row.supplier);
+        if (supplierId) catalogUpdates.supplier_id = supplierId;
+      }
       if (Object.keys(catalogUpdates).length > 0) {
         await supabase.from("products").update(catalogUpdates).eq("id", existingProduct.id).eq("shop_id", shopId);
       }
@@ -287,6 +322,8 @@ export async function importProductsCsv(formData: FormData): Promise<{ summary?:
           name: row.name,
           brand: row.brand || null,
           product_type: row.type || null,
+          supplier_id: await findOrCreateSupplier(supabase, shopId, row.supplier),
+          origin_country: row.origin_country || null,
           category_id: categoryId,
           purchase_price: row.purchase_price,
           selling_price: row.selling_price,

@@ -4,6 +4,7 @@ import { StockActions } from "@/features/stock/components/StockActions";
 import { getTranslations } from "next-intl/server";
 import { createClient } from "@/utils/supabase/server";
 import { getShopSettings } from "@/features/settings/queries";
+import { getSuppliers } from "@/features/suppliers/queries";
 import { Link } from "@/i18n/routing";
 import { AlertTriangle } from "lucide-react";
 
@@ -13,10 +14,12 @@ export async function generateMetadata() {
 }
 
 export default async function StockPage() {
-  const [t, shopSettings] = await Promise.all([
+  const [t, shopSettings, allSuppliers] = await Promise.all([
     getTranslations("Stock"),
     getShopSettings(),
+    getSuppliers(),
   ]);
+  const suppliers = allSuppliers.filter((s) => s.is_active).map((s) => ({ id: s.id, name: s.name }));
   const supabase = await createClient();
 
   const { data: products, error } = await supabase
@@ -26,6 +29,8 @@ export default async function StockPage() {
       name,
       brand,
       product_type,
+      supplier_id,
+      origin_country,
       quantity_in_stock,
       purchase_price,
       selling_price,
@@ -48,6 +53,8 @@ export default async function StockPage() {
     name: p.name,
     brand: p.brand,
     product_type: p.product_type,
+    supplier_id: p.supplier_id,
+    origin_country: p.origin_country,
     quantity_in_stock: p.quantity_in_stock,
     purchase_price: p.purchase_price,
     selling_price: p.selling_price,
@@ -66,7 +73,7 @@ export default async function StockPage() {
         <h1 className="text-2xl font-bold tracking-tight">{t("title")}</h1>
         <div className="flex items-center gap-4">
           <StockActions />
-          <AddProductButton label={t("add_product")} hasShopSlug={Boolean(shopSettings?.shop_slug)} />
+          <AddProductButton label={t("add_product")} hasShopSlug={Boolean(shopSettings?.shop_slug)} suppliers={suppliers} />
         </div>
       </div>
 
@@ -82,7 +89,7 @@ export default async function StockPage() {
         </div>
       )}
 
-      <ProductList products={normalizedProducts} hasShopSlug={Boolean(shopSettings?.shop_slug)} />
+      <ProductList products={normalizedProducts} hasShopSlug={Boolean(shopSettings?.shop_slug)} suppliers={suppliers} />
     </div>
   );
 }
