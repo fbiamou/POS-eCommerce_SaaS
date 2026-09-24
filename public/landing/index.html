@@ -984,7 +984,7 @@ function initHeroOnce(){
 var VIDEO_URL = (function(){
   var px = Math.max(innerWidth, innerHeight * 16 / 9) * (window.devicePixelRatio || 1);
   var c = navigator.connection || {};
-  var slow = !!c.saveData || /(^|-)2g|3g/.test(c.effectiveType || '');
+  var slow = !!c.saveData || /(^|-)2g|3g/.test(c.effectiveType || '') || (c.downlink > 0 && c.downlink < 5);
   return px > 1800 && !slow ? '/landing/assets/hero-scrub-2k.mp4' : '/landing/assets/hero-scrub.mp4';
 })();
 function markReady(){
