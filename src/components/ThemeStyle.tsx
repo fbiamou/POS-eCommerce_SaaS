@@ -12,6 +12,7 @@ type AccentShades = {
 
 // Mapping des 8 couleurs accent vers leurs nuances Tailwind correspondantes
 const ACCENT_MAP: Record<string, AccentShades> = {
+  '#2B44A0': { bg: '#2B44A0', bgHover: '#22388A', light: '#E6EAF7', text: '#2B44A0', ring: '#4A63BA', darkText: '#9FB2F2' },
   '#7c3aed': { bg: '#7c3aed', bgHover: '#6d28d9', light: '#ede9fe', text: '#6d28d9', ring: '#8b5cf6', darkText: '#a78bfa' },
   '#2563eb': { bg: '#2563eb', bgHover: '#1d4ed8', light: '#dbeafe', text: '#1d4ed8', ring: '#3b82f6', darkText: '#60a5fa' },
   '#16a34a': { bg: '#16a34a', bgHover: '#15803d', light: '#dcfce7', text: '#15803d', ring: '#22c55e', darkText: '#4ade80' },
@@ -22,7 +23,8 @@ const ACCENT_MAP: Record<string, AccentShades> = {
   '#374151': { bg: '#374151', bgHover: '#1f2937', light: '#f3f4f6', text: '#1f2937', ring: '#6b7280', darkText: '#9ca3af' },
 }
 
-const DEFAULT_ACCENT = ACCENT_MAP['#7c3aed']
+// A shop that never picked a colour gets the WISHOP indigo.
+const DEFAULT_ACCENT = ACCENT_MAP['#2B44A0']
 
 // Google Fonts à charger si ce n'est pas Geist (déjà chargé par Next.js)
 const GOOGLE_FONTS: Record<string, string> = {
@@ -52,6 +54,7 @@ export function ThemeStyle({ accentColor, fontFamily }: Props) {
       --accent-ring: ${accent.ring};
       --accent-dark-text: ${accent.darkText};
       --theme-font: ${googleFontName ? `'${googleFontName}'` : 'var(--font-app-sans)'}, system-ui, sans-serif;
+      --store-heading: ${googleFontName ? `'${googleFontName}'` : 'var(--font-app-display)'};
     }
     body {
       font-family: var(--theme-font);

@@ -138,6 +138,12 @@ h1, h2, h3, .font-display {
   outline-offset: 2px;
 }
 
+/* Storefront headings: the shop's chosen font (set by ThemeStyle), or the
+   WISHOP display face when the shop kept the default. */
+.store-heading {
+  font-family: var(--store-heading, var(--font-app-display)), system-ui, sans-serif;
+}
+
 /* ============================================================
    THEMING DYNAMIQUE — couleur accent
    On surcharge les classes Tailwind violet-* utilisées dans
