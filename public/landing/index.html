@@ -66,7 +66,7 @@ button{font:inherit;color:inherit}
 
 /* Navigation */
 .nav{position:fixed;top:0;left:0;right:0;z-index:40;padding-top:env(safe-area-inset-top,0px);color:var(--light);transition:background-color .35s var(--ease-out),color .35s var(--ease-out),box-shadow .35s var(--ease-out)}
-.nav.solid{background:rgba(242,243,248,.88);color:var(--ink);box-shadow:0 1px 0 rgba(20,28,69,.08);-webkit-backdrop-filter:saturate(1.2) blur(14px);backdrop-filter:saturate(1.2) blur(14px)}
+.nav.solid{background:rgba(242,243,248,.95);color:var(--ink);box-shadow:0 1px 0 rgba(20,28,69,.08);-webkit-backdrop-filter:saturate(1.2) blur(14px);backdrop-filter:saturate(1.2) blur(14px)}
 .nav-in{height:var(--nav-h);display:flex;align-items:center;gap:20px;padding-inline:var(--gutter)}
 .brand{display:flex;align-items:center;gap:10px;text-decoration:none;font-family:var(--f-display);font-weight:800;font-size:21px;letter-spacing:-.02em}
 .brand svg{width:28px;height:auto}
@@ -1042,7 +1042,9 @@ var MQLS = GATES.map(function(q){ return matchMedia(q); });
 /* ---------------- nav, reveals, spine ---------------- */
 var nav = document.getElementById('nav'), navSolid = null;
 function onNav(){
-  var solid = hero.getBoundingClientRect().bottom <= 72;
+  /* The header turns opaque as soon as the hero starts to leave the screen, before any
+     caption can slide under it (desktop: end of the pinned scroll; phones: first swipe). */
+  var solid = hero.getBoundingClientRect().bottom < innerHeight - 2;
   if (solid !== navSolid) { navSolid = solid; nav.classList.toggle('solid', solid); }
 }
 addEventListener('scroll', onNav, { passive:true }); addEventListener('resize', onNav, { passive:true });
