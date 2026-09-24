@@ -339,6 +339,40 @@ main{display:block}
 .devices svg{height:90px;width:auto}
 @media (max-width:860px){.team-grid{grid-template-columns:1fr}}
 
+/* Pricing */
+#tarifs{padding-block:clamp(72px,10vw,140px) clamp(40px,6vw,80px)}
+.pricing{max-width:1180px;margin-inline:auto;display:grid;gap:36px}
+.price-head{display:grid;gap:16px;max-width:780px}
+.price-head h2{font-size:clamp(34px,4.6vw,60px)}
+.price-head p{font-size:18px;color:var(--ink-2);max-width:62ch}
+.plans{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;align-items:start}
+.plan{background:var(--panel);border-radius:28px;padding:26px 22px;display:grid;gap:12px;align-content:start;box-shadow:inset 0 0 0 1.5px var(--mist)}
+.plan-pro{box-shadow:inset 0 0 0 2px var(--brand)}
+.plan-plus{background:var(--night);color:#F4F5FB;box-shadow:none}
+.plan-top{display:flex;justify-content:space-between;align-items:center;gap:8px;min-height:24px}
+.plan-name{font-family:var(--f-mono);font-size:12.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-2)}
+.plan-badge{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;background:var(--brand);color:#fff;padding:4px 9px;border-radius:999px}
+.plan-plus .plan-badge{background:var(--accent);color:var(--on-accent)}
+.plan-price{display:flex;flex-wrap:wrap;align-items:baseline;column-gap:6px;font-family:var(--f-display);font-weight:800;font-size:clamp(30px,2.6vw,38px);letter-spacing:-.02em;line-height:1.05}
+.plan-price small{font-family:var(--f-body);font-weight:500;font-size:14px;letter-spacing:0;color:var(--ink-2);white-space:nowrap}
+.plan{min-width:0}
+.plan-then{font-size:14px;color:var(--ink-2);margin-top:-4px}
+.plan-plus .plan-name,.plan-plus .plan-then,.plan-plus .plan-price small,.plan-plus .plus-of{color:#C9CFEA}
+.plan ul{list-style:none;margin:6px 0 0;padding:0;display:grid;gap:9px;font-size:15px;line-height:1.45}
+.plan li{position:relative;padding-left:22px}
+.plan li::before{content:"";position:absolute;left:2px;top:.5em;width:8px;height:8px;transform:rotate(45deg);background:var(--brand);border-radius:1.5px}
+.plan-plus li::before{background:var(--accent)}
+.plan li.plus-of{padding-left:0;font-weight:600;font-size:14px;color:var(--ink-2)}
+.plan li.plus-of::before{display:none}
+.plan-plus li.plus-of{color:#C9CFEA}
+.soon{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;background:var(--accent-muted);color:var(--ink);padding:2px 6px;border-radius:6px;margin-left:4px;white-space:nowrap}
+.plan-plus .soon{color:#F4F5FB}
+.plan a{color:inherit;text-decoration:underline;text-underline-offset:3px}
+.price-foot{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:18px}
+.price-note{font-size:14px;color:var(--ink-2);max-width:70ch;margin:0}
+@media (max-width:1080px){.plans{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:620px){.plans{grid-template-columns:1fr}}
+
 /* FAQ */
 #questions{padding-block:clamp(72px,10vw,140px)}
 .faq{max-width:900px;margin-inline:auto;display:grid;gap:36px}
@@ -405,6 +439,7 @@ body.paused *,body.paused *::before,body.paused *::after{animation-play-state:pa
     <nav class="nav-links" aria-label="Sections">
       <a href="#comment" data-i18n="nav.how">Comment ça marche</a>
       <a href="#vitrine" data-i18n="nav.store">Vitrine</a>
+      <a href="#tarifs" data-i18n="nav.price">Tarifs</a>
       <a href="#questions" data-i18n="nav.faq">Questions</a>
     </nav>
     <div class="nav-right">
@@ -677,11 +712,74 @@ body.paused *,body.paused *::before,body.paused *::after{animation-play-state:pa
     </div>
   </section>
 
+  <section class="section" id="tarifs" aria-labelledby="price-t">
+    <div class="pricing">
+      <div class="price-head reveal">
+        <h2 id="price-t" style="--i:0" data-i18n="price.title">Gratuit pour commencer.</h2>
+        <p style="--i:1" data-i18n="price.lead">Tout le monde commence avec la formule Standard, gratuite et sans limite de durée. Les formules payantes s'ouvriront dans l'application quand votre boutique en aura besoin&#8239;; leurs prix de lancement sont gardés 12&nbsp;mois pour les boutiques qui s'abonnent pendant le lancement.</p>
+      </div>
+      <div class="plans reveal">
+        <article class="plan" style="--i:0">
+          <div class="plan-top"><p class="plan-name">Standard</p></div>
+          <p class="plan-price" data-i18n="price.free">Gratuit</p>
+          <p class="plan-then" data-i18n="price.forever">Sans limite de durée</p>
+          <ul>
+            <li data-i18n="p.s1">1 compte, 100 articles</li>
+            <li data-i18n="p.s2">Stock et caisse au comptant</li>
+            <li data-i18n="p.s3">Ticket de caisse imprimé</li>
+          </ul>
+        </article>
+        <article class="plan" style="--i:1">
+          <div class="plan-top"><p class="plan-name">Essentiel</p></div>
+          <p class="plan-price"><span data-amount="5000"></span><small data-i18n="price.month">/ mois</small></p>
+          <p class="plan-then"><span data-i18n="price.launch">Prix de lancement, puis</span> <span data-amount="7500"></span></p>
+          <ul>
+            <li class="plus-of" data-i18n="p.e0">Tout le Standard, plus&#8239;:</li>
+            <li data-i18n="p.e1">2 comptes, 500 articles</li>
+            <li data-i18n="p.e2">Ventes à crédit et paiements en plusieurs fois</li>
+            <li data-i18n="p.e3">Factures PDF et suivi des dettes</li>
+            <li data-i18n="p.e4">Relance WhatsApp en un clic, message prêt</li>
+          </ul>
+        </article>
+        <article class="plan plan-pro" style="--i:2">
+          <div class="plan-top"><p class="plan-name">Pro</p><span class="plan-badge" data-i18n="price.complete">Le plus complet</span></div>
+          <p class="plan-price"><span data-amount="12500"></span><small data-i18n="price.month">/ mois</small></p>
+          <p class="plan-then"><span data-i18n="price.launch">Prix de lancement, puis</span> <span data-amount="17500"></span></p>
+          <ul>
+            <li class="plus-of" data-i18n="p.p0">Tout l'Essentiel, plus&#8239;:</li>
+            <li data-i18n="p.p1">5 comptes, accès page par page, 2&#8239;000 articles</li>
+            <li data-i18n="p.p2">Vitrine en ligne et commandes à retirer</li>
+            <li data-i18n="p.p3">Bons de commande et réception pointée</li>
+            <li data-i18n="p.p4">Carte de fidélité <span class="soon">bientôt</span></li>
+            <li data-i18n="p.p5">Relances automatiques, <a href="#q-relances">dès l'accord de Meta</a></li>
+          </ul>
+        </article>
+        <article class="plan plan-plus" style="--i:3">
+          <div class="plan-top"><p class="plan-name">Pro Plus</p><span class="plan-badge">Premium</span></div>
+          <p class="plan-price"><span data-amount="25000"></span><small data-i18n="price.month">/ mois</small></p>
+          <p class="plan-then"><span data-i18n="price.launch">Prix de lancement, puis</span> <span data-amount="35000"></span></p>
+          <ul>
+            <li class="plus-of" data-i18n="p.x0">Tout le Pro, plus&#8239;:</li>
+            <li data-i18n="p.x1">Comptes et articles illimités</li>
+            <li data-i18n="p.x2">Achats à distance par lien, avec photo du colis</li>
+            <li data-i18n="p.x3">Vitrine sans mention WISHOP</li>
+            <li data-i18n="p.x4">Nouveautés en avant-première</li>
+            <li data-i18n="p.x5">Aide prioritaire, votre stock importé pour vous</li>
+          </ul>
+        </article>
+      </div>
+      <div class="price-foot reveal">
+        <p class="price-note" style="--i:0" data-i18n="price.note">Prix en FCFA, toutes taxes comprises. Le mode hors ligne arrive bientôt dans toutes les formules, gratuite comprise. Tout changement de prix est annoncé 30&nbsp;jours avant.</p>
+        <a class="btn btn-accent" style="--i:1" data-app="signup" href="/fr/login?mode=signup" data-i18n="cta.create">Créer ma boutique</a>
+      </div>
+    </div>
+  </section>
+
   <section class="section" id="questions" aria-labelledby="faq-t">
     <div class="faq">
       <h2 id="faq-t" class="reveal"><span style="--i:0;display:block" data-i18n="faq.title">Vos questions.</span></h2>
       <div class="faq-list" id="faq-list">
-        <details><summary><span data-i18n="q1">Combien ça coûte&#8239;?</span><span class="pm" aria-hidden="true"></span></summary><p class="answer" data-i18n="a1">WISHOP est gratuit pour commencer. Des formules payantes arriveront plus tard, et nous vous préviendrons avant tout changement.</p></details>
+        <details><summary><span data-i18n="q1">Combien ça coûte&#8239;?</span><span class="pm" aria-hidden="true"></span></summary><p class="answer" data-i18n="a1">La formule Standard est gratuite, sans limite de durée. Les formules payantes vont de 5&#8239;000 à 25&#8239;000&nbsp;FCFA par mois au lancement, toutes taxes comprises (voir les tarifs plus haut). Tout changement de prix est annoncé 30&nbsp;jours avant.</p></details>
         <details><summary><span data-i18n="q2">Est-ce compliqué à prendre en main&#8239;?</span><span class="pm" aria-hidden="true"></span></summary><p class="answer" data-i18n="a2">Au quotidien, non&#8239;: vendre, suivre un crédit ou relancer se fait en quelques touches. Le vrai travail est au départ&#8239;: enregistrer votre stock. Vous pouvez ajouter vos articles un par un depuis l'application, ce qui prend du temps, ou importer d'un coup votre stock existant depuis un fichier Excel (au format CSV), ce qui demande d'être à l'aise avec un tableur. Selon les cas, des vidéos d'explication ou une aide au démarrage peuvent vous être proposées.</p></details>
         <details><summary><span data-i18n="q3">Faut-il une connexion internet&#8239;?</span><span class="pm" aria-hidden="true"></span></summary><p class="answer" data-i18n="a3">Oui, WISHOP fonctionne en ligne. Une connexion mobile ordinaire suffit.</p></details>
         <details id="q-relances"><summary><span data-i18n="q4">Les relances partent-elles toutes seules&#8239;?</span><span class="pm" aria-hidden="true"></span></summary><p class="answer" data-i18n="a4">C'est tout l'intérêt&#8239;: WISHOP relance automatiquement sur WhatsApp chaque client qui vous doit de l'argent, au rythme que vous choisissez, jusqu'à ce que sa dette soit soldée. La fonction est prête dans l'application, mais elle attend le feu vert de Meta, la société derrière WhatsApp, dont l'accès est encore restreint dans notre région. En attendant, WISHOP prépare le message et vous n'avez plus qu'à l'envoyer. Dès que Meta lèvera cette restriction, les relances automatiques seront activées.</p></details>
@@ -713,6 +811,7 @@ body.paused *,body.paused *::before,body.paused *::after{animation-play-state:pa
       <nav class="foot-links" aria-label="Pied de page">
         <a href="#comment" data-i18n="nav.how">Comment ça marche</a>
         <a href="#vitrine" data-i18n="nav.store">Vitrine</a>
+        <a href="#tarifs" data-i18n="nav.price">Tarifs</a>
         <a href="#questions" data-i18n="nav.faq">Questions</a>
         <a data-app="login" href="/fr/login" data-i18n="nav.login">Se connecter</a>
       </nav>
@@ -750,8 +849,9 @@ en:{
  'vit.kicker':'Your storefront','vit.title':'An online shop in your name.','vit.text':'Every WISHOP shop has its own public page, in its own colours. Your customers browse your items and place an order; they pay and pick up in store.',
  'team.title':'Everyone in their place.','team.b1':'You see everything. Your staff only reach the pages you open to them, the till for example.','team.b2':'On the phone you already have: WISHOP opens in the browser, nothing to install.',
  'r.owner':'Owner','r.cashier':'Cashier','pg.dash':'Dashboard','pg.sales':'Sales','pg.stock':'Stock','pg.clients':'Clients','pg.inv':'Invoices','pg.set':'Settings',
+ 'nav.price':'Pricing','price.title':'Free to start.','price.lead':"Everyone starts on the Standard plan, free with no time limit. Paid plans will open in the app when your shop needs them; their launch prices are kept for 12&nbsp;months for shops that subscribe during the launch.",'price.free':'Free','price.forever':'No time limit','price.month':'/ month','price.launch':'Launch price, then','price.complete':'Most complete','p.s1':'1 account, 100 items','p.s2':'Stock and cash sales','p.s3':'Printed till receipt','p.e0':'Everything in Standard, plus:','p.e1':'2 accounts, 500 items','p.e2':'Credit sales and payments in instalments','p.e3':'PDF invoices and debt tracking','p.e4':'One-tap WhatsApp reminder, message ready','p.p0':'Everything in Essentiel, plus:','p.p1':'5 accounts, page-by-page access, 2,000 items','p.p2':'Online storefront and pick-up orders','p.p3':'Purchase orders, checked off on delivery','p.p4':'Loyalty card <span class="soon">soon</span>','p.p5':'Automatic reminders, <a href="#q-relances">once Meta gives the go-ahead</a>','p.x0':'Everything in Pro, plus:','p.x1':'Unlimited accounts and items','p.x2':'Remote buying by link, with a photo of the parcel','p.x3':'Storefront without the WISHOP mention','p.x4':'New features first','p.x5':'Priority help, your stock imported for you','price.note':'Prices in FCFA, all taxes included. Offline mode is coming soon to every plan, the free one included. Any price change is announced 30&nbsp;days ahead.',
  'faq.title':'Your questions.',
- 'q1':'How much does it cost?','a1':"WISHOP is free to start. Paid plans will come later, and we'll let you know before anything changes.",
+ 'q1':'How much does it cost?','a1':'The Standard plan is free, with no time limit. Paid plans range from 5,000 to 25,000&nbsp;FCFA a month at launch, all taxes included (see pricing above). Any price change is announced 30&nbsp;days ahead.',
  'q2':'Is it hard to learn?','a2':'Day to day, no: selling, tracking a credit or sending a reminder takes a few taps. The real work is at the start: entering your stock. You can add your items one by one in the app, which takes time, or import your existing stock in one go from an Excel file (saved as CSV), which requires being comfortable with spreadsheets. Depending on your situation, explanation videos or help getting started may be offered.',
  'q3':'Do I need an internet connection?','a3':'Yes, WISHOP works online. An ordinary mobile connection is enough.',
  'q4':'Do reminders go out on their own?','a4':"That's the whole point: WISHOP automatically reminds every customer who owes you money on WhatsApp, at the pace you choose, until the debt is paid off. The feature is ready in the app, but it is waiting for the green light from Meta, the company behind WhatsApp, whose access is still restricted in our region. Meanwhile, WISHOP prepares the message and all you do is send it. As soon as Meta lifts this restriction, automatic reminders will be switched on.",
@@ -783,8 +883,9 @@ es:{
  'vit.kicker':'Tu escaparate','vit.title':'Una tienda en línea con tu nombre.','vit.text':'Cada tienda WISHOP tiene su página pública, con sus colores. Tus clientes ven tus artículos y hacen su pedido; pagan y recogen en la tienda.',
  'team.title':'Cada uno en su lugar.','team.b1':'Tú lo ves todo. Tus empleados solo acceden a las páginas que les abres, la caja por ejemplo.','team.b2':'En el teléfono que ya tienes: WISHOP se abre en el navegador, sin instalar nada.',
  'r.owner':'Propietario','r.cashier':'Cajero(a)','pg.dash':'Panel','pg.sales':'Ventas','pg.stock':'Inventario','pg.clients':'Clientes','pg.inv':'Facturas','pg.set':'Configuración',
+ 'nav.price':'Precios','price.title':'Gratis para empezar.','price.lead':'Todo el mundo empieza con el plan Standard, gratis y sin límite de tiempo. Los planes de pago se abrirán en la aplicación cuando tu tienda los necesite; sus precios de lanzamiento se mantienen 12&nbsp;meses para las tiendas que se suscriban durante el lanzamiento.','price.free':'Gratis','price.forever':'Sin límite de tiempo','price.month':'/ mes','price.launch':'Precio de lanzamiento, luego','price.complete':'El más completo','p.s1':'1 cuenta, 100 artículos','p.s2':'Stock y caja al contado','p.s3':'Ticket de caja impreso','p.e0':'Todo lo del Standard, más:','p.e1':'2 cuentas, 500 artículos','p.e2':'Ventas a crédito y pagos en varias veces','p.e3':'Facturas PDF y seguimiento de deudas','p.e4':'Recordatorio por WhatsApp en un toque, mensaje listo','p.p0':'Todo lo del Essentiel, más:','p.p1':'5 cuentas, acceso página por página, 2.000 artículos','p.p2':'Escaparate en línea y pedidos para recoger','p.p3':'Pedidos a proveedores, marcados a la entrega','p.p4':'Tarjeta de fidelidad <span class="soon">pronto</span>','p.p5':'Recordatorios automáticos, <a href="#q-relances">en cuanto Meta dé luz verde</a>','p.x0':'Todo lo del Pro, más:','p.x1':'Cuentas y artículos ilimitados','p.x2':'Compras a distancia por enlace, con foto del paquete','p.x3':'Escaparate sin la mención WISHOP','p.x4':'Novedades en primicia','p.x5':'Ayuda prioritaria, tu stock importado por ti','price.note':'Precios en FCFA, impuestos incluidos. El modo sin conexión llega pronto a todos los planes, el gratuito incluido. Cualquier cambio de precio se anuncia con 30&nbsp;días de antelación.',
  'faq.title':'Tus preguntas.',
- 'q1':'¿Cuánto cuesta?','a1':'WISHOP es gratis para empezar. Más adelante llegarán planes de pago, y te avisaremos antes de cualquier cambio.',
+ 'q1':'¿Cuánto cuesta?','a1':'El plan Standard es gratis, sin límite de tiempo. Los planes de pago van de 5.000 a 25.000&nbsp;FCFA al mes en el lanzamiento, impuestos incluidos (mira los precios más arriba). Cualquier cambio de precio se anuncia con 30&nbsp;días de antelación.',
  'q2':'¿Es complicado de usar?','a2':'En el día a día, no: vender, seguir un crédito o enviar un recordatorio se hace en pocos toques. El verdadero trabajo está al principio: registrar tu stock. Puedes añadir tus artículos uno a uno desde la app, lo que lleva tiempo, o importar de una vez tu stock existente desde un archivo de Excel (en formato CSV), lo que requiere manejar una hoja de cálculo. Según el caso, se te pueden ofrecer vídeos explicativos o ayuda para empezar.',
  'q3':'¿Hace falta conexión a internet?','a3':'Sí, WISHOP funciona en línea. Basta con una conexión móvil normal.',
  'q4':'¿Los recordatorios se envían solos?','a4':'Para eso está pensado: WISHOP recuerda automáticamente por WhatsApp a cada cliente que te debe dinero, al ritmo que elijas, hasta que salde su deuda. La función ya está lista en la app, pero espera la luz verde de Meta, la empresa detrás de WhatsApp, cuyo acceso sigue restringido en nuestra región. Mientras tanto, WISHOP prepara el mensaje y solo tienes que enviarlo. En cuanto Meta levante esta restricción, los recordatorios automáticos se activarán.',
@@ -814,7 +915,7 @@ function fmtMoney(n){ return fmtNum(n) + '\u00A0FCFA'; }
 function renderAmounts(root){
   [].forEach.call((root || document).querySelectorAll('[data-amount]'), function(el){
     var n = +el.getAttribute('data-amount');
-    var wide = !!el.closest('.big-amt, .demo-total');
+    var wide = !!el.closest('.big-amt, .demo-total, .plan-price');
     el.textContent = el.hasAttribute('data-plain') ? fmtNum(n, wide) : fmtNum(n, wide) + '\u00A0FCFA';
   });
   [].forEach.call(document.querySelectorAll('[data-dt]'), function(el){
