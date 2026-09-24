@@ -27,6 +27,7 @@ export const FEEDBACK_CODES = [
   "invalid_credentials",
   "signup_failed",
   "signup_check_email",
+  "terms_required",
   // Settings
   "name_required",
   "profile_updated",

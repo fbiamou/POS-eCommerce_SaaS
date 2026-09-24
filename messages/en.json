@@ -459,13 +459,26 @@
     "title": "WISHOP",
     "subtitle": "Manage your shop",
     "sign_in": "Sign in",
-    "sign_up": "Create an account (new shop)",
     "email": "Email address",
     "email_placeholder": "owner@myshop.com",
     "password": "Password",
     "or": "or",
-    "terms": "By creating an account, you agree to the terms of use.",
-    "language": "Language"
+    "language": "Language",
+    "create_shop": "Create my shop",
+    "tagline": "Never lose the thread of your shop.",
+    "point_till": "Your till and stock on your phone.",
+    "point_credit": "Every credit tracked to the last franc, reminders on WhatsApp.",
+    "point_free": "Free to start.",
+    "signin_heading": "Welcome back",
+    "signin_sub": "Sign in to open your shop.",
+    "signup_heading": "Create your shop",
+    "signup_sub": "It takes two minutes. You can invite your team afterwards.",
+    "full_name": "Your name",
+    "full_name_placeholder": "E.g. Marie Obiang",
+    "password_hint": "At least 6 characters.",
+    "accept_terms": "I accept the <link>terms of use and the privacy policy</link>.",
+    "free_note": "The Standard plan is free, with no time limit.",
+    "no_account": "No account yet?"
   },
   "Settings": {
     "title": "Settings",
@@ -655,7 +668,8 @@
     "missing_received_quantity": "Enter the received quantity for every item.",
     "purchase_order_not_found": "Purchase order not found.",
     "purchase_order_not_editable": "This order can no longer be changed: it has already been sent.",
-    "invalid_status_change": "This status change is not possible."
+    "invalid_status_change": "This status change is not possible.",
+    "terms_required": "Tick the box to accept the terms of use."
   },
   "Suppliers": {
     "title": "Suppliers",

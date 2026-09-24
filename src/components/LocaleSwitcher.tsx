@@ -5,10 +5,12 @@ import { useLocale } from 'next-intl'
 import { useRouter, usePathname } from 'next/navigation'
 import { Globe, ChevronDown } from 'lucide-react'
 
+// Language codes only: flag emojis render as letters on Windows ("FR FR"),
+// and a flag names a country, not a language.
 const LOCALES = [
-  { code: 'fr', label: 'FR', flag: '🇫🇷' },
-  { code: 'en', label: 'EN', flag: '🇬🇧' },
-  { code: 'es', label: 'ES', flag: '🇪🇸' },
+  { code: 'fr', label: 'FR' },
+  { code: 'en', label: 'EN' },
+  { code: 'es', label: 'ES' },
 ]
 
 type Props = {
@@ -57,7 +59,7 @@ export function LocaleSwitcher({ variant = 'pills', tone = 'light' }: Props) {
               : 'text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white'
           }`}
         >
-          {selected.flag} {selected.label}
+          {selected.label}
           <ChevronDown className="h-3 w-3 opacity-50" />
         </button>
 
@@ -76,7 +78,6 @@ export function LocaleSwitcher({ variant = 'pills', tone = 'light' }: Props) {
                     : "text-zinc-700 hover:bg-zinc-100/50 dark:text-zinc-300 dark:hover:bg-white/5"
                 }`}
               >
-                <span>{l.flag}</span>
                 <span>{l.label}</span>
               </button>
             ))}
@@ -101,7 +102,6 @@ export function LocaleSwitcher({ variant = 'pills', tone = 'light' }: Props) {
               : 'bg-white dark:bg-[var(--surface-1)] text-zinc-600 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-white/5 border border-zinc-200 dark:border-[var(--line)]'
           } disabled:opacity-60`}
         >
-          <span>{l.flag}</span>
           <span>{l.label}</span>
         </button>
       ))}

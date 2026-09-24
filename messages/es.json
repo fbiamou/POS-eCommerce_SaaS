@@ -459,13 +459,26 @@
     "title": "WISHOP",
     "subtitle": "Gestiona tu tienda",
     "sign_in": "Iniciar sesión",
-    "sign_up": "Crear cuenta (nueva tienda)",
     "email": "Dirección de correo",
     "email_placeholder": "propietario@mitienda.com",
     "password": "Contraseña",
     "or": "o",
-    "terms": "Al crear una cuenta, aceptas los términos de uso.",
-    "language": "Idioma"
+    "language": "Idioma",
+    "create_shop": "Crear mi tienda",
+    "tagline": "No pierdas el hilo de tu tienda.",
+    "point_till": "La caja y el stock en tu teléfono.",
+    "point_credit": "Cada crédito seguido hasta el último franco, recordatorios por WhatsApp.",
+    "point_free": "Gratis para empezar.",
+    "signin_heading": "Hola de nuevo",
+    "signin_sub": "Inicia sesión para abrir tu tienda.",
+    "signup_heading": "Crea tu tienda",
+    "signup_sub": "Bastan dos minutos. Luego podrás invitar a tu equipo.",
+    "full_name": "Tu nombre",
+    "full_name_placeholder": "Ej.: Marie Obiang",
+    "password_hint": "6 caracteres como mínimo.",
+    "accept_terms": "Acepto las <link>condiciones de uso y la política de privacidad</link>.",
+    "free_note": "El plan Standard es gratis, sin límite de tiempo.",
+    "no_account": "¿Todavía no tienes cuenta?"
   },
   "Settings": {
     "title": "Configuración",
@@ -655,7 +668,8 @@
     "missing_received_quantity": "Indique la cantidad recibida de cada artículo.",
     "purchase_order_not_found": "Orden de compra no encontrada.",
     "purchase_order_not_editable": "Esta orden ya no se puede modificar: ya fue enviada.",
-    "invalid_status_change": "Este cambio de estado no es posible."
+    "invalid_status_change": "Este cambio de estado no es posible.",
+    "terms_required": "Marca la casilla para aceptar las condiciones de uso."
   },
   "Suppliers": {
     "title": "Proveedores",

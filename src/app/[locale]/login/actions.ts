@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache'
 import { createClient } from '@/utils/supabase/server'
 import { isPageAllowed, firstAllowedPath } from '@/lib/appPages'
 import { redirectLocalized } from '@/lib/navigation'
+import { TERMS_VERSION } from '@/lib/terms'
 
 export async function login(formData: FormData) {
   const supabase = await createClient()
@@ -41,18 +42,32 @@ export async function login(formData: FormData) {
 }
 
 export async function signup(formData: FormData) {
-  const supabase = await createClient()
-
-  const data = {
-    email: formData.get('email') as string,
-    password: formData.get('password') as string,
+  // Creating a shop requires accepting the terms of use; the browser already
+  // enforces the checkbox, this is the server-side guarantee.
+  if (formData.get('accept_terms') !== 'on') {
+    return redirectLocalized('/login', { mode: 'signup', error: 'terms_required' })
   }
 
-  const { error } = await supabase.auth.signUp(data)
+  const supabase = await createClient()
+  const fullName = ((formData.get('full_name') as string | null) ?? '').trim()
+
+  const { error } = await supabase.auth.signUp({
+    email: formData.get('email') as string,
+    password: formData.get('password') as string,
+    options: {
+      // full_name names the owner's profile (handle_new_user trigger); the
+      // terms fields record which version was accepted, and when.
+      data: {
+        full_name: fullName,
+        terms_version: TERMS_VERSION,
+        terms_accepted_at: new Date().toISOString(),
+      },
+    },
+  })
 
   if (error) {
     console.error("Signup error:", error);
-    return redirectLocalized('/login', { error: 'signup_failed' })
+    return redirectLocalized('/login', { mode: 'signup', error: 'signup_failed' })
   }
 
   // Email confirmation is required before the first sign-in.

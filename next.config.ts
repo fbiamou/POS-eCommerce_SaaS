@@ -8,7 +8,11 @@ const nextConfig: NextConfig = {
   // the 10k-websites method). Files in public are not served for a bare
   // folder path, so /landing is mapped to its index.html.
   async rewrites() {
-    return [{ source: "/landing", destination: "/landing/index.html" }];
+    return [
+      { source: "/landing", destination: "/landing/index.html" },
+      // Terms of use and privacy policy accepted at sign-up (src/lib/terms.ts).
+      { source: "/legal/conditions", destination: "/legal/conditions.html" },
+    ];
   },
   // Preview phase: keep the marketing page out of search engines until the
   // public launch (remove together with the robots meta in its index.html).
@@ -20,6 +24,11 @@ const nextConfig: NextConfig = {
       },
       {
         source: "/landing",
+        headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow" }],
+      },
+      // Provisional terms, under legal review: not for search engines.
+      {
+        source: "/legal/:path*",
         headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow" }],
       },
     ];

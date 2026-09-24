@@ -409,7 +409,7 @@ body.paused *,body.paused *::before,body.paused *::after{animation-play-state:pa
     </nav>
     <div class="nav-right">
       <a class="login" data-app="login" href="/fr/login" data-i18n="nav.login">Se connecter</a>
-      <a class="btn btn-accent" data-app="signup" href="/fr/login" data-i18n="cta.create">Créer ma boutique</a>
+      <a class="btn btn-accent" data-app="signup" href="/fr/login?mode=signup" data-i18n="cta.create">Créer ma boutique</a>
       <div class="lang" role="group" aria-label="Langue">
         <button type="button" data-lang="fr" aria-pressed="true">FR</button>
         <button type="button" data-lang="en" aria-pressed="false">EN</button>
@@ -450,7 +450,7 @@ body.paused *,body.paused *::before,body.paused *::after{animation-play-state:pa
           </svg>
           <p class="sub" data-i18n="hero.sub">Encaissez, suivez chaque crédit jusqu'au dernier franc, surveillez le stock et relancez vos clients sur WhatsApp. Tout depuis votre téléphone.</p>
           <div class="cta-row">
-            <a class="btn btn-accent" data-app="signup" href="/fr/login" data-i18n="cta.create">Créer ma boutique</a>
+            <a class="btn btn-accent" data-app="signup" href="/fr/login?mode=signup" data-i18n="cta.create">Créer ma boutique</a>
             <a class="link-more" href="#comment" data-i18n="hero.more">Voir comment ça marche</a>
           </div>
           <p class="free" data-i18n="cta.free">Gratuit pour commencer.</p>
@@ -697,7 +697,7 @@ body.paused *,body.paused *::before,body.paused *::after{animation-play-state:pa
       <h2 id="final-t" style="--i:0" data-i18n="final.title">Votre boutique mérite mieux qu'un cahier.</h2>
       <svg class="final-fil" style="--i:1" viewBox="0 0 380 30" aria-hidden="true"><polyline class="line" pathLength="1" points="2,22 15,8 28,22 41,8 54,22 67,8 80,22 93,8 106,22 119,8 132,22 145,8 158,22 171,8 184,22 197,8 210,22 223,8 236,22 249,8 262,22 275,8 288,22 301,8 314,22 327,8 340,22 353,8 366,22" fill="none" stroke="#F4F5FB" stroke-width="3"/><path d="M372 9l6 6-6 6-6-6z" fill="#F4B63F"/></svg>
       <p style="--i:2" data-i18n="final.text">Créez-la en ligne, gratuitement pour commencer. Il suffit d'une adresse e-mail.</p>
-      <a class="btn btn-accent" style="--i:3" data-app="signup" href="/fr/login" data-i18n="cta.create">Créer ma boutique</a>
+      <a class="btn btn-accent" style="--i:3" data-app="signup" href="/fr/login?mode=signup" data-i18n="cta.create">Créer ma boutique</a>
     </div>
   </section>
 </main>
@@ -840,7 +840,7 @@ function applyLang(next, persist){
   document.title = t('_title');
   document.querySelector('meta[name="description"]').setAttribute('content', t('_desc'));
   document.querySelector('.lang').setAttribute('aria-label', t('_lang'));
-  [].forEach.call(document.querySelectorAll('[data-app]'), function(a){ a.href = APP + '/' + lang + '/login'; });
+  [].forEach.call(document.querySelectorAll('[data-app]'), function(a){ a.href = APP + '/' + lang + '/login' + (a.getAttribute('data-app') === 'signup' ? '?mode=signup' : ''); });
   [].forEach.call(document.querySelectorAll('.lang button'), function(b){ b.setAttribute('aria-pressed', b.getAttribute('data-lang') === lang ? 'true' : 'false'); });
   splitAll();
   renderAmounts();

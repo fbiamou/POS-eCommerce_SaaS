@@ -459,13 +459,26 @@
     "title": "WISHOP",
     "subtitle": "Gestion de votre boutique",
     "sign_in": "Se connecter",
-    "sign_up": "Créer un compte (nouvelle boutique)",
     "email": "Adresse email",
     "email_placeholder": "proprietaire@maboutique.com",
     "password": "Mot de passe",
     "or": "ou",
-    "terms": "En créant un compte, vous acceptez les conditions d'utilisation.",
-    "language": "Langue"
+    "language": "Langue",
+    "create_shop": "Créer ma boutique",
+    "tagline": "Ne perdez plus le fil de votre boutique.",
+    "point_till": "La caisse et le stock sur votre téléphone.",
+    "point_credit": "Chaque crédit suivi jusqu'au dernier franc, relances par WhatsApp.",
+    "point_free": "Gratuit pour commencer.",
+    "signin_heading": "Bon retour",
+    "signin_sub": "Connectez-vous pour ouvrir votre boutique.",
+    "signup_heading": "Créez votre boutique",
+    "signup_sub": "Deux minutes suffisent. Vous pourrez inviter votre équipe ensuite.",
+    "full_name": "Votre nom",
+    "full_name_placeholder": "Ex. : Marie Obiang",
+    "password_hint": "6 caractères minimum.",
+    "accept_terms": "J'accepte les <link>conditions d'utilisation et la politique de confidentialité</link>.",
+    "free_note": "Formule Standard gratuite, sans limite de durée.",
+    "no_account": "Pas encore de compte ?"
   },
   "Settings": {
     "title": "Paramètres",
@@ -655,7 +668,8 @@
     "missing_received_quantity": "Indiquez la quantité reçue pour chaque article.",
     "purchase_order_not_found": "Bon de commande introuvable.",
     "purchase_order_not_editable": "Ce bon n'est plus modifiable : il a déjà été envoyé.",
-    "invalid_status_change": "Ce changement de statut n'est pas possible."
+    "invalid_status_change": "Ce changement de statut n'est pas possible.",
+    "terms_required": "Cochez la case pour accepter les conditions d'utilisation."
   },
   "Suppliers": {
     "title": "Fournisseurs",
