@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { UserPlus, AlertCircle, Star, Pencil } from "lucide-react";
+import { UserPlus, Star, Search } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Modal } from "@/components/ui/Modal";
 import { PhoneCountryCodeSelect } from "@/components/PhoneCountryCodeSelect";
@@ -9,6 +9,8 @@ import { PHONE_COUNTRY_CODES } from "@/lib/phoneCountryCodes";
 import { useShopFormat } from "@/components/ShopFormatProvider";
 import { addClient, updateClient } from "../actions";
 import { useToast } from "@/components/ui/Toast";
+import { getInitials } from "@/components/layout/ShopAvatar";
+import { LOYALTY_MIN_PURCHASES } from "../stats";
 
 export type ClientData = {
   id: string;
@@ -44,6 +46,7 @@ export default function ClientList({
   const tFeedback = useTranslations("Feedback");
   const format = useShopFormat();
   const [searchTerm, setSearchTerm] = useState("");
+  const [filter, setFilter] = useState<"all" | "debt" | "loyal">("all");
   const [isPending, startTransition] = useTransition();
 
   const [isNewClientModalOpen, setIsNewClientModalOpen] = useState(false);
@@ -122,95 +125,117 @@ export default function ClientList({
     });
   };
 
+  const chipClass = (active: boolean) =>
+    `shrink-0 rounded-full px-3.5 py-1.5 text-[13px] font-semibold transition-colors ${
+      active
+        ? "bg-night text-white dark:bg-violet-500"
+        : "bg-[var(--surface-1)] text-zinc-700 shadow-[inset_0_0_0_1px_var(--line)] hover:bg-zinc-100 dark:text-zinc-300"
+    }`;
+  const debtorCount = clients.filter((c) => c.total_debt > 0).length;
+  const loyalCount = clients.filter((c) => c.is_loyal).length;
+  const visibleClients = filteredClients.filter((c) =>
+    filter === "debt" ? c.total_debt > 0 : filter === "loyal" ? c.is_loyal : true
+  );
+
   return (
     <>
-      <div className="flex flex-col gap-5">
-        <div className="flex items-center justify-between">
-          <h2 className="text-xl font-bold tracking-tight text-zinc-900 dark:text-white">{t("base_clients")}</h2>
+      <div className="flex flex-col gap-3">
+        <div className="flex justify-end">
           <button
             onClick={() => setIsNewClientModalOpen(true)}
-            className="flex items-center gap-2 rounded-xl bg-violet-600 px-4 py-2.5 text-[13px] font-bold text-white hover:bg-violet-700 transition-colors shadow-sm"
+            className="flex items-center gap-2 rounded-xl bg-violet-600 px-4 py-2.5 text-[14px] font-bold text-white transition-colors hover:bg-violet-700"
           >
             <UserPlus className="h-4 w-4" />
             {t("new_client")}
           </button>
         </div>
 
-        <div className="rounded-2xl border border-zinc-100 bg-white shadow-sm overflow-hidden dark:border-[var(--line)] dark:bg-[var(--surface-1)]">
-          <div className="p-4 border-b border-zinc-100 dark:border-[var(--line)]">
-            <input
-              type="text"
-              placeholder={t("search")}
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full max-w-sm rounded-xl border border-zinc-200 bg-white px-4 py-2.5 text-[13px] font-medium transition-colors focus:border-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-500 placeholder:text-zinc-400 dark:border-[var(--line)] dark:bg-[var(--surface-1)]"
-            />
-          </div>
-
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-[13px] min-w-[700px]">
-              <thead>
-                <tr className="border-b border-zinc-100 dark:border-[var(--line)]">
-                  <th className="p-4 text-[11px] font-bold text-zinc-400 tracking-widest uppercase">{t("name")}</th>
-                  <th className="p-4 text-[11px] font-bold text-zinc-400 tracking-widest uppercase">{t("phone")}</th>
-                  <th className="p-4 text-[11px] font-bold text-zinc-400 tracking-widest uppercase">{t("status")}</th>
-                  <th className="p-4 text-[11px] font-bold text-zinc-400 tracking-widest uppercase text-right">{t("total_purchases")}</th>
-                  <th className="p-4 text-[11px] font-bold text-zinc-400 tracking-widest uppercase text-right">{t("debts")}</th>
-                  <th className="p-4 text-[11px] font-bold text-zinc-400 tracking-widest uppercase text-right">{t("action")}</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-zinc-50 dark:divide-white/5">
-                {filteredClients.map((client) => {
-                  const recurring = client.is_loyal;
-                  return (
-                    <tr key={client.id} className="hover:bg-zinc-50 dark:hover:bg-white/[0.02] transition-colors group">
-                      <td className="p-4 font-bold text-zinc-900 dark:text-white">{client.name}</td>
-                      <td className="p-4 font-mono text-zinc-500 group-hover:text-violet-600 dark:group-hover:text-violet-400">{client.phone || "-"}</td>
-                      <td className="p-4">
-                        {recurring ? (
-                          <span className="inline-flex items-center gap-1 rounded-full bg-blue-100 px-2.5 py-1 text-[10px] font-bold text-blue-800 dark:bg-blue-900/30 dark:text-blue-400">
-                            <Star className="h-3 w-3" /> {t("loyal")}
-                          </span>
-                        ) : (
-                          <span className="inline-flex items-center gap-1 rounded-full bg-zinc-100 px-2.5 py-1 text-[10px] font-bold text-zinc-800 dark:bg-[var(--line)] dark:text-zinc-300">
-                            {t("standard")}
-                          </span>
-                        )}
-                      </td>
-                      <td className="p-4 text-right font-mono font-bold text-zinc-900 tabular-nums dark:text-white">{client.total_purchases}</td>
-                      <td className="p-4 text-right">
-                        {client.total_debt > 0 ? (
-                          <span className="inline-flex items-center gap-1 whitespace-nowrap font-mono font-bold tabular-nums text-red-600">
-                            <AlertCircle className="h-4 w-4" />
-                            {format.money(client.total_debt)}
-                          </span>
-                        ) : (
-                          <span className="font-mono text-zinc-400 dark:text-zinc-500 tabular-nums">0</span>
-                        )}
-                      </td>
-                      <td className="p-4 text-right">
-                        <button
-                          onClick={() => openEditModal(client)}
-                          title={t("edit")}
-                          className="inline-flex items-center justify-center h-8 w-8 rounded-full bg-zinc-100 text-zinc-600 hover:bg-violet-600 hover:text-white dark:bg-[var(--line)] dark:text-zinc-300 dark:hover:bg-violet-600 transition-colors"
-                        >
-                          <Pencil className="h-4 w-4" />
-                        </button>
-                      </td>
-                    </tr>
-                  );
-                })}
-                {filteredClients.length === 0 && (
-                  <tr>
-                    <td colSpan={6} className="p-8 text-center text-zinc-500">
-                      {t("not_found")}
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
+        <div className="relative">
+          <label htmlFor="client-search" className="sr-only">{t("search")}</label>
+          <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4.5 w-4.5 -translate-y-1/2 text-zinc-400" />
+          <input
+            id="client-search"
+            type="search"
+            placeholder={t("search")}
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="h-12 w-full rounded-xl border border-zinc-200 bg-[var(--surface-1)] pl-11 pr-4 text-[15px] font-medium transition-colors placeholder:text-zinc-400 focus:border-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-500 dark:border-[var(--line)]"
+          />
         </div>
+
+        <div className="flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none]">
+          <button type="button" onClick={() => setFilter("all")} className={chipClass(filter === "all")}>
+            {t("filter_all")} <span className="ml-1 font-mono tabular-nums opacity-70">{clients.length}</span>
+          </button>
+          <button type="button" onClick={() => setFilter("debt")} className={chipClass(filter === "debt")}>
+            {t("filter_debt")} <span className="ml-1 font-mono tabular-nums opacity-70">{debtorCount}</span>
+          </button>
+          <button type="button" onClick={() => setFilter("loyal")} className={chipClass(filter === "loyal")}>
+            {t("filter_loyal")} <span className="ml-1 font-mono tabular-nums opacity-70">{loyalCount}</span>
+          </button>
+        </div>
+
+        <ul className="divide-y divide-zinc-200 overflow-hidden rounded-2xl bg-[var(--surface-1)] shadow-card dark:divide-[var(--line)]">
+          {visibleClients.map((client) => {
+            const missing = Math.max(0, LOYALTY_MIN_PURCHASES - client.recent_purchases);
+            return (
+              <li key={client.id}>
+                <button
+                  type="button"
+                  onClick={() => openEditModal(client)}
+                  aria-label={`${t("edit")} ${client.name}`}
+                  className="flex w-full items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-zinc-50 dark:hover:bg-[var(--surface-2)]"
+                >
+                  <span
+                    className={`relative flex h-11 w-11 shrink-0 items-center justify-center rounded-full font-display text-[15px] font-bold ${
+                      client.is_loyal
+                        ? "bg-saffron/20 text-amber-900 ring-2 ring-saffron dark:text-saffron"
+                        : "bg-zinc-100 text-zinc-600 dark:bg-[var(--surface-2)] dark:text-zinc-300"
+                    }`}
+                  >
+                    {getInitials(client.name)}
+                    {client.is_loyal && (
+                      <Star aria-hidden="true" className="absolute -right-1 -top-1 h-4 w-4 fill-saffron text-saffron" />
+                    )}
+                  </span>
+                  <span className="min-w-0 flex-1">
+                    <span className="flex items-center gap-2">
+                      <span className="truncate text-[14px] font-semibold text-zinc-900 dark:text-white">{client.name}</span>
+                      {client.is_loyal && (
+                        <span className="shrink-0 rounded-full bg-saffron/20 px-2 py-0.5 text-[11px] font-semibold text-amber-900 dark:text-saffron">
+                          {t("loyal")}
+                        </span>
+                      )}
+                    </span>
+                    <span className="block truncate text-[12.5px] text-zinc-500">
+                      {client.phone ? <span className="font-mono">{client.phone}</span> : t("no_phone")}
+                      {" · "}
+                      {t("purchases_count", { count: client.total_purchases })}
+                    </span>
+                    {!client.is_loyal && client.recent_purchases > 0 && missing > 0 && (
+                      <span className="block text-[12px] text-zinc-500">{t("loyal_missing", { count: missing })}</span>
+                    )}
+                  </span>
+                  <span className="shrink-0 text-right">
+                    {client.total_debt > 0 ? (
+                      <>
+                        <span className="block font-mono text-[14px] font-semibold tabular-nums text-red-700 dark:text-red-400">
+                          {format.money(client.total_debt)}
+                        </span>
+                        <span className="block text-[11.5px] text-zinc-500">{t("owes")}</span>
+                      </>
+                    ) : (
+                      <span className="text-[12.5px] text-zinc-500">{t("up_to_date")}</span>
+                    )}
+                  </span>
+                </button>
+              </li>
+            );
+          })}
+          {visibleClients.length === 0 && (
+            <li className="px-4 py-10 text-center text-zinc-500">{t("not_found")}</li>
+          )}
+        </ul>
       </div>
 
       <Modal isOpen={isNewClientModalOpen} onClose={closeNewClientModal} title={t("new_client_modal_title")}>
@@ -223,7 +248,7 @@ export default function ClientList({
               placeholder={t("full_name_placeholder")}
               value={newName}
               onChange={(e) => setNewName(e.target.value)}
-              className="rounded-xl border border-zinc-200 bg-white px-4 py-2.5 text-[13px] font-medium transition-colors focus:border-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-500 dark:border-[var(--line)] dark:bg-[var(--surface-1)]"
+              className="rounded-xl border border-zinc-200 bg-[var(--surface-1)] px-4 py-2.5 text-[14px] font-medium transition-colors focus:border-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-500 dark:border-[var(--line)]"
             />
           </div>
           <div className="flex flex-col gap-1.5">
@@ -235,7 +260,7 @@ export default function ClientList({
                 placeholder={t("phone_placeholder")}
                 value={newPhone}
                 onChange={(e) => setNewPhone(e.target.value)}
-                className="min-w-0 flex-1 rounded-xl border border-zinc-200 bg-white px-4 py-2.5 text-[13px] font-medium transition-colors focus:border-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-500 dark:border-[var(--line)] dark:bg-[var(--surface-1)]"
+                className="min-w-0 flex-1 rounded-xl border border-zinc-200 bg-[var(--surface-1)] px-4 py-2.5 text-[14px] font-medium transition-colors focus:border-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-500 dark:border-[var(--line)]"
               />
             </div>
           </div>
@@ -262,7 +287,7 @@ export default function ClientList({
               type="text"
               value={editName}
               onChange={(e) => setEditName(e.target.value)}
-              className="rounded-xl border border-zinc-200 bg-white px-4 py-2.5 text-[13px] font-medium transition-colors focus:border-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-500 dark:border-[var(--line)] dark:bg-[var(--surface-1)]"
+              className="rounded-xl border border-zinc-200 bg-[var(--surface-1)] px-4 py-2.5 text-[14px] font-medium transition-colors focus:border-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-500 dark:border-[var(--line)]"
             />
           </div>
           <div className="flex flex-col gap-1.5">
@@ -274,7 +299,7 @@ export default function ClientList({
                 placeholder={t("phone_placeholder")}
                 value={editPhone}
                 onChange={(e) => setEditPhone(e.target.value)}
-                className="min-w-0 flex-1 rounded-xl border border-zinc-200 bg-white px-4 py-2.5 text-[13px] font-medium transition-colors focus:border-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-500 dark:border-[var(--line)] dark:bg-[var(--surface-1)]"
+                className="min-w-0 flex-1 rounded-xl border border-zinc-200 bg-[var(--surface-1)] px-4 py-2.5 text-[14px] font-medium transition-colors focus:border-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-500 dark:border-[var(--line)]"
               />
             </div>
           </div>

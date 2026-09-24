@@ -2,7 +2,7 @@ import ClientList from "@/features/clients/components/ClientList";
 import { getTranslations } from "next-intl/server";
 import { createClient } from "@/utils/supabase/server";
 import { getFormatters, getShopSettings } from "@/features/settings/queries";
-import { computeClientStats, isLoyalClient, type ClientInvoice } from "@/features/clients/stats";
+import { computeClientStats, isLoyalClient, LOYALTY_MIN_PURCHASES, LOYALTY_WINDOW_DAYS, type ClientInvoice } from "@/features/clients/stats";
 
 export async function generateMetadata() {
   const t = await getTranslations("Clients");
@@ -44,28 +44,32 @@ export default async function ClientsPage() {
 
   const totalDebt = clients.reduce((s, c) => s + c.total_debt, 0);
 
+  const debtorCount = clients.filter((c) => c.total_debt > 0).length;
+  const loyalCount = clients.filter((c) => c.is_loyal).length;
+
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold tracking-tight">{t("title")}</h1>
-      </div>
+      <h1 className="text-2xl font-bold tracking-tight md:text-3xl">{t("title")}</h1>
 
-      {/* Summary cards */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        <div className="rounded-lg border border-red-200 bg-red-50 p-6 shadow-sm dark:border-red-900/50 dark:bg-red-900/10">
-          <div className="text-sm font-medium text-red-800 dark:text-red-400">
-            {t("total_debts")}
-          </div>
-          <div className="mt-2 text-2xl font-bold text-red-600 dark:text-red-500">
-            {format.money(totalDebt)}
-          </div>
+      <dl className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+        <div className="col-span-2 rounded-2xl bg-[var(--surface-1)] p-4 shadow-card lg:col-span-1">
+          <dt className="text-[12px] font-semibold text-zinc-500">{t("total_debts")}</dt>
+          <dd className={`mt-1 font-mono text-xl font-semibold tabular-nums ${totalDebt > 0 ? "text-red-700 dark:text-red-400" : ""}`}>{format.money(totalDebt)}</dd>
         </div>
-
-        <div className="rounded-lg border bg-card p-6 shadow-sm">
-          <div className="text-sm font-medium text-zinc-500">{t("total_clients")}</div>
-          <div className="mt-2 text-2xl font-bold">{clients.length}</div>
+        <div className="rounded-2xl bg-[var(--surface-1)] p-4 shadow-card">
+          <dt className="text-[12px] font-semibold text-zinc-500">{t("debtors")}</dt>
+          <dd className="mt-1 font-mono text-xl font-semibold tabular-nums">{debtorCount}</dd>
         </div>
-      </div>
+        <div className="rounded-2xl bg-[var(--surface-1)] p-4 shadow-card">
+          <dt className="text-[12px] font-semibold text-zinc-500">{t("total_clients")}</dt>
+          <dd className="mt-1 font-mono text-xl font-semibold tabular-nums">{clients.length}</dd>
+        </div>
+        <div className="col-span-2 rounded-2xl bg-[var(--surface-1)] p-4 shadow-card lg:col-span-1">
+          <dt className="text-[12px] font-semibold text-zinc-500">{t("loyal_clients")}</dt>
+          <dd className="mt-1 font-mono text-xl font-semibold tabular-nums">{loyalCount}</dd>
+          <p className="mt-1 text-[12px] text-zinc-500">{t("loyal_rule", { count: LOYALTY_MIN_PURCHASES, days: LOYALTY_WINDOW_DAYS })}</p>
+        </div>
+      </dl>
 
       <ClientList clients={clients} defaultPhoneCountryCode={shopSettings?.default_phone_country_code || "+237"} />
     </div>
