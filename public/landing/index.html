@@ -972,14 +972,21 @@ if ('IntersectionObserver' in window) {
 var videoReady = false, heroInit = false;
 function initHeroOnce(){
   if (heroInit) return; heroInit = true;
-  posterEl.style.backgroundImage = "url('/landing/assets/hero-poster.jpg')";
+  posterEl.style.backgroundImage = VIDEO_URL.indexOf('-2k') > 0 ? "url('/landing/assets/hero-poster-2k.jpg')" : "url('/landing/assets/hero-poster.jpg')";
   streamVideo();
 }
 /* The host answers byte-range requests (checked: HTTP 206 on Vercel), so the
    video streams: the first frames arrive in well under a second and the rest
    downloads while the visitor reads the first caption. The whole-file Blob
    loader stays as the fallback for a host that would not serve ranges. */
-var VIDEO_URL = '/landing/assets/hero-scrub.mp4';
+/* Computer screens from about 1800 px of physical width get the 2K upscale (4.2 MB); everyone else, and slow or
+   data-saving connections, keep the 1080p file (3.4 MB) that starts faster. */
+var VIDEO_URL = (function(){
+  var px = Math.max(innerWidth, innerHeight * 16 / 9) * (window.devicePixelRatio || 1);
+  var c = navigator.connection || {};
+  var slow = !!c.saveData || /(^|-)2g|3g/.test(c.effectiveType || '');
+  return px > 1800 && !slow ? '/landing/assets/hero-scrub-2k.mp4' : '/landing/assets/hero-scrub.mp4';
+})();
 function markReady(){
   if (videoReady) return;
   videoReady = true;
