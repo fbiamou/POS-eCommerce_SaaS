@@ -2,7 +2,10 @@
 
 import { X } from "lucide-react";
 import { useEffect, useRef } from "react";
+import { useTranslations } from "next-intl";
 
+// A native <dialog>. On phones it opens as a bottom sheet (thumb reach, full
+// width); from the sm breakpoint up it is a centred card.
 export function Modal({
   isOpen,
   onClose,
@@ -14,15 +17,16 @@ export function Modal({
   title: string;
   children: React.ReactNode;
 }) {
+  const t = useTranslations("Common");
   const dialogRef = useRef<HTMLDialogElement>(null);
 
   useEffect(() => {
     const dialog = dialogRef.current;
     if (!dialog) return;
 
-    if (isOpen) {
+    if (isOpen && !dialog.open) {
       dialog.showModal();
-    } else {
+    } else if (!isOpen && dialog.open) {
       dialog.close();
     }
   }, [isOpen]);
@@ -37,18 +41,26 @@ export function Modal({
     <dialog
       ref={dialogRef}
       onClick={handleBackdropClick}
-      className="backdrop:bg-black/50 backdrop:backdrop-blur-sm bg-white dark:bg-zinc-900 text-black dark:text-white rounded-lg shadow-lg w-full max-w-lg p-0 open:flex flex-col m-auto border border-zinc-200 dark:border-zinc-800"
+      // Escape closes a native dialog on its own; route it through onClose so
+      // the parent's state follows, otherwise the dialog could never reopen.
+      onCancel={(e) => {
+        e.preventDefault();
+        onClose();
+      }}
+      className="m-0 mt-auto max-h-[92dvh] w-full max-w-none flex-col overflow-hidden rounded-t-3xl border-0 bg-[var(--surface-1)] p-0 text-foreground shadow-2xl backdrop:bg-[#141C45]/55 backdrop:backdrop-blur-[2px] open:flex sm:m-auto sm:max-w-lg sm:rounded-2xl"
     >
-      <div className="flex items-center justify-between border-b border-zinc-200 dark:border-zinc-800 p-4">
-        <h2 className="text-lg font-semibold">{title}</h2>
+      <div className="flex items-center justify-between gap-3 border-b border-zinc-200 px-5 py-4 dark:border-[var(--line)]">
+        <h2 className="font-display text-lg font-bold">{title}</h2>
         <button
+          type="button"
           onClick={onClose}
-          className="rounded-full p-1 hover:bg-zinc-100 dark:hover:bg-zinc-800"
+          aria-label={t("close")}
+          className="rounded-full p-1.5 text-zinc-500 hover:bg-zinc-100 dark:hover:bg-zinc-800"
         >
           <X className="h-5 w-5" />
         </button>
       </div>
-      <div className="p-4">{children}</div>
+      <div className="overflow-y-auto p-5 pb-[calc(1.25rem+env(safe-area-inset-bottom))]">{children}</div>
     </dialog>
   );
 }

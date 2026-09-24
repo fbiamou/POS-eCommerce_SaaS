@@ -54,7 +54,7 @@ export function PurchaseOrderEditor({ order, shopName }: { order: PurchaseOrderD
 
   return (
     <div className="flex flex-col gap-4">
-      <ul className="divide-y divide-zinc-100 rounded-2xl border border-zinc-100 bg-white dark:divide-white/5 dark:border-[#2d2936] dark:bg-[#1C1A22]">
+      <ul className="divide-y divide-zinc-100 rounded-2xl border border-zinc-100 bg-white dark:divide-white/5 dark:border-[var(--line)] dark:bg-[var(--surface-1)]">
         {order.lines.map((line) => (
           <li key={line.id} className={`flex flex-col gap-3 p-4 sm:flex-row sm:items-center ${line.excluded ? "opacity-50" : ""}`}>
             <div className="min-w-0 flex-1">
@@ -74,7 +74,7 @@ export function PurchaseOrderEditor({ order, shopName }: { order: PurchaseOrderD
                   onChange={(e) => setQuantities((prev) => ({ ...prev, [line.id]: e.target.value }))}
                   onBlur={() => Number(quantities[line.id]) !== line.quantity && saveLine(line.id, line.excluded)}
                   disabled={line.excluded || isPending}
-                  className="w-24 rounded-xl border border-zinc-200 px-3 py-2 text-sm dark:border-[#2d2936] dark:bg-[#14121a]"
+                  className="w-24 rounded-xl border border-zinc-200 px-3 py-2 text-sm dark:border-[var(--line)] dark:bg-[var(--surface-0)]"
                 />
                 <button
                   type="button"
@@ -111,7 +111,7 @@ export function PurchaseOrderEditor({ order, shopName }: { order: PurchaseOrderD
           href={`/api/purchase-orders/${order.id}/pdf?locale=${locale}`}
           target="_blank"
           rel="noreferrer"
-          className="flex items-center gap-2 rounded-xl border border-zinc-200 px-4 py-2.5 text-[13px] font-bold hover:bg-zinc-50 dark:border-[#2d2936] dark:hover:bg-white/5"
+          className="flex items-center gap-2 rounded-xl border border-zinc-200 px-4 py-2.5 text-[13px] font-bold hover:bg-zinc-50 dark:border-[var(--line)] dark:hover:bg-white/5"
         >
           <Download className="h-4 w-4" /> {t("download_pdf")}
         </a>
@@ -120,7 +120,7 @@ export function PurchaseOrderEditor({ order, shopName }: { order: PurchaseOrderD
             type="button"
             onClick={() => changeStatus("SENT")}
             disabled={isPending}
-            className="rounded-xl border border-zinc-200 px-4 py-2.5 text-[13px] font-bold hover:bg-zinc-50 dark:border-[#2d2936] dark:hover:bg-white/5"
+            className="rounded-xl border border-zinc-200 px-4 py-2.5 text-[13px] font-bold hover:bg-zinc-50 dark:border-[var(--line)] dark:hover:bg-white/5"
           >
             {t("mark_sent")}
           </button>
@@ -130,7 +130,7 @@ export function PurchaseOrderEditor({ order, shopName }: { order: PurchaseOrderD
             type="button"
             onClick={() => changeStatus("RECEIVED", "confirm_received")}
             disabled={isPending}
-            className="rounded-xl border border-zinc-200 px-4 py-2.5 text-[13px] font-bold hover:bg-zinc-50 dark:border-[#2d2936] dark:hover:bg-white/5"
+            className="rounded-xl border border-zinc-200 px-4 py-2.5 text-[13px] font-bold hover:bg-zinc-50 dark:border-[var(--line)] dark:hover:bg-white/5"
           >
             {t("mark_received")}
           </button>

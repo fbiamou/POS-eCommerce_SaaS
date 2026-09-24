@@ -22,7 +22,7 @@ export default async function LandingPage() {
   const tLanding = await getTranslations("Landing");
 
   return (
-    <div className={`min-h-screen bg-[#FDFCFB] dark:bg-zinc-950 font-sans ${bricolage.variable}`}>
+    <div className={`min-h-screen bg-background dark:bg-zinc-950 font-sans ${bricolage.variable}`}>
       {/* Navigation */}
       <nav className="mx-auto flex max-w-7xl items-center justify-between p-6 lg:px-8">
         <div className="flex items-center">
@@ -58,7 +58,7 @@ export default async function LandingPage() {
             <div className="mt-10 flex flex-wrap items-center gap-6">
               <Link
                 href="/login"
-                className="flex items-center justify-center rounded-xl bg-[#7B46F6] px-6 py-3.5 text-sm font-bold text-white hover:bg-violet-700 transition-colors shadow-sm"
+                className="flex items-center justify-center rounded-xl bg-[var(--accent-bg)] px-6 py-3.5 text-sm font-bold text-white hover:bg-violet-700 transition-colors shadow-sm"
               >
                 {tLanding("cta_create")} &rarr;
               </Link>
@@ -74,11 +74,11 @@ export default async function LandingPage() {
           {/* Right Column: Graphic Mockup */}
           <div className="relative mx-auto w-full max-w-md lg:max-w-sm lg:ml-auto mt-12 lg:mt-0">
              {/* The dark mock card */}
-             <div className="relative rounded-3xl bg-[#1C1C21] shadow-2xl p-6 sm:p-8 border border-zinc-800 rotate-2 hover:rotate-0 transition-transform duration-500">
+             <div className="relative rounded-3xl bg-[var(--surface-1)] shadow-2xl p-6 sm:p-8 border border-zinc-800 rotate-2 hover:rotate-0 transition-transform duration-500">
                 {/* Header */}
                 <div className="flex justify-between items-center mb-8">
                    <span className="text-white font-bold text-sm">{tLanding("mock_header")}</span>
-                   <div className="h-5 w-5 rounded-full bg-[#8B5CF6] shadow-[0_0_15px_rgba(139,92,246,0.6)]"></div>
+                   <div className="h-5 w-5 rounded-full bg-[var(--accent-ring)] shadow-[0_0_15px_rgba(139,92,246,0.6)]"></div>
                 </div>
                 {/* Rows */}
                 <div className="space-y-4">
@@ -98,7 +98,7 @@ export default async function LandingPage() {
 
                 {/* Floating Pills */}
                 <div className="animate-float absolute -left-2 sm:-left-12 lg:-left-20 top-6 bg-white dark:bg-zinc-800 rounded-full py-2.5 px-4 shadow-xl border border-zinc-100 dark:border-zinc-700 flex items-center gap-2">
-                   <div className="h-2.5 w-2.5 rounded-full bg-[#8B5CF6]"></div>
+                   <div className="h-2.5 w-2.5 rounded-full bg-[var(--accent-ring)]"></div>
                    <span className="text-xs font-bold font-mono text-zinc-900 dark:text-white">FAC-2026-0005</span>
                 </div>
                 
@@ -134,15 +134,15 @@ export default async function LandingPage() {
         {/* Footer Metrics */}
         <div className="mt-20 grid sm:grid-cols-3 gap-8 lg:gap-12 pt-16">
            <div>
-             <div className="text-2xl font-bold text-[#7B46F6] font-mono mb-2">{tLanding("footer_100_title")}</div>
+             <div className="text-2xl font-bold text-[var(--accent-bg)] font-mono mb-2">{tLanding("footer_100_title")}</div>
              <div className="text-sm text-zinc-600 dark:text-zinc-400">{tLanding("footer_100_desc")}</div>
            </div>
            <div>
-             <div className="text-2xl font-bold text-[#7B46F6] font-mono mb-2">{tLanding("footer_lang_title")}</div>
+             <div className="text-2xl font-bold text-[var(--accent-bg)] font-mono mb-2">{tLanding("footer_lang_title")}</div>
              <div className="text-sm text-zinc-600 dark:text-zinc-400">{tLanding("footer_lang_desc")}</div>
            </div>
            <div>
-             <div className="text-2xl font-bold text-[#7B46F6] font-mono mb-2">{tLanding("footer_mobile_title")}</div>
+             <div className="text-2xl font-bold text-[var(--accent-bg)] font-mono mb-2">{tLanding("footer_mobile_title")}</div>
              <div className="text-sm text-zinc-600 dark:text-zinc-400">{tLanding("footer_mobile_desc")}</div>
            </div>
         </div>

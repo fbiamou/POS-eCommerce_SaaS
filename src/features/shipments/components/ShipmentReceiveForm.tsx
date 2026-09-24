@@ -45,7 +45,7 @@ export function ShipmentReceiveForm({ shipmentId, items }: { shipmentId: string;
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-4">
       <p className="text-sm text-zinc-600 dark:text-zinc-300">{t("receive_instruction")}</p>
-      <ul className="flex flex-col divide-y divide-zinc-100 rounded-2xl border border-zinc-100 bg-white dark:divide-white/5 dark:border-[#2d2936] dark:bg-[#1C1A22]">
+      <ul className="flex flex-col divide-y divide-zinc-100 rounded-2xl border border-zinc-100 bg-white dark:divide-white/5 dark:border-[var(--line)] dark:bg-[var(--surface-1)]">
         {items.map((item) => {
           const received = Number(quantities[item.id]);
           const gap = Number.isInteger(received) ? received - item.declared_quantity : 0;
@@ -83,7 +83,7 @@ export function ShipmentReceiveForm({ shipmentId, items }: { shipmentId: string;
                     required
                     value={quantities[item.id] ?? ""}
                     onChange={(e) => setQuantities((prev) => ({ ...prev, [item.id]: e.target.value }))}
-                    className="w-24 rounded-xl border border-zinc-200 px-3 py-2 text-sm dark:border-[#2d2936] dark:bg-[#14121a]"
+                    className="w-24 rounded-xl border border-zinc-200 px-3 py-2 text-sm dark:border-[var(--line)] dark:bg-[var(--surface-0)]"
                   />
                 </label>
                 {!item.existing_product && (
@@ -98,7 +98,7 @@ export function ShipmentReceiveForm({ shipmentId, items }: { shipmentId: string;
                       value={prices[item.id] ?? ""}
                       onChange={(e) => setPrices((prev) => ({ ...prev, [item.id]: e.target.value }))}
                       placeholder={t("optional")}
-                      className="w-32 rounded-xl border border-zinc-200 px-3 py-2 text-sm dark:border-[#2d2936] dark:bg-[#14121a]"
+                      className="w-32 rounded-xl border border-zinc-200 px-3 py-2 text-sm dark:border-[var(--line)] dark:bg-[var(--surface-0)]"
                     />
                   </label>
                 )}

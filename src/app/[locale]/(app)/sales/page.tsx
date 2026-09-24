@@ -23,6 +23,7 @@ export default async function SalesPage() {
       product_type,
       selling_price,
       quantity_in_stock,
+      image_url,
       categories(name)
     `)
     .eq("is_active", true)
@@ -45,6 +46,7 @@ export default async function SalesPage() {
     brand: p.brand ?? "",
     selling_price: p.selling_price,
     quantity_in_stock: p.quantity_in_stock,
+    image_url: p.image_url,
   }));
 
   const clients = (clientsData ?? []).map((c) => ({

@@ -11,7 +11,7 @@ import { saveSupplier, setSupplierActive } from "../actions";
 import type { Supplier } from "../queries";
 
 const inputClass =
-  "w-full rounded-xl border border-zinc-200 bg-white px-4 py-2.5 text-[13px] font-medium focus:border-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-500 dark:border-[#2d2936] dark:bg-[#1C1A22]";
+  "w-full rounded-xl border border-zinc-200 bg-white px-4 py-2.5 text-[13px] font-medium focus:border-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-500 dark:border-[var(--line)] dark:bg-[var(--surface-1)]";
 
 export function SupplierManager({
   suppliers,
@@ -63,7 +63,7 @@ export function SupplierManager({
   };
 
   return (
-    <section className="rounded-2xl border border-zinc-100 bg-white p-5 shadow-sm dark:border-[#2d2936] dark:bg-[#1C1A22]">
+    <section className="rounded-2xl border border-zinc-100 bg-white p-5 shadow-sm dark:border-[var(--line)] dark:bg-[var(--surface-1)]">
       <div className="mb-4 flex items-center justify-between gap-3">
         <div>
           <h2 className="text-lg font-bold">{t("title")}</h2>
@@ -106,7 +106,7 @@ export function SupplierManager({
                   onClick={() => open(supplier)}
                   title={t("edit")}
                   aria-label={t("edit")}
-                  className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-zinc-100 text-zinc-600 hover:bg-violet-600 hover:text-white dark:bg-[#2d2936] dark:text-zinc-300"
+                  className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-zinc-100 text-zinc-600 hover:bg-violet-600 hover:text-white dark:bg-[var(--line)] dark:text-zinc-300"
                 >
                   <Pencil className="h-4 w-4" />
                 </button>

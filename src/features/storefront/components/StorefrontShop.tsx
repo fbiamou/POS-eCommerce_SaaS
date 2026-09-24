@@ -292,7 +292,7 @@ export default function StorefrontShop({
       </main>
 
       <footer className="mt-auto py-8 text-center text-sm text-zinc-400 border-t bg-white dark:bg-zinc-950">
-        <p>© {new Date().getFullYear()} {shop.shop_name || "Boutique POS"}. {t("footer_rights")}</p>
+        <p>© {new Date().getFullYear()} {shop.shop_name || "WISHOP"}. {t("footer_rights")}</p>
         <div className="mt-4 sm:hidden flex justify-center">
            <LocaleSwitcher variant="dropdown" />
         </div>

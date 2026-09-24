@@ -1,6 +1,6 @@
 {
   "Sidebar": {
-    "app_name": "Boutique POS",
+    "app_name": "WISHOP",
     "dashboard": "Panel de Control",
     "stock": "Inventario y Productos",
     "sales": "Ventas y Facturación",
@@ -16,7 +16,7 @@
     "logout": "Cerrar sesión",
     "more": "Más",
     "tab_dashboard": "Inicio",
-    "tab_sales": "Ventas",
+    "tab_sales": "Vender",
     "tab_stock": "Stock",
     "tab_invoices": "Facturas"
   },
@@ -101,7 +101,18 @@
     "import_row_restock_failed": "no se pudo reabastecer «{value}»",
     "supplier": "Proveedor",
     "no_supplier": "Sin proveedor",
-    "origin_country": "País de origen"
+    "origin_country": "País de origen",
+    "search": "Buscar un artículo...",
+    "filter_all": "Todo",
+    "filter_low": "Stock bajo",
+    "filter_online": "En línea",
+    "in_stock_count": "{count} en stock",
+    "summary_items": "Artículos",
+    "summary_units": "Unidades en stock",
+    "summary_low": "Stock bajo",
+    "summary_value": "Valor a precio de compra",
+    "reorder": "Pedir",
+    "csv_title": "Importar o exportar tu stock"
   },
   "Sales": {
     "title": "Ventas y Facturación",
@@ -114,10 +125,10 @@
     "no_results": "Ningún producto coincide con estos criterios.",
     "stock": "Stock",
     "add": "Añadir",
-    "cart": "Carrito (Nueva Venta)",
+    "cart": "Carrito",
     "client": "Cliente",
-    "default_client": "-- Cliente de paso (Por defecto) --",
-    "add_client": "+ Añadir un nuevo cliente",
+    "default_client": "Cliente de paso",
+    "add_client": "+ Nuevo cliente",
     "full_name": "Nombre completo",
     "phone": "Teléfono (WhatsApp)",
     "phone_country_code": "Código de país",
@@ -136,7 +147,25 @@
     "error_record_sale": "Error al registrar la venta: {message}",
     "error_unknown": "Se produjo un error inesperado.",
     "balance_due": "Pendiente de pago (se registra como deuda): {amount}",
-    "change_due": "Cambio a devolver: {amount}"
+    "change_due": "Cambio a devolver: {amount}",
+    "all_categories": "Todo",
+    "in_stock_count": "{count} en stock",
+    "cart_items": "{count, plural, one {# artículo} other {# artículos}}",
+    "open_cart": "Cobrar",
+    "clear_cart": "Vaciar",
+    "remove_item": "Quitar el artículo",
+    "decrease": "Uno menos",
+    "increase": "Uno más",
+    "payment": "Pago",
+    "pay_full": "Pagado completo",
+    "pay_credit": "A crédito o en parte",
+    "cash_received": "Monto recibido, para dar el cambio ({currency})",
+    "paid_now": "Pagado hoy ({currency})",
+    "choose_client": "Elige el cliente",
+    "client_required_credit": "Elige el cliente: una venta a crédito necesita un nombre, si no la deuda no se podrá recordar.",
+    "submit_amount": "Cobrar {amount}",
+    "new_sale": "Nueva venta",
+    "unit_price": "{price} c/u"
   },
   "Clients": {
     "title": "Clientes y Deudas",
@@ -427,7 +456,7 @@
     "shop_fallback": "Tienda"
   },
   "Auth": {
-    "title": "Boutique POS",
+    "title": "WISHOP",
     "subtitle": "Gestiona tu tienda",
     "sign_in": "Iniciar sesión",
     "sign_up": "Crear cuenta (nueva tienda)",
@@ -642,5 +671,8 @@
     "phone_country_code": "Prefijo del país",
     "cancel": "Cancelar",
     "save": "Guardar"
+  },
+  "Common": {
+    "close": "Cerrar"
   }
 }

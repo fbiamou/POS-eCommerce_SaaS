@@ -1,6 +1,6 @@
 {
   "Sidebar": {
-    "app_name": "Boutique POS",
+    "app_name": "WISHOP",
     "dashboard": "Dashboard",
     "stock": "Stock & Products",
     "sales": "Sales & Billing",
@@ -16,7 +16,7 @@
     "logout": "Log out",
     "more": "More",
     "tab_dashboard": "Home",
-    "tab_sales": "Sales",
+    "tab_sales": "Sell",
     "tab_stock": "Stock",
     "tab_invoices": "Invoices"
   },
@@ -101,7 +101,18 @@
     "import_row_restock_failed": "\"{value}\" could not be restocked",
     "supplier": "Supplier",
     "no_supplier": "No supplier",
-    "origin_country": "Country of origin"
+    "origin_country": "Country of origin",
+    "search": "Search for an item...",
+    "filter_all": "All",
+    "filter_low": "Low stock",
+    "filter_online": "Online",
+    "in_stock_count": "{count} in stock",
+    "summary_items": "Items",
+    "summary_units": "Units in stock",
+    "summary_low": "Low stock",
+    "summary_value": "Value at purchase price",
+    "reorder": "Reorder",
+    "csv_title": "Import or export your stock"
   },
   "Sales": {
     "title": "Sales & Invoicing",
@@ -114,10 +125,10 @@
     "no_results": "No products match these criteria.",
     "stock": "Stock",
     "add": "Add",
-    "cart": "Cart (New Sale)",
+    "cart": "Cart",
     "client": "Client",
-    "default_client": "-- Walk-in Client (Default) --",
-    "add_client": "+ Add New Client",
+    "default_client": "Walk-in customer",
+    "add_client": "+ New customer",
     "full_name": "Full Name",
     "phone": "Phone (WhatsApp)",
     "phone_country_code": "Country code",
@@ -136,7 +147,25 @@
     "error_record_sale": "Sale recording error: {message}",
     "error_unknown": "An unexpected error occurred.",
     "balance_due": "Left to pay (recorded as a debt): {amount}",
-    "change_due": "Change to give back: {amount}"
+    "change_due": "Change to give back: {amount}",
+    "all_categories": "All",
+    "in_stock_count": "{count} in stock",
+    "cart_items": "{count, plural, one {# item} other {# items}}",
+    "open_cart": "Checkout",
+    "clear_cart": "Clear",
+    "remove_item": "Remove item",
+    "decrease": "One less",
+    "increase": "One more",
+    "payment": "Payment",
+    "pay_full": "Paid in full",
+    "pay_credit": "On credit or part-paid",
+    "cash_received": "Cash received, to give change ({currency})",
+    "paid_now": "Paid today ({currency})",
+    "choose_client": "Choose the customer",
+    "client_required_credit": "Choose the customer: a credit sale needs a name, otherwise the debt can't be followed up.",
+    "submit_amount": "Charge {amount}",
+    "new_sale": "New sale",
+    "unit_price": "{price} each"
   },
   "Clients": {
     "title": "Clients & Debts",
@@ -427,7 +456,7 @@
     "shop_fallback": "Shop"
   },
   "Auth": {
-    "title": "Boutique POS",
+    "title": "WISHOP",
     "subtitle": "Manage your shop",
     "sign_in": "Sign in",
     "sign_up": "Create an account (new shop)",
@@ -642,5 +671,8 @@
     "phone_country_code": "Country code",
     "cancel": "Cancel",
     "save": "Save"
+  },
+  "Common": {
+    "close": "Close"
   }
 }

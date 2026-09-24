@@ -55,7 +55,7 @@ export default async function PurchaseOrderPage({ params }: { params: Promise<{ 
 
       <PurchaseOrderEditor order={order} shopName={settings?.shop_name || ""} />
 
-      <section className="flex flex-col gap-3 rounded-2xl border border-zinc-100 bg-white p-4 dark:border-[#2d2936] dark:bg-[#1C1A22]">
+      <section className="flex flex-col gap-3 rounded-2xl border border-zinc-100 bg-white p-4 dark:border-[var(--line)] dark:bg-[var(--surface-1)]">
         <h2 className="font-bold">{t("reception_title")}</h2>
         <p className="text-sm text-zinc-500">{t("reception_explanation")}</p>
         {order.shipments.length > 0 && (

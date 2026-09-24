@@ -6,23 +6,75 @@
    this attribute instead of `prefers-color-scheme`. */
 @custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
 
-:root {
-  /* Warm-biased neutrals per the design charter, not flat zinc. */
-  --background: #F6F3EF;
-  --foreground: #1C1A22;
-  --card: #FFFFFF;
-  --line: #EFEAE3;
-  --elevation-card: 0 1px 2px rgba(28,26,34,0.03), 0 6px 16px -10px rgba(28,26,34,0.14);
+/* WISHOP identity, "Indigo royal" (see docs/landing/design-package.md):
+   Indigo nuit #141C45, Indigo de cuve #2B44A0, Coton #F2F3F8, Brume #D7DBEA,
+   Safran #F4B63F (small doses only). Green and red stay reserved for the
+   paid / overdue statuses, never used as brand colours.
 
-  /* Accent — fixed app-wide identity (violet). The public storefront
+   The app was built on Tailwind's violet and zinc scales; redefining both
+   scales here re-skins every screen at once: violet becomes the indigo
+   accent, zinc becomes a neutral biased toward indigo instead of flat grey. */
+@theme {
+  --color-violet-50: #EEF1FA;
+  --color-violet-100: #DFE5F6;
+  --color-violet-200: #C3CDEE;
+  --color-violet-300: #9DAEE2;
+  --color-violet-400: #7087D0;
+  --color-violet-500: #4A63BA;
+  --color-violet-600: #2B44A0;
+  --color-violet-700: #22388A;
+  --color-violet-800: #1C2E70;
+  --color-violet-900: #172559;
+  --color-violet-950: #111B45;
+
+  --color-zinc-50: #F6F7FB;
+  --color-zinc-100: #EEF0F7;
+  --color-zinc-200: #E1E4EF;
+  --color-zinc-300: #CBD0E1;
+  --color-zinc-400: #9AA1BD;
+  --color-zinc-500: #6B7396;
+  --color-zinc-600: #525A7D;
+  --color-zinc-700: #3D4468;
+  --color-zinc-800: #282F55;
+  --color-zinc-900: #1A2146;
+  --color-zinc-950: #10163A;
+
+  --color-saffron: #F4B63F;
+  --color-night: #141C45;
+}
+
+:root {
+  --background: #F2F3F8;
+  --foreground: #141C45;
+  --card: #FFFFFF;
+  --line: #E1E4EF;
+  --elevation-card: 0 1px 2px rgba(20,28,69,0.04), 0 8px 20px -12px rgba(20,28,69,0.18);
+
+  /* Surfaces, used by components that need an explicit layer in both themes. */
+  --surface-0: #F2F3F8;
+  --surface-1: #FFFFFF;
+  --surface-2: #F6F7FB;
+  --surface-3: #EEF0F7;
+
+  /* Accent — fixed app-wide identity (indigo). The public storefront
      (boutique/[slug]) overrides these same variables per-shop via
      ThemeStyle, rendered from that route only — the admin app never does. */
-  --accent-bg: #7c3aed;
-  --accent-bg-hover: #6d28d9;
-  --accent-light: #ede9fe;
-  --accent-text: #6d28d9;
-  --accent-ring: #8b5cf6;
-  --accent-dark-text: #a78bfa;
+  --accent-bg: #2B44A0;
+  --accent-bg-hover: #22388A;
+  --accent-light: #E6EAF7;
+  --accent-text: #2B44A0;
+  --accent-ring: #4A63BA;
+  --accent-dark-text: #9FB2F2;
+  --saffron: #F4B63F;
+
+  /* Desktop sidebar: indigo night in both themes, the brand's anchor. */
+  --nav-bg: #141C45;
+  --nav-fg: #C9CFE6;
+  --nav-fg-strong: #FFFFFF;
+  --nav-hover: rgba(255,255,255,0.06);
+  --nav-active: rgba(255,255,255,0.10);
+  --nav-line: rgba(215,219,234,0.14);
+
   --theme-font: var(--font-app-sans), system-ui, sans-serif;
 }
 
@@ -31,44 +83,59 @@
   --color-foreground: var(--foreground);
   --color-card: var(--card);
   --font-sans: var(--font-app-sans);
+  --font-display: var(--font-app-display);
   --font-mono: var(--font-app-mono);
   --shadow-card: var(--elevation-card);
 }
 
 :root[data-theme="dark"] {
-  /* A violet-tinted ink scale, not flat zinc — each step is a deliberate
-     elevation, not a naive invert of the light palette. */
-  --surface-0: #14121a; /* deepest layer: page background */
-  --surface-1: #201c29; /* cards, panels, sidebar */
-  --surface-2: #2a2534; /* hover states, inputs, badges */
-  --surface-3: #362f42; /* active/pressed, strong emphasis */
-  --line: #3c3548;      /* borders */
-  --muted-600: #6f697c;
-  --muted-500: #9b94a8;
-  --muted-400: #b3adc0;
-  --muted-300: #d6d1de;
-  --muted-200: #ede9f2;
+  /* Indigo night scale — each step is a deliberate elevation, not a naive
+     invert of the light palette. */
+  --surface-0: #0D1231; /* deepest layer: page background */
+  --surface-1: #151C45; /* cards, panels */
+  --surface-2: #1D2555; /* hover states, inputs, badges */
+  --surface-3: #283166; /* active/pressed, strong emphasis */
+  --line: #2C3570;      /* borders */
+  --muted-600: #7C84A8;
+  --muted-500: #9AA2C6;
+  --muted-400: #B3BAD8;
+  --muted-300: #D2D7EC;
+  --muted-200: #E8EBF6;
 
   --background: var(--surface-0);
-  --foreground: #f5f2fa;
+  --foreground: #EEF0F8;
   --card: var(--surface-1);
-  --elevation-card: 0 1px 2px rgba(0,0,0,0.45), 0 14px 28px -14px rgba(124,58,237,0.35);
+  --elevation-card: 0 1px 2px rgba(0,0,0,0.45), 0 14px 28px -14px rgba(0,0,0,0.6);
 
-  /* Accent retuned for a dark ground: brighter fill, and — critically —
-     accent-text/accent-light get their own dark values instead of reusing
-     the light ones, which were dark violets meant to sit on a pale
-     background and became nearly unreadable on a dark card. */
-  --accent-bg: #8b5cf6;
-  --accent-bg-hover: #7c3aed;
-  --accent-light: color-mix(in srgb, var(--accent-bg) 22%, transparent);
-  --accent-text: #c4b5fd;
-  --accent-ring: #a78bfa;
+  /* Accent retuned for a dark ground: brighter fill, and accent-text /
+     accent-light get their own dark values so they stay readable on a
+     dark card. */
+  --accent-bg: #4A63BA;
+  --accent-bg-hover: #5B74CC;
+  --accent-light: color-mix(in srgb, #7087D0 22%, transparent);
+  --accent-text: #B7C4F5;
+  --accent-ring: #7087D0;
+
+  --nav-bg: #0A0F2A;
+  --nav-line: rgba(215,219,234,0.10);
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--theme-font);
+}
+
+/* Headings use the display face (Bricolage Grotesque); figures and labels
+   use the mono face through the existing font-mono / tabular-nums classes. */
+h1, h2, h3, .font-display {
+  font-family: var(--font-app-display), var(--theme-font);
+  letter-spacing: -0.02em;
+}
+
+:focus-visible {
+  outline: 3px solid var(--saffron);
+  outline-offset: 2px;
 }
 
 /* ============================================================
@@ -119,7 +186,7 @@ body {
   --tw-ring-color: var(--accent-ring) !important;
 }
 
-/* Indicateur de nav active dans la Sidebar */
+/* Arrière-plan accent très léger */
 [class~="bg-violet-50"] {
   background-color: color-mix(in srgb, var(--accent-bg) 8%, transparent) !important;
 }
@@ -127,23 +194,18 @@ body {
   background-color: color-mix(in srgb, var(--accent-bg) 15%, transparent) !important;
 }
 
-/* Checkbox / radio checked */
-[class~="group-has-\[\:checked\]\:ring-current"] {
-  ring-color: var(--accent-bg);
-}
-
 /* Bordures de carte — la charte définit les cartes par leur ombre, pas
    par une bordure marquée : un simple "border" (sans couleur explicite)
    passe donc d'un currentColor visible à un filet quasi invisible, ce
    qui laisse l'ombre porter le relief. Les éléments qui précisent déjà
    une couleur de bordure (inputs, selects, zinc-*) gardent la leur. */
-[class~="border"]:not([class*="border-zinc-"]):not([class*="border-violet-"]) {
+[class~="border"]:not([class*="border-zinc-"]):not([class*="border-violet-"]):not([class*="border-["]) {
   border-color: var(--line) !important;
 }
 
-/* Boutons primaires noir/blanc (motif historique pré-charte : bg-black +
-   dark:bg-white + dark:text-black) — alignés sur l'accent violet plutôt
-   que sur une inversion monochrome. Repérage par classe littérale, donc
+/* Boutons primaires noir/blanc (motif historique : bg-black +
+   dark:bg-white + dark:text-black) — alignés sur l'accent plutôt que
+   sur une inversion monochrome. Repérage par classe littérale, donc
    sans impact sur les overlays (bg-black/50) ni sur le ticket imprimable
    (text-black / bg-white sans préfixe dark:). */
 [class~="bg-black"] { background-color: var(--accent-bg) !important; }
@@ -155,9 +217,8 @@ body {
 
 /* ============================================================
    MODE SOMBRE — reskin des neutres zinc
-   Le reste de l'app utilise le dégradé de gris zinc de Tailwind pour
-   les fonds, bordures et textes secondaires. En clair il reste tel
-   quel ; en sombre on le remplace par notre échelle encre/violette
+   Le reste de l'app utilise l'échelle zinc (redéfinie plus haut en
+   neutres indigo). En sombre on la remplace par l'échelle indigo nuit
    (--surface-*, --line, --muted-*) pour éviter un noir plat et un
    texte qui se fond dans le fond.
    ============================================================ */
@@ -187,12 +248,13 @@ body {
 :root[data-theme="dark"] [class~="dark\:border-zinc-800"] { border-color: var(--line) !important; }
 
 :root[data-theme="dark"] [class~="text-zinc-600"],
-:root[data-theme="dark"] [class~="text-zinc-700"] { color: var(--muted-600) !important; }
+:root[data-theme="dark"] [class~="text-zinc-700"] { color: var(--muted-400) !important; }
 :root[data-theme="dark"] [class~="text-zinc-500"] { color: var(--muted-500) !important; }
 :root[data-theme="dark"] [class~="text-zinc-400"],
 :root[data-theme="dark"] [class~="dark\:text-zinc-400"] { color: var(--muted-400) !important; }
 :root[data-theme="dark"] [class~="dark\:text-zinc-300"] { color: var(--muted-300) !important; }
 :root[data-theme="dark"] [class~="text-zinc-800"],
+:root[data-theme="dark"] [class~="text-zinc-900"],
 :root[data-theme="dark"] [class~="dark\:text-zinc-200"] { color: var(--muted-200) !important; }
 
 :root[data-theme="dark"] [class~="hover\:text-zinc-700"]:hover,
@@ -243,4 +305,11 @@ body {
 }
 .animation-delay-2000 {
   animation-delay: 2s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
 }

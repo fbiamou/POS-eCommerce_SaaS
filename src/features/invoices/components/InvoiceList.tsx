@@ -42,14 +42,14 @@ export default function InvoiceList({ invoices }: { invoices: InvoiceListItem[] 
         placeholder={t("search")}
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
-        className="w-full max-w-sm rounded-xl border border-zinc-200 bg-white dark:border-[#2d2936] dark:bg-[#1C1A22] px-4 py-2.5 text-[13px] font-medium transition-colors focus:border-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-500 placeholder:text-zinc-400"
+        className="w-full max-w-sm rounded-xl border border-zinc-200 bg-white dark:border-[var(--line)] dark:bg-[var(--surface-1)] px-4 py-2.5 text-[13px] font-medium transition-colors focus:border-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-500 placeholder:text-zinc-400"
       />
 
-      <div className="rounded-2xl border border-zinc-100 bg-white dark:border-[#2d2936] dark:bg-[#1C1A22] shadow-sm overflow-hidden">
+      <div className="rounded-2xl border border-zinc-100 bg-white dark:border-[var(--line)] dark:bg-[var(--surface-1)] shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-[13px] min-w-[800px]">
             <thead>
-              <tr className="border-b border-zinc-100 dark:border-[#2d2936]">
+              <tr className="border-b border-zinc-100 dark:border-[var(--line)]">
                 <th className="p-4 text-[11px] font-bold text-zinc-400 tracking-widest uppercase">{t("invoice_number")}</th>
                 <th className="p-4 text-[11px] font-bold text-zinc-400 tracking-widest uppercase">{t("client")}</th>
                 <th className="p-4 text-[11px] font-bold text-zinc-400 tracking-widest uppercase">{t("date")}</th>
@@ -77,7 +77,7 @@ export default function InvoiceList({ invoices }: { invoices: InvoiceListItem[] 
                     <td className="p-4 text-right">
                       <Link
                         href={`/invoices/${invoice.id}`}
-                        className="inline-flex items-center justify-center h-8 w-8 rounded-full bg-zinc-100 text-zinc-600 hover:bg-violet-600 hover:text-white dark:bg-[#2d2936] dark:text-zinc-300 dark:hover:bg-violet-600 transition-colors"
+                        className="inline-flex items-center justify-center h-8 w-8 rounded-full bg-zinc-100 text-zinc-600 hover:bg-violet-600 hover:text-white dark:bg-[var(--line)] dark:text-zinc-300 dark:hover:bg-violet-600 transition-colors"
                         title={t("view")}
                       >
                         <FileText className="h-4 w-4" />

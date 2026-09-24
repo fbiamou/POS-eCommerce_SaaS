@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useEffect, useSyncExternalStore } from "react";
 import { Link, useRouter } from "@/i18n/routing";
-import { Plus, Minus, Trash2 } from "lucide-react";
+import { Plus, Minus, Trash2, Search, ShoppingBag, X, Printer, FileText, CheckCircle2 } from "lucide-react";
 import { useMessages, useTranslations } from "next-intl";
 import { useCartStore } from "../store/useCartStore";
 import { createClient } from "@/utils/supabase/client";
@@ -18,12 +18,18 @@ export type Product = {
   brand: string;
   selling_price: number;
   quantity_in_stock: number;
+  image_url?: string | null;
 };
 
 export type Client = {
   id: string;
   name: string;
 };
+
+type PayMode = "full" | "credit";
+
+const inputClass =
+  "w-full rounded-xl border border-zinc-200 bg-[var(--surface-1)] px-4 py-2.5 text-[14px] font-medium transition-colors focus:border-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-500 placeholder:text-zinc-400 dark:border-[var(--line)]";
 
 export default function CreateSaleForm({
   products,
@@ -36,6 +42,7 @@ export default function CreateSaleForm({
 }) {
   const t = useTranslations("Sales");
   const tFeedback = useTranslations("Feedback");
+  const tCommon = useTranslations("Common");
   const format = useShopFormat();
   const router = useRouter();
   const messages = useMessages();
@@ -47,6 +54,13 @@ export default function CreateSaleForm({
   const [selectedCategory, setSelectedCategory] = useState<string>("");
   const [selectedType, setSelectedType] = useState<string>("");
   const [selectedBrand, setSelectedBrand] = useState<string>("");
+
+  // Payment: most sales are paid in full, so that is the default. "credit"
+  // covers both a partial payment and a sale left entirely on credit.
+  const [payMode, setPayMode] = useState<PayMode>("full");
+  const [cashReceived, setCashReceived] = useState("");
+  // On phones the cart is a sheet that slides up over the product list.
+  const [cartOpen, setCartOpen] = useState(false);
 
   // The cart is persisted in localStorage (Zustand): render it only in the
   // browser, never during server rendering, to avoid a hydration mismatch.
@@ -85,16 +99,23 @@ export default function CreateSaleForm({
     }
   }, [newClientPhoneCountryCode, defaultPhoneCountryCode, setNewClientPhoneCountryCode]);
 
-  const paidValue = Math.max(0, parseInt(paidAmount, 10) || 0);
-
   const totalAmount = cart.reduce((sum, item) => {
     const product = products.find(p => p.id === item.productId);
     return sum + (product?.selling_price || 0) * item.quantity;
   }, 0);
+  const itemCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+
+  const creditPaid = Math.max(0, parseInt(paidAmount, 10) || 0);
+  const paidValue = payMode === "full" ? totalAmount : Math.min(creditPaid, totalAmount);
+  const received = Math.max(0, parseInt(cashReceived, 10) || 0);
+  const hasClient = Boolean(selectedClientId) || (isCreatingClient && newClientName.trim().length > 0);
+  // A debt nobody can be reminded of is lost money: a sale that is not paid
+  // in full must name its customer.
+  const creditNeedsClient = cart.length > 0 && paidValue < totalAmount && !hasClient;
 
   // Derive filter options based on current selection
   const categories = useMemo(() => Array.from(new Set(products.map(p => p.category).filter(Boolean))).sort(), [products]);
-  
+
   // Type and brand are optional product fields: only offer the values that
   // actually exist for the current selection, and never an empty option.
   const types = useMemo(() => {
@@ -111,8 +132,13 @@ export default function CreateSaleForm({
 
   // Filtered products list
   const filteredProducts = useMemo(() => {
+    const term = searchTerm.trim().toLowerCase();
     return products.filter((p) => {
-      const matchSearch = p.name.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchSearch =
+        !term ||
+        p.name.toLowerCase().includes(term) ||
+        p.brand.toLowerCase().includes(term) ||
+        p.sub_category.toLowerCase().includes(term);
       const matchCategory = selectedCategory ? p.category === selectedCategory : true;
       const matchType = selectedType ? p.sub_category === selectedType : true;
       const matchBrand = selectedBrand ? p.brand === selectedBrand : true;
@@ -124,8 +150,27 @@ export default function CreateSaleForm({
   const [submitError, setSubmitError] = useState<FeedbackCode | null>(null);
   const [lastInvoiceId, setLastInvoiceId] = useState<string | null>(null);
 
+  const selectCategory = (value: string) => {
+    // Narrowing the category invalidates the type and brand picks.
+    setSelectedCategory(value);
+    setSelectedType("");
+    setSelectedBrand("");
+  };
+
+  const handleAdd = (product: Product) => {
+    setLastInvoiceId(null);
+    setSubmitError(null);
+    addToCart(product.id, product.quantity_in_stock);
+  };
+
+  const closeCart = () => {
+    setCartOpen(false);
+    setLastInvoiceId(null);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (creditNeedsClient) return;
     setIsSubmitting(true);
     setSubmitError(null);
     setLastInvoiceId(null);
@@ -194,6 +239,8 @@ export default function CreateSaleForm({
 
       setLastInvoiceId(invoiceId as string);
       clearCart();
+      setPayMode("full");
+      setCashReceived("");
       router.refresh();
     } catch (err) {
       console.error("Sale failed:", err);
@@ -205,252 +252,398 @@ export default function CreateSaleForm({
 
   if (!mounted) return null; // Avoid hydration mismatch
 
+  const chipClass = (active: boolean) =>
+    `shrink-0 rounded-full px-3.5 py-1.5 text-[13px] font-semibold transition-colors ${
+      active
+        ? "bg-night text-white dark:bg-violet-500"
+        : "bg-[var(--surface-1)] text-zinc-700 shadow-[inset_0_0_0_1px_var(--line)] hover:bg-zinc-100 dark:text-zinc-300"
+    }`;
+
   return (
-    <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-      {/* Liste des produits disponibles */}
-      <div className="col-span-1 lg:col-span-2 rounded-2xl border border-zinc-100 bg-white dark:border-[#2d2936] dark:bg-[#1C1A22] p-5 sm:p-6 shadow-sm">
-        <h2 className="mb-4 text-lg font-semibold">{t("available_products")}</h2>
-        
-        {/* Filtres de recherche */}
-        <div className="mb-6 flex flex-col gap-4">
-          <input 
-            type="text" 
-            placeholder={t("search")} 
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full rounded-xl border border-zinc-200 bg-white px-4 py-2.5 text-[13px] font-medium transition-colors focus:border-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-500 placeholder:text-zinc-400 dark:border-[#2d2936] dark:bg-[#1C1A22]"
-          />
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <select
-              value={selectedCategory}
-              onChange={(e) => {
-                // Narrowing the category invalidates the type and brand picks.
-                setSelectedCategory(e.target.value);
-                setSelectedType("");
-                setSelectedBrand("");
-              }}
-              className="rounded-xl border border-zinc-200 bg-white px-4 py-2.5 text-[13px] font-medium transition-colors focus:border-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-500 dark:border-[#2d2936] dark:bg-[#1C1A22]"
-            >
-              <option value="">-- {t("category")} --</option>
-              {categories.map(c => <option key={c} value={c}>{translateData(c)}</option>)}
-            </select>
-            <select
-              value={selectedType}
-              onChange={(e) => {
-                setSelectedType(e.target.value);
-                setSelectedBrand("");
-              }}
-              disabled={types.length === 0}
-              className="rounded-xl border border-zinc-200 bg-white px-4 py-2.5 text-[13px] font-medium transition-colors focus:border-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-500 disabled:opacity-50 dark:border-[#2d2936] dark:bg-[#1C1A22]"
-            >
-              <option value="">-- {t("type")} --</option>
-              {types.map(tOption => <option key={tOption} value={tOption}>{translateData(tOption)}</option>)}
-            </select>
-            <select
-              value={selectedBrand}
-              onChange={(e) => setSelectedBrand(e.target.value)}
-              disabled={brands.length === 0}
-              className="rounded-xl border border-zinc-200 bg-white px-4 py-2.5 text-[13px] font-medium transition-colors focus:border-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-500 disabled:opacity-50 dark:border-[#2d2936] dark:bg-[#1C1A22]"
-            >
-              <option value="">-- {t("brand")} --</option>
-              {brands.map(b => <option key={b} value={b}>{translateData(b)}</option>)}
-            </select>
+    <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_380px] lg:items-start lg:gap-6">
+      {/* Products */}
+      <section aria-label={t("available_products")} className="min-w-0">
+        <div className="sticky top-[calc(3.5rem+env(safe-area-inset-top))] z-10 -mx-4 bg-background/95 px-4 pb-3 pt-1 backdrop-blur md:top-0 md:-mx-8 md:px-8 lg:mx-0 lg:px-0">
+          <label htmlFor="sale-search" className="sr-only">{t("search")}</label>
+          <div className="relative">
+            <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4.5 w-4.5 -translate-y-1/2 text-zinc-400" />
+            <input
+              id="sale-search"
+              type="search"
+              placeholder={t("search")}
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className={`${inputClass} h-12 pl-11 text-[15px]`}
+            />
           </div>
+
+          {categories.length > 0 && (
+            <div className="mt-3 flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none]">
+              <button type="button" onClick={() => selectCategory("")} className={chipClass(!selectedCategory)}>
+                {t("all_categories")}
+              </button>
+              {categories.map((c) => (
+                <button key={c} type="button" onClick={() => selectCategory(c)} className={chipClass(selectedCategory === c)}>
+                  {translateData(c)}
+                </button>
+              ))}
+            </div>
+          )}
+
+          {(types.length > 1 || brands.length > 1) && (
+            <div className="mt-2 grid grid-cols-2 gap-2">
+              <select
+                aria-label={t("type")}
+                value={selectedType}
+                onChange={(e) => {
+                  setSelectedType(e.target.value);
+                  setSelectedBrand("");
+                }}
+                disabled={types.length === 0}
+                className={`${inputClass} py-2 text-[13px] disabled:opacity-50`}
+              >
+                <option value="">{t("type")}</option>
+                {types.map(tOption => <option key={tOption} value={tOption}>{translateData(tOption)}</option>)}
+              </select>
+              <select
+                aria-label={t("brand")}
+                value={selectedBrand}
+                onChange={(e) => setSelectedBrand(e.target.value)}
+                disabled={brands.length === 0}
+                className={`${inputClass} py-2 text-[13px] disabled:opacity-50`}
+              >
+                <option value="">{t("brand")}</option>
+                {brands.map(b => <option key={b} value={b}>{translateData(b)}</option>)}
+              </select>
+            </div>
+          )}
         </div>
 
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+        <ul className="grid grid-cols-[repeat(auto-fill,minmax(min(100%,260px),1fr))] gap-2">
           {filteredProducts.map((product) => {
             const cartItem = cart.find(c => c.productId === product.id);
             const qtyInCart = cartItem ? cartItem.quantity : 0;
             const remainingStock = product.quantity_in_stock - qtyInCart;
             const isOutOfStock = remainingStock <= 0;
+            const meta = [product.sub_category, product.brand].filter(Boolean).map(translateData).join(" · ");
 
             return (
-              <div key={product.id} className="flex flex-col rounded-xl border border-zinc-100 bg-white dark:border-[#2d2936] dark:bg-[#1C1A22] p-4 hover:border-violet-200 dark:hover:border-violet-900/50 transition-colors shadow-sm relative overflow-hidden group">
-                <span className="font-bold text-sm line-clamp-2 text-zinc-900 dark:text-white">{product.name}</span>
-                {(product.category || product.sub_category || product.brand) && (
-                  <span className="text-[11px] font-bold text-zinc-500 tracking-widest uppercase mt-1.5">
-                    {[product.category, product.sub_category, product.brand].filter(Boolean).map(translateData).join(" · ")}
-                  </span>
-                )}
-                
-                <span className="mt-2 text-[13px] text-zinc-500 dark:text-zinc-400 font-medium">
-                  {t("stock")}: <span className={`font-bold tabular-nums ${isOutOfStock ? 'text-red-500' : 'text-zinc-900 dark:text-white'}`}>{remainingStock}</span>
-                </span>
-                
-                <span className="mt-2 font-mono text-[15px] font-bold text-violet-600 dark:text-violet-400 tabular-nums">{format.money(product.selling_price)}</span>
-                
+              <li key={product.id}>
                 <button
                   type="button"
-                  onClick={() => addToCart(product.id, product.quantity_in_stock)}
+                  onClick={() => handleAdd(product)}
                   disabled={isOutOfStock}
-                  className="mt-4 rounded-xl bg-zinc-100 px-3 py-2 text-sm font-bold text-zinc-900 hover:bg-violet-600 hover:text-white dark:bg-white/5 dark:text-white dark:hover:bg-violet-600 transition-colors disabled:opacity-50 disabled:hover:bg-zinc-100 dark:disabled:hover:bg-white/5 disabled:hover:text-zinc-400"
+                  aria-label={`${t("add")} ${product.name}`}
+                  className={`group relative flex w-full items-center gap-3 rounded-2xl bg-[var(--surface-1)] p-3 text-left shadow-card transition-[box-shadow,transform] active:scale-[0.99] disabled:cursor-not-allowed ${
+                    qtyInCart > 0 ? "ring-2 ring-violet-500" : "hover:ring-1 hover:ring-violet-300"
+                  } ${isOutOfStock && qtyInCart === 0 ? "opacity-55" : ""}`}
                 >
-                  {isOutOfStock ? t("out_of_stock") : t("add")}
+                  <span className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-zinc-100 font-display text-lg font-bold text-zinc-400 dark:bg-[var(--surface-2)]">
+                    {product.image_url ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={product.image_url} alt="" className="h-full w-full object-cover" loading="lazy" />
+                    ) : (
+                      product.name.trim()[0]?.toUpperCase()
+                    )}
+                  </span>
+                  <span className="min-w-0 flex-1">
+                    <span className="block truncate text-[14px] font-semibold text-zinc-900 dark:text-white">{product.name}</span>
+                    {meta && <span className="block truncate text-[12px] text-zinc-500">{meta}</span>}
+                    <span className="mt-0.5 flex flex-wrap items-baseline gap-x-2">
+                      <span className="font-mono text-[14px] font-semibold tabular-nums text-violet-700 dark:text-violet-300">
+                        {format.money(product.selling_price)}
+                      </span>
+                      <span className={`text-[12px] tabular-nums ${isOutOfStock ? "font-semibold text-red-600 dark:text-red-400" : "text-zinc-500"}`}>
+                        {isOutOfStock ? t("out_of_stock") : t("in_stock_count", { count: remainingStock })}
+                      </span>
+                    </span>
+                  </span>
+                  {qtyInCart > 0 ? (
+                    <span className="flex h-8 min-w-8 shrink-0 items-center justify-center rounded-full bg-violet-600 px-2 font-mono text-[13px] font-semibold text-white tabular-nums">
+                      {qtyInCart}
+                    </span>
+                  ) : (
+                    !isOutOfStock && (
+                      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-zinc-100 text-zinc-600 transition-colors group-hover:bg-violet-600 group-hover:text-white dark:bg-[var(--surface-2)] dark:text-zinc-300">
+                        <Plus className="h-4 w-4" />
+                      </span>
+                    )
+                  )}
                 </button>
-              </div>
+              </li>
             );
           })}
           {filteredProducts.length === 0 && (
-            <div className="col-span-full py-8 text-center text-zinc-500">
+            <li className="col-span-full rounded-2xl bg-[var(--surface-1)] py-10 text-center text-zinc-500 shadow-card">
               {t("no_results")}
-            </div>
+            </li>
           )}
-        </div>
-      </div>
+        </ul>
+      </section>
 
-      {/* Panier et Validation */}
-      <div className="col-span-1 rounded-2xl border border-zinc-100 bg-zinc-50/50 p-5 sm:p-6 shadow-sm dark:border-[#2d2936] dark:bg-white/[0.02]">
-        <h2 className="mb-4 text-lg font-semibold">{t("cart")}</h2>
-        
-        <form onSubmit={handleSubmit} className="flex flex-col gap-6">
-          <div className="flex flex-col gap-1.5">
-            <label className="block text-[13px] font-bold text-zinc-700 dark:text-zinc-300">{t("client")}</label>
-            <div className="flex gap-2">
-              <select
-                value={isCreatingClient ? "new" : selectedClientId}
-                onChange={(e) => {
-                  if (e.target.value === "new") {
-                    setIsCreatingClient(true);
-                    setSelectedClientId("");
-                  } else {
-                    setIsCreatingClient(false);
-                    setSelectedClientId(e.target.value);
-                  }
-                }}
-                className="w-full rounded-xl border border-zinc-200 bg-white px-4 py-2.5 text-[13px] font-medium transition-colors focus:border-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-500 dark:border-[#2d2936] dark:bg-[#1C1A22]"
-              >
-                <option value="">{t("default_client")}</option>
-                <option value="new">{t("add_client")}</option>
-                {clients.map(c => (
-                  <option key={c.id} value={c.id}>{c.name}</option>
-                ))}
-              </select>
-              {isCreatingClient && (
-                <button 
-                  type="button" 
-                  onClick={() => setIsCreatingClient(false)}
-                  className="rounded-xl border border-zinc-200 bg-white px-4 py-2.5 text-[13px] font-bold text-zinc-700 hover:bg-zinc-50 dark:border-[#2d2936] dark:bg-[#1C1A22] dark:text-zinc-300 dark:hover:bg-white/[0.02] transition-colors shadow-sm"
-                >
-                  {t("cancel")}
-                </button>
-              )}
-            </div>
+      {/* Phone: cart summary bar above the tab bar */}
+      {(cart.length > 0 || lastInvoiceId) && !cartOpen && (
+        <button
+          type="button"
+          onClick={() => setCartOpen(true)}
+          className="fixed inset-x-3 bottom-[calc(5.25rem+env(safe-area-inset-bottom))] z-30 flex items-center gap-3 rounded-2xl bg-night px-4 py-3 text-white shadow-[0_14px_30px_-12px_rgba(20,28,69,0.7)] lg:hidden dark:bg-violet-500"
+        >
+          <ShoppingBag className="h-5 w-5 shrink-0" />
+          <span className="text-[14px] font-semibold">
+            {lastInvoiceId && cart.length === 0 ? t("success") : t("cart_items", { count: itemCount })}
+          </span>
+          {cart.length > 0 && (
+            <span className="ml-auto flex items-center gap-3">
+              <span className="font-mono text-[15px] font-semibold tabular-nums">{format.money(totalAmount)}</span>
+              <span className="rounded-full bg-saffron px-3 py-1 text-[13px] font-bold text-night">{t("open_cart")}</span>
+            </span>
+          )}
+        </button>
+      )}
 
-            {isCreatingClient && (
-              <div className="mt-2 flex flex-col gap-3 rounded-2xl bg-white dark:bg-[#1C1A22] border border-zinc-100 dark:border-[#2d2936] p-4 shadow-sm">
-                <input
-                  type="text"
-                  placeholder={t("full_name")}
-                  value={newClientName}
-                  onChange={(e) => setNewClientName(e.target.value)}
-                  className="w-full rounded-xl border border-zinc-200 bg-white px-4 py-2.5 text-[13px] font-medium transition-colors focus:border-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-500 dark:border-[#2d2936] dark:bg-[#1C1A22]"
-                  required
-                />
-                <div className="flex gap-2">
-                  <PhoneCountryCodeSelect
-                    value={newClientPhoneCountryCode || defaultPhoneCountryCode}
-                    onChange={setNewClientPhoneCountryCode}
-                    label={t("phone_country_code")}
-                  />
-                  <input
-                    type="tel"
-                    placeholder={t("phone")}
-                    value={newClientPhone}
-                    onChange={(e) => setNewClientPhone(e.target.value)}
-                    className="min-w-0 flex-1 rounded-xl border border-zinc-200 bg-white px-4 py-2.5 text-[13px] font-medium transition-colors focus:border-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-500 dark:border-[#2d2936] dark:bg-[#1C1A22]"
-                  />
-                </div>
-              </div>
+      {/* Phone: dim the list behind the open cart sheet */}
+      {cartOpen && (
+        <div aria-hidden="true" onClick={closeCart} className="fixed inset-0 z-40 bg-[#141C45]/55 backdrop-blur-[2px] lg:hidden" />
+      )}
+
+      {/* Cart: sheet on phones, sticky panel from lg */}
+      <aside
+        aria-label={t("cart")}
+        className={`fixed inset-x-0 bottom-0 z-50 flex max-h-[90dvh] flex-col rounded-t-3xl bg-[var(--surface-1)] shadow-2xl transition-transform duration-300 lg:sticky lg:inset-auto lg:top-8 lg:z-auto lg:max-h-[calc(100dvh-4rem)] lg:translate-y-0 lg:rounded-2xl lg:shadow-card ${
+          cartOpen ? "translate-y-0" : "translate-y-full"
+        }`}
+      >
+        <div className="flex items-center justify-between gap-3 border-b border-zinc-200 px-5 py-4 dark:border-[var(--line)]">
+          <h2 className="font-display text-lg font-bold">
+            {t("cart")}
+            {itemCount > 0 && <span className="ml-2 font-mono text-sm font-medium text-zinc-500 tabular-nums">{itemCount}</span>}
+          </h2>
+          <div className="flex items-center gap-1">
+            {cart.length > 0 && (
+              <button type="button" onClick={clearCart} className="rounded-lg px-2.5 py-1.5 text-[13px] font-semibold text-zinc-500 hover:bg-zinc-100 hover:text-red-600">
+                {t("clear_cart")}
+              </button>
             )}
-          </div>
-
-          <div className="flex-1 space-y-4 max-h-[400px] overflow-y-auto pr-2">
-            {cart.length === 0 ? (
-              <p className="text-sm text-zinc-500">{t("empty_cart")}</p>
-            ) : (
-              cart.map((item) => {
-                const product = products.find(p => p.id === item.productId);
-                if (!product) return null;
-
-                return (
-                  <div key={item.productId} className="flex items-center justify-between border-b border-zinc-100 dark:border-[#2d2936] pb-3 pt-1">
-                    <div className="flex flex-col flex-1 min-w-0 pr-2">
-                      <span className="text-sm font-bold truncate text-zinc-900 dark:text-white">{product.name}</span>
-                      <span className="text-[13px] font-mono font-bold text-violet-600 dark:text-violet-400 mt-0.5 tabular-nums">{format.money(product.selling_price * item.quantity)}</span>
-                    </div>
-                    <div className="flex items-center gap-2 shrink-0">
-                      <button type="button" onClick={() => updateQuantity(item.productId, -1, product.quantity_in_stock)} className="rounded-full bg-white border border-zinc-200 p-1.5 hover:bg-zinc-100 dark:bg-[#1C1A22] dark:border-[#2d2936] dark:hover:bg-white/5 transition-colors"><Minus className="h-3 w-3" /></button>
-                      <span className="text-[13px] font-mono font-bold w-5 text-center tabular-nums">{item.quantity}</span>
-                      <button type="button" onClick={() => updateQuantity(item.productId, 1, product.quantity_in_stock)} className="rounded-full bg-white border border-zinc-200 p-1.5 hover:bg-zinc-100 dark:bg-[#1C1A22] dark:border-[#2d2936] dark:hover:bg-white/5 transition-colors"><Plus className="h-3 w-3" /></button>
-                      <button type="button" onClick={() => removeFromCart(item.productId)} className="ml-1 rounded-full p-1.5 text-zinc-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"><Trash2 className="h-4 w-4" /></button>
-                    </div>
-                  </div>
-                );
-              })
-            )}
-          </div>
-
-          <div className="border-t border-zinc-200 dark:border-[#2d2936] pt-5">
-            <div className="flex justify-between items-center text-lg font-bold">
-              <span className="text-zinc-500 dark:text-zinc-400 text-sm">{t("total")}</span>
-              <span className="font-mono text-xl tabular-nums text-zinc-900 dark:text-white">{format.money(totalAmount)}</span>
-            </div>
-            
-            <div className="mt-4 flex flex-col gap-1.5">
-              <label className="block text-[13px] font-bold text-zinc-700 dark:text-zinc-300">{t("paid_amount", { currency: format.currencySymbol })}</label>
-              <input
-                type="number"
-                min="0"
-                inputMode="numeric"
-                value={paidAmount}
-                onChange={(e) => setPaidAmount(e.target.value)}
-                placeholder={t("paid_amount_placeholder")}
-                className="w-full rounded-xl border border-zinc-200 bg-white px-4 py-2.5 text-[13px] font-medium transition-colors focus:border-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-500 dark:border-[#2d2936] dark:bg-[#1C1A22]"
-              />
-              {/* An empty amount records the whole sale as a debt: say it out loud. */}
-              {cart.length > 0 && paidValue < totalAmount && (
-                <p className="text-[13px] font-bold text-amber-700 dark:text-amber-400">
-                  {t("balance_due", { amount: format.money(totalAmount - paidValue) })}
-                </p>
-              )}
-              {cart.length > 0 && paidValue > totalAmount && (
-                <p className="text-[13px] font-bold text-emerald-700 dark:text-emerald-400">
-                  {t("change_due", { amount: format.money(paidValue - totalAmount) })}
-                </p>
-              )}
-            </div>
-
-            {submitError && (
-              <div className="mt-2 rounded-xl border border-red-200 bg-red-50 p-3 text-[13px] font-bold text-red-600 dark:border-red-900/30 dark:bg-red-900/20 dark:text-red-400 shadow-sm">
-                {tFeedback(submitError)}
-              </div>
-            )}
-
-            {lastInvoiceId && (
-              <div className="mt-2 flex flex-wrap items-center justify-between gap-2 rounded-xl border border-green-200 bg-green-50 p-3 text-[13px] font-bold text-green-700 dark:border-green-900/30 dark:bg-green-900/20 dark:text-green-400 shadow-sm">
-                <span>{t("success")}</span>
-                <div className="flex items-center gap-3">
-                  <Link href={`/invoices/${lastInvoiceId}/ticket`} className="shrink-0 font-medium underline">
-                    {t("print_ticket")}
-                  </Link>
-                  <Link href={`/invoices/${lastInvoiceId}`} className="shrink-0 font-medium underline">
-                    {t("view_invoice")}
-                  </Link>
-                </div>
-              </div>
-            )}
-
-            <button
-              type="submit"
-              disabled={cart.length === 0 || isSubmitting}
-              className="mt-6 w-full rounded-xl bg-violet-600 py-3.5 text-[15px] font-bold text-white hover:bg-violet-700 transition-colors shadow-sm disabled:opacity-50"
-            >
-              {isSubmitting ? t("submitting") : t("submit")}
+            <button type="button" onClick={closeCart} aria-label={tCommon("close")} className="rounded-full p-1.5 text-zinc-500 hover:bg-zinc-100 lg:hidden">
+              <X className="h-5 w-5" />
             </button>
           </div>
-        </form>
-      </div>
+        </div>
+
+        {lastInvoiceId && cart.length === 0 ? (
+          <div className="flex flex-col items-center gap-4 px-5 py-8 text-center pb-[calc(2rem+env(safe-area-inset-bottom))]">
+            <CheckCircle2 className="h-12 w-12 text-emerald-600" />
+            <p className="font-display text-xl font-bold">{t("success")}</p>
+            <div className="grid w-full gap-2">
+              <Link
+                href={`/invoices/${lastInvoiceId}/ticket`}
+                className="flex items-center justify-center gap-2 rounded-xl bg-violet-600 py-3.5 text-[15px] font-bold text-white hover:bg-violet-700"
+              >
+                <Printer className="h-4.5 w-4.5" /> {t("print_ticket")}
+              </Link>
+              <Link
+                href={`/invoices/${lastInvoiceId}`}
+                className="flex items-center justify-center gap-2 rounded-xl bg-zinc-100 py-3 text-[14px] font-semibold text-zinc-800 hover:bg-zinc-200 dark:bg-[var(--surface-2)] dark:text-zinc-200"
+              >
+                <FileText className="h-4 w-4" /> {t("view_invoice")}
+              </Link>
+              <button type="button" onClick={closeCart} className="py-2 text-[14px] font-semibold text-violet-700 dark:text-violet-300">
+                {t("new_sale")}
+              </button>
+            </div>
+          </div>
+        ) : (
+          <form onSubmit={handleSubmit} className="flex min-h-0 flex-1 flex-col">
+            <div className="min-h-0 flex-1 overflow-y-auto px-5">
+              {cart.length === 0 ? (
+                <p className="py-8 text-center text-sm text-zinc-500">{t("empty_cart")}</p>
+              ) : (
+                <ul className="divide-y divide-zinc-200 dark:divide-[var(--line)]">
+                  {cart.map((item) => {
+                    const product = products.find(p => p.id === item.productId);
+                    if (!product) return null;
+
+                    return (
+                      <li key={item.productId} className="py-3">
+                        <div className="flex items-start gap-2">
+                          <p className="min-w-0 flex-1 text-[14px] font-semibold leading-snug text-zinc-900 line-clamp-2 dark:text-white">{product.name}</p>
+                          <button type="button" aria-label={t("remove_item")} onClick={() => removeFromCart(item.productId)} className="-mt-1 shrink-0 rounded-full p-1.5 text-zinc-400 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-900/20">
+                            <Trash2 className="h-4 w-4" />
+                          </button>
+                        </div>
+                        <div className="mt-2 flex items-center gap-3">
+                          <div className="flex shrink-0 items-center rounded-full bg-zinc-100 dark:bg-[var(--surface-2)]">
+                            <button type="button" aria-label={t("decrease")} onClick={() => updateQuantity(item.productId, -1, product.quantity_in_stock)} className="rounded-full p-2 hover:bg-zinc-200 dark:hover:bg-[var(--surface-3)]"><Minus className="h-3.5 w-3.5" /></button>
+                            <span className="w-6 text-center font-mono text-[13px] font-semibold tabular-nums">{item.quantity}</span>
+                            <button type="button" aria-label={t("increase")} onClick={() => updateQuantity(item.productId, 1, product.quantity_in_stock)} className="rounded-full p-2 hover:bg-zinc-200 dark:hover:bg-[var(--surface-3)]"><Plus className="h-3.5 w-3.5" /></button>
+                          </div>
+                          <span className="min-w-0 truncate font-mono text-[12px] text-zinc-500 tabular-nums">
+                            {t("unit_price", { price: format.money(product.selling_price) })}
+                          </span>
+                          <span className="ml-auto shrink-0 font-mono text-[14px] font-semibold tabular-nums">{format.money(product.selling_price * item.quantity)}</span>
+                        </div>
+                      </li>
+                    );
+                  })}
+                </ul>
+              )}
+            </div>
+
+            <div className="border-t border-zinc-200 px-5 pt-4 pb-[calc(1.25rem+env(safe-area-inset-bottom))] dark:border-[var(--line)] lg:pb-5">
+              <div className="flex items-baseline justify-between">
+                <span className="text-[13px] font-semibold uppercase tracking-wider text-zinc-500">{t("total")}</span>
+                <span className="font-mono text-[26px] font-semibold tabular-nums">{format.money(totalAmount)}</span>
+              </div>
+
+              <div role="radiogroup" aria-label={t("payment")} className="mt-3 grid grid-cols-2 gap-1 rounded-xl bg-zinc-100 p-1 dark:bg-[var(--surface-2)]">
+                {(["full", "credit"] as const).map((mode) => (
+                  <button
+                    key={mode}
+                    type="button"
+                    role="radio"
+                    aria-checked={payMode === mode}
+                    onClick={() => setPayMode(mode)}
+                    className={`rounded-lg px-2 py-2 text-[13px] font-semibold transition-colors ${
+                      payMode === mode ? "bg-[var(--surface-1)] text-zinc-900 shadow-card dark:bg-[var(--surface-3)] dark:text-white" : "text-zinc-500"
+                    }`}
+                  >
+                    {mode === "full" ? t("pay_full") : t("pay_credit")}
+                  </button>
+                ))}
+              </div>
+
+              {payMode === "full" ? (
+                <div className="mt-3">
+                  <label htmlFor="cash-received" className="text-[12px] font-semibold text-zinc-600 dark:text-zinc-300">
+                    {t("cash_received", { currency: format.currencySymbol })}
+                  </label>
+                  <input
+                    id="cash-received"
+                    type="number"
+                    min="0"
+                    inputMode="numeric"
+                    value={cashReceived}
+                    onChange={(e) => setCashReceived(e.target.value)}
+                    placeholder={String(totalAmount || "")}
+                    className={`${inputClass} mt-1 font-mono`}
+                  />
+                  {cart.length > 0 && received > totalAmount && (
+                    <p className="mt-1.5 text-[13px] font-semibold text-emerald-700 dark:text-emerald-400">
+                      {t("change_due", { amount: format.money(received - totalAmount) })}
+                    </p>
+                  )}
+                </div>
+              ) : (
+                <div className="mt-3 flex flex-col gap-3">
+                  <div>
+                    <label htmlFor="paid-now" className="text-[12px] font-semibold text-zinc-600 dark:text-zinc-300">
+                      {t("paid_now", { currency: format.currencySymbol })}
+                    </label>
+                    <input
+                      id="paid-now"
+                      type="number"
+                      min="0"
+                      inputMode="numeric"
+                      value={paidAmount}
+                      onChange={(e) => setPaidAmount(e.target.value)}
+                      placeholder="0"
+                      className={`${inputClass} mt-1 font-mono`}
+                    />
+                    {cart.length > 0 && paidValue < totalAmount && (
+                      <p className="mt-1.5 text-[13px] font-semibold text-amber-700 dark:text-amber-400">
+                        {t("balance_due", { amount: format.money(totalAmount - paidValue) })}
+                      </p>
+                    )}
+                  </div>
+
+                </div>
+              )}
+
+              <div className="mt-3">
+                <label htmlFor="sale-client" className="text-[12px] font-semibold text-zinc-600 dark:text-zinc-300">{t("client")}</label>
+                <div className="mt-1 flex gap-2">
+                  <select
+                    id="sale-client"
+                    value={isCreatingClient ? "new" : selectedClientId}
+                    onChange={(e) => {
+                      if (e.target.value === "new") {
+                        setIsCreatingClient(true);
+                        setSelectedClientId("");
+                      } else {
+                        setIsCreatingClient(false);
+                        setSelectedClientId(e.target.value);
+                      }
+                    }}
+                    className={inputClass}
+                  >
+                    <option value="">{payMode === "full" ? t("default_client") : t("choose_client")}</option>
+                    <option value="new">{t("add_client")}</option>
+                    {clients.map(c => (
+                      <option key={c.id} value={c.id}>{c.name}</option>
+                    ))}
+                  </select>
+                  {isCreatingClient && (
+                    <button
+                      type="button"
+                      onClick={() => setIsCreatingClient(false)}
+                      className="shrink-0 rounded-xl px-3 text-[13px] font-semibold text-zinc-600 hover:bg-zinc-100 dark:text-zinc-300"
+                    >
+                      {t("cancel")}
+                    </button>
+                  )}
+                </div>
+
+                {isCreatingClient && (
+                  <div className="mt-2 flex flex-col gap-2 rounded-xl bg-zinc-50 p-3 dark:bg-[var(--surface-2)]">
+                    <input
+                      type="text"
+                      aria-label={t("full_name")}
+                      placeholder={t("full_name")}
+                      value={newClientName}
+                      onChange={(e) => setNewClientName(e.target.value)}
+                      className={inputClass}
+                      required
+                    />
+                    <div className="flex gap-2">
+                      <PhoneCountryCodeSelect
+                        value={newClientPhoneCountryCode || defaultPhoneCountryCode}
+                        onChange={setNewClientPhoneCountryCode}
+                        label={t("phone_country_code")}
+                      />
+                      <input
+                        type="tel"
+                        aria-label={t("phone")}
+                        placeholder={t("phone")}
+                        value={newClientPhone}
+                        onChange={(e) => setNewClientPhone(e.target.value)}
+                        className={`${inputClass} min-w-0 flex-1`}
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {creditNeedsClient && (
+                <p className="mt-2 text-[13px] text-zinc-600 dark:text-zinc-300">{t("client_required_credit")}</p>
+              )}
+
+              {submitError && (
+                <p role="alert" className="mt-3 rounded-xl bg-red-50 p-3 text-[13px] font-semibold text-red-700 dark:bg-red-900/20 dark:text-red-400">
+                  {tFeedback(submitError)}
+                </p>
+              )}
+
+              <button
+                type="submit"
+                disabled={cart.length === 0 || isSubmitting || creditNeedsClient}
+                className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl bg-violet-600 py-3.5 text-[15px] font-bold text-white transition-colors hover:bg-violet-700 disabled:opacity-50"
+              >
+                {isSubmitting ? t("submitting") : payMode === "full" ? t("submit_amount", { amount: format.money(totalAmount) }) : t("submit")}
+              </button>
+            </div>
+          </form>
+        )}
+      </aside>
     </div>
   );
 }

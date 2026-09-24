@@ -2,6 +2,7 @@ import Sidebar from "@/components/layout/Sidebar";
 import { MobileTopBar } from "@/components/layout/MobileTopBar";
 import { MobileTabBar } from "@/components/layout/MobileTabBar";
 import { ShopFormatProvider } from "@/components/ShopFormatProvider";
+import { Toaster } from "@/components/ui/Toast";
 import { getCurrentProfile } from "@/features/auth/actions";
 import { getShopFormat, getShopSettings } from "@/features/settings/queries";
 
@@ -31,10 +32,11 @@ export default async function AppLayout({ children }: { children: React.ReactNod
           shopName={shopSettings?.shop_name}
           shopLogoUrl={shopSettings?.shop_logo_url}
         />
-        <main className="w-full flex-1 overflow-y-auto bg-background p-4 pt-16 pb-20 md:p-8 md:pt-8 md:pb-8">
+        <main className="w-full flex-1 overflow-y-auto bg-background px-4 pt-[calc(4.5rem+env(safe-area-inset-top))] pb-[calc(6rem+env(safe-area-inset-bottom))] md:p-8 md:pt-8 md:pb-8">
           {children}
         </main>
         <MobileTabBar profile={profile} shopSlug={shopSettings?.shop_slug} />
+        <Toaster />
       </div>
     </ShopFormatProvider>
   );

@@ -2,10 +2,11 @@
 
 import { useRef, useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
-import { Upload } from "lucide-react";
+import { Upload, Search, Globe, Pencil } from "lucide-react";
 import { Modal } from "@/components/ui/Modal";
 import { useShopFormat } from "@/components/ShopFormatProvider";
 import { updateProduct, uploadProductImage } from "../actions";
+import { useToast } from "@/components/ui/Toast";
 
 export type Product = {
   id: string;
@@ -33,9 +34,12 @@ export default function ProductList({
   suppliers: { id: string; name: string }[];
 }) {
   const t = useTranslations("Stock");
+  const showToast = useToast((state) => state.show);
   const tFeedback = useTranslations("Feedback");
   const format = useShopFormat();
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  const [search, setSearch] = useState("");
+  const [filter, setFilter] = useState<"all" | "low" | "online">("all");
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const [isUploadingImage, startImageUpload] = useTransition();
@@ -64,7 +68,7 @@ export default function ProductList({
         setError(tFeedback(result.error));
         return;
       }
-      alert(t("update_success"));
+      showToast(t("update_success"));
       closeEdit();
     });
   };
@@ -89,76 +93,105 @@ export default function ProductList({
     });
   };
 
+  const lowCount = products.filter((p) => format.isLowStock(p.quantity_in_stock)).length;
+  const onlineCount = products.filter((p) => p.is_published_online).length;
+  const term = search.trim().toLowerCase();
+  const visible = products.filter((p) => {
+    if (filter === "low" && !format.isLowStock(p.quantity_in_stock)) return false;
+    if (filter === "online" && !p.is_published_online) return false;
+    if (!term) return true;
+    return [p.name, p.brand, p.product_type, p.category?.name]
+      .filter(Boolean)
+      .some((v) => (v as string).toLowerCase().includes(term));
+  });
+
+  const chipClass = (active: boolean) =>
+    `shrink-0 rounded-full px-3.5 py-1.5 text-[13px] font-semibold transition-colors ${
+      active
+        ? "bg-night text-white dark:bg-violet-500"
+        : "bg-[var(--surface-1)] text-zinc-700 shadow-[inset_0_0_0_1px_var(--line)] hover:bg-zinc-100 dark:text-zinc-300"
+    }`;
+
   return (
     <>
-      <div className="rounded-2xl border border-zinc-100 bg-white dark:border-[#2d2936] dark:bg-[#1C1A22] shadow-sm overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm min-w-[700px]">
-            <thead className="bg-zinc-50/50 dark:bg-white/5 border-b border-zinc-100 dark:border-[#2d2936]">
-              <tr>
-                <th className="p-4 text-[11px] font-bold text-zinc-400 tracking-widest uppercase">{t("name")}</th>
-                <th className="p-4 text-[11px] font-bold text-zinc-400 tracking-widest uppercase">{t("category")}</th>
-                <th className="p-4 text-[11px] font-bold text-zinc-400 tracking-widest uppercase text-right">{t("stock_qty")}</th>
-                <th className="p-4 text-[11px] font-bold text-zinc-400 tracking-widest uppercase text-right">{t("price")}</th>
-                <th className="p-4 text-[11px] font-bold text-zinc-400 tracking-widest uppercase text-center">{t("published_online_column")}</th>
-                <th className="p-4 text-[11px] font-bold text-zinc-400 tracking-widest uppercase text-right">{t("actions")}</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-zinc-50 dark:divide-white/5">
-              {products.map((product) => (
-                <tr key={product.id} className="hover:bg-zinc-50/50 dark:hover:bg-white/[0.02] transition-colors">
-                  <td className="p-4">
-                    <span className="block text-sm font-bold text-zinc-900 dark:text-white">{product.name}</span>
-                    {(product.brand || product.product_type) && (
-                      <span className="mt-0.5 block text-xs text-zinc-500">
-                        {[product.product_type, product.brand].filter(Boolean).join(" · ")}
-                      </span>
-                    )}
-                  </td>
-                  <td className="p-4 text-sm text-zinc-500 dark:text-zinc-400">{product.category?.name || "-"}</td>
-                  <td className="p-4 text-right">
-                    {format.isLowStock(product.quantity_in_stock) ? (
-                      <span className="inline-flex items-center rounded-full bg-red-100 px-2 py-0.5 text-[11px] font-bold text-red-800 dark:bg-red-900/30 dark:text-red-400 tabular-nums">
-                        {product.quantity_in_stock}
-                      </span>
-                    ) : (
-                      <span className="inline-flex items-center rounded-full bg-emerald-100 px-2 py-0.5 text-[11px] font-bold text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400 tabular-nums">
-                        {product.quantity_in_stock}
-                      </span>
-                    )}
-                  </td>
-                  <td className="p-4 text-right">
-                    <span className="font-mono text-[13px] sm:text-sm font-bold text-zinc-900 dark:text-white tabular-nums">
-                      {format.money(product.selling_price)}
-                    </span>
-                  </td>
-                  <td className="p-4 text-center">
-                    {product.is_published_online && (
-                      <span className="inline-flex items-center rounded-full bg-violet-100 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-violet-800 dark:bg-violet-900/30 dark:text-violet-300">
-                        {t("published")}
-                      </span>
-                    )}
-                  </td>
-                  <td className="p-4 text-right">
-                    <button
-                      onClick={() => openEdit(product)}
-                      className="text-sm font-medium text-violet-600 hover:underline dark:text-violet-400"
-                    >
-                      {t("edit")}
-                    </button>
-                  </td>
-                </tr>
-              ))}
-              {products.length === 0 && (
-                <tr>
-                  <td colSpan={6} className="p-8 text-center text-zinc-500">
-                    {t("not_found")}
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+      <div className="flex flex-col gap-3">
+        <div className="relative">
+          <label htmlFor="stock-search" className="sr-only">{t("search")}</label>
+          <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4.5 w-4.5 -translate-y-1/2 text-zinc-400" />
+          <input
+            id="stock-search"
+            type="search"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder={t("search")}
+            className="h-12 w-full rounded-xl border border-zinc-200 bg-[var(--surface-1)] pl-11 pr-4 text-[15px] font-medium transition-colors placeholder:text-zinc-400 focus:border-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-500 dark:border-[var(--line)]"
+          />
         </div>
+        <div className="flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none]">
+          <button type="button" onClick={() => setFilter("all")} className={chipClass(filter === "all")}>
+            {t("filter_all")} <span className="ml-1 font-mono tabular-nums opacity-70">{products.length}</span>
+          </button>
+          <button type="button" onClick={() => setFilter("low")} className={chipClass(filter === "low")}>
+            {t("filter_low")} <span className="ml-1 font-mono tabular-nums opacity-70">{lowCount}</span>
+          </button>
+          <button type="button" onClick={() => setFilter("online")} className={chipClass(filter === "online")}>
+            {t("filter_online")} <span className="ml-1 font-mono tabular-nums opacity-70">{onlineCount}</span>
+          </button>
+        </div>
+
+        <ul className="divide-y divide-zinc-200 overflow-hidden rounded-2xl bg-[var(--surface-1)] shadow-card dark:divide-[var(--line)]">
+          {visible.map((product) => {
+            const low = format.isLowStock(product.quantity_in_stock);
+            const meta = [product.category?.name, product.product_type, product.brand].filter(Boolean).join(" · ");
+            return (
+              <li key={product.id}>
+                <button
+                  type="button"
+                  onClick={() => openEdit(product)}
+                  aria-label={`${t("edit")} ${product.name}`}
+                  className="flex w-full items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-zinc-50 dark:hover:bg-[var(--surface-2)]"
+                >
+                  <span className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-zinc-100 font-display text-base font-bold text-zinc-400 dark:bg-[var(--surface-2)]">
+                    {product.image_url ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={product.image_url} alt="" className="h-full w-full object-cover" loading="lazy" />
+                    ) : (
+                      product.name.trim()[0]?.toUpperCase()
+                    )}
+                  </span>
+                  <span className="min-w-0 flex-1">
+                    <span className="flex items-center gap-2">
+                      <span className="truncate text-[14px] font-semibold text-zinc-900 dark:text-white">{product.name}</span>
+                      {product.is_published_online && (
+                        <span title={t("published")} className="flex shrink-0 items-center text-violet-600 dark:text-violet-300">
+                          <Globe className="h-3.5 w-3.5" />
+                          <span className="sr-only">{t("published")}</span>
+                        </span>
+                      )}
+                    </span>
+                    {meta && <span className="block truncate text-[12px] text-zinc-500">{meta}</span>}
+                  </span>
+                  <span className="flex shrink-0 flex-col items-end gap-1">
+                    <span className="font-mono text-[14px] font-semibold tabular-nums">{format.money(product.selling_price)}</span>
+                    <span
+                      className={`rounded-full px-2 py-0.5 font-mono text-[11.5px] font-semibold tabular-nums ${
+                        low
+                          ? "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300"
+                          : "bg-zinc-100 text-zinc-600 dark:bg-[var(--surface-2)] dark:text-zinc-300"
+                      }`}
+                    >
+                      {t("in_stock_count", { count: product.quantity_in_stock })}
+                    </span>
+                  </span>
+                  <Pencil className="hidden h-4 w-4 shrink-0 text-zinc-400 sm:block" />
+                </button>
+              </li>
+            );
+          })}
+          {visible.length === 0 && (
+            <li className="px-4 py-10 text-center text-zinc-500">{t("not_found")}</li>
+          )}
+        </ul>
       </div>
 
       <Modal isOpen={!!editingProduct} onClose={closeEdit} title={t("edit_product_title")}>
@@ -189,41 +222,41 @@ export default function ProductList({
             </div>
 
             <div className="flex flex-col gap-1">
-              <label className="text-sm font-medium">{t("item_name")}</label>
-              <input required name="name" type="text" defaultValue={editingProduct.name} className="rounded-md border border-zinc-300 p-2 text-sm dark:border-zinc-700 dark:bg-zinc-800" />
+              <label className="text-[13px] font-semibold text-zinc-700 dark:text-zinc-300">{t("item_name")}</label>
+              <input required name="name" type="text" defaultValue={editingProduct.name} className="rounded-xl border border-zinc-200 bg-[var(--surface-1)] px-3.5 py-2.5 text-[14px] dark:border-[var(--line)]" />
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="flex flex-col gap-1">
-                <label className="text-sm font-medium">{t("category")}</label>
-                <input name="category" type="text" defaultValue={editingProduct.category?.name ?? ""} placeholder={t("optional")} className="rounded-md border border-zinc-300 p-2 text-sm dark:border-zinc-700 dark:bg-zinc-800" />
+                <label className="text-[13px] font-semibold text-zinc-700 dark:text-zinc-300">{t("category")}</label>
+                <input name="category" type="text" defaultValue={editingProduct.category?.name ?? ""} placeholder={t("optional")} className="rounded-xl border border-zinc-200 bg-[var(--surface-1)] px-3.5 py-2.5 text-[14px] dark:border-[var(--line)]" />
               </div>
               <div className="flex flex-col gap-1">
-                <label className="text-sm font-medium">{t("type")}</label>
-                <input name="type" type="text" defaultValue={editingProduct.product_type ?? ""} placeholder={t("optional")} className="rounded-md border border-zinc-300 p-2 text-sm dark:border-zinc-700 dark:bg-zinc-800" />
+                <label className="text-[13px] font-semibold text-zinc-700 dark:text-zinc-300">{t("type")}</label>
+                <input name="type" type="text" defaultValue={editingProduct.product_type ?? ""} placeholder={t("optional")} className="rounded-xl border border-zinc-200 bg-[var(--surface-1)] px-3.5 py-2.5 text-[14px] dark:border-[var(--line)]" />
               </div>
               <div className="flex flex-col gap-1">
-                <label className="text-sm font-medium">{t("brand")}</label>
-                <input name="brand" type="text" defaultValue={editingProduct.brand ?? ""} placeholder={t("optional")} className="rounded-md border border-zinc-300 p-2 text-sm dark:border-zinc-700 dark:bg-zinc-800" />
+                <label className="text-[13px] font-semibold text-zinc-700 dark:text-zinc-300">{t("brand")}</label>
+                <input name="brand" type="text" defaultValue={editingProduct.brand ?? ""} placeholder={t("optional")} className="rounded-xl border border-zinc-200 bg-[var(--surface-1)] px-3.5 py-2.5 text-[14px] dark:border-[var(--line)]" />
               </div>
               <div className="flex flex-col gap-1">
-                <label className="text-sm font-medium">{t("purchase_price")}</label>
-                <input name="purchase_price" type="number" defaultValue={editingProduct.purchase_price} className="rounded-md border border-zinc-300 p-2 text-sm dark:border-zinc-700 dark:bg-zinc-800" />
+                <label className="text-[13px] font-semibold text-zinc-700 dark:text-zinc-300">{t("purchase_price")}</label>
+                <input name="purchase_price" type="number" defaultValue={editingProduct.purchase_price} className="rounded-xl border border-zinc-200 bg-[var(--surface-1)] px-3.5 py-2.5 text-[14px] dark:border-[var(--line)]" />
               </div>
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="flex flex-col gap-1">
-                <label className="text-sm font-medium">{t("selling_price")}</label>
-                <input name="selling_price" type="number" min="0" defaultValue={editingProduct.selling_price} className="rounded-md border border-zinc-300 p-2 text-sm dark:border-zinc-700 dark:bg-zinc-800" />
+                <label className="text-[13px] font-semibold text-zinc-700 dark:text-zinc-300">{t("selling_price")}</label>
+                <input name="selling_price" type="number" min="0" defaultValue={editingProduct.selling_price} className="rounded-xl border border-zinc-200 bg-[var(--surface-1)] px-3.5 py-2.5 text-[14px] dark:border-[var(--line)]" />
               </div>
               <div className="flex flex-col gap-1">
-                <label className="text-sm font-medium">{t("quantity_in_stock")}</label>
-                <input required name="quantity_in_stock" type="number" min="0" defaultValue={editingProduct.quantity_in_stock} className="rounded-md border border-zinc-300 p-2 text-sm dark:border-zinc-700 dark:bg-zinc-800" />
+                <label className="text-[13px] font-semibold text-zinc-700 dark:text-zinc-300">{t("quantity_in_stock")}</label>
+                <input required name="quantity_in_stock" type="number" min="0" defaultValue={editingProduct.quantity_in_stock} className="rounded-xl border border-zinc-200 bg-[var(--surface-1)] px-3.5 py-2.5 text-[14px] dark:border-[var(--line)]" />
               </div>
             </div>
           <div className="grid grid-cols-2 gap-4">
             <div className="flex flex-col gap-1.5">
               <label className="text-[13px] font-bold text-zinc-700 dark:text-zinc-300">{t("supplier")}</label>
-              <select name="supplier_id" defaultValue={editingProduct.supplier_id ?? ""} className="rounded-xl border border-zinc-200 bg-white px-4 py-2.5 text-[13px] font-medium dark:border-[#2d2936] dark:bg-[#1C1A22]">
+              <select name="supplier_id" defaultValue={editingProduct.supplier_id ?? ""} className="rounded-xl border border-zinc-200 bg-white px-4 py-2.5 text-[13px] font-medium dark:border-[var(--line)] dark:bg-[var(--surface-1)]">
                 <option value="">{t("no_supplier")}</option>
                 {suppliers.map((s) => (
                   <option key={s.id} value={s.id}>{s.name}</option>
@@ -232,12 +265,12 @@ export default function ProductList({
             </div>
             <div className="flex flex-col gap-1.5">
               <label className="text-[13px] font-bold text-zinc-700 dark:text-zinc-300">{t("origin_country")}</label>
-              <input type="text" name="origin_country" defaultValue={editingProduct.origin_country ?? ""} placeholder={t("optional")} className="rounded-xl border border-zinc-200 bg-white px-4 py-2.5 text-[13px] font-medium dark:border-[#2d2936] dark:bg-[#1C1A22]" />
+              <input type="text" name="origin_country" defaultValue={editingProduct.origin_country ?? ""} placeholder={t("optional")} className="rounded-xl border border-zinc-200 bg-white px-4 py-2.5 text-[13px] font-medium dark:border-[var(--line)] dark:bg-[var(--surface-1)]" />
             </div>
           </div>
             <div className="flex flex-col gap-1">
-              <label className="text-sm font-medium">{t("description")}</label>
-              <textarea name="description" rows={2} defaultValue={editingProduct.description || ""} placeholder={t("optional")} className="rounded-md border border-zinc-300 p-2 text-sm dark:border-zinc-700 dark:bg-zinc-800 resize-none" />
+              <label className="text-[13px] font-semibold text-zinc-700 dark:text-zinc-300">{t("description")}</label>
+              <textarea name="description" rows={2} defaultValue={editingProduct.description || ""} placeholder={t("optional")} className="rounded-xl border border-zinc-200 bg-[var(--surface-1)] px-3.5 py-2.5 text-[14px] dark:border-[var(--line)] resize-none" />
             </div>
             <div className="flex flex-col gap-1">
               <label className="flex items-center gap-2 text-sm font-medium cursor-pointer">

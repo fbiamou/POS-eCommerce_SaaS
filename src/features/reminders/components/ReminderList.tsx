@@ -6,6 +6,7 @@ import { useTranslations } from "next-intl";
 import { useShopFormat } from "@/components/ShopFormatProvider";
 import type { FeedbackCode } from "@/lib/feedback";
 import { sendReminder, type OverdueInvoice } from "../actions";
+import { useToast } from "@/components/ui/Toast";
 
 export type { OverdueInvoice };
 
@@ -15,6 +16,7 @@ export default function ReminderList({
   invoices: OverdueInvoice[];
 }) {
   const t = useTranslations("Reminders");
+  const showToast = useToast((state) => state.show);
   const tFeedback = useTranslations("Feedback");
   const format = useShopFormat();
   const [isPending, startTransition] = useTransition();
@@ -48,10 +50,10 @@ export default function ReminderList({
         } else {
           window.open(result.whatsappUrl, "_blank", "noopener,noreferrer");
         }
-        alert(t("manual_alert", { name: invoice.client_name, amount }));
+        showToast(t("manual_alert", { name: invoice.client_name, amount }));
       } else {
         pendingTab?.close();
-        alert(t("success_alert", { name: invoice.client_name, amount }));
+        showToast(t("success_alert", { name: invoice.client_name, amount }));
       }
     });
   };
@@ -62,11 +64,11 @@ export default function ReminderList({
         <h2 className="text-xl font-bold tracking-tight text-zinc-900 dark:text-white">{t("eligible_invoices")}</h2>
       </div>
 
-      <div className="rounded-2xl border border-zinc-100 bg-white dark:border-[#2d2936] dark:bg-[#1C1A22] shadow-sm overflow-hidden">
+      <div className="rounded-2xl border border-zinc-100 bg-white dark:border-[var(--line)] dark:bg-[var(--surface-1)] shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-[13px] min-w-[700px]">
             <thead>
-              <tr className="border-b border-zinc-100 dark:border-[#2d2936]">
+              <tr className="border-b border-zinc-100 dark:border-[var(--line)]">
                 <th className="p-4 text-[11px] font-bold text-zinc-400 tracking-widest uppercase">{t("client")}</th>
                 <th className="p-4 text-[11px] font-bold text-zinc-400 tracking-widest uppercase">{t("phone")}</th>
                 <th className="p-4 text-[11px] font-bold text-zinc-400 tracking-widest uppercase">{t("overdue_days")}</th>

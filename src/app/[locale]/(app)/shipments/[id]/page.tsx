@@ -44,7 +44,7 @@ export default async function ShipmentPage({ params }: { params: Promise<{ id: s
       </div>
 
       {shipment.photo_url && (
-        <figure className="overflow-hidden rounded-2xl border border-zinc-100 bg-white dark:border-[#2d2936] dark:bg-[#1C1A22]">
+        <figure className="overflow-hidden rounded-2xl border border-zinc-100 bg-white dark:border-[var(--line)] dark:bg-[var(--surface-1)]">
           {/* A signed, short-lived URL to a private bucket: not optimizable by next/image. */}
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={shipment.photo_url} alt={t("parcel_photo")} className="max-h-96 w-full object-contain" />
@@ -55,7 +55,7 @@ export default async function ShipmentPage({ params }: { params: Promise<{ id: s
       {shipment.status === "IN_TRANSIT" ? (
         <ShipmentReceiveForm shipmentId={shipment.id} items={shipment.items} />
       ) : shipment.items.length > 0 ? (
-        <ul className="divide-y divide-zinc-100 rounded-2xl border border-zinc-100 bg-white dark:divide-white/5 dark:border-[#2d2936] dark:bg-[#1C1A22]">
+        <ul className="divide-y divide-zinc-100 rounded-2xl border border-zinc-100 bg-white dark:divide-white/5 dark:border-[var(--line)] dark:bg-[var(--surface-1)]">
           {shipment.items.map((item) => (
             <li key={item.id} className="flex items-center justify-between gap-3 p-4 text-sm">
               <div className="min-w-0">
@@ -75,7 +75,7 @@ export default async function ShipmentPage({ params }: { params: Promise<{ id: s
           ))}
         </ul>
       ) : (
-        <p className="rounded-2xl border border-zinc-100 bg-white p-6 text-sm text-zinc-500 dark:border-[#2d2936] dark:bg-[#1C1A22]">
+        <p className="rounded-2xl border border-zinc-100 bg-white p-6 text-sm text-zinc-500 dark:border-[var(--line)] dark:bg-[var(--surface-1)]">
           {t("awaiting_declaration")}
         </p>
       )}

@@ -40,7 +40,7 @@ export default function ShipmentList({ shipments }: { shipments: ShipmentSummary
 
   if (shipments.length === 0) {
     return (
-      <div className="rounded-2xl border border-zinc-100 bg-white p-8 text-center text-sm text-zinc-500 dark:border-[#2d2936] dark:bg-[#1C1A22]">
+      <div className="rounded-2xl border border-zinc-100 bg-white p-8 text-center text-sm text-zinc-500 dark:border-[var(--line)] dark:bg-[var(--surface-1)]">
         {t("empty")}
       </div>
     );
@@ -53,7 +53,7 @@ export default function ShipmentList({ shipments }: { shipments: ShipmentSummary
         {shipments.map((shipment) => (
           <li
             key={shipment.id}
-            className="flex flex-col gap-3 rounded-2xl border border-zinc-100 bg-white p-4 shadow-sm dark:border-[#2d2936] dark:bg-[#1C1A22]"
+            className="flex flex-col gap-3 rounded-2xl border border-zinc-100 bg-white p-4 shadow-sm dark:border-[var(--line)] dark:bg-[var(--surface-1)]"
           >
             <div className="flex items-start justify-between gap-2">
               <div className="min-w-0">
@@ -85,7 +85,7 @@ export default function ShipmentList({ shipments }: { shipments: ShipmentSummary
                 <button
                   type="button"
                   onClick={() => copyLink(shipment)}
-                  className="flex items-center gap-1.5 rounded-lg border border-zinc-200 px-3 py-1.5 text-xs font-bold hover:bg-zinc-50 dark:border-[#2d2936] dark:hover:bg-white/5"
+                  className="flex items-center gap-1.5 rounded-lg border border-zinc-200 px-3 py-1.5 text-xs font-bold hover:bg-zinc-50 dark:border-[var(--line)] dark:hover:bg-white/5"
                 >
                   <Copy className="h-3.5 w-3.5" /> {copiedId === shipment.id ? t("copied") : t("copy_link")}
                 </button>
@@ -101,7 +101,7 @@ export default function ShipmentList({ shipments }: { shipments: ShipmentSummary
               {(shipment.status === "RECEIVED" || shipment.status === "CANCELLED") && (
                 <Link
                   href={`/shipments/${shipment.id}`}
-                  className="rounded-lg border border-zinc-200 px-3 py-1.5 text-xs font-bold hover:bg-zinc-50 dark:border-[#2d2936] dark:hover:bg-white/5"
+                  className="rounded-lg border border-zinc-200 px-3 py-1.5 text-xs font-bold hover:bg-zinc-50 dark:border-[var(--line)] dark:hover:bg-white/5"
                 >
                   {t("view")}
                 </Link>

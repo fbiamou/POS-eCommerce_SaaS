@@ -1,6 +1,6 @@
 {
   "Sidebar": {
-    "app_name": "Boutique POS",
+    "app_name": "WISHOP",
     "dashboard": "Tableau de Bord",
     "stock": "Stock & Produits",
     "sales": "Ventes & Facturation",
@@ -16,7 +16,7 @@
     "logout": "Se déconnecter",
     "more": "Plus",
     "tab_dashboard": "Accueil",
-    "tab_sales": "Ventes",
+    "tab_sales": "Vendre",
     "tab_stock": "Stock",
     "tab_invoices": "Factures"
   },
@@ -101,7 +101,18 @@
     "import_row_restock_failed": "« {value} » n'a pas pu être réapprovisionné",
     "supplier": "Fournisseur",
     "no_supplier": "Aucun fournisseur",
-    "origin_country": "Pays d'origine"
+    "origin_country": "Pays d'origine",
+    "search": "Rechercher un article...",
+    "filter_all": "Tout",
+    "filter_low": "Stock bas",
+    "filter_online": "En ligne",
+    "in_stock_count": "{count} en stock",
+    "summary_items": "Articles",
+    "summary_units": "Unités en stock",
+    "summary_low": "Stock bas",
+    "summary_value": "Valeur au prix d'achat",
+    "reorder": "Commander",
+    "csv_title": "Importer ou exporter le stock"
   },
   "Sales": {
     "title": "Ventes & Facturation",
@@ -114,10 +125,10 @@
     "no_results": "Aucun produit ne correspond à ces critères.",
     "stock": "Stock",
     "add": "Ajouter",
-    "cart": "Panier (Nouvelle Vente)",
+    "cart": "Panier",
     "client": "Client",
-    "default_client": "-- Client de passage (Par défaut) --",
-    "add_client": "+ Ajouter un nouveau client",
+    "default_client": "Client de passage",
+    "add_client": "+ Nouveau client",
     "full_name": "Nom complet",
     "phone": "Téléphone (WhatsApp)",
     "phone_country_code": "Indicatif du pays",
@@ -136,7 +147,25 @@
     "error_record_sale": "Erreur enregistrement vente : {message}",
     "error_unknown": "Une erreur inattendue est survenue.",
     "balance_due": "Reste à payer (enregistré comme dette) : {amount}",
-    "change_due": "Monnaie à rendre : {amount}"
+    "change_due": "Monnaie à rendre : {amount}",
+    "all_categories": "Tout",
+    "in_stock_count": "{count} en stock",
+    "cart_items": "{count, plural, one {# article} other {# articles}}",
+    "open_cart": "Encaisser",
+    "clear_cart": "Vider",
+    "remove_item": "Retirer l'article",
+    "decrease": "Un de moins",
+    "increase": "Un de plus",
+    "payment": "Paiement",
+    "pay_full": "Payé en entier",
+    "pay_credit": "À crédit ou en partie",
+    "cash_received": "Montant reçu, pour rendre la monnaie ({currency})",
+    "paid_now": "Versé aujourd'hui ({currency})",
+    "choose_client": "Choisir le client",
+    "client_required_credit": "Choisissez le client : une vente à crédit doit avoir un nom, sinon la dette ne pourra pas être relancée.",
+    "submit_amount": "Encaisser {amount}",
+    "new_sale": "Nouvelle vente",
+    "unit_price": "{price} l'unité"
   },
   "Clients": {
     "title": "Clients & Dettes",
@@ -427,7 +456,7 @@
     "shop_fallback": "Boutique"
   },
   "Auth": {
-    "title": "Boutique POS",
+    "title": "WISHOP",
     "subtitle": "Gestion de votre boutique",
     "sign_in": "Se connecter",
     "sign_up": "Créer un compte (nouvelle boutique)",
@@ -547,7 +576,7 @@
     "feature_whatsapp_title": "Relances WhatsApp",
     "feature_whatsapp_desc": "Ne laissez plus les impayés s'accumuler. Envoyez des relances professionnelles en un clic via WhatsApp.",
     "cta_demo": "Voir une démo",
-    "mock_header": "Boutique POS",
+    "mock_header": "WISHOP",
     "mock_ca": "CA du jour",
     "mock_dettes": "Dettes",
     "mock_stock": "Stock bas",
@@ -642,5 +671,8 @@
     "phone_country_code": "Indicatif du pays",
     "cancel": "Annuler",
     "save": "Enregistrer"
+  },
+  "Common": {
+    "close": "Fermer"
   }
 }

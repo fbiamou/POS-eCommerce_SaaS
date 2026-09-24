@@ -46,8 +46,9 @@ export function StockActions() {
   };
 
   return (
-    <div className="flex flex-col items-end gap-2">
-      <div className="flex gap-2">
+    <section aria-labelledby="stock-csv-title" className="flex flex-col gap-3 rounded-2xl bg-[var(--surface-1)] p-4 shadow-card">
+      <h2 id="stock-csv-title" className="text-[15px] font-bold">{t("csv_title")}</h2>
+      <div className="flex flex-wrap gap-2">
         {/* File downloads served by API routes, not page navigations: a plain link is intended. */}
         {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
         <a
@@ -55,26 +56,26 @@ export function StockActions() {
           className="flex items-center gap-2 rounded-xl bg-zinc-100 dark:bg-white/5 px-3 sm:px-4 py-2.5 text-[13px] font-bold text-zinc-700 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-white/10 transition-colors"
         >
           <FileDown className="h-4 w-4 shrink-0" />
-          <span className="hidden sm:inline">{t("download_template")}</span>
+          <span>{t("download_template")}</span>
         </a>
 
         {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
         <a
           href="/api/stock/csv-export"
-          className="flex items-center gap-2 rounded-xl border border-zinc-200 bg-white px-3 sm:px-4 py-2.5 text-[13px] font-bold text-zinc-700 hover:bg-zinc-50 dark:border-[#2d2936] dark:bg-[#1C1A22] dark:text-zinc-300 dark:hover:bg-white/[0.02] transition-colors shadow-sm"
+          className="flex items-center gap-2 rounded-xl border border-zinc-200 bg-white px-3 sm:px-4 py-2.5 text-[13px] font-bold text-zinc-700 hover:bg-zinc-50 dark:border-[var(--line)] dark:bg-[var(--surface-1)] dark:text-zinc-300 dark:hover:bg-white/[0.02] transition-colors shadow-sm"
         >
           <Download className="h-4 w-4 shrink-0" />
-          <span className="hidden sm:inline">{t("export_csv")}</span>
+          <span>{t("export_csv")}</span>
         </a>
 
         <button
           type="button"
           disabled={isPending}
           onClick={() => fileInputRef.current?.click()}
-          className="flex items-center gap-2 rounded-xl border border-zinc-200 bg-white px-3 sm:px-4 py-2.5 text-[13px] font-bold text-zinc-700 hover:bg-zinc-50 dark:border-[#2d2936] dark:bg-[#1C1A22] dark:text-zinc-300 dark:hover:bg-white/[0.02] transition-colors shadow-sm disabled:opacity-50"
+          className="flex items-center gap-2 rounded-xl border border-zinc-200 bg-white px-3 sm:px-4 py-2.5 text-[13px] font-bold text-zinc-700 hover:bg-zinc-50 dark:border-[var(--line)] dark:bg-[var(--surface-1)] dark:text-zinc-300 dark:hover:bg-white/[0.02] transition-colors shadow-sm disabled:opacity-50"
         >
           <Upload className="h-4 w-4 shrink-0" />
-          <span className="hidden sm:inline">{isPending ? t("importing") : t("import_csv")}</span>
+          <span>{isPending ? t("importing") : t("import_csv")}</span>
         </button>
         <input
           ref={fileInputRef}
@@ -87,7 +88,7 @@ export function StockActions() {
 
       {feedback && (
         <div
-          className={`max-w-md rounded-xl p-3 text-right text-[13px] font-bold shadow-sm ${
+          className={`rounded-xl p-3 text-[13px] font-bold ${
             feedback.type === "success"
               ? "bg-green-50 text-green-700 border border-green-200 dark:bg-green-900/20 dark:text-green-400 dark:border-green-900/30"
               : "bg-red-50 text-red-600 border border-red-200 dark:bg-red-900/20 dark:text-red-400 dark:border-red-900/30"
@@ -96,6 +97,6 @@ export function StockActions() {
           {feedback.message}
         </div>
       )}
-    </div>
+    </section>
   );
 }

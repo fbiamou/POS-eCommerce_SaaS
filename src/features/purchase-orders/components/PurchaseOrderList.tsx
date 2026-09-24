@@ -94,7 +94,7 @@ export default function PurchaseOrderList({
       <section>
         <h2 className="mb-3 text-lg font-bold">{t("history")}</h2>
         {orders.length === 0 ? (
-          <p className="rounded-2xl border border-zinc-100 bg-white p-6 text-center text-sm text-zinc-500 dark:border-[#2d2936] dark:bg-[#1C1A22]">
+          <p className="rounded-2xl border border-zinc-100 bg-white p-6 text-center text-sm text-zinc-500 dark:border-[var(--line)] dark:bg-[var(--surface-1)]">
             {t("no_history")}
           </p>
         ) : (
@@ -103,7 +103,7 @@ export default function PurchaseOrderList({
               <li key={order.id}>
                 <Link
                   href={`/purchase-orders/${order.id}`}
-                  className="flex flex-col gap-2 rounded-2xl border border-zinc-100 bg-white p-4 shadow-sm hover:border-violet-300 dark:border-[#2d2936] dark:bg-[#1C1A22]"
+                  className="flex flex-col gap-2 rounded-2xl border border-zinc-100 bg-white p-4 shadow-sm hover:border-violet-300 dark:border-[var(--line)] dark:bg-[var(--surface-1)]"
                 >
                   <div className="flex items-start justify-between gap-2">
                     <div className="min-w-0">

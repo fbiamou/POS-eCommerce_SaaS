@@ -124,7 +124,7 @@ export default async function DashboardPage({
       <div>
         <h1 className="text-2xl font-bold tracking-tight">{t("title")}</h1>
         {firstName && (
-          <p className="mt-1 text-sm text-[#7A7488] dark:text-[#A79FB0]">
+          <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
             {t("greeting", { name: firstName, date: format.date(now, "weekday") })}
           </p>
         )}
@@ -132,28 +132,28 @@ export default async function DashboardPage({
 
       {/* KPI Cards - Dense, 2 columns on mobile */}
       <div className="grid grid-cols-2 gap-3 md:gap-4 lg:grid-cols-4">
-        <div className="rounded-2xl border border-zinc-100 bg-white dark:border-[#2d2936] dark:bg-[#1C1A22] p-4 sm:p-5 shadow-sm flex flex-col justify-between min-h-[100px]">
+        <div className="rounded-2xl border border-zinc-100 bg-white dark:border-[var(--line)] dark:bg-[var(--surface-1)] p-4 sm:p-5 shadow-sm flex flex-col justify-between min-h-[100px]">
           <span className="text-xs font-medium text-zinc-500 dark:text-zinc-400">{t("today_ca")}</span>
           <span className="mt-2 font-mono text-[17px] sm:text-xl font-bold text-zinc-900 dark:text-white leading-tight tabular-nums">
             {format.money(todayRevenue)}
           </span>
         </div>
 
-        <div className="rounded-2xl border border-zinc-100 bg-white dark:border-[#2d2936] dark:bg-[#1C1A22] p-4 sm:p-5 shadow-sm flex flex-col justify-between min-h-[100px]">
+        <div className="rounded-2xl border border-zinc-100 bg-white dark:border-[var(--line)] dark:bg-[var(--surface-1)] p-4 sm:p-5 shadow-sm flex flex-col justify-between min-h-[100px]">
           <span className="text-xs font-medium text-zinc-500 dark:text-zinc-400">{t("sales_count")}</span>
           <span className="mt-2 font-mono text-[17px] sm:text-xl font-bold text-zinc-900 dark:text-white leading-tight tabular-nums">
             {salesCount}
           </span>
         </div>
 
-        <Link href="/clients" className="rounded-2xl border border-zinc-100 bg-white dark:border-[#2d2936] dark:bg-[#1C1A22] p-4 sm:p-5 shadow-sm flex flex-col justify-between min-h-[100px]">
+        <Link href="/clients" className="rounded-2xl border border-zinc-100 bg-white dark:border-[var(--line)] dark:bg-[var(--surface-1)] p-4 sm:p-5 shadow-sm flex flex-col justify-between min-h-[100px]">
           <span className="text-xs font-medium text-zinc-500 dark:text-zinc-400">{t("debts")}</span>
           <span className="mt-2 font-mono text-[17px] sm:text-xl font-bold text-red-600 dark:text-red-400 leading-tight tabular-nums">
             {format.money(totalDebt)}
           </span>
         </Link>
 
-        <Link href="/stock" className="rounded-2xl border border-zinc-100 bg-white dark:border-[#2d2936] dark:bg-[#1C1A22] p-4 sm:p-5 shadow-sm flex flex-col justify-between min-h-[100px]">
+        <Link href="/stock" className="rounded-2xl border border-zinc-100 bg-white dark:border-[var(--line)] dark:bg-[var(--surface-1)] p-4 sm:p-5 shadow-sm flex flex-col justify-between min-h-[100px]">
           <span className="text-xs font-medium text-zinc-500 dark:text-zinc-400">{t("low_stock")}</span>
           <span className="mt-2 text-[17px] sm:text-xl font-bold text-amber-700 dark:text-amber-400 leading-tight tabular-nums">
             {t("articles_count", { count: lowStockCount })}
@@ -162,7 +162,7 @@ export default async function DashboardPage({
       </div>
 
       <div className="grid gap-4 lg:grid-cols-2">
-        <div className="rounded-2xl border border-zinc-100 bg-white dark:border-[#2d2936] dark:bg-[#1C1A22] p-5 sm:p-6 shadow-sm">
+        <div className="rounded-2xl border border-zinc-100 bg-white dark:border-[var(--line)] dark:bg-[var(--surface-1)] p-5 sm:p-6 shadow-sm">
           <h2 className="text-[11px] font-bold text-zinc-500 tracking-widest uppercase mb-4">{t("recent_invoices")}</h2>
 
           <div className="flex flex-col gap-4">
@@ -190,7 +190,7 @@ export default async function DashboardPage({
         </div>
 
         <div className="flex flex-col gap-4">
-          <div className="rounded-2xl border border-zinc-100 bg-white dark:border-[#2d2936] dark:bg-[#1C1A22] p-5 sm:p-6 shadow-sm">
+          <div className="rounded-2xl border border-zinc-100 bg-white dark:border-[var(--line)] dark:bg-[var(--surface-1)] p-5 sm:p-6 shadow-sm">
             <h2 className="text-[11px] font-bold text-zinc-500 tracking-widest uppercase mb-4">{t("quick_actions")}</h2>
             {oldestDebt ? (
               <Link
@@ -204,7 +204,7 @@ export default async function DashboardPage({
             )}
           </div>
 
-          <div className="rounded-2xl border border-zinc-100 bg-white dark:border-[#2d2936] dark:bg-[#1C1A22] p-5 sm:p-6 shadow-sm flex-1">
+          <div className="rounded-2xl border border-zinc-100 bg-white dark:border-[var(--line)] dark:bg-[var(--surface-1)] p-5 sm:p-6 shadow-sm flex-1">
             <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
               <h2 className="text-[11px] font-bold text-zinc-500 tracking-widest uppercase">{t("top_sales")}</h2>
               <nav className="flex gap-1" aria-label={t("top_sales")}>

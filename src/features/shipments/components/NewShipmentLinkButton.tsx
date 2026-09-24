@@ -12,7 +12,7 @@ import { buildIntakeUrl } from "../matching";
 import type { OpenPurchaseOrder } from "../queries";
 
 const inputClass =
-  "w-full rounded-xl border border-zinc-200 bg-white px-4 py-2.5 text-[13px] font-medium focus:border-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-500 dark:border-[#2d2936] dark:bg-[#1C1A22]";
+  "w-full rounded-xl border border-zinc-200 bg-white px-4 py-2.5 text-[13px] font-medium focus:border-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-500 dark:border-[var(--line)] dark:bg-[var(--surface-1)]";
 
 export function NewShipmentLinkButton({
   openPurchaseOrders,
@@ -111,7 +111,7 @@ export function NewShipmentLinkButton({
               <button
                 type="button"
                 onClick={copy}
-                className="flex flex-1 items-center justify-center gap-2 rounded-xl border border-zinc-200 px-4 py-2.5 text-[13px] font-bold hover:bg-zinc-50 dark:border-[#2d2936] dark:hover:bg-white/5"
+                className="flex flex-1 items-center justify-center gap-2 rounded-xl border border-zinc-200 px-4 py-2.5 text-[13px] font-bold hover:bg-zinc-50 dark:border-[var(--line)] dark:hover:bg-white/5"
               >
                 <Copy className="h-4 w-4" /> {copied ? t("copied") : t("copy_link")}
               </button>

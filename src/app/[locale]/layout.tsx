@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Familjen_Grotesk, IBM_Plex_Mono } from "next/font/google";
+import { Bricolage_Grotesque, Figtree, Spline_Sans_Mono } from "next/font/google";
 import "../globals.css";
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages, getTranslations } from 'next-intl/server';
@@ -7,18 +7,23 @@ import { routing } from '@/i18n/routing';
 import { notFound } from 'next/navigation';
 import Script from 'next/script';
 
-// Fixed app-wide typography per the design charter — the admin app keeps a
-// single, coherent identity. Only the public storefront (boutique/[slug])
-// still lets a shop customize its own accent color and font; see ThemeStyle,
-// which is now rendered from that route instead of here.
-const appSans = Familjen_Grotesk({
+// Fixed app-wide typography from the WISHOP identity (Indigo royal): Figtree
+// for body text, Bricolage Grotesque for headings, Spline Sans Mono for
+// figures and labels. Only the public storefront (boutique/[slug]) still
+// lets a shop customize its own accent color and font; see ThemeStyle,
+// which is rendered from that route instead of here.
+const appSans = Figtree({
   variable: "--font-app-sans",
   subsets: ["latin"],
 });
 
-const appMono = IBM_Plex_Mono({
+const appDisplay = Bricolage_Grotesque({
+  variable: "--font-app-display",
+  subsets: ["latin"],
+});
+
+const appMono = Spline_Sans_Mono({
   variable: "--font-app-mono",
-  weight: ["400", "500", "600"],
   subsets: ["latin"],
 });
 
@@ -29,7 +34,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: 'Auth' });
-  // Each page sets its own title ("Stock & Produits · Boutique POS"); every
+  // Each page sets its own title ("Stock & Produits · WISHOP"); every
   // page used to be titled "Tableau de Bord", including the public ones.
   return {
     title: { default: t('title'), template: `%s · ${t('title')}` },
@@ -59,7 +64,7 @@ export default async function RootLayout({
   const messages = await getMessages();
 
   return (
-    <html lang={locale} className={`${appSans.variable} ${appMono.variable}`} suppressHydrationWarning>
+    <html lang={locale} className={`${appSans.variable} ${appDisplay.variable} ${appMono.variable}`} suppressHydrationWarning>
       <head>
         <script
           id="theme-script"

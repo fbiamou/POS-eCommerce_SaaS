@@ -8,6 +8,7 @@ import { PhoneCountryCodeSelect } from "@/components/PhoneCountryCodeSelect";
 import { PHONE_COUNTRY_CODES } from "@/lib/phoneCountryCodes";
 import { useShopFormat } from "@/components/ShopFormatProvider";
 import { addClient, updateClient } from "../actions";
+import { useToast } from "@/components/ui/Toast";
 
 export type ClientData = {
   id: string;
@@ -39,6 +40,7 @@ export default function ClientList({
   defaultPhoneCountryCode?: string;
 }) {
   const t = useTranslations("Clients");
+  const showToast = useToast((state) => state.show);
   const tFeedback = useTranslations("Feedback");
   const format = useShopFormat();
   const [searchTerm, setSearchTerm] = useState("");
@@ -83,7 +85,7 @@ export default function ClientList({
         setCreateError(tFeedback(result.error));
         return;
       }
-      alert(t("new_client_success"));
+      showToast(t("new_client_success"));
       closeNewClientModal();
     });
   };
@@ -134,21 +136,21 @@ export default function ClientList({
           </button>
         </div>
 
-        <div className="rounded-2xl border border-zinc-100 bg-white shadow-sm overflow-hidden dark:border-[#2d2936] dark:bg-[#1C1A22]">
-          <div className="p-4 border-b border-zinc-100 dark:border-[#2d2936]">
+        <div className="rounded-2xl border border-zinc-100 bg-white shadow-sm overflow-hidden dark:border-[var(--line)] dark:bg-[var(--surface-1)]">
+          <div className="p-4 border-b border-zinc-100 dark:border-[var(--line)]">
             <input
               type="text"
               placeholder={t("search")}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full max-w-sm rounded-xl border border-zinc-200 bg-white px-4 py-2.5 text-[13px] font-medium transition-colors focus:border-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-500 placeholder:text-zinc-400 dark:border-[#2d2936] dark:bg-[#1C1A22]"
+              className="w-full max-w-sm rounded-xl border border-zinc-200 bg-white px-4 py-2.5 text-[13px] font-medium transition-colors focus:border-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-500 placeholder:text-zinc-400 dark:border-[var(--line)] dark:bg-[var(--surface-1)]"
             />
           </div>
 
           <div className="overflow-x-auto">
             <table className="w-full text-left text-[13px] min-w-[700px]">
               <thead>
-                <tr className="border-b border-zinc-100 dark:border-[#2d2936]">
+                <tr className="border-b border-zinc-100 dark:border-[var(--line)]">
                   <th className="p-4 text-[11px] font-bold text-zinc-400 tracking-widest uppercase">{t("name")}</th>
                   <th className="p-4 text-[11px] font-bold text-zinc-400 tracking-widest uppercase">{t("phone")}</th>
                   <th className="p-4 text-[11px] font-bold text-zinc-400 tracking-widest uppercase">{t("status")}</th>
@@ -170,7 +172,7 @@ export default function ClientList({
                             <Star className="h-3 w-3" /> {t("loyal")}
                           </span>
                         ) : (
-                          <span className="inline-flex items-center gap-1 rounded-full bg-zinc-100 px-2.5 py-1 text-[10px] font-bold text-zinc-800 dark:bg-[#2d2936] dark:text-zinc-300">
+                          <span className="inline-flex items-center gap-1 rounded-full bg-zinc-100 px-2.5 py-1 text-[10px] font-bold text-zinc-800 dark:bg-[var(--line)] dark:text-zinc-300">
                             {t("standard")}
                           </span>
                         )}
@@ -190,7 +192,7 @@ export default function ClientList({
                         <button
                           onClick={() => openEditModal(client)}
                           title={t("edit")}
-                          className="inline-flex items-center justify-center h-8 w-8 rounded-full bg-zinc-100 text-zinc-600 hover:bg-violet-600 hover:text-white dark:bg-[#2d2936] dark:text-zinc-300 dark:hover:bg-violet-600 transition-colors"
+                          className="inline-flex items-center justify-center h-8 w-8 rounded-full bg-zinc-100 text-zinc-600 hover:bg-violet-600 hover:text-white dark:bg-[var(--line)] dark:text-zinc-300 dark:hover:bg-violet-600 transition-colors"
                         >
                           <Pencil className="h-4 w-4" />
                         </button>
@@ -221,7 +223,7 @@ export default function ClientList({
               placeholder={t("full_name_placeholder")}
               value={newName}
               onChange={(e) => setNewName(e.target.value)}
-              className="rounded-xl border border-zinc-200 bg-white px-4 py-2.5 text-[13px] font-medium transition-colors focus:border-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-500 dark:border-[#2d2936] dark:bg-[#1C1A22]"
+              className="rounded-xl border border-zinc-200 bg-white px-4 py-2.5 text-[13px] font-medium transition-colors focus:border-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-500 dark:border-[var(--line)] dark:bg-[var(--surface-1)]"
             />
           </div>
           <div className="flex flex-col gap-1.5">
@@ -233,7 +235,7 @@ export default function ClientList({
                 placeholder={t("phone_placeholder")}
                 value={newPhone}
                 onChange={(e) => setNewPhone(e.target.value)}
-                className="min-w-0 flex-1 rounded-xl border border-zinc-200 bg-white px-4 py-2.5 text-[13px] font-medium transition-colors focus:border-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-500 dark:border-[#2d2936] dark:bg-[#1C1A22]"
+                className="min-w-0 flex-1 rounded-xl border border-zinc-200 bg-white px-4 py-2.5 text-[13px] font-medium transition-colors focus:border-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-500 dark:border-[var(--line)] dark:bg-[var(--surface-1)]"
               />
             </div>
           </div>
@@ -241,7 +243,7 @@ export default function ClientList({
           {createError && <p className="text-[13px] font-medium text-red-500">{createError}</p>}
 
           <div className="mt-4 flex justify-end gap-3">
-            <button type="button" onClick={closeNewClientModal} className="rounded-xl px-5 py-2.5 text-[13px] font-bold text-zinc-700 hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-[#2d2936] transition-colors">
+            <button type="button" onClick={closeNewClientModal} className="rounded-xl px-5 py-2.5 text-[13px] font-bold text-zinc-700 hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-[var(--line)] transition-colors">
               {t("cancel")}
             </button>
             <button type="submit" disabled={isPending} className="rounded-xl bg-violet-600 px-5 py-2.5 text-[13px] font-bold text-white hover:bg-violet-700 transition-colors disabled:opacity-50 shadow-sm">
@@ -260,7 +262,7 @@ export default function ClientList({
               type="text"
               value={editName}
               onChange={(e) => setEditName(e.target.value)}
-              className="rounded-xl border border-zinc-200 bg-white px-4 py-2.5 text-[13px] font-medium transition-colors focus:border-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-500 dark:border-[#2d2936] dark:bg-[#1C1A22]"
+              className="rounded-xl border border-zinc-200 bg-white px-4 py-2.5 text-[13px] font-medium transition-colors focus:border-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-500 dark:border-[var(--line)] dark:bg-[var(--surface-1)]"
             />
           </div>
           <div className="flex flex-col gap-1.5">
@@ -272,7 +274,7 @@ export default function ClientList({
                 placeholder={t("phone_placeholder")}
                 value={editPhone}
                 onChange={(e) => setEditPhone(e.target.value)}
-                className="min-w-0 flex-1 rounded-xl border border-zinc-200 bg-white px-4 py-2.5 text-[13px] font-medium transition-colors focus:border-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-500 dark:border-[#2d2936] dark:bg-[#1C1A22]"
+                className="min-w-0 flex-1 rounded-xl border border-zinc-200 bg-white px-4 py-2.5 text-[13px] font-medium transition-colors focus:border-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-500 dark:border-[var(--line)] dark:bg-[var(--surface-1)]"
               />
             </div>
           </div>
@@ -280,7 +282,7 @@ export default function ClientList({
           {editError && <p className="text-[13px] font-medium text-red-500">{editError}</p>}
 
           <div className="mt-4 flex justify-end gap-3">
-            <button type="button" onClick={closeEditModal} className="rounded-xl px-5 py-2.5 text-[13px] font-bold text-zinc-700 hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-[#2d2936] transition-colors">
+            <button type="button" onClick={closeEditModal} className="rounded-xl px-5 py-2.5 text-[13px] font-bold text-zinc-700 hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-[var(--line)] transition-colors">
               {t("cancel")}
             </button>
             <button type="submit" disabled={isPending} className="rounded-xl bg-violet-600 px-5 py-2.5 text-[13px] font-bold text-white hover:bg-violet-700 transition-colors disabled:opacity-50 shadow-sm">
