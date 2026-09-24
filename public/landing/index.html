@@ -99,7 +99,7 @@ button{font:inherit;color:inherit}
 .b1 p + p{margin-top:.28em}
 .b2 .big,.b3 .big{font-family:var(--f-display);font-weight:800;font-size:clamp(32px,4.6vw,66px);line-height:1.04;letter-spacing:-.025em}
 .b3 .small{margin-top:22px;font-size:clamp(17px,1.45vw,21px);line-height:1.5;max-width:30ch;opacity:calc(var(--ks,1))}
-.band.settle{width:min(36vw,540px)}
+.settle{width:min(36vw,540px)}
 .settle::before{background:radial-gradient(ellipse 72% 64% at 42% 52%,rgba(5,8,30,.62) 0%,rgba(5,8,30,.4) 50%,rgba(5,8,30,0) 78%)}
 .settle h1{font-size:clamp(36px,4.8vw,70px)}
 .settle .sub{margin-top:18px;font-size:clamp(17px,1.35vw,20px);line-height:1.55;max-width:38ch;opacity:var(--ks,1);transform:translateY(calc((1 - var(--ks,1))*10px))}
@@ -131,7 +131,7 @@ button{font:inherit;color:inherit}
 @media (max-width: 720px){
   .hero{height:100vh;height:100svh}
   #hero-video,.cue,.band:not(.settle){display:none}
-  .poster{background-image:url('/landing/assets/hero-ending.jpg');background-position:64% 38%}
+  .poster{background-image:url('/landing/assets/hero-mobile.jpg');background-position:52% 30%}
   .scrim-left{background:linear-gradient(0deg,rgba(7,11,38,.94) 0%,rgba(7,11,38,.78) 34%,rgba(7,11,38,.2) 62%,rgba(7,11,38,0) 78%)}
   .settle{opacity:1;top:auto;bottom:max(28px,env(safe-area-inset-bottom,0px));transform:none;width:auto;right:var(--gutter);--k:1;--ks:1;--kb:1;--fd:0;--fg:1;pointer-events:auto}
   .settle::before{display:none}
@@ -139,7 +139,7 @@ button{font:inherit;color:inherit}
 @media (orientation: portrait) and (max-width: 1024px){
   .hero{height:100vh;height:100svh}
   #hero-video,.cue,.band:not(.settle){display:none}
-  .poster{background-image:url('/landing/assets/hero-ending.jpg');background-position:64% 38%}
+  .poster{background-image:url('/landing/assets/hero-mobile.jpg');background-position:52% 30%}
   .scrim-left{background:linear-gradient(0deg,rgba(7,11,38,.94) 0%,rgba(7,11,38,.78) 34%,rgba(7,11,38,.2) 62%,rgba(7,11,38,0) 78%)}
   .settle{opacity:1;top:auto;bottom:max(28px,env(safe-area-inset-bottom,0px));transform:none;width:auto;right:var(--gutter);--k:1;--ks:1;--kb:1;--fd:0;--fg:1;pointer-events:auto}
   .settle::before{display:none}
@@ -147,7 +147,7 @@ button{font:inherit;color:inherit}
 @media (orientation: portrait) and (pointer: coarse){
   .hero{height:100vh;height:100svh}
   #hero-video,.cue,.band:not(.settle){display:none}
-  .poster{background-image:url('/landing/assets/hero-ending.jpg');background-position:64% 38%}
+  .poster{background-image:url('/landing/assets/hero-mobile.jpg');background-position:52% 30%}
   .scrim-left{background:linear-gradient(0deg,rgba(7,11,38,.94) 0%,rgba(7,11,38,.78) 34%,rgba(7,11,38,.2) 62%,rgba(7,11,38,0) 78%)}
   .settle{opacity:1;top:auto;bottom:max(28px,env(safe-area-inset-bottom,0px));transform:none;width:auto;right:var(--gutter);--k:1;--ks:1;--kb:1;--fd:0;--fg:1;pointer-events:auto}
   .settle::before{display:none}
@@ -973,20 +973,38 @@ var videoReady = false, heroInit = false;
 function initHeroOnce(){
   if (heroInit) return; heroInit = true;
   posterEl.style.backgroundImage = "url('/landing/assets/hero-poster.jpg')";
-  var started = false;
-  function start(){ if (started) return; started = true; loadVideo().catch(function(){ video.style.display = 'none'; }); }
-  var img = new Image(); img.onload = start; img.onerror = start; img.src = '/landing/assets/hero-poster.jpg';
-  setTimeout(start, 4000);
+  streamVideo();
 }
-function loadVideo(){
-  return fetch('/landing/assets/hero-scrub.mp4').then(function(res){ if (!res.ok) throw new Error('video'); return res.blob(); }).then(function(blob){
+/* The host answers byte-range requests (checked: HTTP 206 on Vercel), so the
+   video streams: the first frames arrive in well under a second and the rest
+   downloads while the visitor reads the first caption. The whole-file Blob
+   loader stays as the fallback for a host that would not serve ranges. */
+var VIDEO_URL = '/landing/assets/hero-scrub.mp4';
+function markReady(){
+  if (videoReady) return;
+  videoReady = true;
+  requestSeek(heroProgress() * video.duration);
+  stage.classList.add('video-ready');
+}
+function streamVideo(){
+  var fellBack = false;
+  function fallback(){
+    if (fellBack || videoReady) return; fellBack = true;
+    video.removeAttribute('src'); video.load();
+    loadVideoBlob().catch(function(){ video.style.display = 'none'; });
+  }
+  video.preload = 'auto';
+  video.addEventListener('loadeddata', markReady, { once:true });
+  video.addEventListener('error', fallback, { once:true });
+  setTimeout(function(){ if (!videoReady && video.readyState < 1) fallback(); }, 12000);
+  video.src = VIDEO_URL;
+  video.load();
+}
+function loadVideoBlob(){
+  return fetch(VIDEO_URL).then(function(res){ if (!res.ok) throw new Error('video'); return res.blob(); }).then(function(blob){
     video.src = URL.createObjectURL(blob);
     video.load();
-    video.addEventListener('canplay', function(){
-      videoReady = true;
-      requestSeek(heroProgress() * video.duration);
-      stage.classList.add('video-ready');
-    }, { once:true });
+    video.addEventListener('canplay', markReady, { once:true });
   });
 }
 
