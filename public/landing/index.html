@@ -985,15 +985,18 @@ var VIDEO_URL = '/landing/assets/hero-scrub.mp4';
 /* Computer screens from about 1800 physical pixels wide then upgrade to the 2K
    upscale, downloaded in the background and swapped in without a cut once it is
    ready. Measured at 4 Mbit/s on a 1920 screen, loading the 2K first delayed the
-   start from 4-5 s to 6-9 s; this way the start stays fast. Data-saving and
-   2G/3G connections never download it. */
+   start from 4-5 s to 6-9 s; this way the start stays fast. Data-saving mode and
+   2G never download it. The browser's own speed estimate is not used to decide:
+   Chrome reports about 1.5 Mbit/s at load whatever the line, and labels any line
+   with more than about 270 ms of round trip as "3g", which is the normal case
+   from Central Africa to the host even on a good connection. */
 var VIDEO_2K_URL = '/landing/assets/hero-scrub-2k.mp4';
 var WANT_2K = (function(){
   var px = Math.max(innerWidth, innerHeight * 16 / 9) * (window.devicePixelRatio || 1);
   var c = navigator.connection || {};
-  return px > 1800 && !c.saveData && !/(^|-)2g|3g/.test(c.effectiveType || '');
+  return px > 1800 && !c.saveData && !/(^|-)2g/.test(c.effectiveType || '');
 })();
-var upgraded = false;
+var upgraded = false, streamStart = 0;
 function markReady(){
   if (videoReady) return;
   videoReady = true;
@@ -1002,13 +1005,15 @@ function markReady(){
   if (WANT_2K) afterFullBuffer(upgradeTo2k);
 }
 /* The 2K download waits until the 1080p file is fully buffered, so the two never
-   share the bandwidth while the visitor scrolls. */
+   share the bandwidth while the visitor scrolls. The time that took is the real
+   speed of the line: the 1080p file is 27.5 Mbit and the 2K 33.8 Mbit, so the 2K
+   only follows when the 1080p arrived within about 20 s (1.35 Mbit/s or more),
+   which brings the 2K in under about 25 s. Slower lines keep the 1080p. */
 function afterFullBuffer(cb){
-  var tries = 0;
   (function check(){
-    var b = video.buffered;
-    if ((b.length && b.end(b.length - 1) >= video.duration - 0.2) || ++tries > 40) cb();
-    else setTimeout(check, 1000);
+    var b = video.buffered, secs = (performance.now() - streamStart) / 1000;
+    if (b.length && b.end(b.length - 1) >= video.duration - 0.2) { if (27.5 / Math.max(secs, 0.1) >= 1.35) cb(); }
+    else if (secs < 40) setTimeout(check, 1000);
   })();
 }
 function streamVideo(){
@@ -1022,6 +1027,7 @@ function streamVideo(){
   video.addEventListener('loadeddata', markReady, { once:true });
   video.addEventListener('error', fallback, { once:true });
   setTimeout(function(){ if (!videoReady && video.readyState < 1) fallback(); }, 12000);
+  streamStart = performance.now();
   video.src = VIDEO_URL;
   video.load();
 }
