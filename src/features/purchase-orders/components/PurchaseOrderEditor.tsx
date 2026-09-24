@@ -2,23 +2,42 @@
 
 import { useState, useTransition } from "react";
 import { useLocale, useTranslations } from "next-intl";
-import { Download, MessageCircle } from "lucide-react";
+import { Download, MessageCircle, PackageCheck, Minus, Plus } from "lucide-react";
 import { buildWhatsAppClickToChatUrl } from "@/features/reminders/whatsapp";
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
+import { useToast } from "@/components/ui/Toast";
 import type { FeedbackCode } from "@/lib/feedback";
-import { setPurchaseOrderStatus, updatePurchaseOrderLine } from "../actions";
+import { receivePurchaseOrder, setPurchaseOrderStatus, updatePurchaseOrderLine } from "../actions";
 import { buildOrderMessage, describeOrderedItem } from "../message";
+import { buildReceivedPayload, initialReceived, receptionSummary, type ReceivedEntry } from "../reception";
 import type { PurchaseOrderDetail } from "../queries";
+
+const secondaryButton =
+  "flex items-center gap-2 rounded-xl bg-[var(--surface-1)] px-4 py-2.5 text-[14px] font-semibold text-zinc-800 shadow-[inset_0_0_0_1px_var(--line)] transition-colors hover:bg-zinc-100 disabled:opacity-50 dark:text-zinc-200";
 
 export function PurchaseOrderEditor({ order, shopName }: { order: PurchaseOrderDetail; shopName: string }) {
   const t = useTranslations("PurchaseOrders");
   const tFeedback = useTranslations("Feedback");
+  const showToast = useToast((state) => state.show);
   const locale = useLocale();
   const [quantities, setQuantities] = useState<Record<string, string>>(() =>
     Object.fromEntries(order.lines.map((line) => [line.id, String(line.quantity)]))
   );
   const [error, setError] = useState<FeedbackCode | null>(null);
   const [isPending, startTransition] = useTransition();
+  const [confirmCancel, setConfirmCancel] = useState(false);
+  // Reception: the owner checks off what the supplier actually delivered.
+  const [receiving, setReceiving] = useState(false);
+  const [received, setReceived] = useState<Record<string, string>>(() => initialReceived(order.lines));
+  const [pendingEntries, setPendingEntries] = useState<ReceivedEntry[] | null>(null);
+
   const isDraft = order.status === "DRAFT";
+  const isSent = order.status === "SENT";
+  // A purchase order followed by a shipment link is received through that
+  // shipment; checking it off here too would count the goods twice.
+  const hasActiveShipment = order.shipments.some((s) => s.status !== "CANCELLED");
+  const canReceive = isSent && !hasActiveShipment;
+  const activeLines = order.lines.filter((line) => !line.excluded);
 
   const saveLine = (lineId: string, excluded: boolean) => {
     const quantity = Number(quantities[lineId]);
@@ -33,14 +52,41 @@ export function PurchaseOrderEditor({ order, shopName }: { order: PurchaseOrderD
     });
   };
 
-  const changeStatus = (status: "SENT" | "RECEIVED" | "CANCELLED", confirmKey?: string) => {
-    if (confirmKey && !confirm(t(confirmKey))) return;
+  const changeStatus = (status: "SENT" | "CANCELLED") => {
     setError(null);
     startTransition(async () => {
       const result = await setPurchaseOrderStatus(order.id, status);
+      setConfirmCancel(false);
       if (result.error) setError(result.error);
     });
   };
+
+  const askReceptionConfirm = () => {
+    const payload = buildReceivedPayload(order.lines, received);
+    if ("error" in payload) {
+      setError(payload.error);
+      return;
+    }
+    setError(null);
+    setPendingEntries(payload.entries);
+  };
+
+  const confirmReception = () => {
+    if (!pendingEntries) return;
+    startTransition(async () => {
+      const result = await receivePurchaseOrder(order.id, pendingEntries);
+      setPendingEntries(null);
+      if (result.error) {
+        setError(result.error);
+        return;
+      }
+      setReceiving(false);
+      showToast(t("received_toast"));
+    });
+  };
+
+  const stepReceived = (lineId: string, delta: number) =>
+    setReceived((prev) => ({ ...prev, [lineId]: String(Math.max(0, (parseInt(prev[lineId] ?? "0", 10) || 0) + delta)) }));
 
   const message = buildOrderMessage(
     t("whatsapp_header", { supplier: order.supplier_name ?? "", reference: order.reference }),
@@ -52,14 +98,20 @@ export function PurchaseOrderEditor({ order, shopName }: { order: PurchaseOrderD
     ? buildWhatsAppClickToChatUrl(order.supplier_phone, message)
     : `https://wa.me/?text=${encodeURIComponent(message)}`;
 
+  const summary = pendingEntries ? receptionSummary(order.lines, pendingEntries) : null;
+
   return (
     <div className="flex flex-col gap-4">
-      <ul className="divide-y divide-zinc-100 rounded-2xl border border-zinc-100 bg-white dark:divide-white/5 dark:border-[var(--line)] dark:bg-[var(--surface-1)]">
+      {receiving && (
+        <p className="rounded-2xl bg-violet-50 p-4 text-[14px] text-violet-900 dark:text-violet-200">{t("reception_hint")}</p>
+      )}
+
+      <ul className="divide-y divide-zinc-200 overflow-hidden rounded-2xl bg-[var(--surface-1)] shadow-card dark:divide-[var(--line)]">
         {order.lines.map((line) => (
-          <li key={line.id} className={`flex flex-col gap-3 p-4 sm:flex-row sm:items-center ${line.excluded ? "opacity-50" : ""}`}>
+          <li key={line.id} className={`flex flex-col gap-3 px-4 py-3.5 sm:flex-row sm:items-center ${line.excluded ? "opacity-50" : ""}`}>
             <div className="min-w-0 flex-1">
-              <p className={`text-sm font-bold ${line.excluded ? "line-through" : ""}`}>{describeOrderedItem(line)}</p>
-              <p className="text-xs text-zinc-500">
+              <p className={`text-[14px] font-semibold ${line.excluded ? "line-through" : ""}`}>{describeOrderedItem(line)}</p>
+              <p className="text-[12.5px] text-zinc-500">
                 {t("stock_then_now", { then: line.stock_at_creation, now: line.current_stock })}
               </p>
             </div>
@@ -74,78 +126,147 @@ export function PurchaseOrderEditor({ order, shopName }: { order: PurchaseOrderD
                   onChange={(e) => setQuantities((prev) => ({ ...prev, [line.id]: e.target.value }))}
                   onBlur={() => Number(quantities[line.id]) !== line.quantity && saveLine(line.id, line.excluded)}
                   disabled={line.excluded || isPending}
-                  className="w-24 rounded-xl border border-zinc-200 px-3 py-2 text-sm dark:border-[var(--line)] dark:bg-[var(--surface-0)]"
+                  className="w-24 rounded-xl border border-zinc-200 bg-[var(--surface-1)] px-3 py-2 font-mono text-[14px] dark:border-[var(--line)]"
                 />
                 <button
                   type="button"
                   onClick={() => saveLine(line.id, !line.excluded)}
                   disabled={isPending}
-                  className="rounded-lg px-3 py-2 text-xs font-bold text-zinc-600 hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-white/5"
+                  className="rounded-lg px-3 py-2 text-[13px] font-semibold text-zinc-600 hover:bg-zinc-100 dark:text-zinc-300"
                 >
                   {line.excluded ? t("include_line") : t("exclude_line")}
                 </button>
               </div>
+            ) : receiving && !line.excluded ? (
+              <div className="flex items-center gap-3">
+                <span className="text-[12.5px] text-zinc-500">{t("ordered_value", { quantity: line.quantity })}</span>
+                <div className="flex items-center rounded-full bg-zinc-100 dark:bg-[var(--surface-2)]">
+                  <button type="button" aria-label={t("one_less")} onClick={() => stepReceived(line.id, -1)} className="rounded-full p-2.5 hover:bg-zinc-200 dark:hover:bg-[var(--surface-3)]">
+                    <Minus className="h-4 w-4" />
+                  </button>
+                  <input
+                    type="number"
+                    inputMode="numeric"
+                    min={0}
+                    aria-label={t("received_quantity")}
+                    value={received[line.id] ?? ""}
+                    onChange={(e) => setReceived((prev) => ({ ...prev, [line.id]: e.target.value }))}
+                    className="w-12 bg-transparent text-center font-mono text-[15px] font-semibold tabular-nums outline-none"
+                  />
+                  <button type="button" aria-label={t("one_more")} onClick={() => stepReceived(line.id, 1)} className="rounded-full p-2.5 hover:bg-zinc-200 dark:hover:bg-[var(--surface-3)]">
+                    <Plus className="h-4 w-4" />
+                  </button>
+                </div>
+              </div>
+            ) : order.status === "RECEIVED" && line.received_quantity !== null ? (
+              <p className={`font-mono text-[13px] font-semibold tabular-nums ${line.received_quantity < line.quantity ? "text-amber-700 dark:text-amber-400" : "text-emerald-700 dark:text-emerald-400"}`}>
+                {t("received_of_ordered", { received: line.received_quantity, ordered: line.quantity })}
+              </p>
             ) : (
-              <p className="text-sm font-bold tabular-nums">{t("quantity_value", { quantity: line.quantity })}</p>
+              <p className="font-mono text-[13px] font-semibold tabular-nums">
+                {order.status === "DRAFT" || isSent ? t("quantity_value", { quantity: line.quantity }) : t("ordered_value", { quantity: line.quantity })}
+              </p>
             )}
           </li>
         ))}
       </ul>
 
-      {error && <p className="text-sm font-medium text-red-600">{tFeedback(error)}</p>}
+      {error && <p role="alert" className="rounded-xl bg-red-50 p-3 text-[14px] font-semibold text-red-700 dark:bg-red-900/20 dark:text-red-400">{tFeedback(error)}</p>}
 
-      <div className="flex flex-wrap gap-2">
-        {(isDraft || order.status === "SENT") && (
-          <a
-            href={whatsappUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            onClick={() => isDraft && changeStatus("SENT")}
-            className="flex items-center gap-2 rounded-xl bg-[#128C7E] px-4 py-2.5 text-[13px] font-bold text-white hover:bg-[#0e6f63]"
+      {receiving ? (
+        <div className="flex flex-wrap gap-2">
+          <button
+            type="button"
+            onClick={askReceptionConfirm}
+            disabled={isPending || activeLines.length === 0}
+            className="flex items-center gap-2 rounded-xl bg-violet-600 px-5 py-3 text-[15px] font-bold text-white hover:bg-violet-700 disabled:opacity-50"
           >
-            <MessageCircle className="h-4 w-4" /> {isDraft ? t("send_whatsapp") : t("resend_whatsapp")}
+            <PackageCheck className="h-5 w-5" /> {t("validate_reception")}
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              setReceiving(false);
+              setReceived(initialReceived(order.lines));
+              setError(null);
+            }}
+            className="rounded-xl px-4 py-3 text-[14px] font-semibold text-zinc-600 hover:bg-zinc-100 dark:text-zinc-300"
+          >
+            {t("cancel_reception")}
+          </button>
+        </div>
+      ) : (
+        <div className="flex flex-wrap gap-2">
+          {canReceive && (
+            <button
+              type="button"
+              onClick={() => setReceiving(true)}
+              className="flex w-full items-center justify-center gap-2 rounded-xl bg-violet-600 px-5 py-3 text-[15px] font-bold text-white hover:bg-violet-700 sm:w-auto"
+            >
+              <PackageCheck className="h-5 w-5" /> {t("receive_order")}
+            </button>
+          )}
+          {(isDraft || isSent) && (
+            <a
+              href={whatsappUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => isDraft && changeStatus("SENT")}
+              className="flex items-center gap-2 rounded-xl bg-[#128C7E] px-4 py-2.5 text-[14px] font-bold text-white hover:bg-[#0e6f63]"
+            >
+              <MessageCircle className="h-4 w-4" /> {isDraft ? t("send_whatsapp") : t("resend_whatsapp")}
+            </a>
+          )}
+          {/* A generated file served by an API route, not a page navigation. */}
+          <a href={`/api/purchase-orders/${order.id}/pdf?locale=${locale}`} target="_blank" rel="noreferrer" className={secondaryButton}>
+            <Download className="h-4 w-4" /> {t("download_pdf")}
           </a>
+          {isDraft && (
+            <button type="button" onClick={() => changeStatus("SENT")} disabled={isPending} className={secondaryButton}>
+              {t("mark_sent")}
+            </button>
+          )}
+          {(isDraft || isSent) && (
+            <button
+              type="button"
+              onClick={() => setConfirmCancel(true)}
+              disabled={isPending}
+              className="rounded-xl px-4 py-2.5 text-[14px] font-semibold text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20"
+            >
+              {t("cancel_order")}
+            </button>
+          )}
+        </div>
+      )}
+
+      <ConfirmDialog
+        isOpen={confirmCancel}
+        title={t("cancel_order")}
+        confirmLabel={t("cancel_order")}
+        tone="danger"
+        pending={isPending}
+        onConfirm={() => changeStatus("CANCELLED")}
+        onCancel={() => setConfirmCancel(false)}
+      >
+        {t("confirm_cancel_order")}
+      </ConfirmDialog>
+
+      <ConfirmDialog
+        isOpen={pendingEntries !== null}
+        title={t("validate_reception")}
+        confirmLabel={t("confirm_reception")}
+        pending={isPending}
+        onConfirm={confirmReception}
+        onCancel={() => setPendingEntries(null)}
+      >
+        {summary && (
+          <div className="flex flex-col gap-2">
+            <p>{t("reception_units", { units: summary.units })}</p>
+            {summary.shortLines > 0 && <p className="text-amber-700 dark:text-amber-400">{t("reception_short", { count: summary.shortLines })}</p>}
+            {summary.overLines > 0 && <p>{t("reception_over", { count: summary.overLines })}</p>}
+          </div>
         )}
-        {/* A generated file served by an API route, not a page navigation. */}
-        <a
-          href={`/api/purchase-orders/${order.id}/pdf?locale=${locale}`}
-          target="_blank"
-          rel="noreferrer"
-          className="flex items-center gap-2 rounded-xl border border-zinc-200 px-4 py-2.5 text-[13px] font-bold hover:bg-zinc-50 dark:border-[var(--line)] dark:hover:bg-white/5"
-        >
-          <Download className="h-4 w-4" /> {t("download_pdf")}
-        </a>
-        {isDraft && (
-          <button
-            type="button"
-            onClick={() => changeStatus("SENT")}
-            disabled={isPending}
-            className="rounded-xl border border-zinc-200 px-4 py-2.5 text-[13px] font-bold hover:bg-zinc-50 dark:border-[var(--line)] dark:hover:bg-white/5"
-          >
-            {t("mark_sent")}
-          </button>
-        )}
-        {order.status === "SENT" && (
-          <button
-            type="button"
-            onClick={() => changeStatus("RECEIVED", "confirm_received")}
-            disabled={isPending}
-            className="rounded-xl border border-zinc-200 px-4 py-2.5 text-[13px] font-bold hover:bg-zinc-50 dark:border-[var(--line)] dark:hover:bg-white/5"
-          >
-            {t("mark_received")}
-          </button>
-        )}
-        {(isDraft || order.status === "SENT") && (
-          <button
-            type="button"
-            onClick={() => changeStatus("CANCELLED", "confirm_cancel_order")}
-            disabled={isPending}
-            className="rounded-xl px-4 py-2.5 text-[13px] font-bold text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20"
-          >
-            {t("cancel_order")}
-          </button>
-        )}
-      </div>
+      </ConfirmDialog>
     </div>
   );
 }

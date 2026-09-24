@@ -318,21 +318,33 @@
     "resend_whatsapp": "Send again via WhatsApp",
     "download_pdf": "Download PDF",
     "mark_sent": "Mark as sent",
-    "mark_received": "Mark as received",
-    "confirm_received": "Mark this order as received? It adds nothing to the stock: goods enter the stock when you check their shipment.",
     "cancel_order": "Cancel order",
     "confirm_cancel_order": "Cancel this purchase order?",
     "whatsapp_header": "Hello {supplier}, here is our order {reference}:",
     "whatsapp_footer": "Please confirm availability and lead time. {shop}",
     "reception_title": "Reception",
-    "reception_explanation": "Goods enter the stock when you check their shipment. Create a collection link for the intermediary who will send this parcel.",
+    "reception_explanation": "Two ways to receive: check off the supplier's delivery with \"Receive the order\", or, if an intermediary sends the parcel, create a collection link and check off its shipment. Either way, only the quantities checked off enter the stock.",
     "create_collection_link": "Create a collection link for this order",
     "pdf_title": "Purchase order",
     "ref": "Ref.",
     "date": "Date",
     "supplier": "Supplier",
     "article": "Item",
-    "shop_fallback": "Shop"
+    "shop_fallback": "Shop",
+    "receive_order": "Receive the order",
+    "reception_hint": "For each item, enter the quantity actually received. Enter 0 for an item that was not delivered.",
+    "ordered_value": "{quantity} ordered",
+    "received_quantity": "Quantity received",
+    "one_less": "One less",
+    "one_more": "One more",
+    "validate_reception": "Confirm the delivery",
+    "cancel_reception": "Cancel",
+    "confirm_reception": "Add to stock",
+    "reception_units": "{units, plural, =0 {Nothing will enter the stock.} one {# unit will enter the stock.} other {# units will enter the stock.}}",
+    "reception_short": "{count, plural, one {# item delivered short of the order.} other {# items delivered short of the order.}}",
+    "reception_over": "{count, plural, one {# item delivered above the order.} other {# items delivered above the order.}}",
+    "received_of_ordered": "{received} received of {ordered}",
+    "received_toast": "Delivery recorded: the stock is up to date."
   },
   "Procurement": {
     "page_title": "Parcel declaration",
@@ -583,7 +595,19 @@
     "font_default": "{name} (default)",
     "members_count": "{count, plural, one {# member} other {# members}}",
     "employee_name_placeholder": "First and last name",
-    "password_min_hint": "At least 6 characters"
+    "password_min_hint": "At least 6 characters",
+    "country_GQ": "Equatorial Guinea",
+    "country_CM": "Cameroon",
+    "country_GA": "Gabon",
+    "country_CG": "Congo",
+    "country_TD": "Chad",
+    "country_CF": "Central African Republic",
+    "country": "Shop's country",
+    "country_hint": "Pre-fills the dialling code, time zone and VAT rate; everything stays editable.",
+    "country_other": "Other country",
+    "tax_id_NIU": "NIU (unique tax ID)",
+    "tax_id_NIF": "NIF (tax ID number)",
+    "tax_id_generic": "Tax ID"
   },
   "Landing": {
     "hero_title_1": "Your business,",
@@ -680,7 +704,8 @@
     "purchase_order_not_found": "Purchase order not found.",
     "purchase_order_not_editable": "This order can no longer be changed: it has already been sent.",
     "invalid_status_change": "This status change is not possible.",
-    "terms_required": "Tick the box to accept the terms of use."
+    "terms_required": "Tick the box to accept the terms of use.",
+    "purchase_order_has_shipment": "This order is followed by a shipment: receive the goods by checking off the shipment."
   },
   "Suppliers": {
     "title": "Suppliers",
@@ -700,6 +725,7 @@
   "Common": {
     "close": "Close",
     "search": "Search",
-    "no_results": "No results"
+    "no_results": "No results",
+    "cancel": "Cancel"
   }
 }

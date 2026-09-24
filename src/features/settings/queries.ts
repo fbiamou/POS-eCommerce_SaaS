@@ -34,6 +34,7 @@ const SETTINGS_COLUMNS = [
   "default_phone_country_code",
   "low_stock_threshold",
   "timezone",
+  "country_code",
 ].join(", ");
 
 export type ShopSettings = {
@@ -58,6 +59,7 @@ export type ShopSettings = {
   whatsapp_template_name: string | null;
   whatsapp_token_set: boolean;
   shop_slug: string | null;
+  country_code: string | null;
   default_phone_country_code: string;
   low_stock_threshold: number;
   timezone: string;

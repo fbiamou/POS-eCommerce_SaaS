@@ -5,6 +5,7 @@ import { createClient } from "@/utils/supabase/server";
 import { getCurrentProfile } from "@/features/auth/actions";
 import { feedbackFromError, type FeedbackCode } from "@/lib/feedback";
 import type { PurchaseOrderStatus } from "./queries";
+import type { ReceivedEntry } from "./reception";
 
 function revalidateOrderPages(id?: string) {
   revalidatePath("/purchase-orders");
@@ -53,11 +54,11 @@ export async function updatePurchaseOrderLine(
   return { success: true };
 }
 
-// Draft -> sent -> received, or cancelled before reception. None of these
-// touches the stock: goods enter it only when a shipment is checked off.
+// Draft -> sent, or cancelled before reception. None of these touches the
+// stock: goods enter it only when the order (or its shipment) is checked off.
 export async function setPurchaseOrderStatus(
   orderId: string,
-  status: Exclude<PurchaseOrderStatus, "DRAFT">
+  status: Exclude<PurchaseOrderStatus, "DRAFT" | "RECEIVED">
 ): Promise<{ success?: true; error?: FeedbackCode }> {
   const profile = await getCurrentProfile();
   if (!profile) return { error: "unauthorized" };
@@ -73,5 +74,32 @@ export async function setPurchaseOrderStatus(
     return { error: feedbackFromError(error) };
   }
   revalidateOrderPages(orderId);
+  return { success: true };
+}
+
+// The supplier delivered: only the quantities checked off enter the stock,
+// each with a logged RESTOCK movement (receive_purchase_order).
+export async function receivePurchaseOrder(
+  orderId: string,
+  entries: ReceivedEntry[]
+): Promise<{ success?: true; error?: FeedbackCode }> {
+  const profile = await getCurrentProfile();
+  if (!profile) return { error: "unauthorized" };
+  if (entries.some((e) => !Number.isInteger(e.received_quantity) || e.received_quantity < 0)) {
+    return { error: "invalid_quantity" };
+  }
+
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("receive_purchase_order", {
+    _shop_id: profile.shop_id,
+    _order_id: orderId,
+    _received: entries,
+  });
+  if (error) {
+    console.error("receive_purchase_order failed:", error);
+    return { error: feedbackFromError(error) };
+  }
+  revalidateOrderPages(orderId);
+  revalidatePath("/stock");
   return { success: true };
 }

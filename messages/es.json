@@ -318,21 +318,33 @@
     "resend_whatsapp": "Reenviar por WhatsApp",
     "download_pdf": "Descargar el PDF",
     "mark_sent": "Marcar como enviada",
-    "mark_received": "Marcar como recibida",
-    "confirm_received": "¿Marcar esta orden como recibida? No añade nada al stock: la mercancía entra en el stock cuando revisa su llegada.",
     "cancel_order": "Cancelar la orden",
     "confirm_cancel_order": "¿Cancelar esta orden de compra?",
     "whatsapp_header": "Hola {supplier}, este es nuestro pedido {reference}:",
     "whatsapp_footer": "Por favor, confírmenos la disponibilidad y el plazo. {shop}",
     "reception_title": "Recepción",
-    "reception_explanation": "La mercancía entra en el stock cuando revisa su llegada. Cree un enlace de recogida para el intermediario que enviará este paquete.",
+    "reception_explanation": "Dos formas de recibir: marca la entrega del proveedor con «Recibir el pedido» o, si un intermediario envía el paquete, crea un enlace de recogida y marca su llegada. En ambos casos solo entran en stock las cantidades marcadas.",
     "create_collection_link": "Crear un enlace de recogida para esta orden",
     "pdf_title": "Orden de compra",
     "ref": "Ref.",
     "date": "Fecha",
     "supplier": "Proveedor",
     "article": "Artículo",
-    "shop_fallback": "Tienda"
+    "shop_fallback": "Tienda",
+    "receive_order": "Recibir el pedido",
+    "reception_hint": "Indica para cada artículo la cantidad realmente recibida. Pon 0 si un artículo no llegó.",
+    "ordered_value": "{quantity} pedidos",
+    "received_quantity": "Cantidad recibida",
+    "one_less": "Uno menos",
+    "one_more": "Uno más",
+    "validate_reception": "Validar la recepción",
+    "cancel_reception": "Cancelar",
+    "confirm_reception": "Añadir al stock",
+    "reception_units": "{units, plural, =0 {No entrará nada en stock.} one {# unidad entrará en stock.} other {# unidades entrarán en stock.}}",
+    "reception_short": "{count, plural, one {# artículo entregado por debajo del pedido.} other {# artículos entregados por debajo del pedido.}}",
+    "reception_over": "{count, plural, one {# artículo entregado por encima del pedido.} other {# artículos entregados por encima del pedido.}}",
+    "received_of_ordered": "{received} recibidos de {ordered}",
+    "received_toast": "Recepción registrada: el stock está al día."
   },
   "Procurement": {
     "page_title": "Declaración de paquete",
@@ -448,7 +460,7 @@
     "print": "Imprimir",
     "thank_you": "¡Gracias por su visita!",
     "not_found": "Factura no encontrada.",
-    "tax_id_label": "NIU",
+    "tax_id_label": "N.º fiscal",
     "trade_register_label": "RCCM",
     "back": "Volver",
     "record_payment": "Registrar un pago",
@@ -583,7 +595,19 @@
     "font_default": "{name} (predeterminada)",
     "members_count": "{count, plural, one {# miembro} other {# miembros}}",
     "employee_name_placeholder": "Nombre y apellido",
-    "password_min_hint": "6 caracteres como mínimo"
+    "password_min_hint": "6 caracteres como mínimo",
+    "country_GQ": "Guinea Ecuatorial",
+    "country_CM": "Camerún",
+    "country_GA": "Gabón",
+    "country_CG": "Congo",
+    "country_TD": "Chad",
+    "country_CF": "República Centroafricana",
+    "country": "País de la tienda",
+    "country_hint": "Rellena el prefijo, la zona horaria y el tipo de IVA; todo sigue siendo editable.",
+    "country_other": "Otro país",
+    "tax_id_NIU": "NIU (número de identificación único)",
+    "tax_id_NIF": "NIF (número de identificación fiscal)",
+    "tax_id_generic": "Identificación fiscal"
   },
   "Landing": {
     "hero_title_1": "Tu negocio,",
@@ -680,7 +704,8 @@
     "purchase_order_not_found": "Orden de compra no encontrada.",
     "purchase_order_not_editable": "Esta orden ya no se puede modificar: ya fue enviada.",
     "invalid_status_change": "Este cambio de estado no es posible.",
-    "terms_required": "Marca la casilla para aceptar las condiciones de uso."
+    "terms_required": "Marca la casilla para aceptar las condiciones de uso.",
+    "purchase_order_has_shipment": "Este pedido tiene un envío asociado: recibe la mercancía marcando ese envío."
   },
   "Suppliers": {
     "title": "Proveedores",
@@ -700,6 +725,7 @@
   "Common": {
     "close": "Cerrar",
     "search": "Buscar",
-    "no_results": "Sin resultados"
+    "no_results": "Sin resultados",
+    "cancel": "Cancelar"
   }
 }

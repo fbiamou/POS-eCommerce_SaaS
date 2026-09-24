@@ -93,6 +93,8 @@ export type PurchaseOrderLine = {
   stock_at_creation: number;
   current_stock: number;
   excluded: boolean;
+  /** Checked off at reception; null until the order is received. */
+  received_quantity: number | null;
 };
 
 export type PurchaseOrderDetail = PurchaseOrderSummary & {
@@ -107,6 +109,7 @@ type LineRow = {
   quantity: number;
   stock_at_creation: number;
   excluded: boolean;
+  received_quantity: number | null;
   products: { name: string; brand: string | null; product_type: string | null; quantity_in_stock: number } | null;
 };
 
@@ -120,7 +123,7 @@ export async function getPurchaseOrderDetail(id: string): Promise<PurchaseOrderD
       .maybeSingle(),
     supabase
       .from("purchase_order_items")
-      .select("id, product_id, quantity, stock_at_creation, excluded, products(name, brand, product_type, quantity_in_stock)")
+      .select("id, product_id, quantity, stock_at_creation, excluded, received_quantity, products(name, brand, product_type, quantity_in_stock)")
       .eq("purchase_order_id", id)
       .order("created_at", { ascending: true }),
     supabase.from("shipments").select("id, reference, status").eq("purchase_order_id", id).order("created_at"),
@@ -154,6 +157,7 @@ export async function getPurchaseOrderDetail(id: string): Promise<PurchaseOrderD
       stock_at_creation: line.stock_at_creation,
       current_stock: line.products?.quantity_in_stock ?? 0,
       excluded: line.excluded,
+      received_quantity: line.received_quantity,
     })),
     shipments: shipments ?? [],
   };

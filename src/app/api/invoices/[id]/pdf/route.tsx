@@ -5,6 +5,7 @@ import { getInvoiceDetail } from "@/features/invoices/actions";
 import { getShopSettings } from "@/features/settings/queries";
 import { routing } from "@/i18n/routing";
 import { InvoiceDocument, type InvoiceLabels } from "@/features/invoices/components/InvoiceDocument";
+import { taxIdLabelFor } from "@/lib/countries";
 
 export const runtime = "nodejs";
 
@@ -44,7 +45,7 @@ export async function GET(
     status_paid: t("status_paid"),
     status_partial: t("status_partial"),
     status_unpaid: t("status_unpaid"),
-    tax_id_label: t("tax_id_label"),
+    tax_id_label: taxIdLabelFor(shop?.country_code) ?? t("tax_id_label"),
     trade_register_label: t("trade_register_label"),
     shop_fallback: t("shop_fallback"),
   };

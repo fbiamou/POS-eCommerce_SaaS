@@ -29,13 +29,13 @@ export default async function PurchaseOrderPage({ params }: { params: Promise<{ 
 
   return (
     <div className="mx-auto flex max-w-3xl flex-col gap-6">
-      <Link href="/purchase-orders" className="flex items-center gap-1 text-sm text-zinc-500 hover:underline">
+      <Link href="/purchase-orders" className="flex w-fit items-center gap-1.5 text-[14px] font-semibold text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200">
         <ArrowLeft className="h-4 w-4" /> {t("back")}
       </Link>
 
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">
+          <h1 className="text-2xl font-bold tracking-tight md:text-3xl">
             {t("order")} <span className="font-mono">{order.reference}</span>
           </h1>
           <p className="mt-1 text-sm text-zinc-500">
@@ -55,8 +55,8 @@ export default async function PurchaseOrderPage({ params }: { params: Promise<{ 
 
       <PurchaseOrderEditor order={order} shopName={settings?.shop_name || ""} />
 
-      <section className="flex flex-col gap-3 rounded-2xl border border-zinc-100 bg-white p-4 dark:border-[var(--line)] dark:bg-[var(--surface-1)]">
-        <h2 className="font-bold">{t("reception_title")}</h2>
+      <section className="flex flex-col gap-3 rounded-2xl bg-[var(--surface-1)] p-5 shadow-card">
+        <h2 className="text-[17px] font-bold">{t("reception_title")}</h2>
         <p className="text-sm text-zinc-500">{t("reception_explanation")}</p>
         {order.shipments.length > 0 && (
           <ul className="flex flex-col gap-1 text-sm">

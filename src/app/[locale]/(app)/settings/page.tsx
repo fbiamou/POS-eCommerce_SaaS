@@ -2,14 +2,12 @@ import { getCurrentProfile, getTeamMembers } from '@/features/auth/actions'
 import { updateShopProfile, updateAppearance, updateOwnerProfile } from '@/features/settings/actions'
 import { getShopSettings } from '@/features/settings/queries'
 import { readFeedbackParam } from '@/lib/feedback'
-import { SHOP_TIME_ZONES } from '@/lib/timeZones'
 import { inviteEmployee } from '@/features/team/actions'
 import { EmployeeAccessFields } from '@/features/team/components/EmployeeAccessFields'
 import { TeamMemberRow } from '@/features/team/components/TeamMemberRow'
 import { LogoUploadButton } from '@/features/settings/components/LogoUploadButton'
 import { ShopSlugField } from '@/features/settings/components/ShopSlugField'
 import { CurrencySelect } from '@/features/settings/components/CurrencySelect'
-import { PHONE_COUNTRY_CODES } from '@/lib/phoneCountryCodes'
 import { getTranslations } from 'next-intl/server'
 import {
   UserCircle, ShieldCheck, ShoppingBag, Plus, Building2,
@@ -17,6 +15,7 @@ import {
 } from 'lucide-react'
 import Image from 'next/image'
 import { Select } from '@/components/ui/Select'
+import { ShopRegionProvider, ShopCountryField, ShopPhoneCodeField, ShopTimeZoneField, ShopVatRateField, ShopTaxIdLabel } from '@/features/settings/components/ShopRegion'
 
 const ACCENT_COLORS = [
   { value: '#7c3aed', key: 'color_violet', className: 'bg-violet-600' },
@@ -181,7 +180,18 @@ export default async function SettingsPage({
             </div>
 
             <form action={updateShopProfile} className="p-6 space-y-5">
+              <ShopRegionProvider
+                initialCountry={shopSettings?.country_code ?? null}
+                initialPhone={shopSettings?.default_phone_country_code || '+237'}
+                initialTimeZone={shopSettings?.timezone || 'Africa/Douala'}
+                initialVatRate={((shopSettings?.vat_rate_bps ?? 1925) / 100).toFixed(2)}
+              >
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div className="md:col-span-2 flex flex-col gap-1.5">
+                  <label className="text-[13px] font-bold text-zinc-700 dark:text-zinc-300" htmlFor="country_code">{t('country')}</label>
+                  <ShopCountryField id="country_code" />
+                  <p className="text-[11px] text-zinc-500 mt-0.5">{t('country_hint')}</p>
+                </div>
                 <div className="flex flex-col gap-1.5">
                   <label className="text-[13px] font-bold text-zinc-700 dark:text-zinc-300" htmlFor="shop_name">{t('shop_name')}</label>
                   <input id="shop_name" name="shop_name" type="text" defaultValue={shopSettings?.shop_name || ''} placeholder={t('shop_name_placeholder')}
@@ -194,8 +204,7 @@ export default async function SettingsPage({
                 </div>
                 <div className="flex flex-col gap-1.5">
                   <label className="text-[13px] font-bold text-zinc-700 dark:text-zinc-300" htmlFor="default_phone_country_code">{t('default_phone_country_code')}</label>
-                  <Select id="default_phone_country_code" name="default_phone_country_code" defaultValue={shopSettings?.default_phone_country_code || '+237'}
-                    options={PHONE_COUNTRY_CODES.map((c) => ({ value: c.code, label: c.label, hint: c.code }))} />
+                  <ShopPhoneCodeField id="default_phone_country_code" />
                   <p className="text-[11px] text-zinc-500 mt-0.5">{t('default_phone_country_code_hint')}</p>
                 </div>
                 <div className="flex flex-col gap-1.5">
@@ -212,8 +221,7 @@ export default async function SettingsPage({
                 </div>
                 <div className="flex flex-col gap-1.5">
                   <label className="text-[13px] font-bold text-zinc-700 dark:text-zinc-300" htmlFor="timezone">{t('timezone')}</label>
-                  <Select id="timezone" name="timezone" defaultValue={shopSettings?.timezone || 'Africa/Douala'}
-                    options={SHOP_TIME_ZONES.map((z) => ({ value: z.value, label: z.label }))} />
+                  <ShopTimeZoneField id="timezone" />
                   <p className="text-[11px] text-zinc-500 mt-0.5">{t('timezone_hint')}</p>
                 </div>
                 <div className="flex flex-col gap-1.5">
@@ -234,7 +242,7 @@ export default async function SettingsPage({
                 <p className="text-[11px] text-zinc-400 mb-4">{t('tax_info_subtitle')}</p>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                   <div className="flex flex-col gap-1.5">
-                    <label className="text-[13px] font-bold text-zinc-700 dark:text-zinc-300" htmlFor="tax_id">{t('tax_id')}</label>
+                    <ShopTaxIdLabel htmlFor="tax_id" className="text-[13px] font-bold text-zinc-700 dark:text-zinc-300" />
                     <input id="tax_id" name="tax_id" type="text" defaultValue={shopSettings?.tax_id || ''} placeholder={t('tax_id_placeholder')}
                       className="w-full rounded-xl border border-zinc-200 bg-white px-4 py-2.5 text-[13px] font-medium transition-colors focus:border-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-500 dark:border-[var(--line)] dark:bg-[var(--surface-1)]" />
                   </div>
@@ -253,8 +261,7 @@ export default async function SettingsPage({
                       className="h-4 w-4 rounded border-zinc-300 text-violet-600 focus:ring-violet-500 dark:border-[var(--line)] dark:bg-[var(--surface-1)]"
                     />
                     <label htmlFor="vat_registered" className="text-[13px] font-bold text-zinc-700 dark:text-zinc-300">{t('vat_registered')}</label>
-                    <input id="vat_rate" name="vat_rate" type="number" step="0.01" min="0" max="100"
-                      defaultValue={((shopSettings?.vat_rate_bps ?? 1925) / 100).toFixed(2)}
+                    <ShopVatRateField id="vat_rate"
                       className="w-24 rounded-xl border border-zinc-200 bg-white px-3 py-2 text-[13px] font-medium transition-colors focus:border-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-500 dark:border-[var(--line)] dark:bg-[var(--surface-1)]" />
                     <span className="text-[13px] font-bold text-zinc-500">% {t('vat_rate_label')}</span>
                   </div>
@@ -290,6 +297,7 @@ export default async function SettingsPage({
                   <Check className="h-4 w-4" /> {t('save_shop_profile')}
                 </button>
               </div>
+              </ShopRegionProvider>
             </form>
           </section>
         </div>

@@ -5,6 +5,7 @@ import { Link } from "@/i18n/routing";
 import { getInvoiceDetail, extractVat } from "@/features/invoices/actions";
 import { getFormatters, getShopSettings } from "@/features/settings/queries";
 import { PrintButton } from "@/features/invoices/components/PrintButton";
+import { taxIdLabelFor } from "@/lib/countries";
 
 export async function generateMetadata() {
   const t = await getTranslations("Invoices");
@@ -70,7 +71,7 @@ export default async function InvoiceTicketPage({
           <p className="font-display text-[17px] font-extrabold leading-tight tracking-tight">{shop?.shop_name || t("shop_fallback")}</p>
           {shop?.shop_address && <p>{shop.shop_address}</p>}
           {shop?.shop_phone && <p>{shop.shop_phone}</p>}
-          {shop?.tax_id && <p>{t("tax_id_label")} : {shop.tax_id}</p>}
+          {shop?.tax_id && <p>{taxIdLabelFor(shop.country_code) ?? t("tax_id_label")} : {shop.tax_id}</p>}
           {shop?.trade_register && <p>{t("trade_register_label")} : {shop.trade_register}</p>}
         </div>
 

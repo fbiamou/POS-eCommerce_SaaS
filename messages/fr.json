@@ -318,21 +318,33 @@
     "resend_whatsapp": "Renvoyer par WhatsApp",
     "download_pdf": "Télécharger le PDF",
     "mark_sent": "Marquer comme envoyé",
-    "mark_received": "Marquer comme reçu",
-    "confirm_received": "Marquer ce bon comme reçu ? Cela n'ajoute rien au stock : la marchandise entre en stock quand vous pointez son arrivage.",
     "cancel_order": "Annuler le bon",
     "confirm_cancel_order": "Annuler ce bon de commande ?",
     "whatsapp_header": "Bonjour {supplier}, voici notre commande {reference} :",
     "whatsapp_footer": "Merci de nous confirmer la disponibilité et le délai. {shop}",
     "reception_title": "Réception",
-    "reception_explanation": "La marchandise entre en stock quand vous pointez son arrivage. Créez un lien de collecte pour l'intermédiaire qui enverra ce colis.",
+    "reception_explanation": "Deux façons de réceptionner : pointez la livraison du fournisseur avec le bouton « Réceptionner la commande », ou, si un intermédiaire envoie le colis, créez un lien de collecte et pointez son arrivage. Dans les deux cas, seules les quantités pointées entrent en stock.",
     "create_collection_link": "Créer un lien de collecte pour ce bon",
     "pdf_title": "Bon de commande",
     "ref": "Réf.",
     "date": "Date",
     "supplier": "Fournisseur",
     "article": "Article",
-    "shop_fallback": "Boutique"
+    "shop_fallback": "Boutique",
+    "receive_order": "Réceptionner la commande",
+    "reception_hint": "Indiquez pour chaque article la quantité réellement reçue. Mettez 0 pour un article non livré.",
+    "ordered_value": "{quantity} commandés",
+    "received_quantity": "Quantité reçue",
+    "one_less": "Un de moins",
+    "one_more": "Un de plus",
+    "validate_reception": "Valider la réception",
+    "cancel_reception": "Annuler",
+    "confirm_reception": "Ajouter au stock",
+    "reception_units": "{units, plural, =0 {Rien n'entrera en stock.} one {# unité entrera en stock.} other {# unités entreront en stock.}}",
+    "reception_short": "{count, plural, one {# article livré en moins que commandé.} other {# articles livrés en moins que commandé.}}",
+    "reception_over": "{count, plural, one {# article livré en plus de la commande.} other {# articles livrés en plus de la commande.}}",
+    "received_of_ordered": "{received} reçus sur {ordered}",
+    "received_toast": "Réception enregistrée : le stock est à jour."
   },
   "Procurement": {
     "page_title": "Déclaration de colis",
@@ -448,7 +460,7 @@
     "print": "Imprimer",
     "thank_you": "Merci de votre visite !",
     "not_found": "Facture introuvable.",
-    "tax_id_label": "NIU",
+    "tax_id_label": "N° fiscal",
     "trade_register_label": "RCCM",
     "back": "Retour",
     "record_payment": "Encaisser un paiement",
@@ -583,7 +595,19 @@
     "font_default": "{name} (par défaut)",
     "members_count": "{count, plural, one {# membre} other {# membres}}",
     "employee_name_placeholder": "Prénom Nom",
-    "password_min_hint": "6 caractères minimum"
+    "password_min_hint": "6 caractères minimum",
+    "country_GQ": "Guinée équatoriale",
+    "country_CM": "Cameroun",
+    "country_GA": "Gabon",
+    "country_CG": "Congo",
+    "country_TD": "Tchad",
+    "country_CF": "Centrafrique",
+    "country": "Pays de la boutique",
+    "country_hint": "Préremplit l'indicatif, le fuseau horaire et le taux de TVA ; tout reste modifiable.",
+    "country_other": "Autre pays",
+    "tax_id_NIU": "NIU (Numéro d'Identifiant Unique)",
+    "tax_id_NIF": "NIF (Numéro d'Identification Fiscale)",
+    "tax_id_generic": "Identifiant fiscal"
   },
   "Landing": {
     "hero_title_1": "Votre commerce,",
@@ -680,7 +704,8 @@
     "purchase_order_not_found": "Bon de commande introuvable.",
     "purchase_order_not_editable": "Ce bon n'est plus modifiable : il a déjà été envoyé.",
     "invalid_status_change": "Ce changement de statut n'est pas possible.",
-    "terms_required": "Cochez la case pour accepter les conditions d'utilisation."
+    "terms_required": "Cochez la case pour accepter les conditions d'utilisation.",
+    "purchase_order_has_shipment": "Ce bon est suivi par un arrivage : réceptionnez la marchandise en pointant l'arrivage."
   },
   "Suppliers": {
     "title": "Fournisseurs",
@@ -700,6 +725,7 @@
   "Common": {
     "close": "Fermer",
     "search": "Rechercher",
-    "no_results": "Aucun résultat"
+    "no_results": "Aucun résultat",
+    "cancel": "Annuler"
   }
 }

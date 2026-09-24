@@ -7,6 +7,7 @@ import { redirectLocalized } from '@/lib/navigation'
 import type { FeedbackCode } from '@/lib/feedback'
 import { SHOP_TIME_ZONES } from '@/lib/timeZones'
 import { DEFAULT_TIME_ZONE } from '@/lib/format'
+import { findShopCountry } from '@/lib/countries'
 
 // Every settings write is reserved to the shop's Propriétaire. The database
 // enforces it too (RLS on `settings`, migration security_hardening); checking
@@ -37,7 +38,11 @@ export async function updateShopProfile(formData: FormData) {
   const timeZoneInput = formData.get('timezone') as string
   const timeZone = SHOP_TIME_ZONES.some((z) => z.value === timeZoneInput) ? timeZoneInput : DEFAULT_TIME_ZONE
 
+  // Only a country from the list is stored; "other country" leaves it empty.
+  const countryCode = findShopCountry(formData.get('country_code') as string)?.code ?? null
+
   const updates: Record<string, string | number | boolean | null> = {
+    country_code: countryCode,
     shop_name: formData.get('shop_name') as string || null,
     shop_phone: formData.get('shop_phone') as string || null,
     shop_address: formData.get('shop_address') as string || null,
