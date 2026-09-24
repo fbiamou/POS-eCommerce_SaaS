@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { APP_PAGES, SELLER_DEFAULT_PAGES, type AppPageKey } from "@/lib/appPages";
+import { Select } from "@/components/ui/Select";
 
 export function EmployeeAccessFields() {
   const t = useTranslations("Settings");
@@ -25,16 +26,16 @@ export function EmployeeAccessFields() {
         <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1" htmlFor="role_emp">
           {t("role")}
         </label>
-        <select
+        <Select
           id="role_emp"
           name="role"
           value={role}
-          onChange={(e) => setRole(e.target.value as "SELLER" | "MANAGER")}
-          className="w-full px-3 py-2 border border-zinc-200 dark:border-zinc-700 rounded-lg bg-zinc-50 dark:bg-zinc-800 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500"
-        >
-          <option value="SELLER">{t("role_cashier")}</option>
-          <option value="MANAGER">{t("role_manager")}</option>
-        </select>
+          onChange={(v) => setRole(v as "SELLER" | "MANAGER")}
+          options={[
+            { value: "SELLER", label: t("role_cashier") },
+            { value: "MANAGER", label: t("role_manager") },
+          ]}
+        />
       </div>
 
       {role === "SELLER" && (

@@ -165,7 +165,9 @@
     "client_required_credit": "Choisissez le client : une vente à crédit doit avoir un nom, sinon la dette ne pourra pas être relancée.",
     "submit_amount": "Encaisser {amount}",
     "new_sale": "Nouvelle vente",
-    "unit_price": "{price} l'unité"
+    "unit_price": "{price} l'unité",
+    "all_types": "Tous les types",
+    "all_brands": "Toutes les marques"
   },
   "Clients": {
     "title": "Clients & Dettes",
@@ -687,6 +689,8 @@
     "save": "Enregistrer"
   },
   "Common": {
-    "close": "Fermer"
+    "close": "Fermer",
+    "search": "Rechercher",
+    "no_results": "Aucun résultat"
   }
 }

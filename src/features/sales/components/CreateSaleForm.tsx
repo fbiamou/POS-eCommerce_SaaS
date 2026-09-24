@@ -9,6 +9,7 @@ import { createClient } from "@/utils/supabase/client";
 import { PhoneCountryCodeSelect } from "@/components/PhoneCountryCodeSelect";
 import { useShopFormat } from "@/components/ShopFormatProvider";
 import { feedbackFromError, type FeedbackCode } from "@/lib/feedback";
+import { Select } from "@/components/ui/Select";
 
 export type Product = {
   id: string;
@@ -292,29 +293,25 @@ export default function CreateSaleForm({
 
           {(types.length > 1 || brands.length > 1) && (
             <div className="mt-2 grid grid-cols-2 gap-2">
-              <select
-                aria-label={t("type")}
+              <Select
+                ariaLabel={t("type")}
                 value={selectedType}
-                onChange={(e) => {
-                  setSelectedType(e.target.value);
+                onChange={(v) => {
+                  setSelectedType(v);
                   setSelectedBrand("");
                 }}
                 disabled={types.length === 0}
-                className={`${inputClass} py-2 text-[13px] disabled:opacity-50`}
-              >
-                <option value="">{t("type")}</option>
-                {types.map(tOption => <option key={tOption} value={tOption}>{translateData(tOption)}</option>)}
-              </select>
-              <select
-                aria-label={t("brand")}
+                triggerClassName="py-2 text-[13px]"
+                options={[{ value: "", label: t("all_types") }, ...types.map((v) => ({ value: v, label: translateData(v) }))]}
+              />
+              <Select
+                ariaLabel={t("brand")}
                 value={selectedBrand}
-                onChange={(e) => setSelectedBrand(e.target.value)}
+                onChange={setSelectedBrand}
                 disabled={brands.length === 0}
-                className={`${inputClass} py-2 text-[13px] disabled:opacity-50`}
-              >
-                <option value="">{t("brand")}</option>
-                {brands.map(b => <option key={b} value={b}>{translateData(b)}</option>)}
-              </select>
+                triggerClassName="py-2 text-[13px]"
+                options={[{ value: "", label: t("all_brands") }, ...brands.map((v) => ({ value: v, label: translateData(v) }))]}
+              />
             </div>
           )}
         </div>
@@ -562,26 +559,26 @@ export default function CreateSaleForm({
               <div className="mt-3">
                 <label htmlFor="sale-client" className="text-[12px] font-semibold text-zinc-600 dark:text-zinc-300">{t("client")}</label>
                 <div className="mt-1 flex gap-2">
-                  <select
+                  <Select
                     id="sale-client"
+                    className="min-w-0 flex-1"
                     value={isCreatingClient ? "new" : selectedClientId}
-                    onChange={(e) => {
-                      if (e.target.value === "new") {
+                    onChange={(v) => {
+                      if (v === "new") {
                         setIsCreatingClient(true);
                         setSelectedClientId("");
                       } else {
                         setIsCreatingClient(false);
-                        setSelectedClientId(e.target.value);
+                        setSelectedClientId(v);
                       }
                     }}
-                    className={inputClass}
-                  >
-                    <option value="">{payMode === "full" ? t("default_client") : t("choose_client")}</option>
-                    <option value="new">{t("add_client")}</option>
-                    {clients.map(c => (
-                      <option key={c.id} value={c.id}>{c.name}</option>
-                    ))}
-                  </select>
+                    searchable={clients.length > 5}
+                    options={[
+                      { value: "", label: payMode === "full" ? t("default_client") : t("choose_client") },
+                      { value: "new", label: t("add_client") },
+                      ...clients.map((c) => ({ value: c.id, label: c.name })),
+                    ]}
+                  />
                   {isCreatingClient && (
                     <button
                       type="button"

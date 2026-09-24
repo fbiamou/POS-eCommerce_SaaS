@@ -165,7 +165,9 @@
     "client_required_credit": "Choose the customer: a credit sale needs a name, otherwise the debt can't be followed up.",
     "submit_amount": "Charge {amount}",
     "new_sale": "New sale",
-    "unit_price": "{price} each"
+    "unit_price": "{price} each",
+    "all_types": "All types",
+    "all_brands": "All brands"
   },
   "Clients": {
     "title": "Clients & Debts",
@@ -687,6 +689,8 @@
     "save": "Save"
   },
   "Common": {
-    "close": "Close"
+    "close": "Close",
+    "search": "Search",
+    "no_results": "No results"
   }
 }

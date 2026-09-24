@@ -6,6 +6,7 @@ import { Modal } from "@/components/ui/Modal";
 import { useTranslations } from "next-intl";
 import { addProduct, uploadProductImage } from "../actions";
 import { useToast } from "@/components/ui/Toast";
+import { Select } from "@/components/ui/Select";
 
 export function AddProductButton({
   label,
@@ -124,12 +125,12 @@ export function AddProductButton({
           <div className="grid grid-cols-2 gap-4">
             <div className="flex flex-col gap-1.5">
               <label className="text-[13px] font-bold text-zinc-700 dark:text-zinc-300">{t("supplier")}</label>
-              <select name="supplier_id" defaultValue={""} className="rounded-xl border border-zinc-200 bg-white px-4 py-2.5 text-[13px] font-medium dark:border-[var(--line)] dark:bg-[var(--surface-1)]">
-                <option value="">{t("no_supplier")}</option>
-                {suppliers.map((s) => (
-                  <option key={s.id} value={s.id}>{s.name}</option>
-                ))}
-              </select>
+              <Select
+                name="supplier_id"
+                ariaLabel={t("supplier")}
+                defaultValue={""}
+                options={[{ value: "", label: t("no_supplier") }, ...suppliers.map((s) => ({ value: s.id, label: s.name }))]}
+              />
             </div>
             <div className="flex flex-col gap-1.5">
               <label className="text-[13px] font-bold text-zinc-700 dark:text-zinc-300">{t("origin_country")}</label>

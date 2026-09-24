@@ -10,6 +10,7 @@ import type { FeedbackCode } from "@/lib/feedback";
 import { createShipmentLink } from "../actions";
 import { buildIntakeUrl } from "../matching";
 import type { OpenPurchaseOrder } from "../queries";
+import { Select } from "@/components/ui/Select";
 
 const inputClass =
   "w-full rounded-xl border border-zinc-200 bg-white px-4 py-2.5 text-[13px] font-medium focus:border-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-500 dark:border-[var(--line)] dark:bg-[var(--surface-1)]";
@@ -149,15 +150,18 @@ export function NewShipmentLinkButton({
             {openPurchaseOrders.length > 0 && (
               <div className="flex flex-col gap-1.5">
                 <label htmlFor="purchase_order_id" className="text-[13px] font-bold">{t("linked_purchase_order")}</label>
-                <select id="purchase_order_id" value={purchaseOrderId} onChange={(e) => setPurchaseOrderId(e.target.value)} className={inputClass}>
-                  <option value="">{t("no_purchase_order")}</option>
-                  {openPurchaseOrders.map((po) => (
-                    <option key={po.id} value={po.id}>
-                      {po.reference}
-                      {po.supplier_name ? ` · ${po.supplier_name}` : ""}
-                    </option>
-                  ))}
-                </select>
+                <Select
+                  id="purchase_order_id"
+                  value={purchaseOrderId}
+                  onChange={setPurchaseOrderId}
+                  options={[
+                    { value: "", label: t("no_purchase_order") },
+                    ...openPurchaseOrders.map((po) => ({
+                      value: po.id,
+                      label: po.supplier_name ? `${po.reference} · ${po.supplier_name}` : po.reference,
+                    })),
+                  ]}
+                />
               </div>
             )}
             {error && <p className="text-sm text-red-600">{tFeedback(error)}</p>}

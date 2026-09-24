@@ -13,6 +13,7 @@ import {
 } from "../actions";
 import type { Profile } from "@/features/auth/actions";
 import { APP_PAGES, type AppPageKey } from "@/lib/appPages";
+import { Select } from "@/components/ui/Select";
 
 const ROLE_STYLES: Record<string, string> = {
   MANAGER: "bg-violet-100 text-violet-700 dark:bg-violet-900/40 dark:text-violet-300",
@@ -111,15 +112,17 @@ export function TeamMemberRow({
           </span>
         ) : (
           <>
-            <select
+            <Select
               value={member.role}
               disabled={isPending}
-              onChange={(e) => handleRoleChange(e.target.value as "MANAGER" | "SELLER")}
-              className="rounded-md border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 px-2 py-1 text-xs disabled:opacity-50"
-            >
-              <option value="SELLER">{roleLabels.SELLER}</option>
-              <option value="MANAGER">{roleLabels.MANAGER}</option>
-            </select>
+              onChange={(v) => handleRoleChange(v as "MANAGER" | "SELLER")}
+              className="w-40"
+              triggerClassName="py-1.5 text-[13px]"
+              options={[
+                { value: "SELLER", label: roleLabels.SELLER },
+                { value: "MANAGER", label: roleLabels.MANAGER },
+              ]}
+            />
 
             {member.role === "SELLER" && (
               <button

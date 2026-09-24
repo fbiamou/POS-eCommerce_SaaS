@@ -16,6 +16,7 @@ import {
   Palette, Users, Check
 } from 'lucide-react'
 import Image from 'next/image'
+import { Select } from '@/components/ui/Select'
 
 const ACCENT_COLORS = [
   { value: '#7c3aed', key: 'color_violet', className: 'bg-violet-600' },
@@ -193,12 +194,8 @@ export default async function SettingsPage({
                 </div>
                 <div className="flex flex-col gap-1.5">
                   <label className="text-[13px] font-bold text-zinc-700 dark:text-zinc-300" htmlFor="default_phone_country_code">{t('default_phone_country_code')}</label>
-                  <select id="default_phone_country_code" name="default_phone_country_code" defaultValue={shopSettings?.default_phone_country_code || '+237'}
-                    className="w-full rounded-xl border border-zinc-200 bg-white px-4 py-2.5 text-[13px] font-medium transition-colors focus:border-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-500 dark:border-[var(--line)] dark:bg-[var(--surface-1)]">
-                    {PHONE_COUNTRY_CODES.map((c) => (
-                      <option key={c.code} value={c.code}>{c.code} {c.label}</option>
-                    ))}
-                  </select>
+                  <Select id="default_phone_country_code" name="default_phone_country_code" defaultValue={shopSettings?.default_phone_country_code || '+237'}
+                    options={PHONE_COUNTRY_CODES.map((c) => ({ value: c.code, label: c.label, hint: c.code }))} />
                   <p className="text-[11px] text-zinc-500 mt-0.5">{t('default_phone_country_code_hint')}</p>
                 </div>
                 <div className="flex flex-col gap-1.5">
@@ -215,12 +212,8 @@ export default async function SettingsPage({
                 </div>
                 <div className="flex flex-col gap-1.5">
                   <label className="text-[13px] font-bold text-zinc-700 dark:text-zinc-300" htmlFor="timezone">{t('timezone')}</label>
-                  <select id="timezone" name="timezone" defaultValue={shopSettings?.timezone || 'Africa/Douala'}
-                    className="w-full rounded-xl border border-zinc-200 bg-white px-4 py-2.5 text-[13px] font-medium transition-colors focus:border-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-500 dark:border-[var(--line)] dark:bg-[var(--surface-1)]">
-                    {SHOP_TIME_ZONES.map((z) => (
-                      <option key={z.value} value={z.value}>{z.label}</option>
-                    ))}
-                  </select>
+                  <Select id="timezone" name="timezone" defaultValue={shopSettings?.timezone || 'Africa/Douala'}
+                    options={SHOP_TIME_ZONES.map((z) => ({ value: z.value, label: z.label }))} />
                   <p className="text-[11px] text-zinc-500 mt-0.5">{t('timezone_hint')}</p>
                 </div>
                 <div className="flex flex-col gap-1.5">
@@ -327,10 +320,8 @@ export default async function SettingsPage({
             </div>
             <div className="flex flex-col gap-1.5">
               <label className="text-[13px] font-bold text-zinc-700 dark:text-zinc-300" htmlFor="theme_font">{t('font')}</label>
-              <select id="theme_font" name="theme_font" defaultValue={shopSettings?.theme_font || 'Geist'}
-                className="w-full md:w-64 rounded-xl border border-zinc-200 bg-white px-4 py-2.5 text-[13px] font-medium transition-colors focus:border-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-500 dark:border-[var(--line)] dark:bg-[var(--surface-1)]">
-                {FONTS.map(f => <option key={f} value={f}>{f === 'Geist' ? t('font_default', { name: f }) : f}</option>)}
-              </select>
+              <Select id="theme_font" name="theme_font" defaultValue={shopSettings?.theme_font || 'Geist'} className="w-full md:w-64"
+                options={FONTS.map((f) => ({ value: f, label: f === 'Geist' ? t('font_default', { name: f }) : f }))} />
             </div>
             <div className="flex justify-end pt-2">
               <button type="submit" className="inline-flex items-center justify-center gap-2 rounded-xl bg-violet-600 px-5 py-2.5 text-[13px] font-bold text-white hover:bg-violet-700 transition-colors shadow-sm">

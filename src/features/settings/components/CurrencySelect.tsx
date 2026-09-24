@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { Select } from '@/components/ui/Select'
 
 const CURRENCIES = [
   { code: 'XAF', symbol: 'FCFA', label: 'Franc CFA (FCFA)' },
@@ -22,24 +23,20 @@ type Props = {
 export function CurrencySelect({ defaultCode = 'XAF', defaultSymbol = 'FCFA' }: Props) {
   const [symbol, setSymbol] = useState(defaultSymbol)
 
-  const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const currency = CURRENCIES.find(c => c.code === e.target.value)
+  const handleChange = (code: string) => {
+    const currency = CURRENCIES.find(c => c.code === code)
     if (currency) setSymbol(currency.symbol)
   }
 
   return (
     <>
-      <select
+      <Select
         id="currency_code"
         name="currency_code"
         defaultValue={defaultCode}
         onChange={handleChange}
-        className="w-full px-3 py-2 border border-zinc-200 dark:border-zinc-700 rounded-lg bg-zinc-50 dark:bg-zinc-800 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500"
-      >
-        {CURRENCIES.map(c => (
-          <option key={c.code} value={c.code}>{c.label}</option>
-        ))}
-      </select>
+        options={CURRENCIES.map((c) => ({ value: c.code, label: c.label }))}
+      />
       <input type="hidden" name="currency_symbol" value={symbol} />
     </>
   )

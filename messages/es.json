@@ -165,7 +165,9 @@
     "client_required_credit": "Elige el cliente: una venta a crédito necesita un nombre, si no la deuda no se podrá recordar.",
     "submit_amount": "Cobrar {amount}",
     "new_sale": "Nueva venta",
-    "unit_price": "{price} c/u"
+    "unit_price": "{price} c/u",
+    "all_types": "Todos los tipos",
+    "all_brands": "Todas las marcas"
   },
   "Clients": {
     "title": "Clientes y Deudas",
@@ -687,6 +689,8 @@
     "save": "Guardar"
   },
   "Common": {
-    "close": "Cerrar"
+    "close": "Cerrar",
+    "search": "Buscar",
+    "no_results": "Sin resultados"
   }
 }
