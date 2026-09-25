@@ -688,7 +688,8 @@
     "data_title": "Vos données",
     "data_subtitle": "Elles vous appartiennent : récupérez-les à tout moment.",
     "data_export_hint": "Un fichier .zip avec un tableau par sujet (articles, clients, factures, paiements…), à ouvrir dans Excel. Gardez-le pour votre comptabilité.",
-    "data_export_button": "Télécharger toutes mes données"
+    "data_export_button": "Télécharger toutes mes données",
+    "tab_appearance": "Apparence"
   },
   "Feedback": {
     "generic_error": "Une erreur inattendue est survenue. Réessayez.",

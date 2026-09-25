@@ -688,7 +688,8 @@
     "data_title": "Your data",
     "data_subtitle": "They belong to you: download them at any time.",
     "data_export_hint": "A .zip file with one table per subject (items, clients, invoices, payments…), to open in Excel. Keep it for your accounts.",
-    "data_export_button": "Download all my data"
+    "data_export_button": "Download all my data",
+    "tab_appearance": "Appearance"
   },
   "Feedback": {
     "generic_error": "Something went wrong. Please try again.",

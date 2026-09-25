@@ -688,7 +688,8 @@
     "data_title": "Tus datos",
     "data_subtitle": "Te pertenecen: descárgalos cuando quieras.",
     "data_export_hint": "Un archivo .zip con una tabla por tema (artículos, clientes, facturas, pagos…), para abrir en Excel. Guárdalo para tu contabilidad.",
-    "data_export_button": "Descargar todos mis datos"
+    "data_export_button": "Descargar todos mis datos",
+    "tab_appearance": "Apariencia"
   },
   "Feedback": {
     "generic_error": "Se produjo un error inesperado. Inténtelo de nuevo.",

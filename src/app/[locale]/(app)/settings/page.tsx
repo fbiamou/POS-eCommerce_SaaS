@@ -73,7 +73,7 @@ export default async function SettingsPage({
 
   const tabs = [
     { id: 'profil', label: t('tab_profile'), icon: <UserCircle className="h-4 w-4" /> },
-    { id: 'boutique', label: t('appearance'), icon: <Palette className="h-4 w-4" /> },
+    { id: 'boutique', label: t('tab_appearance'), icon: <Palette className="h-4 w-4" /> },
     { id: 'equipe', label: t('tab_team'), icon: <Users className="h-4 w-4" /> },
   ]
 
