@@ -7,6 +7,9 @@ import { getCurrentProfile } from "@/features/auth/actions";
 import { getShopFormat, getShopSettings } from "@/features/settings/queries";
 import { getOwnSubscription, isPlatformAdmin } from "@/features/admin/queries";
 import { ShopSuspended } from "@/features/admin/components/ShopSuspended";
+import { getShopAccess } from "@/features/billing/access";
+import { planAllows } from "@/features/billing/plans";
+import { PlanBanner } from "@/features/billing/components/PlanBanner";
 
 // Shared chrome for every authenticated dashboard page. Desktop keeps the
 // persistent Sidebar; mobile — the primary usage per AGENTS.md — gets its
@@ -14,13 +17,18 @@ import { ShopSuspended } from "@/features/admin/components/ShopSuspended";
 // Public pages (login, storefront, procurement intake) live outside this
 // route group and never render this layout.
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
-  const [profile, shopSettings, shopFormat, isAdmin, subscription] = await Promise.all([
+  const [profile, shopSettings, shopFormat, isAdmin, subscription, access] = await Promise.all([
     getCurrentProfile(),
     getShopSettings(),
     getShopFormat(),
     isPlatformAdmin(),
     getOwnSubscription(),
+    getShopAccess(),
   ]);
+  const isManager = profile?.role === "MANAGER";
+  // The storefront link only shows while the storefront is actually online.
+  const liveSlug =
+    shopSettings?.shop_slug && planAllows(access.plan, "storefront") && access.mode !== "read_only" ? shopSettings.shop_slug : null;
   // A shop suspended by WISHOP sees a notice instead of its pages. A platform
   // admin is never locked out of the console this way.
   const suspended = Boolean(subscription?.suspended_at) && !isAdmin;
@@ -32,8 +40,9 @@ export default async function AppLayout({ children }: { children: React.ReactNod
           profile={profile}
           shopName={shopSettings?.shop_name}
           shopLogoUrl={shopSettings?.shop_logo_url}
-          shopSlug={shopSettings?.shop_slug}
+          shopSlug={liveSlug}
           isPlatformAdmin={isAdmin}
+          plan={access.plan}
         />
         <MobileTopBar
           profile={profile}
@@ -41,9 +50,16 @@ export default async function AppLayout({ children }: { children: React.ReactNod
           shopLogoUrl={shopSettings?.shop_logo_url}
         />
         <main className="w-full flex-1 overflow-y-auto bg-background px-4 pt-[calc(4.5rem+env(safe-area-inset-top))] pb-[calc(6rem+env(safe-area-inset-bottom))] md:p-8 md:pt-8 md:pb-8">
-          {suspended ? <ShopSuspended reason={subscription?.suspension_reason ?? null} /> : children}
+          {suspended ? (
+            <ShopSuspended reason={subscription?.suspension_reason ?? null} />
+          ) : (
+            <>
+              <PlanBanner access={access} isManager={isManager} />
+              {children}
+            </>
+          )}
         </main>
-        <MobileTabBar profile={profile} shopSlug={shopSettings?.shop_slug} isPlatformAdmin={isAdmin} />
+        <MobileTabBar profile={profile} shopSlug={liveSlug} isPlatformAdmin={isAdmin} plan={access.plan} />
         <Toaster />
       </div>
     </ShopFormatProvider>

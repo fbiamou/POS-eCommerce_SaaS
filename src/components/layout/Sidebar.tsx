@@ -2,7 +2,8 @@
 
 import { Link, usePathname } from "@/i18n/routing";
 import { useTranslations } from "next-intl";
-import { Settings, LogOut, ExternalLink, ShieldCheck } from "lucide-react";
+import { Settings, LogOut, ExternalLink, ShieldCheck, Lock } from "lucide-react";
+import { planAllows, type Plan } from "@/features/billing/plans";
 import { useState } from "react";
 import { logout } from "@/app/[locale]/login/actions";
 import { LocaleSwitcher } from "@/components/LocaleSwitcher";
@@ -24,13 +25,14 @@ type SidebarProps = {
   shopLogoUrl?: string | null;
   shopSlug?: string | null;
   isPlatformAdmin?: boolean;
+  plan?: Plan;
 }
 
 // Desktop-only persistent navigation, on the indigo night ground that anchors
 // the WISHOP identity (the content area stays light for daylight use in the
 // shop). On mobile, the primary way the owner and sellers use the app,
 // MobileTopBar + MobileTabBar take over instead.
-export default function Sidebar({ profile, shopName, shopLogoUrl, shopSlug, isPlatformAdmin = false }: SidebarProps) {
+export default function Sidebar({ profile, shopName, shopLogoUrl, shopSlug, isPlatformAdmin = false, plan = "PRO_PLUS" }: SidebarProps) {
   const t = useTranslations("Sidebar");
   const tSettings = useTranslations("Settings");
   const [isLoggingOut, setIsLoggingOut] = useState(false);
@@ -93,6 +95,9 @@ export default function Sidebar({ profile, shopName, shopLogoUrl, shopSlug, isPl
                 <Link href={item.path} aria-current={active ? "page" : undefined} className={linkClass(active)}>
                   <item.icon className="h-4 w-4 shrink-0" />
                   {item.label}
+                  {item.feature && !planAllows(plan, item.feature) && (
+                    <Lock className="ml-auto h-3.5 w-3.5 shrink-0 opacity-70" aria-label={t("locked")} />
+                  )}
                 </Link>
               </li>
             );

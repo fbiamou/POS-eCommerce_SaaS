@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { lockedFeature } from "@/features/billing/gate";
 import { getTranslations } from "next-intl/server";
 import { ArrowLeft } from "lucide-react";
 import { Link } from "@/i18n/routing";
@@ -14,6 +15,8 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
 }
 
 export default async function ShipmentPage({ params }: { params: Promise<{ id: string }> }) {
+  const locked = await lockedFeature("shipments");
+  if (locked) return locked;
   const { id } = await params;
   const [t, shipment, format] = await Promise.all([getTranslations("Shipments"), getShipmentDetail(id), getFormatters()]);
   if (!shipment) notFound();

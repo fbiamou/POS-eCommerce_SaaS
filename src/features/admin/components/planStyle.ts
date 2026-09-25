@@ -9,6 +9,13 @@ export const PLAN_BADGE_CLASS: Record<Plan, string> = {
   PRO_PLUS: "bg-night text-saffron dark:bg-violet-950",
 };
 
+// Where a paid plan stands, when it is not simply running.
+export const ACCESS_BADGE_CLASS: Record<"ending_soon" | "grace" | "read_only", string> = {
+  ending_soon: "bg-amber-50 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300",
+  grace: "bg-amber-100 text-amber-900 dark:bg-amber-900/40 dark:text-amber-200",
+  read_only: "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300",
+};
+
 // A country's name in the reader's language ("GQ" → "Guinée équatoriale").
 export function countryName(code: string | null, locale: string): string {
   if (!code) return "";

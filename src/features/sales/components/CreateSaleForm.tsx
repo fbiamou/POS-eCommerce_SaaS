@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useEffect, useSyncExternalStore } from "react";
 import { Link, useRouter } from "@/i18n/routing";
-import { Plus, Minus, Trash2, Search, ShoppingBag, X, Printer, FileText, CheckCircle2 } from "lucide-react";
+import { Plus, Minus, Trash2, Search, ShoppingBag, X, Printer, FileText, CheckCircle2, Lock } from "lucide-react";
 import { useMessages, useTranslations } from "next-intl";
 import { useCartStore } from "../store/useCartStore";
 import { createClient } from "@/utils/supabase/client";
@@ -46,11 +46,14 @@ export default function CreateSaleForm({
   clients,
   defaultPhoneCountryCode = "+237",
   loyalty = { enabled: false, stampsRequired: 10, rewardPercent: 10 },
+  creditAllowed = true,
 }: {
   products: Product[];
   clients: Client[];
   defaultPhoneCountryCode?: string;
   loyalty?: LoyaltySettings;
+  /** Credit sales come with the Essentiel plan: below it, cash only. */
+  creditAllowed?: boolean;
 }) {
   const t = useTranslations("Sales");
   const tFeedback = useTranslations("Feedback");
@@ -527,20 +530,27 @@ export default function CreateSaleForm({
               </div>
 
               <div role="radiogroup" aria-label={t("payment")} className="mt-3 grid grid-cols-2 gap-1 rounded-xl bg-zinc-100 p-1 dark:bg-[var(--surface-2)]">
-                {(["full", "credit"] as const).map((mode) => (
-                  <button
-                    key={mode}
-                    type="button"
-                    role="radio"
-                    aria-checked={payMode === mode}
-                    onClick={() => setPayMode(mode)}
-                    className={`rounded-lg px-2 py-2 text-[13px] font-semibold transition-colors ${
-                      payMode === mode ? "bg-[var(--surface-1)] text-zinc-900 shadow-card dark:bg-[var(--surface-3)] dark:text-white" : "text-zinc-500"
-                    }`}
-                  >
-                    {mode === "full" ? t("pay_full") : t("pay_credit")}
-                  </button>
-                ))}
+                {(["full", "credit"] as const).map((mode) => {
+                  const locked = mode === "credit" && !creditAllowed;
+                  return (
+                    <button
+                      key={mode}
+                      type="button"
+                      role="radio"
+                      aria-checked={payMode === mode}
+                      aria-disabled={locked}
+                      disabled={locked}
+                      title={locked ? t("credit_locked") : undefined}
+                      onClick={() => setPayMode(mode)}
+                      className={`flex items-center justify-center gap-1.5 rounded-lg px-2 py-2 text-[13px] font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-60 ${
+                        payMode === mode ? "bg-[var(--surface-1)] text-zinc-900 shadow-card dark:bg-[var(--surface-3)] dark:text-white" : "text-zinc-500"
+                      }`}
+                    >
+                      {locked && <Lock className="h-3.5 w-3.5" />}
+                      {mode === "full" ? t("pay_full") : t("pay_credit")}
+                    </button>
+                  );
+                })}
               </div>
 
               {payMode === "full" ? (

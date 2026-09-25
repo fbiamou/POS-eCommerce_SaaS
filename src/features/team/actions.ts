@@ -1,5 +1,7 @@
 'use server'
 
+import { getShopAccess } from '@/features/billing/access'
+import { PLAN_LIMITS } from '@/features/billing/plans'
 import { randomBytes } from 'crypto'
 import { createClient } from '@/utils/supabase/server'
 import { createServiceRoleClient } from '@/utils/supabase/service'
@@ -50,6 +52,16 @@ export async function inviteEmployee(formData: FormData) {
 
   if (!password || !fullName) {
     return redirectLocalized('/settings', { tab: 'equipe', error: 'employee_name_password_required' })
+  }
+
+  // Each plan includes a number of accounts (the owner's included).
+  const accountLimit = PLAN_LIMITS[(await getShopAccess()).plan].accounts
+  if (accountLimit !== null) {
+    const supabase = await createClient()
+    const { count } = await supabase.from('profiles').select('id', { count: 'exact', head: true }).eq('is_active', true)
+    if ((count ?? 0) >= accountLimit) {
+      return redirectLocalized('/settings', { tab: 'equipe', error: 'plan_limit_accounts' })
+    }
   }
 
   if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {

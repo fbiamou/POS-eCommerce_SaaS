@@ -6,6 +6,8 @@ import { getFormatters, getShopSettings } from "@/features/settings/queries";
 import { firstSteps, showFirstSteps } from "@/features/onboarding/steps";
 import { FirstSteps } from "@/features/onboarding/components/FirstSteps";
 import { getOverdueInvoices } from "@/features/reminders/actions";
+import { getShopAccess } from "@/features/billing/access";
+import { planAllows } from "@/features/billing/plans";
 import { isPageAllowed, firstAllowedPath } from "@/lib/appPages";
 import { dayRangeInTimeZone } from "@/lib/format";
 import { rankTopProducts, TOP_SALES_PERIODS, type TopSalesPeriod } from "@/features/sales/stats";
@@ -52,6 +54,7 @@ export default async function DashboardPage({
   const periodDays = period === "day" ? 1 : period === "week" ? 7 : 30;
   const periodStart = new Date(today.start.getTime() - (periodDays - 1) * 24 * 60 * 60 * 1000);
 
+  const access = await getShopAccess();
   const [todayInvoicesRes, debtRes, lowStockRes, recentRes, soldItemsRes, dueReminders] = await Promise.all([
     supabase
       .from("invoices")
@@ -95,6 +98,7 @@ export default async function DashboardPage({
       invoiceCount: invoicesRes.count ?? 0,
       storefrontAddress: Boolean(shopSettings?.shop_slug),
       teamSize: teamRes.count ?? 1,
+      storefrontIncluded: planAllows(access.plan, "storefront"),
     });
     if (showFirstSteps(all)) steps = all;
   }
@@ -107,7 +111,10 @@ export default async function DashboardPage({
   // The same list as the Reminders page (first delay, then the recurring
   // delay since the last reminder): the button only offers a reminder that
   // is actually due, the most overdue first.
-  const nextReminder = [...dueReminders].sort((a, b) => b.days_overdue - a.days_overdue)[0];
+  // Reminders come with the Essentiel plan: below it, no reminder button.
+  const nextReminder = planAllows(access.plan, "reminders")
+    ? [...dueReminders].sort((a, b) => b.days_overdue - a.days_overdue)[0]
+    : undefined;
   const topArticles = rankTopProducts(
     (soldItemsRes.data ?? []) as unknown as { product_id: string; quantity: number; products: { name: string } | null }[],
     t("unknown_product"),
@@ -222,7 +229,7 @@ export default async function DashboardPage({
                   ? t("remind_many", { count: dueReminders.length })
                   : t("remind_client", { name: nextReminder.client_name.split(" ")[0] })}
               </Link>
-            ) : totalDebt > 0 ? (
+            ) : totalDebt > 0 && planAllows(access.plan, "reminders") ? (
               <div className="flex flex-col gap-2">
                 <p className="text-sm text-zinc-500">{t("no_reminder_due")}</p>
                 <Link href="/reminders" className="text-sm font-semibold text-violet-700 underline underline-offset-2 dark:text-violet-300">

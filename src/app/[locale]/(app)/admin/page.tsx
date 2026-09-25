@@ -4,8 +4,8 @@ import { ChevronRight, Flag } from "lucide-react";
 import { Link } from "@/i18n/routing";
 import { getFormatters } from "@/features/settings/queries";
 import { isPlatformAdmin, listReports, listShops } from "@/features/admin/queries";
-import { effectivePlan } from "@/features/billing/plans";
-import { PLAN_BADGE_CLASS, countryName } from "@/features/admin/components/planStyle";
+import { shopAccess } from "@/features/billing/plans";
+import { ACCESS_BADGE_CLASS, PLAN_BADGE_CLASS, countryName } from "@/features/admin/components/planStyle";
 
 export async function generateMetadata() {
   const t = await getTranslations("Admin");
@@ -26,7 +26,10 @@ export default async function AdminPage() {
   ]);
 
   const now = new Date();
-  const paying = shops.filter((shop) => effectivePlan(shop, now) !== "STANDARD").length;
+  const paying = shops.filter((shop) => {
+    const access = shopAccess(shop, now);
+    return access.plan !== "STANDARD" && access.mode !== "read_only";
+  }).length;
   const suspended = shops.filter((shop) => shop.suspended_at).length;
   const newReports = reports.filter((report) => report.status === "NEW").length;
 
@@ -71,8 +74,8 @@ export default async function AdminPage() {
         ) : (
           <ul className="grid gap-3 lg:grid-cols-2">
             {shops.map((shop) => {
-              const plan = effectivePlan(shop, now);
-              const expired = shop.plan !== "STANDARD" && plan === "STANDARD";
+              const access = shopAccess(shop, now);
+              const plan = access.plan;
               return (
                 <li key={shop.shop_id}>
                   <Link
@@ -83,6 +86,9 @@ export default async function AdminPage() {
                       <div className="flex flex-wrap items-center gap-2">
                         <p className="truncate font-semibold">{shop.shop_name || t("unnamed_shop")}</p>
                         <span className={`rounded-full px-2.5 py-0.5 text-[11px] font-bold ${PLAN_BADGE_CLASS[plan]}`}>{t(`plan_${plan}`)}</span>
+                        {access.mode !== "active" && (
+                          <span className={`rounded-full px-2.5 py-0.5 text-[11px] font-bold ${ACCESS_BADGE_CLASS[access.mode]}`}>{t(`access_${access.mode}`)}</span>
+                        )}
                         {shop.suspended_at && (
                           <span className="rounded-full bg-red-100 px-2.5 py-0.5 text-[11px] font-bold text-red-700 dark:bg-red-900/30 dark:text-red-300">
                             {t("suspended_badge")}
@@ -99,7 +105,6 @@ export default async function AdminPage() {
                       <p className="text-[12px] text-zinc-500">
                         {shop.signed_up_at && t("signed_up", { date: format.date(shop.signed_up_at) })}
                         {plan !== "STANDARD" && shop.paid_until && ` · ${t("until", { date: format.date(shop.paid_until) })}`}
-                        {expired && shop.paid_until && ` · ${t("expired_on", { plan: t(`plan_${shop.plan}`), date: format.date(shop.paid_until) })}`}
                       </p>
                     </div>
                     <ChevronRight className="h-4 w-4 shrink-0 text-zinc-400" />

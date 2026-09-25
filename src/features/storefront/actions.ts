@@ -10,6 +10,8 @@ export type PublicShopProfile = {
   theme_accent_color: string;
   theme_font: string;
   default_phone_country_code: string;
+  /** False on Pro Plus: the storefront carries no WISHOP mention. */
+  show_wishop_badge: boolean;
 };
 
 export type PublicProduct = {

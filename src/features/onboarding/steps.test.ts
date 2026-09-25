@@ -21,6 +21,13 @@ describe("first steps guide", () => {
     expect(steps.filter((s) => s.done).map((s) => s.key)).toEqual(["shop", "stock", "sale", "team"]);
   });
 
+  it("leaves out the storefront step when the plan has no storefront", () => {
+    const steps = firstSteps({ ...newShop, storefrontIncluded: false });
+    expect(steps.map((s) => s.key)).toEqual(["shop", "stock", "sale", "team"]);
+    const done = firstSteps({ shopDetailsFilled: true, productCount: 1, invoiceCount: 1, storefrontAddress: false, teamSize: 1, storefrontIncluded: false });
+    expect(showFirstSteps(done)).toBe(false);
+  });
+
   it("disappears once the required steps are done, even without a team", () => {
     const steps = firstSteps({ shopDetailsFilled: true, productCount: 3, invoiceCount: 5, storefrontAddress: true, teamSize: 1 });
     expect(showFirstSteps(steps)).toBe(false);

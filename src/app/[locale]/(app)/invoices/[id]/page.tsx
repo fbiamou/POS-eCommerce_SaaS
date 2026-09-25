@@ -1,12 +1,14 @@
 import { getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
-import { ArrowLeft, Download, Printer } from "lucide-react";
+import { ArrowLeft, Download, Lock, Printer } from "lucide-react";
 import { Link } from "@/i18n/routing";
 import { getInvoiceDetail, extractVat } from "@/features/invoices/actions";
 import { getFormatters, getShopSettings } from "@/features/settings/queries";
 import { RecordPaymentButton } from "@/features/invoices/components/RecordPaymentButton";
 import { INVOICE_STATUS_CLASS } from "@/features/invoices/status";
 import { DebtProgress } from "@/components/ui/DebtProgress";
+import { getShopAccess } from "@/features/billing/access";
+import { planAllows } from "@/features/billing/plans";
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -83,9 +85,15 @@ export default async function InvoicePage({
         <Link href={`/invoices/${invoice.id}/ticket`} className={secondaryButton}>
           <Printer className="h-4 w-4" /> {t("print_ticket")}
         </Link>
-        <a href={`/api/invoices/${invoice.id}/pdf?locale=${locale}`} target="_blank" rel="noreferrer" className={secondaryButton}>
-          <Download className="h-4 w-4" /> {t("download_pdf")}
-        </a>
+        {planAllows((await getShopAccess()).plan, "invoice_pdf") ? (
+          <a href={`/api/invoices/${invoice.id}/pdf?locale=${locale}`} target="_blank" rel="noreferrer" className={secondaryButton}>
+            <Download className="h-4 w-4" /> {t("download_pdf")}
+          </a>
+        ) : (
+          <Link href="/settings?tab=formule" className={`${secondaryButton} opacity-70`}>
+            <Lock className="h-4 w-4" /> {t("download_pdf")}
+          </Link>
+        )}
       </div>
 
       <article className="flex flex-col gap-5 rounded-2xl bg-[var(--surface-1)] p-5 shadow-card sm:p-6">

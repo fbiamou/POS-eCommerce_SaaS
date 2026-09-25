@@ -107,6 +107,23 @@ export async function proxy(request: NextRequest) {
 
     if (profile) {
       const pathWithoutLocale = request.nextUrl.pathname.replace(/^\/(es|fr|en)/, '') || '/'
+
+      // An account beyond the plan's number of accounts is paused (never the
+      // owner): it only sees the pause page, and gets back in on its own as
+      // soon as the plan allows it (supabase: current_member_paused).
+      const { data: paused } = await supabase.rpc('current_member_paused')
+      const onPausedPage = pathWithoutLocale === '/paused'
+      if (paused === true && !onPausedPage) {
+        const pausedUrl = request.nextUrl.clone()
+        pausedUrl.pathname = `/${locale}/paused`
+        return withSession(NextResponse.redirect(pausedUrl))
+      }
+      if (paused !== true && onPausedPage) {
+        const homeUrl = request.nextUrl.clone()
+        homeUrl.pathname = `/${locale}/dashboard`
+        return withSession(NextResponse.redirect(homeUrl))
+      }
+
       const allowed = isPageAllowed(profile.role, profile.allowed_pages ?? [], pathWithoutLocale)
       if (!allowed) {
         const redirectUrl = request.nextUrl.clone()

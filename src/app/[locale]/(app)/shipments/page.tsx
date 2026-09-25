@@ -1,4 +1,5 @@
 import ShipmentList from "@/features/shipments/components/ShipmentList";
+import { lockedFeature } from "@/features/billing/gate";
 import { NewShipmentLinkButton } from "@/features/shipments/components/NewShipmentLinkButton";
 import { getOpenPurchaseOrders, getShipments } from "@/features/shipments/queries";
 import { getShopSettings } from "@/features/settings/queries";
@@ -10,6 +11,8 @@ export async function generateMetadata() {
 }
 
 export default async function ShipmentsPage() {
+  const locked = await lockedFeature("shipments");
+  if (locked) return locked;
   const [t, shipments, openPurchaseOrders, settings] = await Promise.all([
     getTranslations("Shipments"),
     getShipments(),

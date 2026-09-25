@@ -88,6 +88,12 @@ export const FEEDBACK_CODES = [
   "shop_has_payments",
   "shop_has_admin",
   "delete_name_mismatch",
+  // Plans
+  "shop_read_only",
+  "plan_feature_locked",
+  "plan_credit_locked",
+  "plan_limit_items",
+  "plan_limit_accounts",
   // Loyalty
   "loyalty_reward_unavailable",
   "loyalty_invalid",

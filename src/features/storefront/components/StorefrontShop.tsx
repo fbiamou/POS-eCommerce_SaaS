@@ -314,13 +314,16 @@ export default function StorefrontShop({
           >
             <Flag className="h-3.5 w-3.5" /> {t("report_link")}
           </button>
-          {/* The WISHOP site is a static page (public/landing), not an app route. */}
-          {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
-          <a href="/landing" className="flex items-center gap-1.5 text-zinc-500 hover:text-zinc-800">
-            {t("powered_by")}
-            <WishopMark className="h-3.5 w-auto text-night" />
-            <span className="font-display font-extrabold tracking-tight text-night">WISHOP</span>
-          </a>
+          {/* The WISHOP site is a static page (public/landing), not an app
+              route. Pro Plus storefronts carry no WISHOP mention. */}
+          {shop.show_wishop_badge !== false && (
+            // eslint-disable-next-line @next/next/no-html-link-for-pages
+            <a href="/landing" className="flex items-center gap-1.5 text-zinc-500 hover:text-zinc-800">
+              {t("powered_by")}
+              <WishopMark className="h-3.5 w-auto text-night" />
+              <span className="font-display font-extrabold tracking-tight text-night">WISHOP</span>
+            </a>
+          )}
         </div>
       </footer>
 

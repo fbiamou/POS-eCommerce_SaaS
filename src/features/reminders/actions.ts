@@ -1,5 +1,7 @@
 "use server";
 
+import { getShopAccess } from "@/features/billing/access";
+import { planAllows } from "@/features/billing/plans";
 import { createClient } from "@/utils/supabase/server";
 import { revalidatePath } from "next/cache";
 import { getLocale, getTranslations } from "next-intl/server";
@@ -64,6 +66,8 @@ export async function sendReminder(
 ): Promise<{ success?: true; error?: FeedbackCode; whatsappUrl?: string; amountDue?: number }> {
   const { supabase, shopId } = await getShopId();
   if (!shopId) return { error: "unauthorized" };
+  // WhatsApp reminders come with the Essentiel plan.
+  if (!planAllows((await getShopAccess()).plan, "reminders")) return { error: "plan_feature_locked" };
 
   const { data: invoice } = await supabase
     .from("invoices")

@@ -1,4 +1,5 @@
 import PurchaseOrderList from "@/features/purchase-orders/components/PurchaseOrderList";
+import { lockedFeature } from "@/features/billing/gate";
 import { getLowStockProducts, getPurchaseOrders } from "@/features/purchase-orders/queries";
 import { SupplierManager } from "@/features/suppliers/components/SupplierManager";
 import { getSuppliers } from "@/features/suppliers/queries";
@@ -11,6 +12,8 @@ export async function generateMetadata() {
 }
 
 export default async function PurchaseOrdersPage() {
+  const locked = await lockedFeature("purchase_orders");
+  if (locked) return locked;
   const [t, format, settings] = await Promise.all([getTranslations("PurchaseOrders"), getShopFormat(), getShopSettings()]);
   const [lowStock, orders, suppliers] = await Promise.all([
     getLowStockProducts(format.lowStockThreshold),

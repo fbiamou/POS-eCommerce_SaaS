@@ -8,6 +8,8 @@ export type FirstStepsState = {
   invoiceCount: number;
   storefrontAddress: boolean;
   teamSize: number;
+  /** The storefront comes with the Pro plan: below it, no storefront step. */
+  storefrontIncluded?: boolean;
 };
 
 export type FirstStepKey = "shop" | "stock" | "sale" | "storefront" | "team";
@@ -20,13 +22,14 @@ export type FirstStep = {
 };
 
 export function firstSteps(state: FirstStepsState): FirstStep[] {
-  return [
+  const steps: FirstStep[] = [
     { key: "shop", href: "/settings", done: state.shopDetailsFilled, optional: false },
     { key: "stock", href: "/stock", done: state.productCount > 0, optional: false },
     { key: "sale", href: "/sales", done: state.invoiceCount > 0, optional: false },
     { key: "storefront", href: "/settings", done: state.storefrontAddress, optional: false },
     { key: "team", href: "/settings?tab=equipe", done: state.teamSize > 1, optional: true },
   ];
+  return state.storefrontIncluded === false ? steps.filter((step) => step.key !== "storefront") : steps;
 }
 
 // The guide stays until every required step is done.

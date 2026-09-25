@@ -1,4 +1,7 @@
 import CreateSaleForm from "@/features/sales/components/CreateSaleForm";
+import { readOnlyTill } from "@/features/billing/gate";
+import { getShopAccess } from "@/features/billing/access";
+import { planAllows } from "@/features/billing/plans";
 import { getTranslations } from "next-intl/server";
 import { createClient } from "@/utils/supabase/server";
 import { getShopSettings } from "@/features/settings/queries";
@@ -10,6 +13,8 @@ export async function generateMetadata() {
 }
 
 export default async function SalesPage() {
+  const readOnly = await readOnlyTill();
+  if (readOnly) return readOnly;
   const t = await getTranslations("Sales");
   const supabase = await createClient();
   const shopSettings = await getShopSettings();
@@ -50,8 +55,10 @@ export default async function SalesPage() {
     image_url: p.image_url,
   }));
 
+  // Credit sales come with Essentiel, the loyalty card with Pro.
+  const access = await getShopAccess();
   const loyalty = {
-    enabled: shopSettings?.loyalty_enabled ?? true,
+    enabled: (shopSettings?.loyalty_enabled ?? true) && planAllows(access.plan, "loyalty"),
     stampsRequired: shopSettings?.loyalty_stamps_required ?? 10,
     rewardPercent: shopSettings?.loyalty_reward_percent ?? 10,
   };
@@ -73,6 +80,7 @@ export default async function SalesPage() {
         clients={clients}
         defaultPhoneCountryCode={shopSettings?.default_phone_country_code || "+237"}
         loyalty={loyalty}
+        creditAllowed={planAllows(access.plan, "credit")}
       />
     </div>
   );

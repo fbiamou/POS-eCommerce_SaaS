@@ -4,8 +4,8 @@ import { ArrowLeft, ExternalLink, Mail } from "lucide-react";
 import { Link } from "@/i18n/routing";
 import { getFormatters } from "@/features/settings/queries";
 import { getShopEvents, isPlatformAdmin, listShops, type SubscriptionEvent } from "@/features/admin/queries";
-import { effectivePlan } from "@/features/billing/plans";
-import { PLAN_BADGE_CLASS, countryName } from "@/features/admin/components/planStyle";
+import { shopAccess } from "@/features/billing/plans";
+import { ACCESS_BADGE_CLASS, PLAN_BADGE_CLASS, countryName } from "@/features/admin/components/planStyle";
 import { PlanActions } from "@/features/admin/components/PlanActions";
 import { SuspendShop } from "@/features/admin/components/SuspendShop";
 import { DeleteShop } from "@/features/admin/components/DeleteShop";
@@ -29,9 +29,9 @@ export default async function AdminShopPage({ params }: { params: Promise<{ id: 
   const shop = shops.find((s) => s.shop_id === id);
   if (!shop) notFound();
 
-  const plan = effectivePlan(shop, new Date());
+  const access = shopAccess(shop, new Date());
+  const plan = access.plan;
   const hasPayments = events.some((event) => event.kind === "PAYMENT");
-  const expired = shop.plan !== "STANDARD" && plan === "STANDARD";
 
   const describe = (event: SubscriptionEvent) => {
     const planName = event.plan ? t(`plan_${event.plan}`) : "";
@@ -66,6 +66,9 @@ export default async function AdminShopPage({ params }: { params: Promise<{ id: 
         <div className="flex flex-wrap items-center gap-2">
           <h1 className="text-2xl font-bold tracking-tight md:text-3xl">{shop.shop_name || t("unnamed_shop")}</h1>
           <span className={`rounded-full px-2.5 py-0.5 text-[12px] font-bold ${PLAN_BADGE_CLASS[plan]}`}>{t(`plan_${plan}`)}</span>
+          {access.mode !== "active" && (
+            <span className={`rounded-full px-2.5 py-0.5 text-[12px] font-bold ${ACCESS_BADGE_CLASS[access.mode]}`}>{t(`access_${access.mode}`)}</span>
+          )}
           {shop.suspended_at && (
             <span className="rounded-full bg-red-100 px-2.5 py-0.5 text-[12px] font-bold text-red-700 dark:bg-red-900/30 dark:text-red-300">
               {t("suspended_badge")}
@@ -122,10 +125,14 @@ export default async function AdminShopPage({ params }: { params: Promise<{ id: 
           <h2 id="admin-plan" className="text-lg font-bold">{t("plan_section")}</h2>
           <p className="mt-1 text-[14px] text-zinc-500">
             {plan === "STANDARD"
-              ? expired && shop.paid_until
-                ? t("expired_on", { plan: t(`plan_${shop.plan}`), date: format.date(shop.paid_until) })
-                : t("on_standard")
-              : t("current_until", { plan: t(`plan_${plan}`), date: format.date(shop.paid_until as string, "long") })}
+              ? t("on_standard")
+              : access.mode === "grace" || access.mode === "read_only"
+                ? t(access.mode === "grace" ? "grace_until" : "read_only_since", {
+                    plan: t(`plan_${plan}`),
+                    date: format.date(shop.paid_until as string),
+                    since: format.date(access.readOnlySince as string),
+                  })
+                : t("current_until", { plan: t(`plan_${plan}`), date: format.date(shop.paid_until as string, "long") })}
           </p>
         </div>
         <PlanActions shopId={shop.shop_id} current={{ plan: shop.plan, paid_until: shop.paid_until }} />

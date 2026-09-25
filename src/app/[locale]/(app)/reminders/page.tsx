@@ -1,4 +1,5 @@
 import ReminderList from "@/features/reminders/components/ReminderList";
+import { lockedFeature } from "@/features/billing/gate";
 import { ReminderSettingsButton } from "@/features/reminders/components/ReminderSettingsButton";
 import { Link } from "@/i18n/routing";
 import { getTranslations } from "next-intl/server";
@@ -12,6 +13,8 @@ export async function generateMetadata() {
 }
 
 export default async function RemindersPage() {
+  const locked = await lockedFeature("reminders");
+  if (locked) return locked;
   const [t, invoices, shopSettings, format] = await Promise.all([
     getTranslations("Reminders"),
     getOverdueInvoices(),

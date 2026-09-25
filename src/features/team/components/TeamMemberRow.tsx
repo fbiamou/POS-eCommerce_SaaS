@@ -25,10 +25,16 @@ export function TeamMemberRow({
   member,
   isSelf,
   roleLabels,
+  paused = false,
+  canManageAccess = true,
 }: {
   member: Profile;
   isSelf: boolean;
   roleLabels: { MANAGER: string; SELLER: string };
+  /** Beyond the plan's number of accounts (see pausedMemberIds). */
+  paused?: boolean;
+  /** Page-by-page access comes with the Pro plan. */
+  canManageAccess?: boolean;
 }) {
   const t = useTranslations("Settings");
   const tFeedback = useTranslations("Feedback");
@@ -104,6 +110,9 @@ export function TeamMemberRow({
           {!member.is_active && (
             <span className="text-xs font-medium text-red-500">{t("suspended")}</span>
           )}
+          {member.is_active && paused && (
+            <span className="text-xs font-medium text-amber-600 dark:text-amber-400">{t("member_paused")}</span>
+          )}
         </div>
 
         {isSelf ? (
@@ -126,7 +135,7 @@ export function TeamMemberRow({
               ]}
             />
 
-            {member.role === "SELLER" && (
+            {member.role === "SELLER" && canManageAccess && (
               <button
                 type="button"
                 onClick={() => setShowAccess((v) => !v)}

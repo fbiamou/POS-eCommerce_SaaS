@@ -6,6 +6,8 @@ import { getShopSettings } from "@/features/settings/queries";
 import { routing } from "@/i18n/routing";
 import { InvoiceDocument, type InvoiceLabels } from "@/features/invoices/components/InvoiceDocument";
 import { taxIdLabelFor } from "@/lib/countries";
+import { getShopAccess } from "@/features/billing/access";
+import { planAllows } from "@/features/billing/plans";
 
 export const runtime = "nodejs";
 
@@ -18,6 +20,10 @@ export async function GET(
   const invoice = await getInvoiceDetail(id);
   if (!invoice) {
     return NextResponse.json({ error: "invoice_not_found" }, { status: 404 });
+  }
+  // PDF invoices come with the Essentiel plan (the till receipt stays free).
+  if (!planAllows((await getShopAccess()).plan, "invoice_pdf")) {
+    return NextResponse.json({ error: "plan_feature_locked" }, { status: 403 });
   }
 
   const shop = await getShopSettings();

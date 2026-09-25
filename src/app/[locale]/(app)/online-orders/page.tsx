@@ -1,4 +1,5 @@
 import { getTranslations } from "next-intl/server";
+import { lockedFeature } from "@/features/billing/gate";
 import { ExternalLink } from "lucide-react";
 import { Link } from "@/i18n/routing";
 import { getOnlineOrders } from "@/features/online-orders/actions";
@@ -11,6 +12,8 @@ export async function generateMetadata() {
 }
 
 export default async function OnlineOrdersPage() {
+  const locked = await lockedFeature("storefront");
+  if (locked) return locked;
   const [t, orders, shopSettings, format] = await Promise.all([
     getTranslations("OnlineOrders"),
     getOnlineOrders(),

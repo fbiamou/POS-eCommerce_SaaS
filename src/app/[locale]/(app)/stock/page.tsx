@@ -8,6 +8,8 @@ import { getSuppliers } from "@/features/suppliers/queries";
 import { Link } from "@/i18n/routing";
 import { AlertTriangle, ArrowRight } from "lucide-react";
 import { formatMoney } from "@/lib/format";
+import { getShopAccess } from "@/features/billing/access";
+import { PLAN_LIMITS } from "@/features/billing/plans";
 
 export async function generateMetadata() {
   const t = await getTranslations("Stock");
@@ -75,6 +77,11 @@ export default async function StockPage() {
     value: normalizedProducts.reduce((sum, p) => sum + p.quantity_in_stock * (p.purchase_price ?? 0), 0),
   };
 
+  // Each plan includes a number of items (Standard 100, Essentiel 500...).
+  const access = await getShopAccess();
+  const itemLimit = PLAN_LIMITS[access.plan].items;
+  const tPlans = await getTranslations("Plans");
+
   const hasPublishedProducts = normalizedProducts.some((p) => p.is_published_online);
   const showNoSlugWarning = hasPublishedProducts && !shopSettings?.shop_slug;
 
@@ -88,7 +95,10 @@ export default async function StockPage() {
       <dl className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         <div className="rounded-2xl bg-[var(--surface-1)] p-4 shadow-card">
           <dt className="text-[12px] font-semibold text-zinc-500">{t("summary_items")}</dt>
-          <dd className="mt-1 font-mono text-xl font-semibold tabular-nums">{summary.items}</dd>
+          <dd className="mt-1 font-mono text-xl font-semibold tabular-nums">
+            {summary.items}
+            {itemLimit !== null && <span className="ml-1 font-sans text-[12px] font-semibold text-zinc-500">{tPlans("of_limit", { limit: itemLimit })}</span>}
+          </dd>
         </div>
         <div className="rounded-2xl bg-[var(--surface-1)] p-4 shadow-card">
           <dt className="text-[12px] font-semibold text-zinc-500">{t("summary_units")}</dt>
@@ -110,6 +120,13 @@ export default async function StockPage() {
           <dd className="mt-1 font-mono text-xl font-semibold tabular-nums">{money(summary.value)}</dd>
         </div>
       </dl>
+
+      {itemLimit !== null && summary.items >= itemLimit && (
+        <div className="flex flex-wrap items-center justify-between gap-2 rounded-2xl bg-amber-50 px-4 py-3 text-[14px] text-amber-900 ring-1 ring-amber-200 dark:bg-amber-900/20 dark:text-amber-200 dark:ring-amber-900/40">
+          <p>{tPlans("limit_items", { plan: tPlans(`plan_${access.plan}`), limit: itemLimit })}</p>
+          <Link href="/settings?tab=formule" className="font-bold underline underline-offset-2">{tPlans("locked_cta")}</Link>
+        </div>
+      )}
 
       {showNoSlugWarning && (
         <div className="flex items-start gap-3 rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800 dark:border-amber-900/50 dark:bg-amber-900/20 dark:text-amber-300">

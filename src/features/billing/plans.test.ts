@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { addMonths, effectivePlan, nextPaidUntil, suggestedAmount } from "./plans";
+import { addMonths, nextPaidUntil, pausedMemberIds, planAllows, shopAccess, suggestedAmount } from "./plans";
 
 const now = new Date("2026-09-25T10:00:00Z");
 
@@ -11,11 +11,37 @@ describe("plans", () => {
     expect(addMonths(new Date("2026-11-30T10:00:00Z"), 3).toISOString()).toBe("2027-02-28T10:00:00.000Z");
   });
 
-  it("falls back to Standard when there is no plan or the period is over", () => {
-    expect(effectivePlan(null, now)).toBe("STANDARD");
-    expect(effectivePlan({ plan: "PRO_PLUS", paid_until: "2026-11-25T10:00:00Z" }, now)).toBe("PRO_PLUS");
-    expect(effectivePlan({ plan: "PRO", paid_until: "2026-09-25T09:59:00Z" }, now)).toBe("STANDARD");
-    expect(effectivePlan({ plan: "PRO", paid_until: null }, now)).toBe("STANDARD");
+  it("gives each feature from its plan upwards", () => {
+    expect(planAllows("STANDARD", "credit")).toBe(false);
+    expect(planAllows("ESSENTIEL", "credit")).toBe(true);
+    expect(planAllows("ESSENTIEL", "storefront")).toBe(false);
+    expect(planAllows("PRO", "storefront")).toBe(true);
+    expect(planAllows("PRO", "shipments")).toBe(false);
+    expect(planAllows("PRO_PLUS", "shipments")).toBe(true);
+  });
+
+  it("keeps a paid plan for 3 days after its end, then turns read-only", () => {
+    expect(shopAccess(null, now).mode).toBe("active");
+    expect(shopAccess({ plan: "STANDARD", paid_until: null }, now)).toEqual({ plan: "STANDARD", mode: "active", paidUntil: null, readOnlySince: null });
+    expect(shopAccess({ plan: "PRO", paid_until: "2026-12-25T10:00:00Z" }, now).mode).toBe("active");
+    expect(shopAccess({ plan: "PRO", paid_until: "2026-09-30T10:00:00Z" }, now).mode).toBe("ending_soon");
+    const grace = shopAccess({ plan: "PRO", paid_until: "2026-09-24T10:00:00Z" }, now);
+    expect(grace.mode).toBe("grace");
+    expect(grace.readOnlySince).toBe("2026-09-27T10:00:00.000Z");
+    expect(shopAccess({ plan: "PRO", paid_until: "2026-09-22T10:00:00Z" }, now).mode).toBe("read_only");
+  });
+
+  it("pauses the accounts beyond the plan, never the owner, oldest kept first", () => {
+    const members = [
+      { id: "seller-new", role: "SELLER", is_active: true, created_at: "2026-09-20T00:00:00Z" },
+      { id: "owner", role: "MANAGER", is_active: true, created_at: "2026-08-30T00:00:00Z" },
+      { id: "seller-old", role: "SELLER", is_active: true, created_at: "2026-09-01T00:00:00Z" },
+      { id: "seller-off", role: "SELLER", is_active: false, created_at: "2026-09-02T00:00:00Z" },
+    ];
+    expect([...pausedMemberIds(members, "STANDARD")].sort()).toEqual(["seller-new", "seller-old"]);
+    expect([...pausedMemberIds(members, "ESSENTIEL")]).toEqual(["seller-new"]);
+    expect(pausedMemberIds(members, "PRO").size).toBe(0);
+    expect(pausedMemberIds(members, "PRO_PLUS").size).toBe(0);
   });
 
   it("extends the same running plan after its end date, otherwise starts today", () => {

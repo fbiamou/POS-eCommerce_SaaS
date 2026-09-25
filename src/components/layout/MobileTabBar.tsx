@@ -3,7 +3,8 @@
 import { useState } from "react";
 import { Link, usePathname } from "@/i18n/routing";
 import { useTranslations } from "next-intl";
-import { MoreHorizontal, Settings as SettingsIcon, ExternalLink, ShieldCheck } from "lucide-react";
+import { MoreHorizontal, Settings as SettingsIcon, ExternalLink, ShieldCheck, Lock } from "lucide-react";
+import { planAllows, type Plan } from "@/features/billing/plans";
 import { isPageAllowed, type AppPageKey } from "@/lib/appPages";
 import { buildNavItems } from "./navItems";
 import { Modal } from "@/components/ui/Modal";
@@ -17,6 +18,7 @@ type MobileTabBarProps = {
   profile?: Profile | null;
   shopSlug?: string | null;
   isPlatformAdmin?: boolean;
+  plan?: Plan;
 };
 
 // Bottom tab bar for phones. The till ("Vendre") is the action staff take
@@ -35,7 +37,7 @@ const TAB_LABEL_KEY: Record<string, string> = {
   invoices: "tab_invoices",
 };
 
-export function MobileTabBar({ profile, shopSlug, isPlatformAdmin = false }: MobileTabBarProps) {
+export function MobileTabBar({ profile, shopSlug, isPlatformAdmin = false, plan = "PRO_PLUS" }: MobileTabBarProps) {
   const t = useTranslations("Sidebar");
   const tSettings = useTranslations("Settings");
   const pathname = usePathname();
@@ -118,6 +120,9 @@ export function MobileTabBar({ profile, shopSlug, isPlatformAdmin = false }: Mob
           {overflow.map((item) => (
             <Link key={item.key} href={item.path} onClick={() => setShowMore(false)} className={overflowLinkClass}>
               <item.icon className="h-5 w-5 text-violet-600" /> {item.label}
+              {item.feature && !planAllows(plan, item.feature) && (
+                <Lock className="ml-auto h-4 w-4 text-zinc-400" aria-label={t("locked")} />
+              )}
             </Link>
           ))}
           {isPlatformAdmin && (

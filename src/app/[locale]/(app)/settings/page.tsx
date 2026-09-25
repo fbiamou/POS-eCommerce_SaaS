@@ -9,9 +9,13 @@ import { LogoUploadButton } from '@/features/settings/components/LogoUploadButto
 import { ShopSlugField } from '@/features/settings/components/ShopSlugField'
 import { CurrencySelect } from '@/features/settings/components/CurrencySelect'
 import { getLocale, getTranslations } from 'next-intl/server'
+import { createClient } from '@/utils/supabase/server'
+import { getShopAccess } from '@/features/billing/access'
+import { PLAN_LIMITS, pausedMemberIds, planAllows } from '@/features/billing/plans'
+import { PlanOverview } from '@/features/billing/components/PlanOverview'
 import {
   UserCircle, ShieldCheck, ShoppingBag, Plus, Building2,
-  Palette, Users, Check, Download
+  Palette, Users, Check, Download, Crown, Lock
 } from 'lucide-react'
 import Image from 'next/image'
 import { Select } from '@/components/ui/Select'
@@ -47,16 +51,31 @@ export default async function SettingsPage({
   const error = readFeedbackParam(params.error)
   const message = readFeedbackParam(params.message)
 
-  const [t, tFeedback, currentProfile, teamMembers, shopSettings, locale] = await Promise.all([
+  const [t, tFeedback, tPlans, currentProfile, teamMembers, shopSettings, locale, access] = await Promise.all([
     getTranslations('Settings'),
     getTranslations('Feedback'),
+    getTranslations('Plans'),
     getCurrentProfile(),
     getTeamMembers(),
     getShopSettings(),
     getLocale(),
+    getShopAccess(),
   ])
 
   const isManager = currentProfile?.role === 'MANAGER'
+  const plan = access.plan
+  const activeAccounts = teamMembers.filter((m) => m.is_active).length
+  const accountLimit = PLAN_LIMITS[plan].accounts
+  const accountsFull = accountLimit !== null && activeAccounts >= accountLimit
+  const paused = pausedMemberIds(teamMembers, plan)
+
+  // Items count, for the "Ma formule" tab only.
+  let activeItems = 0
+  if (activeTab === 'formule' && isManager) {
+    const supabase = await createClient()
+    const { count } = await supabase.from('products').select('id', { count: 'exact', head: true }).eq('is_active', true)
+    activeItems = count ?? 0
+  }
 
   const ROLE_CONFIG: Record<string, { label: string; color: string; icon: React.ReactNode }> = {
     MANAGER: {
@@ -75,6 +94,7 @@ export default async function SettingsPage({
     { id: 'profil', label: t('tab_profile'), icon: <UserCircle className="h-4 w-4" /> },
     { id: 'boutique', label: t('tab_appearance'), icon: <Palette className="h-4 w-4" /> },
     { id: 'equipe', label: t('tab_team'), icon: <Users className="h-4 w-4" /> },
+    ...(isManager ? [{ id: 'formule', label: t('tab_plan'), icon: <Crown className="h-4 w-4" /> }] : []),
   ]
 
   return (
@@ -178,6 +198,9 @@ export default async function SettingsPage({
             {/* Boutique en ligne */}
             <div className="px-6 pt-4 pb-2">
               <ShopSlugField initialSlug={shopSettings?.shop_slug ?? null} />
+              {!planAllows(plan, 'storefront') && (
+                <p className="mt-2 flex items-center gap-1.5 text-[12px] text-zinc-500"><Lock className="h-3.5 w-3.5" /> {tPlans('storefront_needs_pro')}</p>
+              )}
             </div>
 
             <form action={updateShopProfile} className="p-6 space-y-5">
@@ -272,6 +295,9 @@ export default async function SettingsPage({
               <div className="border-t border-zinc-100 dark:border-[var(--line)] pt-6">
                 <p className="text-[13px] font-bold text-zinc-900 dark:text-white mb-1">{t('loyalty_section')}</p>
                 <p className="text-[11px] text-zinc-400 mb-4">{t('loyalty_section_subtitle')}</p>
+                {!planAllows(plan, 'loyalty') && (
+                  <p className="-mt-2 mb-4 flex items-center gap-1.5 text-[12px] text-zinc-500"><Lock className="h-3.5 w-3.5" /> {tPlans('loyalty_needs_pro')}</p>
+                )}
                 <div className="flex flex-col gap-4">
                   <label htmlFor="loyalty_enabled" className="flex items-center gap-3 text-[13px] font-bold text-zinc-700 dark:text-zinc-300">
                     <input id="loyalty_enabled" name="loyalty_enabled" type="checkbox" value="true" defaultChecked={shopSettings?.loyalty_enabled ?? true}
@@ -379,6 +405,15 @@ export default async function SettingsPage({
         </section>
       )}
 
+      {/* ====== FORMULE ====== */}
+      {activeTab === 'formule' && isManager && (
+        <PlanOverview
+          access={access}
+          shopName={shopSettings?.shop_name || tPlans('your_shop')}
+          usage={{ items: activeItems, accounts: activeAccounts }}
+        />
+      )}
+
       {/* ====== ÉQUIPE ====== */}
       {activeTab === 'equipe' && (
         <div className="flex flex-col gap-6">
@@ -396,6 +431,8 @@ export default async function SettingsPage({
                   member={member}
                   isSelf={member.id === currentProfile?.id}
                   roleLabels={{ MANAGER: t('role_manager'), SELLER: t('role_cashier') }}
+                  paused={paused.has(member.id)}
+                  canManageAccess={planAllows(plan, 'page_access')}
                 />
               ))}
             </div>
@@ -407,6 +444,15 @@ export default async function SettingsPage({
                 <h2 className="font-bold text-zinc-900 dark:text-white">{t('add_employee')}</h2>
                 <p className="text-[11px] text-zinc-400 mt-0.5">{t('add_employee_subtitle')}</p>
               </div>
+              {accountsFull ? (
+                <div className="p-6 flex flex-col gap-3">
+                  <p className="flex items-start gap-2 text-[13px] text-zinc-600 dark:text-zinc-300">
+                    <Lock className="mt-0.5 h-4 w-4 shrink-0" />
+                    {tPlans('limit_accounts', { plan: tPlans(`plan_${plan}`), count: accountLimit ?? 0 })}
+                  </p>
+                  <a href="?tab=formule" className="self-start text-[13px] font-bold text-violet-700 underline underline-offset-2 dark:text-violet-300">{tPlans('locked_cta')}</a>
+                </div>
+              ) : (
               <form action={inviteEmployee} className="p-6 space-y-5">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                   <div className="flex flex-col gap-1.5">
@@ -425,7 +471,11 @@ export default async function SettingsPage({
                     <input id="password_emp" name="password" type="password" required minLength={6} placeholder={t('password_min_hint')}
                       className="w-full rounded-xl border border-zinc-200 bg-white px-4 py-2.5 text-[13px] font-medium transition-colors focus:border-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-500 dark:border-[var(--line)] dark:bg-[var(--surface-1)]" />
                   </div>
-                  <EmployeeAccessFields />
+                  {planAllows(plan, 'page_access') ? (
+                    <EmployeeAccessFields />
+                  ) : (
+                    <p className="flex items-center gap-1.5 self-end text-[12px] text-zinc-500"><Lock className="h-3.5 w-3.5" /> {tPlans('page_access_needs_pro')}</p>
+                  )}
                 </div>
                 <div className="flex justify-end pt-2">
                   <button type="submit" className="inline-flex items-center justify-center gap-2 rounded-xl bg-violet-600 px-5 py-2.5 text-[13px] font-bold text-white hover:bg-violet-700 transition-colors shadow-sm">
@@ -433,6 +483,7 @@ export default async function SettingsPage({
                   </button>
                 </div>
               </form>
+              )}
             </section>
           )}
         </div>

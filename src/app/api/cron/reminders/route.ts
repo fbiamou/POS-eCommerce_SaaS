@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServiceRoleClient } from "@/utils/supabase/service";
 import { sendWhatsAppTemplateMessage } from "@/features/reminders/whatsapp";
+import { planAllows, shopAccess, type SubscriptionState } from "@/features/billing/plans";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -32,7 +33,17 @@ export async function GET(request: NextRequest) {
   let remindersFailed = 0;
   const failures: { shop_id: string; message: string }[] = [];
 
+  // Automatic reminders come with the Pro plan, and stop while a shop is
+  // read-only (a shop without a subscription row is on Standard).
+  const { data: subscriptions } = await supabase.from("subscriptions").select("shop_id, plan, paid_until");
+  const subscriptionByShop = new Map(
+    ((subscriptions ?? []) as (SubscriptionState & { shop_id: string })[]).map((s) => [s.shop_id, s]),
+  );
+  const now = new Date();
+
   for (const shop of shops ?? []) {
+    const access = shopAccess(subscriptionByShop.get(shop.shop_id) ?? null, now);
+    if (!planAllows(access.plan, "auto_reminders") || access.mode === "read_only") continue;
     shopsProcessed++;
     const shopHasCredentials = Boolean(
       shop.whatsapp_phone_number_id && shop.whatsapp_api_token && shop.whatsapp_template_name

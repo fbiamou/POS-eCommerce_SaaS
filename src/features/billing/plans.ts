@@ -3,8 +3,12 @@
 // launch price for 12 months; the normal price applies after that.
 //
 // A shop starts on Standard (free). Paid months are granted or recorded by a
-// platform admin (supabase: admin_extend_plan); past its end date a paid plan
-// falls back to Standard.
+// platform admin (supabase: admin_extend_plan). Past its end date, a paid plan
+// keeps working for GRACE_DAYS, then the shop is read-only (terms of use,
+// article 8) until it pays or its owner goes back to Standard.
+//
+// The database applies the same rules (supabase: plan_allows, plan_item_limit,
+// plan_account_limit, shop_plan_state): keep both in step.
 
 export const PLANS = ["STANDARD", "ESSENTIEL", "PRO", "PRO_PLUS"] as const;
 export type Plan = (typeof PLANS)[number];
@@ -18,10 +22,36 @@ export const PLAN_PRICES: Record<PaidPlan, { launch: number; normal: number }> =
   PRO_PLUS: { launch: 25000, normal: 35000 },
 };
 
+// null: unlimited.
+export const PLAN_LIMITS: Record<Plan, { accounts: number | null; items: number | null }> = {
+  STANDARD: { accounts: 1, items: 100 },
+  ESSENTIEL: { accounts: 2, items: 500 },
+  PRO: { accounts: 5, items: 2000 },
+  PRO_PLUS: { accounts: null, items: null },
+};
+
+// The lowest plan that includes each feature.
+export const FEATURE_PLAN = {
+  credit: "ESSENTIEL",
+  invoice_pdf: "ESSENTIEL",
+  reminders: "ESSENTIEL",
+  storefront: "PRO",
+  purchase_orders: "PRO",
+  loyalty: "PRO",
+  page_access: "PRO",
+  auto_reminders: "PRO",
+  shipments: "PRO_PLUS",
+  no_branding: "PRO_PLUS",
+} as const satisfies Record<string, Plan>;
+export type PlanFeature = keyof typeof FEATURE_PLAN;
+
 export const PAYMENT_METHODS = ["MUNI_DINERO", "BANK_TRANSFER", "CASH", "OTHER"] as const;
 export type PaymentMethod = (typeof PAYMENT_METHODS)[number];
 
 export const MAX_MONTHS = 36;
+export const GRACE_DAYS = 3;
+const ENDING_SOON_DAYS = 7;
+const DAY = 24 * 60 * 60 * 1000;
 
 export type SubscriptionState = { plan: Plan; paid_until: string | null };
 
@@ -33,12 +63,52 @@ export function isPaymentMethod(value: string): value is PaymentMethod {
   return (PAYMENT_METHODS as readonly string[]).includes(value);
 }
 
-// The plan the shop actually has today: Standard when it has none, or when
-// its paid period is over.
-export function effectivePlan(subscription: SubscriptionState | null, now: Date): Plan {
-  if (!subscription || subscription.plan === "STANDARD") return "STANDARD";
-  if (!subscription.paid_until || new Date(subscription.paid_until) <= now) return "STANDARD";
-  return subscription.plan;
+export function planRank(plan: Plan): number {
+  return PLANS.indexOf(plan);
+}
+
+export function planAllows(plan: Plan, feature: PlanFeature): boolean {
+  return planRank(plan) >= planRank(FEATURE_PLAN[feature]);
+}
+
+// Where the shop stands today:
+// - active: Standard, or a paid plan running normally;
+// - ending_soon: a paid plan ending within a week;
+// - grace: the end date has passed, everything still works for GRACE_DAYS;
+// - read_only: after that, until it pays or goes back to Standard.
+export type ShopAccess = {
+  plan: Plan;
+  mode: "active" | "ending_soon" | "grace" | "read_only";
+  paidUntil: string | null;
+  readOnlySince: string | null;
+};
+
+export function shopAccess(subscription: SubscriptionState | null, now: Date): ShopAccess {
+  const plan = subscription?.plan ?? "STANDARD";
+  if (plan === "STANDARD" || !subscription) return { plan: "STANDARD", mode: "active", paidUntil: null, readOnlySince: null };
+  if (!subscription.paid_until) return { plan, mode: "read_only", paidUntil: null, readOnlySince: null };
+
+  const end = new Date(subscription.paid_until).getTime();
+  const readOnlySince = new Date(end + GRACE_DAYS * DAY).toISOString();
+  const base = { plan, paidUntil: subscription.paid_until, readOnlySince };
+  if (now.getTime() >= end + GRACE_DAYS * DAY) return { ...base, mode: "read_only" };
+  if (now.getTime() >= end) return { ...base, mode: "grace" };
+  if (end - now.getTime() <= ENDING_SOON_DAYS * DAY) return { ...base, mode: "ending_soon" };
+  return { ...base, mode: "active" };
+}
+
+// Accounts beyond the plan's limit are paused. The owner (first manager)
+// never is; the other active accounts keep access from the oldest on.
+export function pausedMemberIds(
+  members: { id: string; role: string; is_active: boolean; created_at: string }[],
+  plan: Plan,
+): Set<string> {
+  const limit = PLAN_LIMITS[plan].accounts;
+  if (limit === null) return new Set();
+  const byAge = [...members].sort((a, b) => a.created_at.localeCompare(b.created_at) || a.id.localeCompare(b.id));
+  const owner = byAge.find((m) => m.role === "MANAGER");
+  const others = byAge.filter((m) => m.is_active && m.id !== owner?.id);
+  return new Set(others.slice(Math.max(limit - 1, 0)).map((m) => m.id));
 }
 
 // Calendar months, the way Postgres adds an interval: 31 January + 1 month is
