@@ -67,6 +67,7 @@ export async function getPurchaseOrders(): Promise<PurchaseOrderSummary[]> {
   const { data, error } = await supabase
     .from("purchase_orders")
     .select("id, reference, status, created_at, sent_at, received_at, suppliers(name), purchase_order_items(quantity, excluded)")
+    .is("deleted_at", null)
     .order("created_at", { ascending: false });
   if (error) {
     console.error("Error fetching purchase orders:", error);
@@ -120,6 +121,7 @@ export async function getPurchaseOrderDetail(id: string): Promise<PurchaseOrderD
       .from("purchase_orders")
       .select("id, reference, status, created_at, sent_at, received_at, suppliers(name, phone), purchase_order_items(quantity, excluded)")
       .eq("id", id)
+      .is("deleted_at", null)
       .maybeSingle(),
     supabase
       .from("purchase_order_items")

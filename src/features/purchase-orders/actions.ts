@@ -77,6 +77,25 @@ export async function setPurchaseOrderStatus(
   return { success: true };
 }
 
+// A draft or cancelled order the shop no longer wants to see. Soft delete:
+// the row stays in the database (see delete_purchase_order).
+export async function deletePurchaseOrder(orderId: string): Promise<{ success?: true; error?: FeedbackCode }> {
+  const profile = await getCurrentProfile();
+  if (!profile) return { error: "unauthorized" };
+
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("delete_purchase_order", {
+    _shop_id: profile.shop_id,
+    _order_id: orderId,
+  });
+  if (error) {
+    console.error("delete_purchase_order failed:", error);
+    return { error: feedbackFromError(error) };
+  }
+  revalidateOrderPages(orderId);
+  return { success: true };
+}
+
 // The supplier delivered: only the quantities checked off enter the stock,
 // each with a logged RESTOCK movement (receive_purchase_order).
 export async function receivePurchaseOrder(

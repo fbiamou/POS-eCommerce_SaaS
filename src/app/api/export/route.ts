@@ -5,7 +5,7 @@ import { getCurrentProfile } from "@/features/auth/actions";
 import { getShopSettings } from "@/features/settings/queries";
 import { routing } from "@/i18n/routing";
 import { DEFAULT_TIME_ZONE } from "@/lib/format";
-import { buildExportFiles, type ExportData } from "@/features/export/build";
+import { buildExportFiles, withoutDeletedOrders, type ExportData } from "@/features/export/build";
 import { buildZip } from "@/features/export/zip";
 
 export const runtime = "nodejs";
@@ -69,7 +69,11 @@ export async function GET(request: NextRequest) {
       fetchAll<ExportData["invoiceItems"][number]>(supabase, "invoice_items", "invoice_id, product_id, quantity, unit_price, total_price"),
       fetchAll<ExportData["payments"][number]>(supabase, "payments", "invoice_id, amount, payment_date, recorded_by"),
       fetchAll<ExportData["stockMovements"][number]>(supabase, "stock_movements", "product_id, type, quantity_change, created_at, created_by"),
-      fetchAll<ExportData["purchaseOrders"][number]>(supabase, "purchase_orders", "id, reference, supplier_id, status, created_at, sent_at, received_at"),
+      fetchAll<ExportData["purchaseOrders"][number] & { deleted_at: string | null }>(
+        supabase,
+        "purchase_orders",
+        "id, reference, supplier_id, status, created_at, sent_at, received_at, deleted_at",
+      ),
       fetchAll<ExportData["purchaseOrderItems"][number]>(
         supabase,
         "purchase_order_items",
@@ -93,10 +97,12 @@ export async function GET(request: NextRequest) {
       fetchAll<ExportData["onlineOrderItems"][number]>(supabase, "online_order_items", "order_id, product_id, quantity, unit_price, total_price"),
       fetchAll<ExportData["reminders"][number]>(supabase, "reminder_logs", "client_id, invoice_id, template_name, status, sent_at"),
     ]);
+    const orders = withoutDeletedOrders(purchaseOrders, purchaseOrderItems);
     data = {
       shop: settings,
       categories, suppliers, products, clients, profiles, invoices, invoiceItems, payments, stockMovements,
-      purchaseOrders, purchaseOrderItems, shipments, shipmentItems, onlineOrders, onlineOrderItems, reminders,
+      purchaseOrders: orders.orders, purchaseOrderItems: orders.lines,
+      shipments, shipmentItems, onlineOrders, onlineOrderItems, reminders,
     };
   } catch (error) {
     console.error("Data export failed:", error);

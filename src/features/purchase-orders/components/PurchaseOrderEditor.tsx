@@ -2,12 +2,13 @@
 
 import { useState, useTransition } from "react";
 import { useLocale, useTranslations } from "next-intl";
-import { Download, MessageCircle, PackageCheck, Minus, Plus } from "lucide-react";
+import { Download, MessageCircle, PackageCheck, Minus, Plus, Trash2 } from "lucide-react";
+import { useRouter } from "@/i18n/routing";
 import { buildWhatsAppClickToChatUrl } from "@/features/reminders/whatsapp";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { useToast } from "@/components/ui/Toast";
 import type { FeedbackCode } from "@/lib/feedback";
-import { receivePurchaseOrder, setPurchaseOrderStatus, updatePurchaseOrderLine } from "../actions";
+import { deletePurchaseOrder, receivePurchaseOrder, setPurchaseOrderStatus, updatePurchaseOrderLine } from "../actions";
 import { buildOrderMessage, describeOrderedItem } from "../message";
 import { buildReceivedPayload, initialReceived, receptionSummary, type ReceivedEntry } from "../reception";
 import type { PurchaseOrderDetail } from "../queries";
@@ -26,6 +27,8 @@ export function PurchaseOrderEditor({ order, shopName }: { order: PurchaseOrderD
   const [error, setError] = useState<FeedbackCode | null>(null);
   const [isPending, startTransition] = useTransition();
   const [confirmCancel, setConfirmCancel] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  const router = useRouter();
   // Reception: the owner checks off what the supplier actually delivered.
   const [receiving, setReceiving] = useState(false);
   const [received, setReceived] = useState<Record<string, string>>(() => initialReceived(order.lines));
@@ -58,6 +61,19 @@ export function PurchaseOrderEditor({ order, shopName }: { order: PurchaseOrderD
       const result = await setPurchaseOrderStatus(order.id, status);
       setConfirmCancel(false);
       if (result.error) setError(result.error);
+    });
+  };
+
+  const deleteOrder = () => {
+    setError(null);
+    startTransition(async () => {
+      const result = await deletePurchaseOrder(order.id);
+      setConfirmDelete(false);
+      if (result.error) {
+        setError(result.error);
+        return;
+      }
+      router.replace("/purchase-orders");
     });
   };
 
@@ -236,6 +252,16 @@ export function PurchaseOrderEditor({ order, shopName }: { order: PurchaseOrderD
               {t("cancel_order")}
             </button>
           )}
+          {(isDraft || order.status === "CANCELLED") && (
+            <button
+              type="button"
+              onClick={() => setConfirmDelete(true)}
+              disabled={isPending}
+              className="flex items-center gap-2 rounded-xl px-4 py-2.5 text-[14px] font-semibold text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20"
+            >
+              <Trash2 className="h-4 w-4" /> {t("delete_order")}
+            </button>
+          )}
         </div>
       )}
 
@@ -249,6 +275,18 @@ export function PurchaseOrderEditor({ order, shopName }: { order: PurchaseOrderD
         onCancel={() => setConfirmCancel(false)}
       >
         {t("confirm_cancel_order")}
+      </ConfirmDialog>
+
+      <ConfirmDialog
+        isOpen={confirmDelete}
+        title={t("delete_order_title", { reference: order.reference })}
+        confirmLabel={t("delete_order")}
+        tone="danger"
+        pending={isPending}
+        onConfirm={deleteOrder}
+        onCancel={() => setConfirmDelete(false)}
+      >
+        {t("confirm_delete_order")}
       </ConfirmDialog>
 
       <ConfirmDialog

@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { buildZip, crc32 } from "./zip";
 import { csvCell, exportDate, toExportCsv } from "./csv";
-import { buildExportFiles, EXPORT_CODES, type ExportData } from "./build";
+import { buildExportFiles, EXPORT_CODES, withoutDeletedOrders, type ExportData } from "./build";
 import fr from "../../../messages/fr.json";
 import es from "../../../messages/es.json";
 import en from "../../../messages/en.json";
@@ -135,5 +135,20 @@ describe("full data export", () => {
     expect(cells).toContain("Impagada");
     expect(cells).toContain("Cajero(a)");
     expect(cells).toContain("Guinea Ecuatorial");
+  });
+
+  it("leaves out purchase orders the shop deleted, with their lines", () => {
+    const { orders, lines } = withoutDeletedOrders(
+      [
+        { id: "o1", deleted_at: null },
+        { id: "o2", deleted_at: "2026-09-25T09:00:00Z" },
+      ],
+      [
+        { purchase_order_id: "o1", quantity: 3 },
+        { purchase_order_id: "o2", quantity: 5 },
+      ],
+    );
+    expect(orders.map((o) => o.id)).toEqual(["o1"]);
+    expect(lines).toEqual([{ purchase_order_id: "o1", quantity: 3 }]);
   });
 });

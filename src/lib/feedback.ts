@@ -80,6 +80,7 @@ export const FEEDBACK_CODES = [
   "purchase_order_not_editable",
   "invalid_status_change",
   "purchase_order_has_shipment",
+  "purchase_order_not_deletable",
   // Loyalty
   "loyalty_reward_unavailable",
   "loyalty_invalid",

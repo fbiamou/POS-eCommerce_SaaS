@@ -375,7 +375,10 @@
     "reception_short": "{count, plural, one {# article livré en moins que commandé.} other {# articles livrés en moins que commandé.}}",
     "reception_over": "{count, plural, one {# article livré en plus de la commande.} other {# articles livrés en plus de la commande.}}",
     "received_of_ordered": "{received} reçus sur {ordered}",
-    "received_toast": "Réception enregistrée : le stock est à jour."
+    "received_toast": "Réception enregistrée : le stock est à jour.",
+    "delete_order": "Supprimer le bon",
+    "delete_order_title": "Supprimer le bon {reference} ?",
+    "confirm_delete_order": "Il disparaîtra de la liste des bons de commande et de vos exports. Il ne pourra pas être récupéré depuis l'application."
   },
   "Procurement": {
     "page_title": "Déclaration de colis",
@@ -762,7 +765,8 @@
     "loyalty_reward_unavailable": "La récompense de fidélité n'est plus disponible pour ce client. Décochez-la et réessayez.",
     "loyalty_invalid": "Carte de fidélité : entre 2 et 50 achats, et une remise entre 1 et 100 %.",
     "report_invalid": "Choisissez un motif ; les précisions ne doivent pas dépasser 1 000 caractères.",
-    "report_rate_limited": "Trop de signalements pour cette vitrine en ce moment. Réessayez dans une heure."
+    "report_rate_limited": "Trop de signalements pour cette vitrine en ce moment. Réessayez dans une heure.",
+    "purchase_order_not_deletable": "Seul un bon en brouillon ou annulé peut être supprimé."
   },
   "Suppliers": {
     "title": "Fournisseurs",

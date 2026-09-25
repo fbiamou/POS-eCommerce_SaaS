@@ -125,6 +125,17 @@ export const EXPORT_CODES = {
 
 type CodeKind = keyof typeof EXPORT_CODES;
 
+// Orders the shop deleted (soft delete) are left out of the export, with
+// their lines: the owner asked for them to disappear.
+export function withoutDeletedOrders<O extends { id: Id; deleted_at: string | null }, L extends { purchase_order_id: Id }>(
+  orders: O[],
+  lines: L[],
+): { orders: O[]; lines: L[] } {
+  const kept = orders.filter((order) => !order.deleted_at);
+  const ids = new Set(kept.map((order) => order.id));
+  return { orders: kept, lines: lines.filter((line) => ids.has(line.purchase_order_id)) };
+}
+
 // A country's name in the owner's language ("GQ" → "Guinea Ecuatorial").
 function countryName(code: string | null, locale: string): string {
   if (!code) return "";

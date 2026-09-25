@@ -375,7 +375,10 @@
     "reception_short": "{count, plural, one {# artículo entregado por debajo del pedido.} other {# artículos entregados por debajo del pedido.}}",
     "reception_over": "{count, plural, one {# artículo entregado por encima del pedido.} other {# artículos entregados por encima del pedido.}}",
     "received_of_ordered": "{received} recibidos de {ordered}",
-    "received_toast": "Recepción registrada: el stock está al día."
+    "received_toast": "Recepción registrada: el stock está al día.",
+    "delete_order": "Eliminar la orden",
+    "delete_order_title": "¿Eliminar la orden {reference}?",
+    "confirm_delete_order": "Desaparecerá de la lista de órdenes de compra y de tus exportaciones. No se podrá recuperar desde la aplicación."
   },
   "Procurement": {
     "page_title": "Declaración de paquete",
@@ -762,7 +765,8 @@
     "loyalty_reward_unavailable": "La recompensa de fidelidad ya no está disponible para este cliente. Desmárcala y vuelve a intentarlo.",
     "loyalty_invalid": "Tarjeta de fidelidad: entre 2 y 50 compras, y un descuento entre 1 y 100 %.",
     "report_invalid": "Elige un motivo; los detalles no deben superar los 1000 caracteres.",
-    "report_rate_limited": "Demasiadas denuncias para este escaparate en este momento. Inténtalo de nuevo dentro de una hora."
+    "report_rate_limited": "Demasiadas denuncias para este escaparate en este momento. Inténtalo de nuevo dentro de una hora.",
+    "purchase_order_not_deletable": "Solo se puede eliminar una orden en borrador o cancelada."
   },
   "Suppliers": {
     "title": "Proveedores",

@@ -375,7 +375,10 @@
     "reception_short": "{count, plural, one {# item delivered short of the order.} other {# items delivered short of the order.}}",
     "reception_over": "{count, plural, one {# item delivered above the order.} other {# items delivered above the order.}}",
     "received_of_ordered": "{received} received of {ordered}",
-    "received_toast": "Delivery recorded: the stock is up to date."
+    "received_toast": "Delivery recorded: the stock is up to date.",
+    "delete_order": "Delete the order",
+    "delete_order_title": "Delete order {reference}?",
+    "confirm_delete_order": "It will disappear from the purchase order list and from your exports. It cannot be recovered from the app."
   },
   "Procurement": {
     "page_title": "Parcel declaration",
@@ -762,7 +765,8 @@
     "loyalty_reward_unavailable": "The loyalty reward is no longer available for this customer. Untick it and try again.",
     "loyalty_invalid": "Loyalty card: between 2 and 50 purchases, and a discount between 1 and 100%.",
     "report_invalid": "Choose a reason; details must not exceed 1,000 characters.",
-    "report_rate_limited": "Too many reports for this storefront right now. Please try again in an hour."
+    "report_rate_limited": "Too many reports for this storefront right now. Please try again in an hour.",
+    "purchase_order_not_deletable": "Only a draft or cancelled order can be deleted."
   },
   "Suppliers": {
     "title": "Suppliers",
