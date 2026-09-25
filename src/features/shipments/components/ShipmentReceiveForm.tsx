@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
 import { useShopFormat } from "@/components/ShopFormatProvider";
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import type { FeedbackCode } from "@/lib/feedback";
 import { receiveShipment } from "../actions";
 import type { ShipmentItem } from "../queries";
@@ -20,6 +21,9 @@ export function ShipmentReceiveForm({ shipmentId, items }: { shipmentId: string;
   const [prices, setPrices] = useState<Record<string, string>>({});
   const [error, setError] = useState<FeedbackCode | null>(null);
   const [isPending, startTransition] = useTransition();
+  const [pendingEntries, setPendingEntries] = useState<
+    { item_id: string; received_quantity: number; selling_price: number | null }[] | null
+  >(null);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -33,9 +37,15 @@ export function ShipmentReceiveForm({ shipmentId, items }: { shipmentId: string;
       setError("invalid_quantity");
       return;
     }
-    if (!confirm(t("confirm_receive"))) return;
+    setPendingEntries(entries);
+  };
+
+  const receive = () => {
+    if (!pendingEntries) return;
+    const entries = pendingEntries;
     startTransition(async () => {
       const result = await receiveShipment(shipmentId, entries);
+      setPendingEntries(null);
       // On success the server action's revalidation re-renders this page
       // (status "Reçu", quantities read-only): nothing else to do here.
       if (result.error) setError(result.error);
@@ -120,6 +130,17 @@ export function ShipmentReceiveForm({ shipmentId, items }: { shipmentId: string;
       >
         {isPending ? t("saving") : t("validate_reception")}
       </button>
+
+      <ConfirmDialog
+        isOpen={pendingEntries !== null}
+        title={t("validate_reception")}
+        confirmLabel={t("validate_reception")}
+        pending={isPending}
+        onConfirm={receive}
+        onCancel={() => setPendingEntries(null)}
+      >
+        {t("confirm_receive")}
+      </ConfirmDialog>
     </form>
   );
 }

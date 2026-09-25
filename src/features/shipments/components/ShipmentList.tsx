@@ -5,6 +5,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { Link } from "@/i18n/routing";
 import { Copy, PackageCheck } from "lucide-react";
 import { useShopFormat } from "@/components/ShopFormatProvider";
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import type { FeedbackCode } from "@/lib/feedback";
 import { cancelShipment } from "../actions";
 import { buildIntakeUrl } from "../matching";
@@ -19,6 +20,7 @@ export default function ShipmentList({ shipments }: { shipments: ShipmentSummary
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [error, setError] = useState<FeedbackCode | null>(null);
   const [isPending, startTransition] = useTransition();
+  const [toCancel, setToCancel] = useState<ShipmentSummary | null>(null);
 
   const copyLink = async (shipment: ShipmentSummary) => {
     try {
@@ -29,11 +31,13 @@ export default function ShipmentList({ shipments }: { shipments: ShipmentSummary
     }
   };
 
-  const cancel = (shipment: ShipmentSummary) => {
-    if (!confirm(t("confirm_cancel", { reference: shipment.reference }))) return;
+  const cancel = () => {
+    if (!toCancel) return;
+    const shipment = toCancel;
     setError(null);
     startTransition(async () => {
       const result = await cancelShipment(shipment.id);
+      setToCancel(null);
       if (result.error) setError(result.error);
     });
   };
@@ -109,7 +113,7 @@ export default function ShipmentList({ shipments }: { shipments: ShipmentSummary
               {(shipment.status === "AWAITING_DECLARATION" || shipment.status === "IN_TRANSIT") && (
                 <button
                   type="button"
-                  onClick={() => cancel(shipment)}
+                  onClick={() => setToCancel(shipment)}
                   disabled={isPending}
                   className="rounded-lg px-3 py-1.5 text-xs font-bold text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20"
                 >
@@ -120,6 +124,18 @@ export default function ShipmentList({ shipments }: { shipments: ShipmentSummary
           </li>
         ))}
       </ul>
+
+      <ConfirmDialog
+        isOpen={toCancel !== null}
+        title={toCancel?.reference ?? ""}
+        confirmLabel={t("cancel_shipment")}
+        tone="danger"
+        pending={isPending}
+        onConfirm={cancel}
+        onCancel={() => setToCancel(null)}
+      >
+        {toCancel && t("confirm_cancel", { reference: toCancel.reference })}
+      </ConfirmDialog>
     </div>
   );
 }

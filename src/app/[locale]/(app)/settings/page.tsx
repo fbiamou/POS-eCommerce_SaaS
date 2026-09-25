@@ -73,7 +73,7 @@ export default async function SettingsPage({
 
   const tabs = [
     { id: 'profil', label: t('tab_profile'), icon: <UserCircle className="h-4 w-4" /> },
-    { id: 'boutique', label: t('tab_shop'), icon: <Palette className="h-4 w-4" /> },
+    { id: 'boutique', label: t('appearance'), icon: <Palette className="h-4 w-4" /> },
     { id: 'equipe', label: t('tab_team'), icon: <Users className="h-4 w-4" /> },
   ]
 
@@ -106,7 +106,7 @@ export default async function SettingsPage({
             }`}
           >
             {tab.icon}
-            <span className="hidden sm:inline">{tab.label}</span>
+            <span>{tab.label}</span>
           </a>
         ))}
       </div>
@@ -116,7 +116,7 @@ export default async function SettingsPage({
         <div className="flex flex-col gap-6">
 
           {/* Profil personnel */}
-          <section className="rounded-2xl border border-zinc-100 bg-white dark:border-[var(--line)] dark:bg-[var(--surface-1)] shadow-sm overflow-hidden">
+          <section className="rounded-2xl bg-[var(--surface-1)] shadow-card overflow-hidden">
             <div className="px-6 py-4 border-b border-zinc-100 dark:border-[var(--line)] bg-transparent">
               <h2 className="font-bold text-zinc-900 dark:text-white">{t('my_profile')}</h2>
               <p className="text-[11px] text-zinc-400 mt-0.5">{t('my_profile_subtitle')}</p>
@@ -152,7 +152,7 @@ export default async function SettingsPage({
           </section>
 
           {/* Profil boutique */}
-          <section className="rounded-2xl border border-zinc-100 bg-white dark:border-[var(--line)] dark:bg-[var(--surface-1)] shadow-sm overflow-hidden">
+          <section className="rounded-2xl bg-[var(--surface-1)] shadow-card overflow-hidden">
             <div className="px-6 py-4 border-b border-zinc-100 dark:border-[var(--line)] bg-transparent">
               <h2 className="font-bold text-zinc-900 dark:text-white flex items-center gap-2"><Building2 className="h-4 w-4" /> {t('shop_profile')}</h2>
               <p className="text-[11px] text-zinc-400 mt-0.5">{t('shop_profile_subtitle')}</p>
@@ -325,7 +325,7 @@ export default async function SettingsPage({
 
           {/* Vos données : l'export complet promis par les conditions d'utilisation */}
           {isManager && (
-            <section className="rounded-2xl border border-zinc-100 bg-white dark:border-[var(--line)] dark:bg-[var(--surface-1)] shadow-sm overflow-hidden">
+            <section className="rounded-2xl bg-[var(--surface-1)] shadow-card overflow-hidden">
               <div className="px-6 py-4 border-b border-zinc-100 dark:border-[var(--line)] bg-transparent">
                 <h2 className="font-bold text-zinc-900 dark:text-white flex items-center gap-2"><Download className="h-4 w-4" /> {t('data_title')}</h2>
                 <p className="text-[11px] text-zinc-400 mt-0.5">{t('data_subtitle')}</p>
@@ -344,7 +344,7 @@ export default async function SettingsPage({
 
       {/* ====== BOUTIQUE (APPARENCE) ====== */}
       {activeTab === 'boutique' && (
-        <section className="rounded-2xl border border-zinc-100 bg-white dark:border-[var(--line)] dark:bg-[var(--surface-1)] shadow-sm overflow-hidden">
+        <section className="rounded-2xl bg-[var(--surface-1)] shadow-card overflow-hidden">
           <div className="px-6 py-4 border-b border-zinc-100 dark:border-[var(--line)] bg-transparent">
             <h2 className="font-bold text-zinc-900 dark:text-white flex items-center gap-2"><Palette className="h-4 w-4" /> {t('appearance')}</h2>
             <p className="text-[11px] text-zinc-400 mt-0.5">{t('appearance_subtitle')}</p>
@@ -382,7 +382,7 @@ export default async function SettingsPage({
       {/* ====== ÉQUIPE ====== */}
       {activeTab === 'equipe' && (
         <div className="flex flex-col gap-6">
-          <section className="rounded-2xl border border-zinc-100 bg-white dark:border-[var(--line)] dark:bg-[var(--surface-1)] shadow-sm overflow-hidden">
+          <section className="rounded-2xl bg-[var(--surface-1)] shadow-card overflow-hidden">
             <div className="px-6 py-4 border-b border-zinc-100 dark:border-[var(--line)] bg-transparent flex items-center justify-between">
               <h2 className="font-bold text-zinc-900 dark:text-white flex items-center gap-2"><Users className="h-4 w-4" /> {t('team')}</h2>
               <span className="text-[11px] font-bold text-zinc-400 bg-zinc-100 dark:bg-white/5 px-2 py-0.5 rounded-full">{t('members_count', { count: teamMembers.length })}</span>
@@ -402,7 +402,7 @@ export default async function SettingsPage({
           </section>
 
           {isManager && (
-            <section className="rounded-2xl border border-zinc-100 bg-white dark:border-[var(--line)] dark:bg-[var(--surface-1)] shadow-sm overflow-hidden">
+            <section className="rounded-2xl bg-[var(--surface-1)] shadow-card overflow-hidden">
               <div className="px-6 py-4 border-b border-zinc-100 dark:border-[var(--line)] bg-transparent">
                 <h2 className="font-bold text-zinc-900 dark:text-white">{t('add_employee')}</h2>
                 <p className="text-[11px] text-zinc-400 mt-0.5">{t('add_employee_subtitle')}</p>

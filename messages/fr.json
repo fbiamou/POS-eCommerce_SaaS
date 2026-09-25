@@ -255,7 +255,19 @@
     "save_success": "Paramètres de relance mis à jour !",
     "settings_short": "Réglages",
     "manual_message": "Bonjour {name}, nous vous rappelons qu'il reste {amount} à régler chez {shop}. Merci de nous contacter pour convenir du règlement. {shop}",
-    "manual_message_shop_fallback": "la boutique"
+    "manual_message_shop_fallback": "la boutique",
+    "intro": "Les ventes à crédit en retard de paiement, prêtes à relancer.",
+    "to_remind": "À relancer",
+    "overdue_total": "Montant en retard",
+    "mode_live_short": "Envoi automatique",
+    "mode_manual_short": "Envoi manuel",
+    "rhythm": "1re relance {first} jours après la facture, puis tous les {every} jours.",
+    "mode_live_hint": "Les messages partent de votre compte WhatsApp Business.",
+    "mode_manual_hint": "WhatsApp s’ouvre avec le message prêt : il reste à appuyer sur envoyer.",
+    "days_late": "{days} j de retard",
+    "last_reminder_on": "Dernière relance le {date} ({count})",
+    "never_reminded": "Aucune relance envoyée",
+    "no_phone": "Pas de numéro pour ce client : ajoutez-le dans Clients."
   },
   "Shipments": {
     "title": "Arrivages",
@@ -420,7 +432,19 @@
     "cancel": "Annuler",
     "confirm_cancel": "Annuler cette commande ? La cliente ne sera pas notifiée automatiquement.",
     "confirmed_success": "Commande confirmée : la facture est créée, à encaisser au retrait.",
-    "view_invoice": "Voir la facture"
+    "view_invoice": "Voir la facture",
+    "intro": "Les commandes passées sur votre vitrine. En confirmant, la facture est créée ; le paiement se fait au retrait.",
+    "no_orders_hint": "Partagez le lien de votre vitrine sur WhatsApp et Facebook : les commandes arriveront ici.",
+    "view_storefront": "Voir ma vitrine",
+    "set_storefront_address": "Choisir l'adresse de ma vitrine",
+    "to_confirm": "À confirmer",
+    "to_confirm_amount": "Montant à confirmer",
+    "filter_pending": "À confirmer",
+    "filter_all": "Toutes",
+    "nothing_pending": "Aucune commande à confirmer.",
+    "contact_customer": "Écrire sur WhatsApp",
+    "cancel_title": "Annuler la commande ?",
+    "cancel_order": "Annuler la commande"
   },
   "Storefront": {
     "default_shop_name": "Boutique",

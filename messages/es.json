@@ -255,7 +255,19 @@
     "save_success": "¡Configuración de recordatorios actualizada!",
     "settings_short": "Ajustes",
     "manual_message": "Hola {name}, le recordamos que tiene {amount} pendientes de pago en {shop}. Contáctenos para acordar el pago. {shop}",
-    "manual_message_shop_fallback": "la tienda"
+    "manual_message_shop_fallback": "la tienda",
+    "intro": "Las ventas a crédito con pago atrasado, listas para recordar.",
+    "to_remind": "Por recordar",
+    "overdue_total": "Importe atrasado",
+    "mode_live_short": "Envío automático",
+    "mode_manual_short": "Envío manual",
+    "rhythm": "1.er recordatorio {first} días después de la factura, luego cada {every} días.",
+    "mode_live_hint": "Los mensajes salen de tu cuenta de WhatsApp Business.",
+    "mode_manual_hint": "WhatsApp se abre con el mensaje listo: solo queda pulsar enviar.",
+    "days_late": "{days} d de retraso",
+    "last_reminder_on": "Último recordatorio el {date} ({count})",
+    "never_reminded": "Ningún recordatorio enviado",
+    "no_phone": "No hay número para este cliente: añádelo en Clientes."
   },
   "Shipments": {
     "title": "Llegadas",
@@ -420,7 +432,19 @@
     "cancel": "Cancelar",
     "confirm_cancel": "¿Cancelar este pedido? La clienta no será notificada automáticamente.",
     "confirmed_success": "Pedido confirmado: la factura está creada, se cobra en la recogida.",
-    "view_invoice": "Ver la factura"
+    "view_invoice": "Ver la factura",
+    "intro": "Los pedidos hechos en tu escaparate. Al confirmar, se crea la factura; el pago se hace al recoger.",
+    "no_orders_hint": "Comparte el enlace de tu escaparate en WhatsApp y Facebook: los pedidos llegarán aquí.",
+    "view_storefront": "Ver mi escaparate",
+    "set_storefront_address": "Elegir la dirección de mi escaparate",
+    "to_confirm": "Por confirmar",
+    "to_confirm_amount": "Importe por confirmar",
+    "filter_pending": "Por confirmar",
+    "filter_all": "Todos",
+    "nothing_pending": "Ningún pedido por confirmar.",
+    "contact_customer": "Escribir por WhatsApp",
+    "cancel_title": "¿Cancelar el pedido?",
+    "cancel_order": "Cancelar el pedido"
   },
   "Storefront": {
     "default_shop_name": "Tienda",

@@ -59,91 +59,60 @@ export default function ReminderList({
   };
 
   return (
-    <div className="flex flex-col gap-5">
-      <div className="flex items-center justify-between">
-        <h2 className="text-xl font-bold tracking-tight text-zinc-900 dark:text-white">{t("eligible_invoices")}</h2>
-      </div>
+    <section aria-labelledby="eligible-invoices" className="flex flex-col gap-3">
+      <h2 id="eligible-invoices" className="text-lg font-bold">{t("eligible_invoices")}</h2>
 
-      <div className="rounded-2xl border border-zinc-100 bg-white dark:border-[var(--line)] dark:bg-[var(--surface-1)] shadow-sm overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-[13px] min-w-[700px]">
-            <thead>
-              <tr className="border-b border-zinc-100 dark:border-[var(--line)]">
-                <th className="p-4 text-[11px] font-bold text-zinc-400 tracking-widest uppercase">{t("client")}</th>
-                <th className="p-4 text-[11px] font-bold text-zinc-400 tracking-widest uppercase">{t("phone")}</th>
-                <th className="p-4 text-[11px] font-bold text-zinc-400 tracking-widest uppercase">{t("overdue_days")}</th>
-                <th className="p-4 text-[11px] font-bold text-zinc-400 tracking-widest uppercase text-right">{t("remaining_due")}</th>
-                <th className="p-4 text-[11px] font-bold text-zinc-400 tracking-widest uppercase">{t("last_reminder")}</th>
-                <th className="p-4 text-[11px] font-bold text-zinc-400 tracking-widest uppercase text-right">{t("action")}</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-zinc-50 dark:divide-white/5">
-              {invoices.map((invoice) => {
-                const dueAmount = invoice.total_amount - invoice.paid_amount;
-                return (
-                  <tr key={invoice.id} className="hover:bg-zinc-50 dark:hover:bg-white/[0.02] transition-colors group">
-                    <td className="p-4">
-                      <span className="font-bold text-zinc-900 dark:text-white group-hover:text-violet-600 dark:group-hover:text-violet-400">{invoice.client_name}</span>
-                      {invoice.invoice_number && (
-                        <span className="block font-mono text-[11px] text-zinc-400">{invoice.invoice_number}</span>
-                      )}
-                    </td>
-                    <td className="p-4 font-mono text-zinc-500">{invoice.client_phone || "-"}</td>
-                    <td className="p-4">
-                      <span className="font-mono font-bold text-red-500">
-                        +{invoice.days_overdue}
-                      </span>
-                    </td>
-                    <td className="p-4 text-right font-mono font-bold tabular-nums whitespace-nowrap text-zinc-900 dark:text-white">
-                      {format.money(dueAmount)}
-                    </td>
-                    <td className="p-4">
-                      {invoice.last_reminder_at ? (
-                        <div className="flex items-center gap-2 text-[11px] text-zinc-500">
-                          <History className="h-3 w-3" />
-                          <span>
-                            {format.date(invoice.last_reminder_at)} ({invoice.reminder_count})
-                          </span>
-                        </div>
-                      ) : (
-                        <span className="text-[11px] text-zinc-400">{t("never")}</span>
-                      )}
-                    </td>
-                    <td className="p-4 text-right">
-                      <button
-                        onClick={() => handleSendReminder(invoice)}
-                        disabled={(isPending && sendingId === invoice.id) || !invoice.client_phone}
-                        className="inline-flex items-center gap-2 rounded-xl bg-[#25D366] px-4 py-2 text-[13px] font-bold text-white hover:bg-[#128C7E] disabled:opacity-50 transition-colors shadow-sm"
-                      >
-                        {isPending && sendingId === invoice.id ? (
-                          t("sending")
-                        ) : (
-                          <>
-                            <MessageCircle className="h-4 w-4" /> {t("send")}
-                          </>
-                        )}
-                      </button>
-                      {failure?.id === invoice.id && (
-                        <p className="mt-1 text-[11px] text-red-500">{tFeedback(failure.code)}</p>
-                      )}
-                    </td>
-                  </tr>
-                );
-              })}
-              {invoices.length === 0 && (
-                <tr>
-                  <td colSpan={6} className="p-8 text-center text-zinc-500">
-                    <div className="flex flex-col items-center justify-center gap-2">
-                      <CheckCircle2 className="h-8 w-8 text-green-500" />
-                      <p>{t("no_invoices")}</p>
-                    </div>
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+      {invoices.length === 0 ? (
+        <div className="flex flex-col items-center gap-2 rounded-2xl bg-[var(--surface-1)] p-8 text-center shadow-card">
+          <CheckCircle2 className="h-8 w-8 text-emerald-600" />
+          <p className="text-[14px] text-zinc-500">{t("no_invoices")}</p>
         </div>
-      </div>
-    </div>
+      ) : (
+        <ul className="grid gap-3 lg:grid-cols-2">
+          {invoices.map((invoice) => {
+            const dueAmount = invoice.total_amount - invoice.paid_amount;
+            const sending = isPending && sendingId === invoice.id;
+            return (
+              <li key={invoice.id} className="flex flex-col rounded-2xl bg-[var(--surface-1)] p-4 shadow-card">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <p className="truncate font-semibold">{invoice.client_name}</p>
+                    <p className="truncate font-mono text-[12px] text-zinc-500">
+                      {[invoice.invoice_number, invoice.client_phone].filter(Boolean).join(" · ")}
+                    </p>
+                  </div>
+                  <div className="shrink-0 text-right">
+                    <p className="whitespace-nowrap font-mono font-semibold tabular-nums text-red-700 dark:text-red-400">{format.money(dueAmount)}</p>
+                    <p className="text-[12px] font-semibold text-red-600 dark:text-red-400">{t("days_late", { days: invoice.days_overdue })}</p>
+                  </div>
+                </div>
+
+                <div className="mt-3 flex flex-wrap items-center justify-between gap-3 border-t border-zinc-100 pt-3 dark:border-[var(--line)]">
+                  <p className="flex items-center gap-1.5 text-[12px] text-zinc-500">
+                    <History className="h-3.5 w-3.5" />
+                    {invoice.last_reminder_at
+                      ? t("last_reminder_on", { date: format.date(invoice.last_reminder_at), count: invoice.reminder_count })
+                      : t("never_reminded")}
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => handleSendReminder(invoice)}
+                    disabled={sending || !invoice.client_phone}
+                    className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-700 px-4 py-2.5 text-[14px] font-bold text-white transition-colors hover:bg-emerald-800 disabled:opacity-50 sm:w-auto"
+                  >
+                    <MessageCircle className="h-4 w-4" /> {sending ? t("sending") : t("send")}
+                  </button>
+                </div>
+
+                {!invoice.client_phone && <p className="mt-2 text-[12.5px] text-amber-700 dark:text-amber-400">{t("no_phone")}</p>}
+                {failure?.id === invoice.id && (
+                  <p role="alert" className="mt-2 text-[12.5px] font-semibold text-red-600">{tFeedback(failure.code)}</p>
+                )}
+              </li>
+            );
+          })}
+        </ul>
+      )}
+    </section>
   );
 }

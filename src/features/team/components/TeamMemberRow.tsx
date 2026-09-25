@@ -14,6 +14,7 @@ import {
 import type { Profile } from "@/features/auth/actions";
 import { APP_PAGES, type AppPageKey } from "@/lib/appPages";
 import { Select } from "@/components/ui/Select";
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 
 const ROLE_STYLES: Record<string, string> = {
   MANAGER: "bg-violet-100 text-violet-700 dark:bg-violet-900/40 dark:text-violet-300",
@@ -35,6 +36,7 @@ export function TeamMemberRow({
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<FeedbackCode | null>(null);
   const [revealedPassword, setRevealedPassword] = useState<string | null>(null);
+  const [confirmReset, setConfirmReset] = useState(false);
   const [showAccess, setShowAccess] = useState(false);
   const [selectedPages, setSelectedPages] = useState<Set<AppPageKey>>(
     new Set((member.allowed_pages ?? []) as AppPageKey[])
@@ -77,7 +79,7 @@ export function TeamMemberRow({
 
   const handleResetPassword = () => {
     setError(null);
-    if (!confirm(t("confirm_reset_password"))) return;
+    setConfirmReset(false);
     startTransition(async () => {
       const result = await resetTeamMemberPassword(member.id);
       if (result.error) {
@@ -138,7 +140,7 @@ export function TeamMemberRow({
 
             <button
               type="button"
-              onClick={handleResetPassword}
+              onClick={() => setConfirmReset(true)}
               disabled={isPending}
               title={t("reset_password")}
               className="rounded-md p-1.5 text-zinc-400 hover:bg-zinc-100 hover:text-zinc-700 dark:hover:bg-zinc-800 dark:hover:text-zinc-200 disabled:opacity-50"
@@ -224,6 +226,18 @@ export function TeamMemberRow({
           </button>
         </div>
       )}
+
+      <ConfirmDialog
+        isOpen={confirmReset}
+        title={t("reset_password")}
+        confirmLabel={t("reset_password")}
+        tone="danger"
+        pending={isPending}
+        onConfirm={handleResetPassword}
+        onCancel={() => setConfirmReset(false)}
+      >
+        {t("confirm_reset_password")}
+      </ConfirmDialog>
     </div>
   );
 }

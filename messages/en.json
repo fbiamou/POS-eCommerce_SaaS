@@ -255,7 +255,19 @@
     "save_success": "Reminder settings updated!",
     "settings_short": "Settings",
     "manual_message": "Hello {name}, this is a reminder that {amount} is still due at {shop}. Please contact us to arrange the payment. {shop}",
-    "manual_message_shop_fallback": "the shop"
+    "manual_message_shop_fallback": "the shop",
+    "intro": "Credit sales that are overdue, ready for a reminder.",
+    "to_remind": "To remind",
+    "overdue_total": "Overdue amount",
+    "mode_live_short": "Automatic sending",
+    "mode_manual_short": "Manual sending",
+    "rhythm": "First reminder {first} days after the invoice, then every {every} days.",
+    "mode_live_hint": "Messages are sent from your WhatsApp Business account.",
+    "mode_manual_hint": "WhatsApp opens with the message ready: just press send.",
+    "days_late": "{days} d overdue",
+    "last_reminder_on": "Last reminder on {date} ({count})",
+    "never_reminded": "No reminder sent yet",
+    "no_phone": "No number for this client: add it in Clients."
   },
   "Shipments": {
     "title": "Shipments",
@@ -420,7 +432,19 @@
     "cancel": "Cancel",
     "confirm_cancel": "Cancel this order? The customer will not be notified automatically.",
     "confirmed_success": "Order confirmed: the invoice is created, to be paid at pickup.",
-    "view_invoice": "View invoice"
+    "view_invoice": "View invoice",
+    "intro": "Orders placed on your storefront. Confirming creates the invoice; payment is made at pickup.",
+    "no_orders_hint": "Share your storefront link on WhatsApp and Facebook: orders will arrive here.",
+    "view_storefront": "View my storefront",
+    "set_storefront_address": "Choose my storefront address",
+    "to_confirm": "To confirm",
+    "to_confirm_amount": "Amount to confirm",
+    "filter_pending": "To confirm",
+    "filter_all": "All",
+    "nothing_pending": "No orders to confirm.",
+    "contact_customer": "Message on WhatsApp",
+    "cancel_title": "Cancel the order?",
+    "cancel_order": "Cancel the order"
   },
   "Storefront": {
     "default_shop_name": "Shop",
