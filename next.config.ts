@@ -12,6 +12,7 @@ const nextConfig: NextConfig = {
       { source: "/landing", destination: "/landing/index.html" },
       // Terms of use and privacy policy accepted at sign-up (src/lib/terms.ts).
       { source: "/legal/conditions", destination: "/legal/conditions.html" },
+      { source: "/legal/condiciones", destination: "/legal/condiciones.html" },
     ];
   },
   // Preview phase: keep the marketing page out of search engines until the
