@@ -30,6 +30,8 @@ export type OfflineStatus = {
   lastSyncAt: string | null;
   /** The device has a full copy of the shop (first sync done). */
   ready: boolean;
+  /** A newer version of the app is out: the page should be reloaded. */
+  updateAvailable: boolean;
 };
 
 export type OfflineContextValue = {
@@ -73,6 +75,7 @@ export function OfflineProvider({
   const [browserOnline, setBrowserOnline] = useState(true);
   const [serverReachable, setServerReachable] = useState(true);
   const [syncing, setSyncing] = useState(false);
+  const [updateAvailable, setUpdateAvailable] = useState(false);
   // The person selling survives a reload of the page, not a change of account.
   const [cashierOverride, setCashierOverride] = useState<Cashier | null>(() =>
     typeof window === "undefined" ? null : readCashier(window.localStorage, shopId, userId)
@@ -111,6 +114,17 @@ export function OfflineProvider({
           const result = await syncNow(db, backend, { full: !fullDone.current });
           const reached = !result.push.offline && result.pull?.ok !== false;
           setServerReachable(reached);
+          // A page kept for offline use runs the version it was saved with:
+          // once online, it checks whether a newer one is out.
+          if (reached) {
+            try {
+              const response = await fetch("/api/version", { cache: "no-store" });
+              const { build } = (await response.json()) as { build?: string };
+              if (build && build !== process.env.NEXT_PUBLIC_BUILD_ID) setUpdateAvailable(true);
+            } catch {
+              // No answer: checked again at the next sync.
+            }
+          }
           if (reached && !fullDone.current) {
             fullDone.current = true;
             // The main pages are kept now, so they open offline later even
@@ -177,11 +191,12 @@ export function OfflineProvider({
         failed: counts.failed,
         lastSyncAt: lastPullAt,
         ready: lastPullAt !== null,
+        updateAvailable,
       },
       requestSync: () => void runSync(),
       markOffline: () => setServerReachable(false),
     }),
-    [shopId, userId, userName, cashier, setCashier, db, backend, tillBackend, browserOnline, serverReachable, syncing, counts.pending, counts.failed, lastPullAt, runSync]
+    [shopId, userId, userName, cashier, setCashier, db, backend, tillBackend, browserOnline, serverReachable, syncing, updateAvailable, counts.pending, counts.failed, lastPullAt, runSync]
   );
 
   return <OfflineContext.Provider value={value}>{children}</OfflineContext.Provider>;

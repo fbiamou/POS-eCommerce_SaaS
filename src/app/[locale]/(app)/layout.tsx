@@ -13,6 +13,7 @@ import { PlanBanner } from "@/features/billing/components/PlanBanner";
 import { getUnreadMessages } from "@/features/messages/queries";
 import { ShopMessages } from "@/features/messages/components/ShopMessages";
 import { OfflineProvider } from "@/features/offline/OfflineProvider";
+import { UpdateBanner } from "@/features/offline/components/UpdateBanner";
 import type { Metadata, Viewport } from "next";
 
 // The signed-in app can be installed (home screen of a phone, desktop of a
@@ -82,6 +83,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
             <ShopSuspended reason={subscription?.suspension_reason ?? null} />
           ) : (
             <>
+              <UpdateBanner />
               <ShopMessages messages={messages} />
               <PlanBanner access={access} isManager={isManager} />
               {children}

@@ -4,6 +4,11 @@ import createNextIntlPlugin from "next-intl/plugin";
 const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
 
 const nextConfig: NextConfig = {
+  // Version of the app, to tell a page kept for offline use that a newer
+  // one is out (features/offline: "Nouvelle version disponible").
+  env: {
+    NEXT_PUBLIC_BUILD_ID: process.env.VERCEL_GIT_COMMIT_SHA ?? "local",
+  },
   // The WISHOP marketing page is a static site in public/landing (built with
   // the 10k-websites method). Files in public are not served for a bare
   // folder path, so /landing is mapped to its index.html.

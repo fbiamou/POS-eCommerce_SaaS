@@ -1216,7 +1216,9 @@
     "image_needs_connection": "La photo s'ajoutera avec internet : l'article est enregistré sans photo pour l'instant.",
     "item_saved_offline": "Article enregistré sur l'appareil. Il sera envoyé au retour d'internet.",
     "kind_po_receive": "Réception du bon {reference}",
-    "po_received_offline": "Réception enregistrée sur l'appareil : les articles sont déjà dans le stock. Elle sera envoyée au retour d'internet."
+    "po_received_offline": "Réception enregistrée sur l'appareil : les articles sont déjà dans le stock. Elle sera envoyée au retour d'internet.",
+    "update_available": "Une nouvelle version de WISHOP est prête.",
+    "update_now": "Mettre à jour"
   },
   "Cashier": {
     "selling_as": "Vente au nom de",
