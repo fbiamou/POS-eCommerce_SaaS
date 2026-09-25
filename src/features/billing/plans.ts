@@ -45,7 +45,7 @@ export const FEATURE_PLAN = {
 } as const satisfies Record<string, Plan>;
 export type PlanFeature = keyof typeof FEATURE_PLAN;
 
-export const PAYMENT_METHODS = ["MUNI_DINERO", "BANK_TRANSFER", "CASH", "OTHER"] as const;
+export const PAYMENT_METHODS = ["MUNI_DINERO", "BGFI_MOBILE", "ORANGE_MONEY", "ECOBANK_MOBILE", "BANK_TRANSFER", "CASH", "OTHER"] as const;
 export type PaymentMethod = (typeof PAYMENT_METHODS)[number];
 
 export const MAX_MONTHS = 36;

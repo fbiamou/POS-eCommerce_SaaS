@@ -1045,7 +1045,10 @@
     "language_en": "English",
     "write_in": "Shop language: {language}. Write in this language.",
     "language_from_signup": "chosen at sign-up",
-    "language_from_country": "based on the country"
+    "language_from_country": "based on the country",
+    "method_BGFI_MOBILE": "BGFI Mobile",
+    "method_ORANGE_MONEY": "Orange Money",
+    "method_ECOBANK_MOBILE": "Ecobank Mobile Money"
   },
   "Suspension": {
     "title": "Your account is suspended",
@@ -1114,7 +1117,7 @@
     "whatsapp_message": "Hello WISHOP, I would like to move the shop “{shop}” to the {plan} plan.",
     "renew": "Renew",
     "choose": "Choose {plan}",
-    "how_to_pay": "Payment by Muni Dinero, bank transfer or cash: message WISHOP on WhatsApp at {phone}. Your plan is activated as soon as the payment is received.",
+    "how_to_pay": "Payment by Muni Dinero, BGFI Mobile, Orange Money, Ecobank Mobile Money, bank transfer or cash: message WISHOP on WhatsApp at {phone}. Your plan is activated as soon as the payment is received.",
     "launch_kept": "The launch price is kept for 12 months for shops that subscribe during the launch; any price change is announced 30 days ahead.",
     "back_to_standard": "Go back to the free Standard plan",
     "back_to_standard_confirm": "Your shop goes back to the free Standard plan: you can sell again, within Standard’s limits (1 account, 100 items, cash sales). All your data stays.",

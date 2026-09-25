@@ -1045,7 +1045,10 @@
     "language_en": "inglés",
     "write_in": "Idioma de la tienda: {language}. Escríbele en este idioma.",
     "language_from_signup": "elegido al registrarse",
-    "language_from_country": "deducido del país"
+    "language_from_country": "deducido del país",
+    "method_BGFI_MOBILE": "BGFI Mobile",
+    "method_ORANGE_MONEY": "Orange Money",
+    "method_ECOBANK_MOBILE": "Ecobank Mobile Money"
   },
   "Suspension": {
     "title": "Tu cuenta está suspendida",
@@ -1114,7 +1117,7 @@
     "whatsapp_message": "Hola WISHOP, quiero pasar la tienda «{shop}» al plan {plan}.",
     "renew": "Renovar",
     "choose": "Elegir {plan}",
-    "how_to_pay": "Pago por Muni Dinero, transferencia o efectivo: escribe a WISHOP por WhatsApp al {phone}. Tu plan se activa en cuanto se recibe el pago.",
+    "how_to_pay": "Pago por Muni Dinero, BGFI Mobile, Orange Money, Ecobank Mobile Money, transferencia bancaria o efectivo: escribe a WISHOP por WhatsApp al {phone}. Tu plan se activa en cuanto se recibe el pago.",
     "launch_kept": "El precio de lanzamiento se mantiene 12 meses para las tiendas suscritas durante el lanzamiento; todo cambio de precio se anuncia 30 días antes.",
     "back_to_standard": "Volver al Standard gratuito",
     "back_to_standard_confirm": "Tu tienda vuelve al Standard gratuito: puedes volver a vender, dentro de los límites del Standard (1 cuenta, 100 artículos, caja al contado). Todos tus datos se conservan.",
