@@ -1012,7 +1012,19 @@
     "access_grace": "Periodo de gracia",
     "access_read_only": "Solo lectura",
     "grace_until": "{plan} terminado el {date} · solo lectura a partir del {since}.",
-    "read_only_since": "{plan} terminado el {date} · en solo lectura desde el {since}."
+    "read_only_since": "{plan} terminado el {date} · en solo lectura desde el {since}.",
+    "search_placeholder": "Buscar una tienda, una propietaria, un correo…",
+    "filter_all": "Todas",
+    "filter_attention": "Por vigilar",
+    "filter_new": "Nuevas",
+    "all_plans": "Todos los planes",
+    "all_countries": "Todos los países",
+    "results_count": "{count, plural, =0 {Ninguna tienda} one {# tienda} other {# tiendas}}",
+    "no_results": "Ninguna tienda coincide.",
+    "show_more": "Mostrar más ({count} restantes)",
+    "new_this_week": "Nuevas (7 días)",
+    "attention": "Por vigilar",
+    "new_badge": "Nueva"
   },
   "Suspension": {
     "title": "Tu cuenta está suspendida",

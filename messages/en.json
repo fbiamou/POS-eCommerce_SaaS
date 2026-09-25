@@ -1012,7 +1012,19 @@
     "access_grace": "Grace period",
     "access_read_only": "Read-only",
     "grace_until": "{plan} ended on {date} · read-only from {since}.",
-    "read_only_since": "{plan} ended on {date} · read-only since {since}."
+    "read_only_since": "{plan} ended on {date} · read-only since {since}.",
+    "search_placeholder": "Search a shop, an owner, an email…",
+    "filter_all": "All",
+    "filter_attention": "Needs a look",
+    "filter_new": "New",
+    "all_plans": "All plans",
+    "all_countries": "All countries",
+    "results_count": "{count, plural, =0 {No shop} one {# shop} other {# shops}}",
+    "no_results": "No shop matches.",
+    "show_more": "Show more ({count} left)",
+    "new_this_week": "New (7 days)",
+    "attention": "Needs a look",
+    "new_badge": "New"
   },
   "Suspension": {
     "title": "Your account is suspended",

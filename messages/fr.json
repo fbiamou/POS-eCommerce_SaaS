@@ -1012,7 +1012,19 @@
     "access_grace": "Délai de grâce",
     "access_read_only": "Lecture seule",
     "grace_until": "{plan} terminé le {date} · lecture seule à partir du {since}.",
-    "read_only_since": "{plan} terminé le {date} · en lecture seule depuis le {since}."
+    "read_only_since": "{plan} terminé le {date} · en lecture seule depuis le {since}.",
+    "search_placeholder": "Rechercher une boutique, une propriétaire, un e-mail…",
+    "filter_all": "Toutes",
+    "filter_attention": "À surveiller",
+    "filter_new": "Nouvelles",
+    "all_plans": "Toutes les formules",
+    "all_countries": "Tous les pays",
+    "results_count": "{count, plural, =0 {Aucune boutique} one {# boutique} other {# boutiques}}",
+    "no_results": "Aucune boutique ne correspond.",
+    "show_more": "Afficher plus ({count} restantes)",
+    "new_this_week": "Nouvelles (7 jours)",
+    "attention": "À surveiller",
+    "new_badge": "Nouvelle"
   },
   "Suspension": {
     "title": "Votre compte est suspendu",
