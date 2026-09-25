@@ -501,7 +501,10 @@
     "report_sending": "Envoi…",
     "report_sent_title": "Merci",
     "report_sent_body": "WISHOP examinera votre signalement et prendra les mesures nécessaires.",
-    "report_close": "Fermer"
+    "report_close": "Fermer",
+    "wishop_cta_title": "Vous aussi, vendez en ligne avec WISHOP",
+    "wishop_cta_body": "Caisse, stock, crédits clients et vitrine en ligne, depuis votre téléphone. Gratuit pour commencer.",
+    "wishop_cta_button": "Découvrir WISHOP"
   },
   "Invoices": {
     "list_title": "Factures",
@@ -581,7 +584,14 @@
     "open_my_shop": "Ouvrir ma boutique",
     "sign_out_create_other": "Me déconnecter pour créer une autre boutique",
     "shop_name": "Nom de la boutique",
-    "shop_name_placeholder": "Ex. : Boss MaMa B"
+    "shop_name_placeholder": "Ex. : Boss MaMa B",
+    "check_email_title": "Vérifiez votre boîte mail",
+    "check_email_body": "Votre boutique est créée. Pour l’activer, confirmez votre adresse e-mail :",
+    "check_email_step1": "Ouvrez l’e-mail envoyé par WISHOP à l’adresse indiquée.",
+    "check_email_step2": "Appuyez sur le lien de confirmation.",
+    "check_email_step3": "Votre boutique s’ouvre : vous pouvez commencer.",
+    "check_email_spam": "Rien reçu après quelques minutes ? Regardez dans les courriers indésirables (spam).",
+    "check_email_done": "J’ai confirmé, je me connecte"
   },
   "Settings": {
     "title": "Paramètres",
@@ -700,7 +710,8 @@
     "data_export_button": "Télécharger toutes mes données",
     "tab_appearance": "Apparence",
     "tab_plan": "Formule",
-    "member_paused": "En pause (formule)"
+    "member_paused": "En pause (formule)",
+    "choose_storefront_address": "Choisir l’adresse de ma vitrine"
   },
   "Feedback": {
     "generic_error": "Une erreur inattendue est survenue. Réessayez.",
@@ -785,7 +796,8 @@
     "plan_feature_locked": "Cette fonction ne fait pas partie de votre formule.",
     "plan_credit_locked": "La vente à crédit est comprise à partir de la formule Essentiel.",
     "plan_limit_items": "Limite d’articles de votre formule atteinte.",
-    "plan_limit_accounts": "Votre formule ne permet pas d’ajouter un compte de plus."
+    "plan_limit_accounts": "Votre formule ne permet pas d’ajouter un compte de plus.",
+    "password_weak": "Mot de passe trop faible : 8 caractères minimum, avec une majuscule, une minuscule, un chiffre et un caractère spécial."
   },
   "Suppliers": {
     "title": "Fournisseurs",
@@ -1081,6 +1093,23 @@
     "loyalty_needs_pro": "La carte de fidélité est comprise à partir de la formule Pro.",
     "page_access_needs_pro": "Le choix des pages par employé est compris à partir de la formule Pro.",
     "limit_accounts": "La formule {plan} comprend {count, plural, one {# compte} other {# comptes}}, le vôtre compris. Passez à une formule supérieure pour ajouter quelqu’un.",
-    "limit_items": "Vous avez atteint {limit} articles, la limite de la formule {plan}."
+    "limit_items": "Vous avez atteint {limit} articles, la limite de la formule {plan}.",
+    "appearance_needs_pro": "Les couleurs et la police habillent votre vitrine en ligne, comprise à partir de la formule Pro. Votre boutique est en {current}."
+  },
+  "Validation": {
+    "required": "Veuillez remplir ce champ.",
+    "checkbox_required": "Cochez cette case pour continuer.",
+    "email_invalid": "Saisissez une adresse e-mail valide (ex. : nom@exemple.com).",
+    "too_short": "Au moins {min} caractères.",
+    "min_value": "La valeur doit être au moins {min}.",
+    "max_value": "La valeur doit être au plus {max}.",
+    "number_invalid": "Saisissez un nombre entier valide.",
+    "format_invalid": "Le format n’est pas valide.",
+    "password_weak": "Le mot de passe ne remplit pas encore toutes les conditions ci-dessous.",
+    "password_rule_length": "{min} caractères minimum",
+    "password_rule_upper": "Une majuscule",
+    "password_rule_lower": "Une minuscule",
+    "password_rule_digit": "Un chiffre",
+    "password_rule_special": "Un caractère spécial (! @ # - …)"
   }
 }

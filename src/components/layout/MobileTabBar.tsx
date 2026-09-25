@@ -19,6 +19,7 @@ type MobileTabBarProps = {
   shopSlug?: string | null;
   isPlatformAdmin?: boolean;
   plan?: Plan;
+  storefrontNeedsAddress?: boolean;
 };
 
 // Bottom tab bar for phones. The till ("Vendre") is the action staff take
@@ -37,7 +38,7 @@ const TAB_LABEL_KEY: Record<string, string> = {
   invoices: "tab_invoices",
 };
 
-export function MobileTabBar({ profile, shopSlug, isPlatformAdmin = false, plan = "PRO_PLUS" }: MobileTabBarProps) {
+export function MobileTabBar({ profile, shopSlug, isPlatformAdmin = false, plan = "PRO_PLUS", storefrontNeedsAddress = false }: MobileTabBarProps) {
   const t = useTranslations("Sidebar");
   const tSettings = useTranslations("Settings");
   const pathname = usePathname();
@@ -56,7 +57,7 @@ export function MobileTabBar({ profile, shopSlug, isPlatformAdmin = false, plan 
   const shownKeys = [...LEFT_KEYS, CENTER_KEY, ...RIGHT_KEYS];
   const overflow = allItems.filter((item) => !shownKeys.includes(item.key));
   const showSettings = canSee("/settings");
-  const hasMore = overflow.length > 0 || showSettings || Boolean(shopSlug) || isPlatformAdmin;
+  const hasMore = overflow.length > 0 || showSettings || Boolean(shopSlug) || isPlatformAdmin || storefrontNeedsAddress;
 
   const isActive = (path: string) =>
     path === "/dashboard" ? pathname === "/dashboard" : pathname === path || pathname.startsWith(path + "/");
@@ -133,6 +134,11 @@ export function MobileTabBar({ profile, shopSlug, isPlatformAdmin = false, plan 
           {showSettings && (
             <Link href="/settings" onClick={() => setShowMore(false)} className={overflowLinkClass}>
               <SettingsIcon className="h-5 w-5 text-violet-600" /> {t("settings")}
+            </Link>
+          )}
+          {!shopSlug && storefrontNeedsAddress && (
+            <Link href="/settings" onClick={() => setShowMore(false)} className={overflowLinkClass}>
+              <ExternalLink className="h-5 w-5 text-violet-600" /> {tSettings("choose_storefront_address")}
             </Link>
           )}
           {shopSlug && (

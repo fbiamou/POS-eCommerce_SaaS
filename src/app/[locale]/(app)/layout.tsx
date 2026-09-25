@@ -27,15 +27,18 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   ]);
   const isManager = profile?.role === "MANAGER";
   // The storefront link only shows while the storefront is actually online.
-  const liveSlug =
-    shopSettings?.shop_slug && planAllows(access.plan, "storefront") && access.mode !== "read_only" ? shopSettings.shop_slug : null;
+  const storefrontOpen = planAllows(access.plan, "storefront") && access.mode !== "read_only";
+  const liveSlug = storefrontOpen && shopSettings?.shop_slug ? shopSettings.shop_slug : null;
+  // The plan includes a storefront but no address was chosen yet: the menu
+  // says where to choose it instead of showing no link at all.
+  const storefrontNeedsAddress = storefrontOpen && !shopSettings?.shop_slug && isManager;
   // A shop suspended by WISHOP sees a notice instead of its pages. A platform
   // admin is never locked out of the console this way.
   const suspended = Boolean(subscription?.suspended_at) && !isAdmin;
 
   return (
     <ShopFormatProvider value={shopFormat}>
-      <div className="flex h-screen w-full flex-col overflow-hidden md:flex-row">
+      <div className="relative flex h-screen w-full flex-col overflow-hidden md:flex-row">
         <Sidebar
           profile={profile}
           shopName={shopSettings?.shop_name}
@@ -43,13 +46,18 @@ export default async function AppLayout({ children }: { children: React.ReactNod
           shopSlug={liveSlug}
           isPlatformAdmin={isAdmin}
           plan={access.plan}
+          storefrontNeedsAddress={storefrontNeedsAddress}
         />
         <MobileTopBar
           profile={profile}
           shopName={shopSettings?.shop_name}
           shopLogoUrl={shopSettings?.shop_logo_url}
         />
-        <main className="w-full flex-1 overflow-y-auto bg-background px-4 pt-[calc(4.5rem+env(safe-area-inset-top))] pb-[calc(6rem+env(safe-area-inset-bottom))] md:p-8 md:pt-8 md:pb-8">
+        {/* relative: every positioned element inside (visually hidden inputs,
+            badges) stays within the scrolling content instead of stretching
+            the whole document; overscroll-contain: reaching the end of a long
+            page (Settings) no longer scrolls the sidebar along with it. */}
+        <main className="relative w-full flex-1 overflow-y-auto overscroll-contain bg-background px-4 pt-[calc(4.5rem+env(safe-area-inset-top))] pb-[calc(6rem+env(safe-area-inset-bottom))] md:p-8 md:pt-8 md:pb-8">
           {suspended ? (
             <ShopSuspended reason={subscription?.suspension_reason ?? null} />
           ) : (
@@ -59,7 +67,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
             </>
           )}
         </main>
-        <MobileTabBar profile={profile} shopSlug={liveSlug} isPlatformAdmin={isAdmin} plan={access.plan} />
+        <MobileTabBar profile={profile} shopSlug={liveSlug} isPlatformAdmin={isAdmin} plan={access.plan} storefrontNeedsAddress={storefrontNeedsAddress} />
         <Toaster />
       </div>
     </ShopFormatProvider>

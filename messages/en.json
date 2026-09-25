@@ -501,7 +501,10 @@
     "report_sending": "Sending…",
     "report_sent_title": "Thank you",
     "report_sent_body": "WISHOP will review your report and take the necessary action.",
-    "report_close": "Close"
+    "report_close": "Close",
+    "wishop_cta_title": "Sell online with WISHOP too",
+    "wishop_cta_body": "Till, stock, customer credit and an online storefront, from your phone. Free to start.",
+    "wishop_cta_button": "Discover WISHOP"
   },
   "Invoices": {
     "list_title": "Invoices",
@@ -581,7 +584,14 @@
     "open_my_shop": "Open my shop",
     "sign_out_create_other": "Sign out to create another shop",
     "shop_name": "Shop's name",
-    "shop_name_placeholder": "E.g. Boss MaMa B"
+    "shop_name_placeholder": "E.g. Boss MaMa B",
+    "check_email_title": "Check your email",
+    "check_email_body": "Your shop is created. To activate it, confirm your email address:",
+    "check_email_step1": "Open the email WISHOP sent to the address you entered.",
+    "check_email_step2": "Tap the confirmation link.",
+    "check_email_step3": "Your shop opens: you can get started.",
+    "check_email_spam": "Nothing after a few minutes? Check your spam folder.",
+    "check_email_done": "I’ve confirmed, sign in"
   },
   "Settings": {
     "title": "Settings",
@@ -700,7 +710,8 @@
     "data_export_button": "Download all my data",
     "tab_appearance": "Appearance",
     "tab_plan": "Plan",
-    "member_paused": "Paused (plan)"
+    "member_paused": "Paused (plan)",
+    "choose_storefront_address": "Choose my storefront address"
   },
   "Feedback": {
     "generic_error": "Something went wrong. Please try again.",
@@ -785,7 +796,8 @@
     "plan_feature_locked": "This feature is not part of your plan.",
     "plan_credit_locked": "Credit sales come with the Essentiel plan and above.",
     "plan_limit_items": "Your plan’s item limit is reached.",
-    "plan_limit_accounts": "Your plan does not allow one more account."
+    "plan_limit_accounts": "Your plan does not allow one more account.",
+    "password_weak": "Password too weak: at least 8 characters, with an uppercase letter, a lowercase letter, a digit and a special character."
   },
   "Suppliers": {
     "title": "Suppliers",
@@ -1081,6 +1093,23 @@
     "loyalty_needs_pro": "The loyalty card comes with the Pro plan and above.",
     "page_access_needs_pro": "Choosing each employee’s pages comes with the Pro plan and above.",
     "limit_accounts": "The {plan} plan includes {count, plural, one {# account} other {# accounts}}, yours included. Move to a higher plan to add someone.",
-    "limit_items": "You have reached {limit} items, the limit of the {plan} plan."
+    "limit_items": "You have reached {limit} items, the limit of the {plan} plan.",
+    "appearance_needs_pro": "Colours and font dress your online storefront, included from the Pro plan. Your shop is on {current}."
+  },
+  "Validation": {
+    "required": "Please fill in this field.",
+    "checkbox_required": "Tick this box to continue.",
+    "email_invalid": "Enter a valid email address (e.g. name@example.com).",
+    "too_short": "At least {min} characters.",
+    "min_value": "The value must be at least {min}.",
+    "max_value": "The value must be at most {max}.",
+    "number_invalid": "Enter a valid whole number.",
+    "format_invalid": "The format is not valid.",
+    "password_weak": "The password does not meet all the conditions below yet.",
+    "password_rule_length": "At least {min} characters",
+    "password_rule_upper": "An uppercase letter",
+    "password_rule_lower": "A lowercase letter",
+    "password_rule_digit": "A digit",
+    "password_rule_special": "A special character (! @ # - …)"
   }
 }

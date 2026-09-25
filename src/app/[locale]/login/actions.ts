@@ -8,6 +8,7 @@ import { isPageAllowed, firstAllowedPath } from '@/lib/appPages'
 import { redirectLocalized } from '@/lib/navigation'
 import { TERMS_VERSION } from '@/lib/terms'
 import { findShopCountry } from '@/lib/countries'
+import { isStrongPassword } from '@/lib/password'
 
 export async function login(formData: FormData) {
   const supabase = await createClient()
@@ -51,6 +52,10 @@ export async function signup(formData: FormData) {
     return redirectLocalized('/login', { mode: 'signup', error: 'terms_required' })
   }
 
+  if (!isStrongPassword((formData.get('password') as string | null) ?? '')) {
+    return redirectLocalized('/login', { mode: 'signup', error: 'password_weak' })
+  }
+
   const supabase = await createClient()
   const fullName = ((formData.get('full_name') as string | null) ?? '').trim()
   const shopName = ((formData.get('shop_name') as string | null) ?? '').trim().slice(0, 80)
@@ -62,7 +67,8 @@ export async function signup(formData: FormData) {
   const requestHeaders = await headers()
   const host = requestHeaders.get('x-forwarded-host') ?? requestHeaders.get('host')
   const protocol = requestHeaders.get('x-forwarded-proto') ?? 'https'
-  const emailRedirectTo = host ? `${protocol}://${host}/auth/confirm?locale=${await getLocale()}` : undefined
+  const locale = await getLocale()
+  const emailRedirectTo = host ? `${protocol}://${host}/auth/confirm?locale=${locale}` : undefined
 
   const { error } = await supabase.auth.signUp({
     email: formData.get('email') as string,
@@ -76,6 +82,9 @@ export async function signup(formData: FormData) {
         full_name: fullName,
         shop_name: shopName,
         country_code: countryCode,
+        // The confirmation email is written in this language (Supabase
+        // template: {{ .Data.locale }}).
+        locale,
         terms_version: TERMS_VERSION,
         terms_accepted_at: new Date().toISOString(),
       },

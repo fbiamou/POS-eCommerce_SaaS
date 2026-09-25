@@ -2,6 +2,7 @@
 
 import { getShopAccess } from '@/features/billing/access'
 import { PLAN_LIMITS } from '@/features/billing/plans'
+import { isStrongPassword } from '@/lib/password'
 import { randomBytes } from 'crypto'
 import { createClient } from '@/utils/supabase/server'
 import { createServiceRoleClient } from '@/utils/supabase/service'
@@ -52,6 +53,9 @@ export async function inviteEmployee(formData: FormData) {
 
   if (!password || !fullName) {
     return redirectLocalized('/settings', { tab: 'equipe', error: 'employee_name_password_required' })
+  }
+  if (!isStrongPassword(password)) {
+    return redirectLocalized('/settings', { tab: 'equipe', error: 'password_weak' })
   }
 
   // Each plan includes a number of accounts (the owner's included).

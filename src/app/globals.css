@@ -319,3 +319,17 @@ h1, h2, h3, .font-display {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* "Check your email" after sign-up: the card pops in and the envelope floats,
+   so the waiting step cannot be missed. */
+@keyframes wishop-pop {
+  0% { opacity: 0; transform: scale(0.92) translateY(8px); }
+  100% { opacity: 1; transform: scale(1) translateY(0); }
+}
+@keyframes wishop-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  [class*="animate-[wishop-"], .animate-ping { animation: none !important; }
+}

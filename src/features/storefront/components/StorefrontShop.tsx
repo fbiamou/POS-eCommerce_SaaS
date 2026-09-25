@@ -302,6 +302,27 @@ export default function StorefrontShop({
         )}
       </main>
 
+      {/* Every storefront below Pro Plus invites its visitors to discover
+          WISHOP and open their own shop: the storefronts advertise the
+          platform. Pro Plus removes it. */}
+      {shop.show_wishop_badge !== false && (
+        <section aria-label="WISHOP" className="bg-night text-white">
+          <div className="mx-auto flex max-w-6xl flex-col items-start gap-4 px-4 py-6 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+            <div className="flex items-center gap-3">
+              <WishopMark className="h-7 w-auto shrink-0 text-white" />
+              <div>
+                <p className="font-display text-[17px] font-extrabold leading-tight">{t("wishop_cta_title")}</p>
+                <p className="mt-0.5 text-[13.5px] text-[#C9CFE6]">{t("wishop_cta_body")}</p>
+              </div>
+            </div>
+            {/* The WISHOP home page is a static page (public/landing), not an app route. */}
+            <a href={`/${locale}`} className="shrink-0 rounded-xl bg-saffron px-5 py-3 text-[14px] font-bold text-night hover:brightness-95">
+              {t("wishop_cta_button")}
+            </a>
+          </div>
+        </section>
+      )}
+
       <footer className="border-t border-zinc-200 bg-white">
         <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-3 px-4 py-6 text-[13px] text-zinc-500 sm:flex-row sm:px-6">
           <p>

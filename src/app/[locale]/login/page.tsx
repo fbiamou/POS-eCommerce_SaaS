@@ -9,6 +9,8 @@ import { readFeedbackParam } from '@/lib/feedback'
 import { termsPathFor } from '@/lib/terms'
 import { Select } from '@/components/ui/Select'
 import { SHOP_COUNTRIES } from '@/lib/countries'
+import { PasswordField } from '@/components/PasswordField'
+import { MailCheck } from 'lucide-react'
 
 export async function generateMetadata() {
   const t = await getTranslations('Auth')
@@ -37,6 +39,8 @@ export default async function LoginPage({
   const error = readFeedbackParam(params.error)
   const message = readFeedbackParam(params.message)
   const isSignup = params.mode === 'signup'
+  // Right after creating a shop: only the "check your email" step is shown.
+  const checkEmail = message === 'signup_check_email'
   // Only reachable signed in through ?mode=signup (see proxy.ts).
   const profile = isSignup ? await getCurrentProfile() : null
   const currentShop = profile ? await getShopSettings() : null
@@ -82,6 +86,8 @@ export default async function LoginPage({
         </div>
 
         <div className="mx-auto mt-10 w-full max-w-[420px] lg:mt-8">
+          {!checkEmail && (
+          <>
           <h2 className="font-display text-[28px] font-extrabold tracking-tight">
             {isSignup ? t('signup_heading') : t('signin_heading')}
           </h2>
@@ -95,19 +101,41 @@ export default async function LoginPage({
               {t('create_shop')}
             </Link>
           </nav>
+          </>
+          )}
 
           {error && (
             <p role="alert" className="mt-5 rounded-xl bg-red-50 p-3 text-[14px] font-medium text-red-700 dark:bg-red-900/20 dark:text-red-400">
               {tFeedback(error)}
             </p>
           )}
-          {message && (
+          {message && message !== 'signup_check_email' && (
             <p role="status" className="mt-5 rounded-xl bg-emerald-50 p-3 text-[14px] font-medium text-emerald-800 dark:bg-emerald-900/20 dark:text-emerald-300">
               {tFeedback(message)}
             </p>
           )}
 
-          {isSignup && profile ? (
+          {checkEmail ? (
+            <section role="status" aria-live="polite" className="mt-6 flex flex-col items-center gap-4 rounded-2xl bg-[var(--surface-1)] px-6 py-8 text-center shadow-card ring-2 ring-violet-500/40 animate-[wishop-pop_0.5s_ease-out]">
+              <span className="relative flex h-20 w-20 items-center justify-center">
+                <span className="absolute inset-0 animate-ping rounded-full bg-violet-400/30" aria-hidden="true" />
+                <span className="relative flex h-20 w-20 items-center justify-center rounded-full bg-violet-600 text-white">
+                  <MailCheck className="h-9 w-9 animate-[wishop-float_1.8s_ease-in-out_infinite]" />
+                </span>
+              </span>
+              <h3 className="font-display text-[22px] font-extrabold tracking-tight">{t('check_email_title')}</h3>
+              <p className="text-[15px] text-zinc-600 dark:text-zinc-300">{t('check_email_body')}</p>
+              <ol className="w-full space-y-2 text-left text-[14px]">
+                <li className="flex gap-3 rounded-xl bg-zinc-100/70 p-3 dark:bg-[var(--surface-2)]"><span className="font-mono font-bold text-violet-700 dark:text-violet-300">1</span>{t('check_email_step1')}</li>
+                <li className="flex gap-3 rounded-xl bg-zinc-100/70 p-3 dark:bg-[var(--surface-2)]"><span className="font-mono font-bold text-violet-700 dark:text-violet-300">2</span>{t('check_email_step2')}</li>
+                <li className="flex gap-3 rounded-xl bg-zinc-100/70 p-3 dark:bg-[var(--surface-2)]"><span className="font-mono font-bold text-violet-700 dark:text-violet-300">3</span>{t('check_email_step3')}</li>
+              </ol>
+              <p className="text-[13px] text-zinc-500">{t('check_email_spam')}</p>
+              <Link href="/login" className="w-full rounded-xl bg-violet-600 py-3.5 text-center text-[15px] font-bold text-white transition-colors hover:bg-violet-700">
+                {t('check_email_done')}
+              </Link>
+            </section>
+          ) : isSignup && profile ? (
             <div className="mt-6 flex flex-col gap-3 rounded-2xl bg-[var(--surface-1)] p-5 shadow-card">
               <p className="text-[15px]">
                 {t.rich('already_signed_in', {
@@ -153,8 +181,7 @@ export default async function LoginPage({
               </div>
               <div className="flex flex-col gap-1.5">
                 <label className={labelClass} htmlFor="password">{t('password')}</label>
-                <input id="password" name="password" type="password" autoComplete="new-password" required minLength={6} aria-describedby="password-hint" className={inputClass} />
-                <p id="password-hint" className="text-[12.5px] text-zinc-500">{t('password_hint')}</p>
+                <PasswordField id="password" name="password" inputClassName={inputClass} />
               </div>
               <label htmlFor="accept_terms" className="flex items-start gap-3 rounded-xl bg-zinc-100/70 p-3 text-[14px] leading-snug dark:bg-[var(--surface-2)]">
                 <input id="accept_terms" name="accept_terms" type="checkbox" required className="mt-0.5 h-5 w-5 shrink-0 accent-[var(--accent-bg)]" />

@@ -6,6 +6,7 @@ import { getMessages, getTranslations } from 'next-intl/server';
 import { routing } from '@/i18n/routing';
 import { notFound } from 'next/navigation';
 import Script from 'next/script';
+import { NativeValidationMessages } from '@/components/NativeValidationMessages';
 
 // Fixed app-wide typography from the WISHOP identity (Indigo royal): Figtree
 // for body text, Bricolage Grotesque for headings, Spline Sans Mono for
@@ -83,6 +84,7 @@ export default async function RootLayout({
       </head>
       <body className="antialiased">
         <NextIntlClientProvider messages={messages}>
+          <NativeValidationMessages />
           {children}
         </NextIntlClientProvider>
       </body>

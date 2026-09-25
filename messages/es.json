@@ -501,7 +501,10 @@
     "report_sending": "Enviando…",
     "report_sent_title": "Gracias",
     "report_sent_body": "WISHOP examinará tu denuncia y tomará las medidas necesarias.",
-    "report_close": "Cerrar"
+    "report_close": "Cerrar",
+    "wishop_cta_title": "Tú también, vende en línea con WISHOP",
+    "wishop_cta_body": "Caja, stock, créditos de clientes y escaparate en línea, desde tu teléfono. Gratis para empezar.",
+    "wishop_cta_button": "Descubrir WISHOP"
   },
   "Invoices": {
     "list_title": "Facturas",
@@ -581,7 +584,14 @@
     "open_my_shop": "Abrir mi tienda",
     "sign_out_create_other": "Cerrar sesión para crear otra tienda",
     "shop_name": "Nombre de la tienda",
-    "shop_name_placeholder": "Ej.: Boss MaMa B"
+    "shop_name_placeholder": "Ej.: Boss MaMa B",
+    "check_email_title": "Revisa tu correo",
+    "check_email_body": "Tu tienda está creada. Para activarla, confirma tu correo:",
+    "check_email_step1": "Abre el correo que WISHOP envió a la dirección indicada.",
+    "check_email_step2": "Pulsa el enlace de confirmación.",
+    "check_email_step3": "Tu tienda se abre: ya puedes empezar.",
+    "check_email_spam": "¿No llegó nada tras unos minutos? Mira en la carpeta de correo no deseado (spam).",
+    "check_email_done": "Ya confirmé, iniciar sesión"
   },
   "Settings": {
     "title": "Configuración",
@@ -700,7 +710,8 @@
     "data_export_button": "Descargar todos mis datos",
     "tab_appearance": "Apariencia",
     "tab_plan": "Plan",
-    "member_paused": "En pausa (plan)"
+    "member_paused": "En pausa (plan)",
+    "choose_storefront_address": "Elegir la dirección de mi escaparate"
   },
   "Feedback": {
     "generic_error": "Se produjo un error inesperado. Inténtelo de nuevo.",
@@ -785,7 +796,8 @@
     "plan_feature_locked": "Esta función no forma parte de tu plan.",
     "plan_credit_locked": "La venta a crédito está incluida a partir del plan Essentiel.",
     "plan_limit_items": "Límite de artículos de tu plan alcanzado.",
-    "plan_limit_accounts": "Tu plan no permite añadir una cuenta más."
+    "plan_limit_accounts": "Tu plan no permite añadir una cuenta más.",
+    "password_weak": "Contraseña demasiado débil: 8 caracteres como mínimo, con una mayúscula, una minúscula, un número y un carácter especial."
   },
   "Suppliers": {
     "title": "Proveedores",
@@ -1081,6 +1093,23 @@
     "loyalty_needs_pro": "La tarjeta de fidelidad está incluida a partir del plan Pro.",
     "page_access_needs_pro": "Elegir las páginas de cada empleado está incluido a partir del plan Pro.",
     "limit_accounts": "El plan {plan} incluye {count, plural, one {# cuenta} other {# cuentas}}, la tuya incluida. Pasa a un plan superior para añadir a alguien.",
-    "limit_items": "Has llegado a {limit} artículos, el límite del plan {plan}."
+    "limit_items": "Has llegado a {limit} artículos, el límite del plan {plan}.",
+    "appearance_needs_pro": "Los colores y la fuente visten tu escaparate en línea, incluido a partir del plan Pro. Tu tienda está en {current}."
+  },
+  "Validation": {
+    "required": "Rellena este campo.",
+    "checkbox_required": "Marca esta casilla para continuar.",
+    "email_invalid": "Escribe un correo válido (p. ej.: nombre@ejemplo.com).",
+    "too_short": "Al menos {min} caracteres.",
+    "min_value": "El valor debe ser al menos {min}.",
+    "max_value": "El valor debe ser como máximo {max}.",
+    "number_invalid": "Escribe un número entero válido.",
+    "format_invalid": "El formato no es válido.",
+    "password_weak": "La contraseña aún no cumple todas las condiciones de abajo.",
+    "password_rule_length": "{min} caracteres como mínimo",
+    "password_rule_upper": "Una mayúscula",
+    "password_rule_lower": "Una minúscula",
+    "password_rule_digit": "Un número",
+    "password_rule_special": "Un carácter especial (! @ # - …)"
   }
 }

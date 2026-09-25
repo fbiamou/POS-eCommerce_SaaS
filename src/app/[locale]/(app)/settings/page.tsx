@@ -13,6 +13,7 @@ import { createClient } from '@/utils/supabase/server'
 import { getShopAccess } from '@/features/billing/access'
 import { PLAN_LIMITS, pausedMemberIds, planAllows } from '@/features/billing/plans'
 import { PlanOverview } from '@/features/billing/components/PlanOverview'
+import { PasswordField } from '@/components/PasswordField'
 import {
   UserCircle, ShieldCheck, ShoppingBag, Plus, Building2,
   Palette, Users, Check, Download, Crown, Lock
@@ -369,7 +370,17 @@ export default async function SettingsPage({
       )}
 
       {/* ====== BOUTIQUE (APPARENCE) ====== */}
-      {activeTab === 'boutique' && (
+      {/* The accent colour and font only dress the online storefront, which
+          comes with the Pro plan: below it, the same padlock as elsewhere. */}
+      {activeTab === 'boutique' && !planAllows(plan, 'storefront') && (
+        <section className="flex flex-col items-center gap-3 rounded-2xl bg-[var(--surface-1)] px-6 py-10 text-center shadow-card">
+          <span className="flex h-12 w-12 items-center justify-center rounded-full bg-violet-50 text-violet-700 dark:bg-violet-900/30 dark:text-violet-300"><Lock className="h-5 w-5" /></span>
+          <h2 className="text-lg font-bold">{t('appearance')}</h2>
+          <p className="max-w-md text-[14px] text-zinc-600 dark:text-zinc-300">{tPlans('appearance_needs_pro', { current: tPlans(`plan_${plan}`) })}</p>
+          <a href="?tab=formule" className="rounded-xl bg-violet-600 px-5 py-2.5 text-[14px] font-bold text-white hover:bg-violet-700">{tPlans('locked_cta')}</a>
+        </section>
+      )}
+      {activeTab === 'boutique' && planAllows(plan, 'storefront') && (
         <section className="rounded-2xl bg-[var(--surface-1)] shadow-card overflow-hidden">
           <div className="px-6 py-4 border-b border-zinc-100 dark:border-[var(--line)] bg-transparent">
             <h2 className="font-bold text-zinc-900 dark:text-white flex items-center gap-2"><Palette className="h-4 w-4" /> {t('appearance')}</h2>
@@ -468,8 +479,7 @@ export default async function SettingsPage({
                   </div>
                   <div className="flex flex-col gap-1.5">
                     <label className="text-[13px] font-bold text-zinc-700 dark:text-zinc-300" htmlFor="password_emp">{t('temp_password')}</label>
-                    <input id="password_emp" name="password" type="password" required minLength={6} placeholder={t('password_min_hint')}
-                      className="w-full rounded-xl border border-zinc-200 bg-white px-4 py-2.5 text-[13px] font-medium transition-colors focus:border-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-500 dark:border-[var(--line)] dark:bg-[var(--surface-1)]" />
+                    <PasswordField id="password_emp" name="password" inputClassName="w-full rounded-xl border border-zinc-200 bg-white px-4 py-2.5 text-[13px] font-medium transition-colors focus:border-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-500 dark:border-[var(--line)] dark:bg-[var(--surface-1)]" />
                   </div>
                   {planAllows(plan, 'page_access') ? (
                     <EmployeeAccessFields />

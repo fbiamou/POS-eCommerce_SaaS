@@ -26,13 +26,14 @@ type SidebarProps = {
   shopSlug?: string | null;
   isPlatformAdmin?: boolean;
   plan?: Plan;
+  storefrontNeedsAddress?: boolean;
 }
 
 // Desktop-only persistent navigation, on the indigo night ground that anchors
 // the WISHOP identity (the content area stays light for daylight use in the
 // shop). On mobile, the primary way the owner and sellers use the app,
 // MobileTopBar + MobileTabBar take over instead.
-export default function Sidebar({ profile, shopName, shopLogoUrl, shopSlug, isPlatformAdmin = false, plan = "PRO_PLUS" }: SidebarProps) {
+export default function Sidebar({ profile, shopName, shopLogoUrl, shopSlug, isPlatformAdmin = false, plan = "PRO_PLUS", storefrontNeedsAddress = false }: SidebarProps) {
   const t = useTranslations("Sidebar");
   const tSettings = useTranslations("Settings");
   const [isLoggingOut, setIsLoggingOut] = useState(false);
@@ -81,6 +82,11 @@ export default function Sidebar({ profile, shopName, shopLogoUrl, shopSlug, isPl
             >
               {tSettings("view_online_shop")}
               <ExternalLink className="h-3 w-3" />
+            </Link>
+          )}
+          {!shopSlug && storefrontNeedsAddress && (
+            <Link href="/settings" className="inline-flex items-center gap-1 text-xs text-saffron hover:text-white">
+              {tSettings("choose_storefront_address")}
             </Link>
           )}
         </div>

@@ -539,10 +539,11 @@ export default function CreateSaleForm({
                       role="radio"
                       aria-checked={payMode === mode}
                       aria-disabled={locked}
-                      disabled={locked}
                       title={locked ? t("credit_locked") : undefined}
-                      onClick={() => setPayMode(mode)}
-                      className={`flex items-center justify-center gap-1.5 rounded-lg px-2 py-2 text-[13px] font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-60 ${
+                      // Locked: the click explains which plan includes credit
+                      // (same screen as a locked page), instead of doing nothing.
+                      onClick={() => (locked ? router.push("/locked/credit") : setPayMode(mode))}
+                      className={`flex items-center justify-center gap-1.5 rounded-lg px-2 py-2 text-[13px] font-semibold transition-colors ${locked ? "opacity-60" : ""} ${
                         payMode === mode ? "bg-[var(--surface-1)] text-zinc-900 shadow-card dark:bg-[var(--surface-3)] dark:text-white" : "text-zinc-500"
                       }`}
                     >

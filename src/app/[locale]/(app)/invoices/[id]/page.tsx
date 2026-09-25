@@ -90,7 +90,7 @@ export default async function InvoicePage({
             <Download className="h-4 w-4" /> {t("download_pdf")}
           </a>
         ) : (
-          <Link href="/settings?tab=formule" className={`${secondaryButton} opacity-70`}>
+          <Link href="/locked/invoice_pdf" className={`${secondaryButton} opacity-70`}>
             <Lock className="h-4 w-4" /> {t("download_pdf")}
           </Link>
         )}
