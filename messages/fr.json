@@ -591,7 +591,15 @@
     "check_email_step2": "Appuyez sur le lien de confirmation.",
     "check_email_step3": "Votre boutique s’ouvre : vous pouvez commencer.",
     "check_email_spam": "Rien reçu après quelques minutes ? Regardez dans les courriers indésirables (spam).",
-    "check_email_done": "J’ai confirmé, je me connecte"
+    "check_email_done": "J’ai confirmé, je me connecte",
+    "forgot_password": "Mot de passe oublié ?",
+    "reset_heading": "Mot de passe oublié",
+    "reset_sub": "Indiquez l’adresse e-mail de votre compte : vous recevrez un lien pour choisir un nouveau mot de passe.",
+    "reset_send": "Recevoir le lien",
+    "back_to_signin": "Retour à la connexion",
+    "new_password_heading": "Nouveau mot de passe",
+    "new_password_sub": "Choisissez le mot de passe que vous utiliserez désormais pour ouvrir votre boutique.",
+    "new_password_save": "Enregistrer le mot de passe"
   },
   "Settings": {
     "title": "Paramètres",
@@ -797,7 +805,9 @@
     "plan_credit_locked": "La vente à crédit est comprise à partir de la formule Essentiel.",
     "plan_limit_items": "Limite d’articles de votre formule atteinte.",
     "plan_limit_accounts": "Votre formule ne permet pas d’ajouter un compte de plus.",
-    "password_weak": "Mot de passe trop faible : 8 caractères minimum, avec une majuscule, une minuscule, un chiffre et un caractère spécial."
+    "password_weak": "Mot de passe trop faible : 8 caractères minimum, avec une majuscule, une minuscule, un chiffre et un caractère spécial.",
+    "reset_email_sent": "Si un compte existe avec cette adresse, un e-mail vient de partir avec un lien pour choisir un nouveau mot de passe. Pensez à regarder dans les spams.",
+    "password_updated": "Mot de passe enregistré."
   },
   "Suppliers": {
     "title": "Fournisseurs",
@@ -1024,7 +1034,8 @@
     "show_more": "Afficher plus ({count} restantes)",
     "new_this_week": "Nouvelles (7 jours)",
     "attention": "À surveiller",
-    "new_badge": "Nouvelle"
+    "new_badge": "Nouvelle",
+    "write_to_all": "Écrire à toutes les boutiques"
   },
   "Suspension": {
     "title": "Votre compte est suspendu",
@@ -1123,5 +1134,29 @@
     "password_rule_lower": "Une minuscule",
     "password_rule_digit": "Un chiffre",
     "password_rule_special": "Un caractère spécial (! @ # - …)"
+  },
+  "Messages": {
+    "from_wishop": "Message de WISHOP",
+    "mark_read": "J’ai lu",
+    "field_title": "Titre",
+    "field_body": "Message",
+    "field_tone": "Type",
+    "tone_INFO": "Information",
+    "tone_WARNING": "Avertissement",
+    "send_one": "Envoyer à cette boutique",
+    "send_all": "Envoyer à toutes les boutiques",
+    "sent_one": "Message envoyé : il s’affiche en haut de l’application de la boutique.",
+    "sent_all": "Message envoyé à toutes les boutiques.",
+    "to_one_title": "Écrire à la boutique",
+    "to_one_intro": "Le message s’affiche en haut de l’application de la Propriétaire jusqu’à ce qu’elle le marque comme lu.",
+    "to_all_title": "Écrire à toutes les boutiques",
+    "to_all_intro": "Une annonce pour toutes les boutiques actuelles (nouveauté, maintenance, changement de prix annoncé 30 jours avant). Les boutiques créées ensuite ne la voient pas.",
+    "history": "Messages envoyés",
+    "none_sent": "Aucun message envoyé pour le moment.",
+    "read_on": "Lu le {date}",
+    "not_read": "Pas encore lu",
+    "read_count": "{count, plural, =0 {Lu par aucune boutique} one {Lu par # boutique} other {Lu par # boutiques}}",
+    "withdraw": "Retirer",
+    "withdraw_confirm": "Le message disparaît aussi des boutiques qui ne l’ont pas encore lu."
   }
 }

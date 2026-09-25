@@ -591,7 +591,15 @@
     "check_email_step2": "Tap the confirmation link.",
     "check_email_step3": "Your shop opens: you can get started.",
     "check_email_spam": "Nothing after a few minutes? Check your spam folder.",
-    "check_email_done": "I’ve confirmed, sign in"
+    "check_email_done": "I’ve confirmed, sign in",
+    "forgot_password": "Forgot your password?",
+    "reset_heading": "Forgot password",
+    "reset_sub": "Enter your account’s email address: you will receive a link to choose a new password.",
+    "reset_send": "Send me the link",
+    "back_to_signin": "Back to sign in",
+    "new_password_heading": "New password",
+    "new_password_sub": "Choose the password you will use from now on to open your shop.",
+    "new_password_save": "Save the password"
   },
   "Settings": {
     "title": "Settings",
@@ -797,7 +805,9 @@
     "plan_credit_locked": "Credit sales come with the Essentiel plan and above.",
     "plan_limit_items": "Your plan’s item limit is reached.",
     "plan_limit_accounts": "Your plan does not allow one more account.",
-    "password_weak": "Password too weak: at least 8 characters, with an uppercase letter, a lowercase letter, a digit and a special character."
+    "password_weak": "Password too weak: at least 8 characters, with an uppercase letter, a lowercase letter, a digit and a special character.",
+    "reset_email_sent": "If an account exists with this address, an email is on its way with a link to choose a new password. Check your spam folder too.",
+    "password_updated": "Password saved."
   },
   "Suppliers": {
     "title": "Suppliers",
@@ -1024,7 +1034,8 @@
     "show_more": "Show more ({count} left)",
     "new_this_week": "New (7 days)",
     "attention": "Needs a look",
-    "new_badge": "New"
+    "new_badge": "New",
+    "write_to_all": "Write to every shop"
   },
   "Suspension": {
     "title": "Your account is suspended",
@@ -1123,5 +1134,29 @@
     "password_rule_lower": "A lowercase letter",
     "password_rule_digit": "A digit",
     "password_rule_special": "A special character (! @ # - …)"
+  },
+  "Messages": {
+    "from_wishop": "Message from WISHOP",
+    "mark_read": "Got it",
+    "field_title": "Title",
+    "field_body": "Message",
+    "field_tone": "Type",
+    "tone_INFO": "Information",
+    "tone_WARNING": "Warning",
+    "send_one": "Send to this shop",
+    "send_all": "Send to every shop",
+    "sent_one": "Message sent: it shows at the top of the shop’s app.",
+    "sent_all": "Message sent to every shop.",
+    "to_one_title": "Write to the shop",
+    "to_one_intro": "The message shows at the top of the owner’s app until she marks it as read.",
+    "to_all_title": "Write to every shop",
+    "to_all_intro": "An announcement to every current shop (new feature, maintenance, a price change announced 30 days ahead). Shops created afterwards do not see it.",
+    "history": "Sent messages",
+    "none_sent": "No message sent yet.",
+    "read_on": "Read on {date}",
+    "not_read": "Not read yet",
+    "read_count": "{count, plural, =0 {Read by no shop} one {Read by # shop} other {Read by # shops}}",
+    "withdraw": "Withdraw",
+    "withdraw_confirm": "The message also disappears for shops that have not read it yet."
   }
 }

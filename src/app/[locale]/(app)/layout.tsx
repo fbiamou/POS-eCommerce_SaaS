@@ -10,6 +10,8 @@ import { ShopSuspended } from "@/features/admin/components/ShopSuspended";
 import { getShopAccess } from "@/features/billing/access";
 import { planAllows } from "@/features/billing/plans";
 import { PlanBanner } from "@/features/billing/components/PlanBanner";
+import { getUnreadMessages } from "@/features/messages/queries";
+import { ShopMessages } from "@/features/messages/components/ShopMessages";
 
 // Shared chrome for every authenticated dashboard page. Desktop keeps the
 // persistent Sidebar; mobile — the primary usage per AGENTS.md — gets its
@@ -26,6 +28,8 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     getShopAccess(),
   ]);
   const isManager = profile?.role === "MANAGER";
+  // Messages from WISHOP are for the owner (a seller never sees them).
+  const messages = isManager ? await getUnreadMessages(profile?.created_at ?? null) : [];
   // The storefront link only shows while the storefront is actually online.
   const storefrontOpen = planAllows(access.plan, "storefront") && access.mode !== "read_only";
   const liveSlug = storefrontOpen && shopSettings?.shop_slug ? shopSettings.shop_slug : null;
@@ -62,6 +66,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
             <ShopSuspended reason={subscription?.suspension_reason ?? null} />
           ) : (
             <>
+              <ShopMessages messages={messages} />
               <PlanBanner access={access} isManager={isManager} />
               {children}
             </>

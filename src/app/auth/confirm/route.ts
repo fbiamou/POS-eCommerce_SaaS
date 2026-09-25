@@ -13,6 +13,9 @@ export async function GET(request: NextRequest) {
   const requested = params.get("locale");
   const locale = routing.locales.find((l) => l === requested) ?? routing.defaultLocale;
   const to = (path: string) => NextResponse.redirect(new URL(`/${locale}${path}`, request.url));
+  // Where the link leads once the session is open: the dashboard after a
+  // sign-up, the new-password page after "Mot de passe oublié". Only these.
+  const next = params.get("next") === "/reset-password" ? "/reset-password" : "/dashboard";
 
   const supabase = await createClient();
   const code = params.get("code");
@@ -21,10 +24,10 @@ export async function GET(request: NextRequest) {
 
   if (code) {
     const { error } = await supabase.auth.exchangeCodeForSession(code);
-    if (!error) return to("/dashboard");
+    if (!error) return to(next);
   } else if (tokenHash && type) {
     const { error } = await supabase.auth.verifyOtp({ type, token_hash: tokenHash });
-    if (!error) return to("/dashboard");
+    if (!error) return to(next);
   }
 
   if (params.get("error")) return to("/login?error=confirmation_link_invalid");

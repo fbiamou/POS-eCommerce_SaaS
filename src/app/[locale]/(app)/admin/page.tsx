@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { getLocale, getTranslations } from "next-intl/server";
-import { Flag } from "lucide-react";
+import { Flag, Megaphone } from "lucide-react";
 import { Link } from "@/i18n/routing";
 import { isPlatformAdmin, listReports, listShops } from "@/features/admin/queries";
 import { shopAccess } from "@/features/billing/plans";
@@ -59,9 +59,17 @@ export default async function AdminPage() {
 
   return (
     <div className="flex flex-col gap-6">
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight md:text-3xl">{t("title")}</h1>
-        <p className="mt-1 text-[14px] text-zinc-500">{t("subtitle")}</p>
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight md:text-3xl">{t("title")}</h1>
+          <p className="mt-1 text-[14px] text-zinc-500">{t("subtitle")}</p>
+        </div>
+        <Link
+          href="/admin/messages"
+          className="inline-flex items-center gap-2 rounded-xl bg-violet-600 px-4 py-2.5 text-[14px] font-bold text-white hover:bg-violet-700"
+        >
+          <Megaphone className="h-4 w-4" /> {t("write_to_all")}
+        </Link>
       </div>
 
       <dl className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">

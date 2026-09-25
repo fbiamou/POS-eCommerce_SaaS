@@ -9,6 +9,9 @@ import { ACCESS_BADGE_CLASS, PLAN_BADGE_CLASS, countryName } from "@/features/ad
 import { PlanActions } from "@/features/admin/components/PlanActions";
 import { SuspendShop } from "@/features/admin/components/SuspendShop";
 import { DeleteShop } from "@/features/admin/components/DeleteShop";
+import { listSentMessages } from "@/features/messages/queries";
+import { SendMessageForm } from "@/features/messages/components/SendMessageForm";
+import { SentMessages } from "@/features/messages/components/SentMessages";
 
 export async function generateMetadata() {
   const t = await getTranslations("Admin");
@@ -19,12 +22,14 @@ export default async function AdminShopPage({ params }: { params: Promise<{ id: 
   if (!(await isPlatformAdmin())) notFound();
   const { id } = await params;
 
-  const [t, locale, format, shops, events] = await Promise.all([
+  const [t, tMessages, locale, format, shops, events, messages] = await Promise.all([
     getTranslations("Admin"),
+    getTranslations("Messages"),
     getLocale(),
     getFormatters(),
     listShops(),
     getShopEvents(id),
+    listSentMessages(id),
   ]);
   const shop = shops.find((s) => s.shop_id === id);
   if (!shop) notFound();
@@ -136,6 +141,15 @@ export default async function AdminShopPage({ params }: { params: Promise<{ id: 
           </p>
         </div>
         <PlanActions shopId={shop.shop_id} current={{ plan: shop.plan, paid_until: shop.paid_until }} />
+      </section>
+
+      <section aria-labelledby="admin-messages" className="flex flex-col gap-4 rounded-2xl bg-[var(--surface-1)] p-5 shadow-card sm:p-6">
+        <div>
+          <h2 id="admin-messages" className="text-lg font-bold">{tMessages("to_one_title")}</h2>
+          <p className="mt-1 text-[14px] text-zinc-500">{tMessages("to_one_intro")}</p>
+        </div>
+        <SendMessageForm shopId={shop.shop_id} />
+        <SentMessages messages={messages} toAll={false} />
       </section>
 
       <section aria-labelledby="admin-suspension" className="flex flex-col gap-3 rounded-2xl bg-[var(--surface-1)] p-5 shadow-card sm:p-6">

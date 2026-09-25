@@ -45,6 +45,48 @@ export async function login(formData: FormData) {
   return redirectLocalized(landingPath)
 }
 
+// The address of this site as the visitor reached it, for links sent by
+// email (Supabase follows them only if they are in its Redirect URLs).
+async function siteOrigin(): Promise<string | null> {
+  const requestHeaders = await headers()
+  const host = requestHeaders.get('x-forwarded-host') ?? requestHeaders.get('host')
+  const protocol = requestHeaders.get('x-forwarded-proto') ?? 'https'
+  return host ? `${protocol}://${host}` : null
+}
+
+// "Mot de passe oublié" : Supabase emails a link that leads, through
+// /auth/confirm, to the page where the owner chooses a new password. The
+// answer is the same whether the address exists or not.
+export async function requestPasswordReset(formData: FormData) {
+  const email = ((formData.get('email') as string | null) ?? '').trim()
+  if (!email) {
+    return redirectLocalized('/login', { mode: 'reset', error: 'required_fields_missing' })
+  }
+  const supabase = await createClient()
+  const origin = await siteOrigin()
+  const redirectTo = origin ? `${origin}/auth/confirm?locale=${await getLocale()}&next=/reset-password` : undefined
+  const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo })
+  if (error) console.error('Password reset request failed:', error)
+  return redirectLocalized('/login', { mode: 'reset', message: 'reset_email_sent' })
+}
+
+// The new password, chosen after following the emailed link (the link has
+// already signed the owner in).
+export async function updatePassword(formData: FormData) {
+  const password = (formData.get('password') as string | null) ?? ''
+  if (!isStrongPassword(password)) {
+    return redirectLocalized('/reset-password', { error: 'password_weak' })
+  }
+  const supabase = await createClient()
+  const { error } = await supabase.auth.updateUser({ password })
+  if (error) {
+    console.error('Password update failed:', error)
+    return redirectLocalized('/reset-password', { error: 'generic_error' })
+  }
+  revalidatePath('/', 'layout')
+  return redirectLocalized('/settings', { message: 'password_updated' })
+}
+
 export async function signup(formData: FormData) {
   // Creating a shop requires accepting the terms of use; the browser already
   // enforces the checkbox, this is the server-side guarantee.
@@ -64,11 +106,9 @@ export async function signup(formData: FormData) {
   // The confirmation email leads back to this same site (/auth/confirm),
   // which signs the new owner in. Supabase only follows it if the address is
   // in its Redirect URLs; otherwise it falls back to its Site URL.
-  const requestHeaders = await headers()
-  const host = requestHeaders.get('x-forwarded-host') ?? requestHeaders.get('host')
-  const protocol = requestHeaders.get('x-forwarded-proto') ?? 'https'
+  const origin = await siteOrigin()
   const locale = await getLocale()
-  const emailRedirectTo = host ? `${protocol}://${host}/auth/confirm?locale=${locale}` : undefined
+  const emailRedirectTo = origin ? `${origin}/auth/confirm?locale=${locale}` : undefined
 
   const { error } = await supabase.auth.signUp({
     email: formData.get('email') as string,

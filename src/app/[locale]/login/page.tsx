@@ -1,4 +1,4 @@
-import { login, logoutToSignup, signup } from './actions'
+import { login, logoutToSignup, requestPasswordReset, signup } from './actions'
 import { getCurrentProfile } from '@/features/auth/actions'
 import { getShopSettings } from '@/features/settings/queries'
 import { getLocale, getTranslations } from 'next-intl/server'
@@ -41,6 +41,7 @@ export default async function LoginPage({
   const isSignup = params.mode === 'signup'
   // Right after creating a shop: only the "check your email" step is shown.
   const checkEmail = message === 'signup_check_email'
+  const isReset = params.mode === 'reset'
   // Only reachable signed in through ?mode=signup (see proxy.ts).
   const profile = isSignup ? await getCurrentProfile() : null
   const currentShop = profile ? await getShopSettings() : null
@@ -86,7 +87,12 @@ export default async function LoginPage({
         </div>
 
         <div className="mx-auto mt-10 w-full max-w-[420px] lg:mt-8">
-          {!checkEmail && (
+          {isReset ? (
+            <>
+              <h2 className="font-display text-[28px] font-extrabold tracking-tight">{t('reset_heading')}</h2>
+              <p className="mt-1 text-[15px] text-zinc-500">{t('reset_sub')}</p>
+            </>
+          ) : !checkEmail && (
           <>
           <h2 className="font-display text-[28px] font-extrabold tracking-tight">
             {isSignup ? t('signup_heading') : t('signin_heading')}
@@ -135,6 +141,23 @@ export default async function LoginPage({
                 {t('check_email_done')}
               </Link>
             </section>
+          ) : isReset ? (
+            <form action={requestPasswordReset} className="mt-6 flex flex-col gap-4">
+              {message !== 'reset_email_sent' && (
+                <>
+                  <div className="flex flex-col gap-1.5">
+                    <label className={labelClass} htmlFor="email">{t('email')}</label>
+                    <input id="email" name="email" type="email" autoComplete="email" required placeholder={t('email_placeholder')} className={inputClass} />
+                  </div>
+                  <button type="submit" className="mt-1 w-full rounded-xl bg-violet-600 py-3.5 text-[15px] font-bold text-white transition-colors hover:bg-violet-700">
+                    {t('reset_send')}
+                  </button>
+                </>
+              )}
+              <Link href="/login" className="text-center text-[14px] font-semibold text-violet-700 hover:underline dark:text-violet-300">
+                {t('back_to_signin')}
+              </Link>
+            </form>
           ) : isSignup && profile ? (
             <div className="mt-6 flex flex-col gap-3 rounded-2xl bg-[var(--surface-1)] p-5 shadow-card">
               <p className="text-[15px]">
@@ -210,6 +233,9 @@ export default async function LoginPage({
               <div className="flex flex-col gap-1.5">
                 <label className={labelClass} htmlFor="password">{t('password')}</label>
                 <input id="password" name="password" type="password" autoComplete="current-password" required className={inputClass} />
+                <Link href="/login?mode=reset" className="self-end text-[13px] font-semibold text-violet-700 hover:underline dark:text-violet-300">
+                  {t('forgot_password')}
+                </Link>
               </div>
               <button type="submit" className="mt-1 w-full rounded-xl bg-violet-600 py-3.5 text-[15px] font-bold text-white transition-colors hover:bg-violet-700">
                 {t('sign_in')}

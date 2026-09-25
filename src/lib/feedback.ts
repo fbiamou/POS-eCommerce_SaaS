@@ -29,6 +29,8 @@ export const FEEDBACK_CODES = [
   "signup_check_email",
   "terms_required",
   "password_weak",
+  "reset_email_sent",
+  "password_updated",
   "email_confirmed",
   "confirmation_link_invalid",
   // Settings
