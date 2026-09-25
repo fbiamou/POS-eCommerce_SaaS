@@ -771,7 +771,9 @@
     "report_invalid": "Choisissez un motif ; les précisions ne doivent pas dépasser 1 000 caractères.",
     "report_rate_limited": "Trop de signalements pour cette vitrine en ce moment. Réessayez dans une heure.",
     "purchase_order_not_deletable": "Seul un bon en brouillon ou annulé peut être supprimé.",
-    "admin_invalid": "Vérifiez la formule, la durée, le montant et le moyen de paiement."
+    "admin_invalid": "Vérifiez la formule, la durée, le montant et le moyen de paiement.",
+    "email_confirmed": "Adresse confirmée. Connectez-vous pour ouvrir votre boutique.",
+    "confirmation_link_invalid": "Ce lien de confirmation a expiré ou a déjà servi. Essayez de vous connecter ; sinon, inscrivez-vous à nouveau."
   },
   "Suppliers": {
     "title": "Fournisseurs",

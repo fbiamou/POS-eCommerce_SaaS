@@ -771,7 +771,9 @@
     "report_invalid": "Choose a reason; details must not exceed 1,000 characters.",
     "report_rate_limited": "Too many reports for this storefront right now. Please try again in an hour.",
     "purchase_order_not_deletable": "Only a draft or cancelled order can be deleted.",
-    "admin_invalid": "Check the plan, duration, amount and payment method."
+    "admin_invalid": "Check the plan, duration, amount and payment method.",
+    "email_confirmed": "Address confirmed. Sign in to open your shop.",
+    "confirmation_link_invalid": "This confirmation link has expired or was already used. Try signing in; otherwise, sign up again."
   },
   "Suppliers": {
     "title": "Suppliers",

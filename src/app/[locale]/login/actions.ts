@@ -1,6 +1,8 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
+import { headers } from 'next/headers'
+import { getLocale } from 'next-intl/server'
 import { createClient } from '@/utils/supabase/server'
 import { isPageAllowed, firstAllowedPath } from '@/lib/appPages'
 import { redirectLocalized } from '@/lib/navigation'
@@ -54,10 +56,19 @@ export async function signup(formData: FormData) {
   const shopName = ((formData.get('shop_name') as string | null) ?? '').trim().slice(0, 80)
   const countryCode = findShopCountry(formData.get('country_code') as string)?.code ?? ''
 
+  // The confirmation email leads back to this same site (/auth/confirm),
+  // which signs the new owner in. Supabase only follows it if the address is
+  // in its Redirect URLs; otherwise it falls back to its Site URL.
+  const requestHeaders = await headers()
+  const host = requestHeaders.get('x-forwarded-host') ?? requestHeaders.get('host')
+  const protocol = requestHeaders.get('x-forwarded-proto') ?? 'https'
+  const emailRedirectTo = host ? `${protocol}://${host}/auth/confirm?locale=${await getLocale()}` : undefined
+
   const { error } = await supabase.auth.signUp({
     email: formData.get('email') as string,
     password: formData.get('password') as string,
     options: {
+      emailRedirectTo,
       // full_name names the owner's profile, shop_name and country_code set up
       // the new shop (handle_new_user trigger); the terms fields record which
       // version was accepted, and when.

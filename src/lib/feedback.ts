@@ -28,6 +28,8 @@ export const FEEDBACK_CODES = [
   "signup_failed",
   "signup_check_email",
   "terms_required",
+  "email_confirmed",
+  "confirmation_link_invalid",
   // Settings
   "name_required",
   "profile_updated",

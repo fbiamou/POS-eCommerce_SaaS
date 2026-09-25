@@ -771,7 +771,9 @@
     "report_invalid": "Elige un motivo; los detalles no deben superar los 1000 caracteres.",
     "report_rate_limited": "Demasiadas denuncias para este escaparate en este momento. Inténtalo de nuevo dentro de una hora.",
     "purchase_order_not_deletable": "Solo se puede eliminar una orden en borrador o cancelada.",
-    "admin_invalid": "Revisa el plan, la duración, el importe y el medio de pago."
+    "admin_invalid": "Revisa el plan, la duración, el importe y el medio de pago.",
+    "email_confirmed": "Dirección confirmada. Inicia sesión para abrir tu tienda.",
+    "confirmation_link_invalid": "Este enlace de confirmación ha caducado o ya se usó. Intenta iniciar sesión; si no, regístrate de nuevo."
   },
   "Suppliers": {
     "title": "Proveedores",
