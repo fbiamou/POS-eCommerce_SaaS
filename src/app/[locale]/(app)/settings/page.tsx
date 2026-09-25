@@ -8,10 +8,10 @@ import { TeamMemberRow } from '@/features/team/components/TeamMemberRow'
 import { LogoUploadButton } from '@/features/settings/components/LogoUploadButton'
 import { ShopSlugField } from '@/features/settings/components/ShopSlugField'
 import { CurrencySelect } from '@/features/settings/components/CurrencySelect'
-import { getTranslations } from 'next-intl/server'
+import { getLocale, getTranslations } from 'next-intl/server'
 import {
   UserCircle, ShieldCheck, ShoppingBag, Plus, Building2,
-  Palette, Users, Check
+  Palette, Users, Check, Download
 } from 'lucide-react'
 import Image from 'next/image'
 import { Select } from '@/components/ui/Select'
@@ -47,12 +47,13 @@ export default async function SettingsPage({
   const error = readFeedbackParam(params.error)
   const message = readFeedbackParam(params.message)
 
-  const [t, tFeedback, currentProfile, teamMembers, shopSettings] = await Promise.all([
+  const [t, tFeedback, currentProfile, teamMembers, shopSettings, locale] = await Promise.all([
     getTranslations('Settings'),
     getTranslations('Feedback'),
     getCurrentProfile(),
     getTeamMembers(),
     getShopSettings(),
+    getLocale(),
   ])
 
   const isManager = currentProfile?.role === 'MANAGER'
@@ -321,6 +322,23 @@ export default async function SettingsPage({
               </ShopRegionProvider>
             </form>
           </section>
+
+          {/* Vos données : l'export complet promis par les conditions d'utilisation */}
+          {isManager && (
+            <section className="rounded-2xl border border-zinc-100 bg-white dark:border-[var(--line)] dark:bg-[var(--surface-1)] shadow-sm overflow-hidden">
+              <div className="px-6 py-4 border-b border-zinc-100 dark:border-[var(--line)] bg-transparent">
+                <h2 className="font-bold text-zinc-900 dark:text-white flex items-center gap-2"><Download className="h-4 w-4" /> {t('data_title')}</h2>
+                <p className="text-[11px] text-zinc-400 mt-0.5">{t('data_subtitle')}</p>
+              </div>
+              <div className="p-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                <p className="text-[13px] text-zinc-600 dark:text-zinc-400 sm:max-w-md">{t('data_export_hint')}</p>
+                <a href={`/api/export?locale=${locale}`} download
+                  className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl border border-zinc-200 dark:border-[var(--line)] px-5 py-2.5 text-[13px] font-bold text-zinc-800 dark:text-zinc-100 hover:bg-zinc-50 dark:hover:bg-white/5 transition-colors">
+                  <Download className="h-4 w-4" /> {t('data_export_button')}
+                </a>
+              </div>
+            </section>
+          )}
         </div>
       )}
 
