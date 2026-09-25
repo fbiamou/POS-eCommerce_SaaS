@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Link, usePathname } from "@/i18n/routing";
 import { useTranslations } from "next-intl";
-import { MoreHorizontal, Settings as SettingsIcon, ExternalLink } from "lucide-react";
+import { MoreHorizontal, Settings as SettingsIcon, ExternalLink, ShieldCheck } from "lucide-react";
 import { isPageAllowed, type AppPageKey } from "@/lib/appPages";
 import { buildNavItems } from "./navItems";
 import { Modal } from "@/components/ui/Modal";
@@ -16,6 +16,7 @@ type Profile = {
 type MobileTabBarProps = {
   profile?: Profile | null;
   shopSlug?: string | null;
+  isPlatformAdmin?: boolean;
 };
 
 // Bottom tab bar for phones. The till ("Vendre") is the action staff take
@@ -34,7 +35,7 @@ const TAB_LABEL_KEY: Record<string, string> = {
   invoices: "tab_invoices",
 };
 
-export function MobileTabBar({ profile, shopSlug }: MobileTabBarProps) {
+export function MobileTabBar({ profile, shopSlug, isPlatformAdmin = false }: MobileTabBarProps) {
   const t = useTranslations("Sidebar");
   const tSettings = useTranslations("Settings");
   const pathname = usePathname();
@@ -53,7 +54,7 @@ export function MobileTabBar({ profile, shopSlug }: MobileTabBarProps) {
   const shownKeys = [...LEFT_KEYS, CENTER_KEY, ...RIGHT_KEYS];
   const overflow = allItems.filter((item) => !shownKeys.includes(item.key));
   const showSettings = canSee("/settings");
-  const hasMore = overflow.length > 0 || showSettings || Boolean(shopSlug);
+  const hasMore = overflow.length > 0 || showSettings || Boolean(shopSlug) || isPlatformAdmin;
 
   const isActive = (path: string) =>
     path === "/dashboard" ? pathname === "/dashboard" : pathname === path || pathname.startsWith(path + "/");
@@ -119,6 +120,11 @@ export function MobileTabBar({ profile, shopSlug }: MobileTabBarProps) {
               <item.icon className="h-5 w-5 text-violet-600" /> {item.label}
             </Link>
           ))}
+          {isPlatformAdmin && (
+            <Link href="/admin" onClick={() => setShowMore(false)} className={overflowLinkClass}>
+              <ShieldCheck className="h-5 w-5 text-violet-600" /> {t("admin")}
+            </Link>
+          )}
           {showSettings && (
             <Link href="/settings" onClick={() => setShowMore(false)} className={overflowLinkClass}>
               <SettingsIcon className="h-5 w-5 text-violet-600" /> {t("settings")}

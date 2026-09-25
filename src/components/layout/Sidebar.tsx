@@ -2,7 +2,7 @@
 
 import { Link, usePathname } from "@/i18n/routing";
 import { useTranslations } from "next-intl";
-import { Settings, LogOut, ExternalLink } from "lucide-react";
+import { Settings, LogOut, ExternalLink, ShieldCheck } from "lucide-react";
 import { useState } from "react";
 import { logout } from "@/app/[locale]/login/actions";
 import { LocaleSwitcher } from "@/components/LocaleSwitcher";
@@ -23,13 +23,14 @@ type SidebarProps = {
   shopName?: string | null;
   shopLogoUrl?: string | null;
   shopSlug?: string | null;
+  isPlatformAdmin?: boolean;
 }
 
 // Desktop-only persistent navigation, on the indigo night ground that anchors
 // the WISHOP identity (the content area stays light for daylight use in the
 // shop). On mobile, the primary way the owner and sellers use the app,
 // MobileTopBar + MobileTabBar take over instead.
-export default function Sidebar({ profile, shopName, shopLogoUrl, shopSlug }: SidebarProps) {
+export default function Sidebar({ profile, shopName, shopLogoUrl, shopSlug, isPlatformAdmin = false }: SidebarProps) {
   const t = useTranslations("Sidebar");
   const tSettings = useTranslations("Settings");
   const [isLoggingOut, setIsLoggingOut] = useState(false);
@@ -100,6 +101,12 @@ export default function Sidebar({ profile, shopName, shopLogoUrl, shopSlug }: Si
       </nav>
 
       <div className="border-t border-[var(--nav-line)] px-3 py-3">
+        {isPlatformAdmin && (
+          <Link href="/admin" aria-current={isActive("/admin") ? "page" : undefined} className={linkClass(isActive("/admin"))}>
+            <ShieldCheck className="h-4 w-4 shrink-0" />
+            {t("admin")}
+          </Link>
+        )}
         {canSee("/settings") && (
           <Link href="/settings" aria-current={isActive("/settings") ? "page" : undefined} className={linkClass(isActive("/settings"))}>
             <Settings className="h-4 w-4 shrink-0" />
