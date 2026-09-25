@@ -5,6 +5,7 @@ import { getCurrentProfile } from "@/features/auth/actions";
 import { getFormatters, getShopSettings } from "@/features/settings/queries";
 import { firstSteps, showFirstSteps } from "@/features/onboarding/steps";
 import { FirstSteps } from "@/features/onboarding/components/FirstSteps";
+import { getOverdueInvoices } from "@/features/reminders/actions";
 import { isPageAllowed, firstAllowedPath } from "@/lib/appPages";
 import { dayRangeInTimeZone } from "@/lib/format";
 import { rankTopProducts, TOP_SALES_PERIODS, type TopSalesPeriod } from "@/features/sales/stats";
@@ -51,7 +52,7 @@ export default async function DashboardPage({
   const periodDays = period === "day" ? 1 : period === "week" ? 7 : 30;
   const periodStart = new Date(today.start.getTime() - (periodDays - 1) * 24 * 60 * 60 * 1000);
 
-  const [todayInvoicesRes, debtRes, lowStockRes, recentRes, oldestDebtRes, soldItemsRes] = await Promise.all([
+  const [todayInvoicesRes, debtRes, lowStockRes, recentRes, soldItemsRes, dueReminders] = await Promise.all([
     supabase
       .from("invoices")
       .select("total_amount")
@@ -68,21 +69,15 @@ export default async function DashboardPage({
       .select("id, invoice_number, total_amount, status, clients(name)")
       .order("created_at", { ascending: false })
       .limit(5),
-    // The oldest unpaid invoice with a client is the most urgent reminder.
-    supabase
-      .from("invoices")
-      .select("id, clients!inner(name)")
-      .in("status", ["UNPAID", "PARTIAL"])
-      .order("created_at", { ascending: true })
-      .limit(1),
     supabase
       .from("invoice_items")
       .select("product_id, quantity, products(name)")
       .gte("created_at", periodStart.toISOString())
       .lt("created_at", today.end.toISOString()),
+    getOverdueInvoices(),
   ]);
 
-  for (const res of [todayInvoicesRes, debtRes, lowStockRes, recentRes, oldestDebtRes, soldItemsRes]) {
+  for (const res of [todayInvoicesRes, debtRes, lowStockRes, recentRes, soldItemsRes]) {
     if (res.error) console.error("Dashboard query failed:", res.error);
   }
 
@@ -109,7 +104,10 @@ export default async function DashboardPage({
   const totalDebt = (debtRes.data ?? []).reduce((sum, inv) => sum + (inv.total_amount - inv.paid_amount), 0);
   const lowStockCount = lowStockRes.count ?? 0;
   const recentInvoices = (recentRes.data ?? []) as unknown as InvoiceWithClient[];
-  const oldestDebt = oldestDebtRes.data?.[0] as unknown as { id: string; clients: { name: string } } | undefined;
+  // The same list as the Reminders page (first delay, then the recurring
+  // delay since the last reminder): the button only offers a reminder that
+  // is actually due, the most overdue first.
+  const nextReminder = [...dueReminders].sort((a, b) => b.days_overdue - a.days_overdue)[0];
   const topArticles = rankTopProducts(
     (soldItemsRes.data ?? []) as unknown as { product_id: string; quantity: number; products: { name: string } | null }[],
     t("unknown_product"),
@@ -215,13 +213,22 @@ export default async function DashboardPage({
         <div className="flex flex-col gap-4">
           <div className="rounded-2xl border border-zinc-100 bg-white dark:border-[var(--line)] dark:bg-[var(--surface-1)] p-5 sm:p-6 shadow-sm">
             <h2 className="text-[11px] font-bold text-zinc-500 tracking-widest uppercase mb-4">{t("quick_actions")}</h2>
-            {oldestDebt ? (
+            {nextReminder ? (
               <Link
                 href="/reminders"
                 className="flex w-full items-center justify-center rounded-xl bg-[#047857] px-4 py-3 text-sm font-bold text-white hover:bg-[#065f46] transition-colors shadow-sm"
               >
-                {t("remind_client", { name: oldestDebt.clients.name.split(" ")[0] })}
+                {dueReminders.length > 1
+                  ? t("remind_many", { count: dueReminders.length })
+                  : t("remind_client", { name: nextReminder.client_name.split(" ")[0] })}
               </Link>
+            ) : totalDebt > 0 ? (
+              <div className="flex flex-col gap-2">
+                <p className="text-sm text-zinc-500">{t("no_reminder_due")}</p>
+                <Link href="/reminders" className="text-sm font-semibold text-violet-700 underline underline-offset-2 dark:text-violet-300">
+                  {t("see_reminders")}
+                </Link>
+              </div>
             ) : (
               <p className="text-sm text-zinc-500">{t("no_urgent_action")}</p>
             )}

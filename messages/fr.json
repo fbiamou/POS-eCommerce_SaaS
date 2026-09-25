@@ -62,7 +62,10 @@
     "step_storefront": "Ouvrir votre vitrine en ligne",
     "step_storefront_hint": "Choisissez l'adresse de votre vitrine dans les paramètres, puis publiez vos articles.",
     "step_team": "Inviter votre équipe",
-    "step_team_hint": "Chaque membre de l'équipe a son accès, avec seulement les pages que vous choisissez."
+    "step_team_hint": "Chaque membre de l'équipe a son accès, avec seulement les pages que vous choisissez.",
+    "remind_many": "Faire {count} relances WhatsApp",
+    "no_reminder_due": "Aucune relance à faire aujourd'hui : les suivantes arriveront selon vos délais.",
+    "see_reminders": "Voir les relances"
   },
   "Stock": {
     "title": "Stock & Produits",

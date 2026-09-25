@@ -62,7 +62,10 @@
     "step_storefront": "Abrir tu escaparate en línea",
     "step_storefront_hint": "Elige la dirección de tu escaparate en los ajustes y después publica tus artículos.",
     "step_team": "Invitar a tu equipo",
-    "step_team_hint": "Cada persona del equipo tiene su acceso, solo con las páginas que tú elijas."
+    "step_team_hint": "Cada persona del equipo tiene su acceso, solo con las páginas que tú elijas.",
+    "remind_many": "Hacer {count} recordatorios por WhatsApp",
+    "no_reminder_due": "Ningún recordatorio pendiente hoy: los siguientes llegarán según tus plazos.",
+    "see_reminders": "Ver los recordatorios"
   },
   "Stock": {
     "title": "Inventario y Productos",

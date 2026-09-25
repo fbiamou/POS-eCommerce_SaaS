@@ -62,7 +62,10 @@
     "step_storefront": "Open your online storefront",
     "step_storefront_hint": "Choose your storefront's address in the settings, then publish your items.",
     "step_team": "Invite your team",
-    "step_team_hint": "Each team member gets their own access, with only the pages you choose."
+    "step_team_hint": "Each team member gets their own access, with only the pages you choose.",
+    "remind_many": "Send {count} WhatsApp reminders",
+    "no_reminder_due": "No reminder due today: the next ones will come according to your delays.",
+    "see_reminders": "View reminders"
   },
   "Stock": {
     "title": "Stock & Products",
