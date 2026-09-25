@@ -1,7 +1,10 @@
 import { describe, expect, it } from "vitest";
 import { buildZip, crc32 } from "./zip";
 import { csvCell, exportDate, toExportCsv } from "./csv";
-import { buildExportFiles, type ExportData } from "./build";
+import { buildExportFiles, EXPORT_CODES, type ExportData } from "./build";
+import fr from "../../../messages/fr.json";
+import es from "../../../messages/es.json";
+import en from "../../../messages/en.json";
 
 const empty: ExportData = {
   shop: null,
@@ -70,7 +73,7 @@ describe("export csv", () => {
 
 describe("full data export", () => {
   it("produces one file per subject, even for a new shop", () => {
-    const files = buildExportFiles(empty, t, "Africa/Malabo");
+    const files = buildExportFiles(empty, t, "Africa/Malabo", "fr");
     expect(files.map((f) => f.name)).toContain("file_invoices.csv");
     expect(files).toHaveLength(17);
     for (const f of files) expect(csvRows(f.content)[0].length).toBeGreaterThan(0);
@@ -96,10 +99,41 @@ describe("full data export", () => {
       ],
       invoiceItems: [{ invoice_id: "i1", product_id: "p1", quantity: 1, unit_price: 25000, total_price: 25000 }],
     };
-    const files = buildExportFiles(data, t, "Africa/Malabo");
+    const files = buildExportFiles(data, t, "Africa/Malabo", "fr");
     const invoices = csvRows(files.find((f) => f.name === "file_invoices.csv")!.content);
-    expect(invoices[1]).toEqual(["i1", "F-0001", "2026-09-02 11:00", "Awa", "+240 555", "25000", "0", "10000", "15000", "PARTIAL", "Mireille"]);
+    expect(invoices[1]).toEqual(["i1", "F-0001", "2026-09-02 11:00", "Awa", "+240 555", "25000", "0", "10000", "15000", "invoice_status_PARTIAL", "Mireille"]);
     const items = csvRows(files.find((f) => f.name === "file_invoice_items.csv")!.content);
     expect(items[1]).toEqual(["F-0001", "Perruque", "1", "25000", "25000"]);
+  });
+
+  it("translates every database code in each language, and never shows it raw", () => {
+    for (const messages of [fr, es, en]) {
+      const exportTexts = messages.Export as Record<string, string>;
+      for (const [kind, values] of Object.entries(EXPORT_CODES)) {
+        for (const value of values) expect(exportTexts[`${kind}_${value}`], `${kind}_${value}`).toBeTruthy();
+      }
+    }
+
+    const tEs = (key: string) => (es.Export as Record<string, string>)[key] ?? key;
+    const data: ExportData = {
+      ...empty,
+      shop: { shop_name: "Mamá B", shop_phone: null, shop_email: null, shop_address: null, country_code: "GQ", tax_id: null, trade_register: null, shop_slug: null },
+      profiles: [{ id: "u1", full_name: "Mireille", role: "SELLER", is_active: true, created_at: "2026-09-01T10:00:00Z" }],
+      invoices: [
+        {
+          id: "i1", invoice_number: "F-0001", client_id: null, total_amount: 25000, discount_amount: 0, paid_amount: 0,
+          status: "UNPAID", loyalty_reward_used: false, created_by: "u1", created_at: "2026-09-02T10:00:00Z",
+        },
+      ],
+      reminders: [{ client_id: null, invoice_id: "i1", template_name: "MANUAL_CLICK_TO_CHAT", status: "MANUAL", sent_at: "2026-09-03T10:00:00Z" }],
+    };
+    const files = buildExportFiles(data, tEs, "Africa/Malabo", "es");
+    const cells = files.flatMap((f) => csvRows(f.content).flat());
+    const rawCodes = new Set<string>(Object.values(EXPORT_CODES).flat());
+    expect(cells.filter((cell) => rawCodes.has(cell))).toEqual([]);
+    expect(cells).not.toContain("MANUAL_CLICK_TO_CHAT");
+    expect(cells).toContain("Impagada");
+    expect(cells).toContain("Cajero(a)");
+    expect(cells).toContain("Guinea Ecuatorial");
   });
 });

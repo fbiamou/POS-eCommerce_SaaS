@@ -103,7 +103,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "generic_error" }, { status: 500 });
   }
 
-  const files = buildExportFiles(data, (key) => t(key), settings?.timezone ?? DEFAULT_TIME_ZONE);
+  const files = buildExportFiles(data, (key) => t(key), settings?.timezone ?? DEFAULT_TIME_ZONE, locale);
   const zip = buildZip(files);
   const day = new Date().toISOString().slice(0, 10);
   const name = `wishop-${settings?.shop_slug || "export"}-${day}.zip`;

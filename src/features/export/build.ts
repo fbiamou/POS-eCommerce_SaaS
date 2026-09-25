@@ -107,8 +107,33 @@ export type ExportData = {
 };
 
 // Every visible word goes through the translation files: file names and
-// column headers ("Export.file_*", "Export.col_*"), plus yes/no.
+// column headers ("Export.file_*", "Export.col_*"), yes/no, and every code
+// stored in the database ("Export.invoice_status_PAID"...). The owner reads
+// her data in her own language, never the English codes of the database.
 export type ExportTranslate = (key: string) => string;
+
+// The database enums (supabase/migrations), each translated in messages/*.json.
+export const EXPORT_CODES = {
+  invoice_status: ["PAID", "PARTIAL", "UNPAID"],
+  movement_type: ["SALE", "RESTOCK", "ADJUSTMENT"],
+  online_order_status: ["PENDING", "CONFIRMED", "CANCELLED"],
+  purchase_order_status: ["DRAFT", "SENT", "RECEIVED", "CANCELLED"],
+  reminder_status: ["SENT", "FAILED", "SIMULATED", "MANUAL"],
+  role: ["MANAGER", "SELLER"],
+  shipment_status: ["AWAITING_DECLARATION", "IN_TRANSIT", "RECEIVED", "CANCELLED"],
+} as const;
+
+type CodeKind = keyof typeof EXPORT_CODES;
+
+// A country's name in the owner's language ("GQ" → "Guinea Ecuatorial").
+function countryName(code: string | null, locale: string): string {
+  if (!code) return "";
+  try {
+    return new Intl.DisplayNames([locale], { type: "region" }).of(code) ?? code;
+  } catch {
+    return code;
+  }
+}
 
 function byId<T extends { id: Id }>(rows: T[]): Map<Id, T> {
   return new Map(rows.map((row) => [row.id, row]));
@@ -118,8 +143,12 @@ function chronological<T>(rows: T[], date: (row: T) => string | null): T[] {
   return [...rows].sort((a, b) => (date(a) ?? "").localeCompare(date(b) ?? ""));
 }
 
-export function buildExportFiles(data: ExportData, t: ExportTranslate, timeZone: string): ZipEntry[] {
+export function buildExportFiles(data: ExportData, t: ExportTranslate, timeZone: string, locale: string): ZipEntry[] {
   const yes = (value: boolean) => (value ? t("yes") : t("no"));
+  const label = (kind: CodeKind, value: string | null) => {
+    if (!value) return "";
+    return (EXPORT_CODES[kind] as readonly string[]).includes(value) ? t(`${kind}_${value}`) : value;
+  };
   const date = (value: string | null | undefined) => exportDate(value, timeZone);
   const categories = byId(data.categories);
   const suppliers = byId(data.suppliers);
@@ -145,7 +174,7 @@ export function buildExportFiles(data: ExportData, t: ExportTranslate, timeZone:
       "shop",
       ["shop_name", "phone", "email", "address", "country", "tax_id", "trade_register", "storefront_address"],
       shop
-        ? [[shop.shop_name, shop.shop_phone, shop.shop_email, shop.shop_address, shop.country_code, shop.tax_id, shop.trade_register, shop.shop_slug]]
+        ? [[shop.shop_name, shop.shop_phone, shop.shop_email, shop.shop_address, countryName(shop.country_code, locale), shop.tax_id, shop.trade_register, shop.shop_slug]]
         : [],
     ),
     file(
@@ -197,7 +226,7 @@ export function buildExportFiles(data: ExportData, t: ExportTranslate, timeZone:
           i.discount_amount,
           i.paid_amount,
           Math.max(i.total_amount - i.paid_amount, 0),
-          i.status,
+          label("invoice_status", i.status),
           personName(i.created_by),
         ];
       }),
@@ -215,7 +244,7 @@ export function buildExportFiles(data: ExportData, t: ExportTranslate, timeZone:
     file(
       "stock_movements",
       ["date", "product", "movement_type", "quantity_change", "by"],
-      chronological(data.stockMovements, (m) => m.created_at).map((m) => [date(m.created_at), productName(m.product_id), m.type, m.quantity_change, personName(m.created_by)]),
+      chronological(data.stockMovements, (m) => m.created_at).map((m) => [date(m.created_at), productName(m.product_id), label("movement_type", m.type), m.quantity_change, personName(m.created_by)]),
     ),
     file(
       "purchase_orders",
@@ -224,7 +253,7 @@ export function buildExportFiles(data: ExportData, t: ExportTranslate, timeZone:
         o.id,
         o.reference,
         o.supplier_id ? suppliers.get(o.supplier_id)?.name ?? "" : "",
-        o.status,
+        label("purchase_order_status", o.status),
         date(o.created_at),
         date(o.sent_at),
         date(o.received_at),
@@ -250,7 +279,7 @@ export function buildExportFiles(data: ExportData, t: ExportTranslate, timeZone:
         s.intermediary_name,
         s.intermediary_phone,
         s.purchase_order_id ? purchaseOrders.get(s.purchase_order_id)?.reference ?? "" : "",
-        s.status,
+        label("shipment_status", s.status),
         date(s.declared_at),
         date(s.received_at),
       ]),
@@ -278,7 +307,7 @@ export function buildExportFiles(data: ExportData, t: ExportTranslate, timeZone:
         o.customer_name,
         o.customer_phone,
         o.total_amount,
-        o.status,
+        label("online_order_status", o.status),
         invoiceNumber(o.invoice_id),
         date(o.confirmed_at),
       ]),
@@ -295,14 +324,16 @@ export function buildExportFiles(data: ExportData, t: ExportTranslate, timeZone:
         date(r.sent_at),
         r.client_id ? clients.get(r.client_id)?.name ?? "" : "",
         invoiceNumber(r.invoice_id),
-        r.template_name,
-        r.status,
+        // Only a real Meta template name is shown: manual links and test runs
+        // are logged with internal markers, and their status already says so.
+        r.status === "SENT" || r.status === "FAILED" ? r.template_name : "",
+        label("reminder_status", r.status),
       ]),
     ),
     file(
       "team",
       ["name", "role", "active", "created_at"],
-      chronological(data.profiles, (p) => p.created_at).map((p) => [p.full_name, p.role, yes(p.is_active), date(p.created_at)]),
+      chronological(data.profiles, (p) => p.created_at).map((p) => [p.full_name, label("role", p.role), yes(p.is_active), date(p.created_at)]),
     ),
   ];
 }
