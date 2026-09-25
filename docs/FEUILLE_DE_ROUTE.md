@@ -16,6 +16,8 @@ Document vivant : ce qui est décidé pour les prochaines versions, pour le gard
 - E-mails automatiques : avertissements et messages aux boutiques par e-mail (en plus des messages dans l'application, déjà en place), alertes à l'administrateur (nouvelle inscription, signalement, erreur de la plateforme). Il faut un nom de domaine à WISHOP (on ne peut pas envoyer d'e-mails au nom de vercel.app) et un service d'envoi (par exemple Resend, gratuit jusqu'à 3 000 e-mails par mois). Le même domaine servirait d'adresse définitive au site et à une adresse de contact professionnelle.
 - Coût indicatif d'un nom de domaine (par an, à vérifier au moment de l'achat) : un .com autour de 10 à 15 dollars (6 000 à 9 000 FCFA) ; un .app autour de 15 à 20 dollars ; les .shop et .store sont souvent très bon marché la première année puis nettement plus chers au renouvellement. Choix du fondateur (25/09/2026) : un domaine en .app, à acheter dès que les moyens le permettent.
 
+- Validation manuelle des vitrines avant leur mise en ligne (décision du 25/09/2026) : en cas d'abus, ou par simple contrôle, une vitrine nouvellement ouverte attend l'accord de l'administrateur dans la console avant d'être visible du public.
+
 ## V3
 
 - Mode hors ligne, dans toutes les formules, gratuite comprise (coupures de courant et d'internet).

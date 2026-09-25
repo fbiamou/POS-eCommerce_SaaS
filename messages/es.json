@@ -1035,7 +1035,13 @@
     "new_this_week": "Nuevas (7 días)",
     "attention": "Por vigilar",
     "new_badge": "Nueva",
-    "write_to_all": "Escribir a todas las tiendas"
+    "write_to_all": "Escribir a todas las tiendas",
+    "language_es": "español",
+    "language_fr": "francés",
+    "language_en": "inglés",
+    "write_in": "Idioma de la tienda: {language}. Escríbele en este idioma.",
+    "language_from_signup": "elegido al registrarse",
+    "language_from_country": "deducido del país"
   },
   "Suspension": {
     "title": "Tu cuenta está suspendida",

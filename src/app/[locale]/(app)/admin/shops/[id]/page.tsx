@@ -5,7 +5,7 @@ import { Link } from "@/i18n/routing";
 import { getFormatters } from "@/features/settings/queries";
 import { getShopEvents, isPlatformAdmin, listShops, type SubscriptionEvent } from "@/features/admin/queries";
 import { shopAccess } from "@/features/billing/plans";
-import { ACCESS_BADGE_CLASS, PLAN_BADGE_CLASS, countryName } from "@/features/admin/components/planStyle";
+import { ACCESS_BADGE_CLASS, PLAN_BADGE_CLASS, countryName, shopLanguage } from "@/features/admin/components/planStyle";
 import { PlanActions } from "@/features/admin/components/PlanActions";
 import { SuspendShop } from "@/features/admin/components/SuspendShop";
 import { DeleteShop } from "@/features/admin/components/DeleteShop";
@@ -35,6 +35,7 @@ export default async function AdminShopPage({ params }: { params: Promise<{ id: 
   if (!shop) notFound();
 
   const access = shopAccess(shop, new Date());
+  const language = shopLanguage(shop.owner_locale, shop.country_code);
   const plan = access.plan;
   const hasPayments = events.some((event) => event.kind === "PAYMENT");
 
@@ -147,6 +148,14 @@ export default async function AdminShopPage({ params }: { params: Promise<{ id: 
         <div>
           <h2 id="admin-messages" className="text-lg font-bold">{tMessages("to_one_title")}</h2>
           <p className="mt-1 text-[14px] text-zinc-500">{tMessages("to_one_intro")}</p>
+          {language && (
+            <p className="mt-2 rounded-xl bg-violet-50 px-3 py-2 text-[13.5px] text-violet-900 dark:bg-violet-900/20 dark:text-violet-200">
+              {t("write_in", { language: t(`language_${language.code}`) })}{" "}
+              <span className="text-violet-700/80 dark:text-violet-300/80">
+                ({language.fromSignup ? t("language_from_signup") : t("language_from_country")})
+              </span>
+            </p>
+          )}
         </div>
         <SendMessageForm shopId={shop.shop_id} />
         <SentMessages messages={messages} toAll={false} />

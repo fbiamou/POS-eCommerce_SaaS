@@ -31,6 +31,8 @@ export type AdminShop = {
   paid_until: string | null;
   suspended_at: string | null;
   suspension_reason: string | null;
+  /** Interface language chosen at sign-up (null for older shops). */
+  owner_locale: string | null;
 };
 
 export async function listShops(): Promise<AdminShop[]> {

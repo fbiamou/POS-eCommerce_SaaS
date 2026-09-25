@@ -8,7 +8,7 @@ import { Select } from "@/components/ui/Select";
 import { useShopFormat } from "@/components/ShopFormatProvider";
 import { PLANS, type Plan, type ShopAccess } from "@/features/billing/plans";
 import type { AdminShop } from "../queries";
-import { ACCESS_BADGE_CLASS, PLAN_BADGE_CLASS } from "./planStyle";
+import { ACCESS_BADGE_CLASS, PLAN_BADGE_CLASS, shopLanguage } from "./planStyle";
 
 export type AdminShopRow = AdminShop & { access: ShopAccess; country: string; isNew: boolean; needsAttention: boolean };
 
@@ -137,6 +137,10 @@ export function AdminShopList({ shops }: { shops: AdminShopRow[] }) {
                     </div>
                     <p className="truncate text-[13px] text-zinc-500">
                       {[shop.owner_name, shop.owner_email, shop.country].filter(Boolean).join(" · ")}
+                      {(() => {
+                        const language = shopLanguage(shop.owner_locale, shop.country_code);
+                        return language ? ` · ${t(`language_${language.code}`)}` : "";
+                      })()}
                     </p>
                     <p className="mt-1 text-[12px] text-zinc-500">
                       {t("activity", { products: shop.product_count, invoices: shop.invoice_count, members: shop.member_count })}

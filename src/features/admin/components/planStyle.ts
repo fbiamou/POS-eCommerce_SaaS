@@ -16,6 +16,15 @@ export const ACCESS_BADGE_CLASS: Record<"ending_soon" | "grace" | "read_only", s
   read_only: "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300",
 };
 
+// The language to write to a shop in: the one chosen at sign-up, or, for
+// shops that signed up before it was recorded, the one of its country
+// (Spanish in Equatorial Guinea, French elsewhere in the CEMAC zone).
+export function shopLanguage(locale: string | null, countryCode: string | null): { code: "es" | "fr" | "en"; fromSignup: boolean } | null {
+  if (locale === "es" || locale === "fr" || locale === "en") return { code: locale, fromSignup: true };
+  if (!countryCode) return null;
+  return { code: countryCode === "GQ" ? "es" : "fr", fromSignup: false };
+}
+
 // A country's name in the reader's language ("GQ" → "Guinée équatoriale").
 export function countryName(code: string | null, locale: string): string {
   if (!code) return "";
