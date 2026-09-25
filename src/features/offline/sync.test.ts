@@ -27,6 +27,10 @@ function fakeBackend(overrides: Partial<SyncBackend> = {}) {
     pullInvoices: async (s) => (since.invoices.push(s), { ok: true, data: [] }),
     pullShop: async () => ({ ok: true, data: null }),
     pullMembers: async () => ({ ok: true, data: [] }),
+    pullSuppliers: async () => ({ ok: true, data: [] }),
+    recordProduct: async (p, offline) => (calls.push({ kind: "product_create", offline, id: p.product_id }), OK),
+    updateProductOffline: async (p) => (calls.push({ kind: "product_update", offline: true, id: p.change_id }), OK),
+    receivePurchaseOrderOffline: async (p) => (calls.push({ kind: "po_receive", offline: true, id: p.order_id }), OK),
     ...overrides,
   };
   return { backend, calls, since };
@@ -179,5 +183,80 @@ describe("receiving the server's changes", () => {
     });
     expect(await pullChanges(db, backend)).toEqual({ ok: false, network: true });
     expect((await db.products.get(perruque.id))?.quantity_in_stock).toBe(10);
+  });
+});
+
+describe("items changed offline", () => {
+  const fields = {
+    name: "Perruque lisse 50 cm", category: "Perruques", brand: null, product_type: null, supplier_id: null,
+    origin_country: null, purchase_price: 30000, selling_price: 48000, description: null, is_published_online: false,
+  };
+
+  async function queueCount(counted: number) {
+    const before = (await db.products.get(perruque.id))!;
+    const delta = counted - before.quantity_in_stock;
+    await db.products.put({ ...before, ...fields, category_name: "Perruques", quantity_in_stock: counted, local_state: "pending" });
+    await db.outbox.add({
+      kind: "product_update", ref_id: perruque.id, created_at: new Date().toISOString(), offline: true, state: "pending", attempts: 0,
+      payload: { ...fields, product_id: perruque.id, change_id: "chg-1", stock_delta: delta, changed_at: new Date().toISOString(), before },
+    });
+  }
+
+  it("does not bring the old count back when the server's copy arrives before the change is sent", async () => {
+    await queueCount(14); // counted 14 on the shelf, the device had 10: +4
+    const { backend } = fakeBackend({
+      pullProducts: async () => ({ ok: true, data: [{ ...perruque, quantity_in_stock: 9, updated_at: "2026-09-26T09:10:00Z" }] }),
+    });
+    await pullChanges(db, backend);
+    // Another till sold 1 (10 → 9); with this device's +4, 13 on the shelf.
+    expect((await db.products.get(perruque.id))?.quantity_in_stock).toBe(13);
+  });
+
+  it("puts a refused change back, keeping the sales made on the device since", async () => {
+    await queueCount(14);
+    await queueOfflineSale(2, 90000); // 14 → 12, sale still waiting too
+    const { backend } = fakeBackend({
+      updateProductOffline: async () => ({ ok: false, network: false, code: "product_not_found" }),
+      recordSale: async () => NETWORK,
+    });
+    await pushOutbox(db, backend);
+    const product = await db.products.get(perruque.id);
+    // Back to the old name and price, stock 10 − the 2 sold = 8.
+    expect(product).toMatchObject({ name: "Perruque lisse", selling_price: 45000, quantity_in_stock: 8, local_state: "failed" });
+  });
+});
+
+describe("a delivery checked off offline", () => {
+  async function queueReception(quantity: number) {
+    const product = (await db.products.get(perruque.id))!;
+    await db.products.update(perruque.id, { quantity_in_stock: product.quantity_in_stock + quantity });
+    await db.meta.put({ key: "po_received:po-1", value: "2026-09-26T09:00:00Z" });
+    await db.outbox.add({
+      kind: "po_receive", ref_id: "po-1", created_at: "2026-09-26T09:00:00Z", offline: true, state: "pending", attempts: 0,
+      payload: { order_id: "po-1", reference: "BC-0003", entries: [{ item_id: "line-1", received_quantity: quantity }], stock: [{ product_id: perruque.id, quantity }], received_at: "2026-09-26T09:00:00Z" },
+    });
+  }
+
+  it("keeps the delivered units when the server's copy arrives before the reception is sent", async () => {
+    await queueReception(6); // 10 + 6 = 16 on the device
+    const { backend } = fakeBackend({
+      pullProducts: async () => ({ ok: true, data: [{ ...perruque, quantity_in_stock: 10, updated_at: "2026-09-26T09:10:00Z" }] }),
+    });
+    await pullChanges(db, backend);
+    expect((await db.products.get(perruque.id))?.quantity_in_stock).toBe(16);
+  });
+
+  it("takes the units back out when the server refuses the reception", async () => {
+    await queueReception(6);
+    await pushOutbox(db, fakeBackend({ receivePurchaseOrderOffline: async () => ({ ok: false, network: false, code: "invalid_status_change" }) }).backend);
+    expect((await db.products.get(perruque.id))?.quantity_in_stock).toBe(10);
+    expect(await db.meta.get("po_received:po-1")).toBeUndefined();
+  });
+
+  it("clears the mark once the server has it", async () => {
+    await queueReception(6);
+    await pushOutbox(db, fakeBackend().backend);
+    expect(await db.meta.get("po_received:po-1")).toBeUndefined();
+    expect((await db.products.get(perruque.id))?.quantity_in_stock).toBe(16);
   });
 });

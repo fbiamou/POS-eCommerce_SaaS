@@ -1210,7 +1210,13 @@
     "needs_connection": "Cette action demande internet.",
     "not_on_device": "Cette facture n'est pas encore sur cet appareil. Elle apparaîtra à la prochaine mise à jour.",
     "loading": "Chargement des données de l'appareil…",
-    "stock_to_check": "Stock à vérifier"
+    "stock_to_check": "Stock à vérifier",
+    "kind_product_create": "Nouvel article {name}",
+    "kind_product_update": "Modification de {name}",
+    "image_needs_connection": "La photo s'ajoutera avec internet : l'article est enregistré sans photo pour l'instant.",
+    "item_saved_offline": "Article enregistré sur l'appareil. Il sera envoyé au retour d'internet.",
+    "kind_po_receive": "Réception du bon {reference}",
+    "po_received_offline": "Réception enregistrée sur l'appareil : les articles sont déjà dans le stock. Elle sera envoyée au retour d'internet."
   },
   "Cashier": {
     "selling_as": "Vente au nom de",

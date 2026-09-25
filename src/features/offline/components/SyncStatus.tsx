@@ -80,6 +80,9 @@ function SyncPanel({ onClose }: { onClose: () => void }) {
   const describe = (entry: OutboxEntry) => {
     if (entry.kind === "sale") return t("kind_sale", { number: invoiceNumbers.get(entry.ref_id) ?? "" });
     if (entry.kind === "payment") return t("kind_payment", { amount: format.money(entry.payload.amount) });
+    if (entry.kind === "product_create") return t("kind_product_create", { name: entry.payload.name });
+    if (entry.kind === "product_update") return t("kind_product_update", { name: entry.payload.name });
+    if (entry.kind === "po_receive") return t("kind_po_receive", { reference: entry.payload.reference });
     return t("kind_client", { name: entry.payload.name });
   };
 

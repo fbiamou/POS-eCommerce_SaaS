@@ -32,7 +32,7 @@ export async function warmOfflinePages(locale: string) {
     if (sessionStorage.getItem("wishop-pages-warmed") === locale) return;
     const worker = await activeWorker();
     if (!worker) return;
-    const pages = ["dashboard", "sales", "stock", "clients", "invoices", `invoices/${SHELL_ID}`, `invoices/${SHELL_ID}/ticket`];
+    const pages = ["dashboard", "sales", "stock", "clients", "invoices", "purchase-orders", `invoices/${SHELL_ID}`, `invoices/${SHELL_ID}/ticket`];
     worker.postMessage({ type: "warm", urls: pages.map((page) => `/${locale}/${page}`) });
     sessionStorage.setItem("wishop-pages-warmed", locale);
   } catch {

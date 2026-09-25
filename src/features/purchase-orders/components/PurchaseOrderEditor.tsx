@@ -12,6 +12,11 @@ import { deletePurchaseOrder, receivePurchaseOrder, setPurchaseOrderStatus, upda
 import { buildOrderMessage, describeOrderedItem } from "../message";
 import { buildReceivedPayload, initialReceived, receptionSummary, type ReceivedEntry } from "../reception";
 import type { PurchaseOrderDetail } from "../queries";
+import { useLiveQuery } from "dexie-react-hooks";
+import { CloudOff } from "lucide-react";
+import { useOptionalOfflineContext } from "@/features/offline/OfflineProvider";
+import { receivePurchaseOrderOffline } from "@/features/offline/localActions";
+import { purchaseOrderMarker } from "@/features/offline/db";
 
 const secondaryButton =
   "flex items-center gap-2 rounded-xl bg-[var(--surface-1)] px-4 py-2.5 text-[14px] font-semibold text-zinc-800 shadow-[inset_0_0_0_1px_var(--line)] transition-colors hover:bg-zinc-100 disabled:opacity-50 dark:text-zinc-200";
@@ -33,13 +38,22 @@ export function PurchaseOrderEditor({ order, shopName }: { order: PurchaseOrderD
   const [receiving, setReceiving] = useState(false);
   const [received, setReceived] = useState<Record<string, string>>(() => initialReceived(order.lines));
   const [pendingEntries, setPendingEntries] = useState<ReceivedEntry[] | null>(null);
+  // Offline mode: a delivery checked off without internet is kept on the
+  // device; the page (a kept copy) still says "sent" until it is sent.
+  const offline = useOptionalOfflineContext();
+  const tOffline = useTranslations("Offline");
+  const receivedOnDevice = useLiveQuery(
+    async () => (offline ? Boolean(await offline.db.meta.get(purchaseOrderMarker(order.id))) : false),
+    [offline?.db, order.id],
+    false
+  );
 
   const isDraft = order.status === "DRAFT";
   const isSent = order.status === "SENT";
   // A purchase order followed by a shipment link is received through that
   // shipment; checking it off here too would count the goods twice.
   const hasActiveShipment = order.shipments.some((s) => s.status !== "CANCELLED");
-  const canReceive = isSent && !hasActiveShipment;
+  const canReceive = isSent && !hasActiveShipment && !receivedOnDevice;
   const activeLines = order.lines.filter((line) => !line.excluded);
 
   const saveLine = (lineId: string, excluded: boolean) => {
@@ -89,8 +103,28 @@ export function PurchaseOrderEditor({ order, shopName }: { order: PurchaseOrderD
 
   const confirmReception = () => {
     if (!pendingEntries) return;
+    const entries = pendingEntries;
+    const keepOnDevice = async () => {
+      if (!offline) return;
+      await receivePurchaseOrderOffline(offline, order, entries);
+      setPendingEntries(null);
+      setReceiving(false);
+      showToast(tOffline("po_received_offline"));
+    };
     startTransition(async () => {
-      const result = await receivePurchaseOrder(order.id, pendingEntries);
+      if (offline && !offline.status.online) {
+        await keepOnDevice();
+        return;
+      }
+      let result: Awaited<ReturnType<typeof receivePurchaseOrder>>;
+      try {
+        result = await receivePurchaseOrder(order.id, entries);
+      } catch {
+        if (offline) await keepOnDevice();
+        else setError("generic_error");
+        return;
+      }
+      offline?.requestSync();
       setPendingEntries(null);
       if (result.error) {
         setError(result.error);
@@ -188,6 +222,13 @@ export function PurchaseOrderEditor({ order, shopName }: { order: PurchaseOrderD
       </ul>
 
       {error && <p role="alert" className="rounded-xl bg-red-50 p-3 text-[14px] font-semibold text-red-700 dark:bg-red-900/20 dark:text-red-400">{tFeedback(error)}</p>}
+
+      {receivedOnDevice && isSent && (
+        <p className="flex items-start gap-2 rounded-xl bg-amber-50 p-3 text-[14px] font-semibold text-amber-900 dark:bg-amber-900/20 dark:text-amber-200">
+          <CloudOff className="mt-0.5 h-4 w-4 shrink-0" />
+          {tOffline("po_received_offline")}
+        </p>
+      )}
 
       {receiving ? (
         <div className="flex flex-wrap gap-2">

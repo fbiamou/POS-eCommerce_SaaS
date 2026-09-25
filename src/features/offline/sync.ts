@@ -7,6 +7,11 @@ import {
   type LocalInvoice,
   type LocalInvoiceItem,
   type LocalMember,
+  type LocalSupplier,
+  type ProductCreatePayload,
+  type ProductUpdatePayload,
+  type PurchaseOrderReceivePayload,
+  purchaseOrderMarker,
   type LocalPayment,
   type LocalProduct,
   type OutboxEntry,
@@ -62,6 +67,10 @@ export interface SyncBackend {
   pullShop(): Promise<Outcome<ShopSnapshot | null>>;
   /** The whole team (a few rows): names and till code fingerprints. */
   pullMembers(): Promise<Outcome<LocalMember[]>>;
+  pullSuppliers(): Promise<Outcome<LocalSupplier[]>>;
+  recordProduct(payload: ProductCreatePayload, offline: boolean): Promise<Outcome<null>>;
+  updateProductOffline(payload: ProductUpdatePayload): Promise<Outcome<null>>;
+  receivePurchaseOrderOffline(payload: PurchaseOrderReceivePayload): Promise<Outcome<null>>;
 }
 
 export type PushResult = { sent: number; failed: number; offline: boolean };
@@ -96,14 +105,36 @@ function send(backend: SyncBackend, entry: OutboxEntry): Promise<Outcome<null>> 
       return backend.recordSale(entry.payload, entry.offline);
     case "payment":
       return backend.recordPayment(entry.payload, entry.offline);
+    case "product_create":
+      return backend.recordProduct(entry.payload, entry.offline);
+    case "product_update":
+      return backend.updateProductOffline(entry.payload);
+    case "po_receive":
+      return backend.receivePurchaseOrderOffline(entry.payload);
+  }
+}
+
+function tableOf(db: ShopDatabase, entry: OutboxEntry) {
+  switch (entry.kind) {
+    case "client":
+      return db.clients;
+    case "sale":
+      return db.invoices;
+    case "payment":
+      return db.payments;
+    default:
+      return db.products;
   }
 }
 
 async function markSent(db: ShopDatabase, entry: OutboxEntry) {
-  await db.transaction("rw", [db.outbox, db.clients, db.invoices, db.payments], async () => {
+  await db.transaction("rw", [db.outbox, db.clients, db.invoices, db.payments, db.products, db.meta], async () => {
     if (entry.seq !== undefined) await db.outbox.delete(entry.seq);
-    const table = entry.kind === "client" ? db.clients : entry.kind === "sale" ? db.invoices : db.payments;
-    await table.update(entry.ref_id, { local_state: undefined });
+    if (entry.kind === "po_receive") {
+      await db.meta.delete(purchaseOrderMarker(entry.payload.order_id));
+      return;
+    }
+    await tableOf(db, entry).update(entry.ref_id, { local_state: undefined });
   });
 }
 
@@ -111,9 +142,18 @@ async function markSent(db: ShopDatabase, entry: OutboxEntry) {
 // was already paid on another phone...). The operation stays visible « à
 // vérifier » for the owner, and what it had changed on the phone is undone.
 async function markFailed(db: ShopDatabase, entry: OutboxEntry, code: FeedbackCode) {
-  await db.transaction("rw", [db.outbox, db.clients, db.invoices, db.payments, db.products], async () => {
+  await db.transaction("rw", [db.outbox, db.clients, db.invoices, db.payments, db.products, db.meta], async () => {
     if (entry.seq !== undefined) {
       await db.outbox.update(entry.seq, { state: "failed", error: code, attempts: entry.attempts + 1 });
+    }
+    if (entry.kind === "po_receive") {
+      // The delivery did not enter the stock: the device's count goes back.
+      for (const line of entry.payload.stock) {
+        const product = await db.products.get(line.product_id);
+        if (product) await db.products.update(line.product_id, { quantity_in_stock: product.quantity_in_stock - line.quantity });
+      }
+      await db.meta.delete(purchaseOrderMarker(entry.payload.order_id));
+      return;
     }
     if (entry.kind === "client") {
       await db.clients.update(entry.ref_id, { local_state: "failed" });
@@ -123,12 +163,25 @@ async function markFailed(db: ShopDatabase, entry: OutboxEntry, code: FeedbackCo
         const product = await db.products.get(productId);
         if (product) await db.products.update(productId, { quantity_in_stock: product.quantity_in_stock + quantity });
       }
-    } else {
+    } else if (entry.kind === "payment") {
       await db.payments.update(entry.ref_id, { local_state: "failed" });
       const invoice = await db.invoices.get(entry.payload.invoice_id);
       if (invoice) {
         const paid = Math.max(0, invoice.paid_amount - entry.payload.amount);
         await db.invoices.update(invoice.id, { paid_amount: paid, status: invoiceStatus(paid, invoice.total_amount) });
+      }
+    } else if (entry.kind === "product_create") {
+      await db.products.update(entry.ref_id, { local_state: "failed" });
+    } else {
+      // The item goes back to how it was, minus the stock change only: sales
+      // made on the device since then stay counted.
+      const current = await db.products.get(entry.ref_id);
+      if (current) {
+        await db.products.put({
+          ...entry.payload.before,
+          quantity_in_stock: current.quantity_in_stock - entry.payload.stock_delta,
+          local_state: "failed",
+        });
       }
     }
   });
@@ -137,10 +190,15 @@ async function markFailed(db: ShopDatabase, entry: OutboxEntry, code: FeedbackCo
 /** What the phone did and has not sent yet, to lay over the server's rows. */
 async function pendingOverlay(db: ShopDatabase) {
   const pending = await db.outbox.where("state").equals("pending").toArray();
+  // Stock taken by sales, or changed by counts, not sent yet.
   const sold = new Map<string, number>();
   const paid = new Map<string, number>();
   for (const entry of pending) {
-    if (entry.kind === "sale") {
+    if (entry.kind === "po_receive") {
+      for (const line of entry.payload.stock) sold.set(line.product_id, (sold.get(line.product_id) ?? 0) - line.quantity);
+    } else if (entry.kind === "product_update" && entry.payload.stock_delta !== 0) {
+      sold.set(entry.payload.product_id, (sold.get(entry.payload.product_id) ?? 0) - entry.payload.stock_delta);
+    } else if (entry.kind === "sale") {
       for (const [productId, quantity] of soldQuantities(entry.payload.items)) {
         sold.set(productId, (sold.get(productId) ?? 0) + quantity);
       }
@@ -183,25 +241,31 @@ export async function pullChanges(db: ShopDatabase, backend: SyncBackend, option
     invoices: (await getMeta<string>(db, CURSOR.invoices)) ?? null,
   };
 
-  const [shop, products, clients, invoices, members] = await Promise.all([
+  const [shop, products, clients, invoices, members, suppliers] = await Promise.all([
     backend.pullShop(),
     backend.pullProducts(cursors.products),
     backend.pullClients(cursors.clients),
     backend.pullInvoices(cursors.invoices),
     backend.pullMembers(),
+    backend.pullSuppliers(),
   ]);
-  for (const outcome of [shop, products, clients, invoices, members]) {
+  for (const outcome of [shop, products, clients, invoices, members, suppliers]) {
     if (!outcome.ok) return { ok: false, network: outcome.network };
   }
-  if (!shop.ok || !products.ok || !clients.ok || !invoices.ok || !members.ok) return { ok: false, network: true };
+  if (!shop.ok || !products.ok || !clients.ok || !invoices.ok || !members.ok || !suppliers.ok) return { ok: false, network: true };
 
-  await db.transaction("rw", [db.meta, db.products, db.clients, db.invoices, db.invoice_items, db.payments, db.outbox, db.members], async () => {
+  await db.transaction(
+    "rw",
+    [db.meta, db.products, db.clients, db.invoices, db.invoice_items, db.payments, db.outbox, db.members, db.suppliers],
+    async () => {
     const overlay = await pendingOverlay(db);
 
     if (shop.data) await setMeta(db, "shop", shop.data);
     // The team is small: replaced as a whole, so a removed code disappears.
     await db.members.clear();
     await db.members.bulkPut(members.data);
+    await db.suppliers.clear();
+    await db.suppliers.bulkPut(suppliers.data);
 
     await db.products.bulkPut(
       products.data.map((row) => ({
@@ -237,7 +301,8 @@ export async function pullChanges(db: ShopDatabase, backend: SyncBackend, option
     await setMeta(db, CURSOR.clients, latest(clients.data, cursors.clients));
     await setMeta(db, CURSOR.invoices, latest(invoices.data, cursors.invoices));
     await setMeta(db, "lastPullAt", new Date().toISOString());
-  });
+    }
+  );
 
   return { ok: true };
 }

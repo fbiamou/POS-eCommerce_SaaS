@@ -80,7 +80,7 @@ export default async function StockPage() {
     <div className="flex flex-col gap-6">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <h1 className="text-2xl font-bold tracking-tight md:text-3xl">{t("title")}</h1>
-        <AddProductButton label={t("add_product")} hasShopSlug={Boolean(shopSettings?.shop_slug)} suppliers={suppliers} />
+        <AddProductButton label={t("add_product")} hasShopSlug={Boolean(shopSettings?.shop_slug)} suppliers={suppliers} itemLimit={itemLimit} />
       </div>
 
       <StockSummary serverProducts={normalizedProducts} itemLimit={itemLimit} />

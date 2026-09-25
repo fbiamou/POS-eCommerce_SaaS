@@ -27,7 +27,10 @@ export type LocalProduct = {
   image_url: string | null;
   is_published_online: boolean;
   is_active: boolean;
+  local_state?: LocalState;
 };
+
+export type LocalSupplier = { id: string; name: string; is_active: boolean };
 
 /** A team member, for choosing who sells on a shared device (till code). */
 export type LocalMember = {
@@ -116,10 +119,55 @@ export type ClientPayload = {
   created_at: string;
 };
 
+/** What the item forms fill in (same fields online and offline). */
+export type ProductFields = {
+  name: string;
+  category: string | null;
+  brand: string | null;
+  product_type: string | null;
+  supplier_id: string | null;
+  origin_country: string | null;
+  purchase_price: number;
+  selling_price: number;
+  description: string | null;
+  is_published_online: boolean;
+};
+
+export type ProductCreatePayload = ProductFields & { product_id: string; opening_stock: number; created_at: string };
+
+export type ProductUpdatePayload = ProductFields & {
+  product_id: string;
+  /** Id of the change on the device: the stock movement's id on the server. */
+  change_id: string;
+  /** Counted quantity minus the device's quantity: other tills' sales stay counted. */
+  stock_delta: number;
+  changed_at: string;
+  /** The item before the change, to put back if the server refuses it. */
+  before: LocalProduct;
+};
+
+/** A delivery checked off offline (purchase order received). */
+export type PurchaseOrderReceivePayload = {
+  order_id: string;
+  reference: string;
+  entries: { item_id: string; received_quantity: number }[];
+  /** Units entering each item's stock, to update the device's copy. */
+  stock: { product_id: string; quantity: number }[];
+  received_at: string;
+};
+
+/** Meta key marking a purchase order received on the device, not sent yet. */
+export function purchaseOrderMarker(orderId: string) {
+  return `po_received:${orderId}`;
+}
+
 export type OutboxOp =
   | { kind: "client"; payload: ClientPayload }
   | { kind: "sale"; payload: SalePayload }
-  | { kind: "payment"; payload: PaymentPayload };
+  | { kind: "payment"; payload: PaymentPayload }
+  | { kind: "product_create"; payload: ProductCreatePayload }
+  | { kind: "product_update"; payload: ProductUpdatePayload }
+  | { kind: "po_receive"; payload: PurchaseOrderReceivePayload };
 
 export type OutboxEntry = OutboxOp & {
   /** Auto-increment: operations are sent in the order they were made. */
@@ -146,6 +194,7 @@ export class ShopDatabase extends Dexie {
   outbox!: EntityTable<OutboxEntry, "seq">;
   meta!: EntityTable<MetaEntry, "key">;
   members!: EntityTable<LocalMember, "id">;
+  suppliers!: EntityTable<LocalSupplier, "id">;
 
   constructor(name: string) {
     super(name);
@@ -160,6 +209,8 @@ export class ShopDatabase extends Dexie {
     });
     // Till codes: the team, to check a code without internet.
     this.version(2).stores({ members: "id" });
+    // Items created or changed offline: the shop's suppliers for the form.
+    this.version(3).stores({ suppliers: "id" });
   }
 }
 

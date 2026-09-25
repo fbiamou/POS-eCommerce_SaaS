@@ -10,6 +10,8 @@ import { useToast } from "@/components/ui/Toast";
 import { Select } from "@/components/ui/Select";
 import { useOptionalOfflineContext } from "@/features/offline/OfflineProvider";
 import { useLocalProducts } from "@/features/offline/hooks";
+import { productFieldsFromForm, updateProductOffline } from "@/features/offline/localActions";
+import type { LocalState } from "@/features/offline/db";
 
 export type Product = {
   id: string;
@@ -25,6 +27,8 @@ export type Product = {
   description: string | null;
   image_url: string | null;
   is_published_online: boolean;
+  /** Changed on this device and not sent yet, or refused by the server. */
+  local_state?: LocalState;
 };
 
 export default function ProductList({
@@ -62,6 +66,7 @@ export default function ProductList({
             description: p.description,
             image_url: p.image_url,
             is_published_online: p.is_published_online,
+            local_state: p.local_state,
           }))
         : serverProducts,
     [localProducts, serverProducts]
@@ -89,14 +94,37 @@ export default function ProductList({
   const handleEditSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError(null);
-    if (offline && !offline.status.online) {
-      setError(tFeedback("needs_connection"));
-      return;
-    }
     const formData = new FormData(e.currentTarget);
+    const product = editingProduct;
+
+    // Offline mode: the change is kept on the device and sent later; the
+    // counted quantity becomes a difference with the device's stock.
+    const saveOnDevice = async () => {
+      if (!offline || !product) return;
+      const counted = parseInt((formData.get("quantity_in_stock") as string) || "0", 10) || 0;
+      const saved = await updateProductOffline(offline, product.id, productFieldsFromForm(formData, "selling_price"), counted);
+      if (!saved.ok) {
+        setError(tFeedback(saved.code));
+        return;
+      }
+      showToast(tOffline("item_saved_offline"));
+      closeEdit();
+    };
 
     startTransition(async () => {
-      const result = await updateProduct(formData);
+      if (offline && !offline.status.online) {
+        await saveOnDevice();
+        return;
+      }
+      let result: Awaited<ReturnType<typeof updateProduct>>;
+      try {
+        result = await updateProduct(formData);
+      } catch {
+        if (offline) await saveOnDevice();
+        else setError(tFeedback("generic_error"));
+        return;
+      }
+      offline?.requestSync();
       if (result.error) {
         setError(tFeedback(result.error));
         return;
@@ -109,6 +137,10 @@ export default function ProductList({
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file || !editingProduct) return;
+    if (offline && !offline.status.online) {
+      setError(tFeedback("needs_connection"));
+      return;
+    }
 
     const localPreview = URL.createObjectURL(file);
     setPreviewUrl(localPreview);
@@ -215,6 +247,16 @@ export default function ProductList({
                     >
                       {t("in_stock_count", { count: product.quantity_in_stock })}
                     </span>
+                    {product.local_state === "pending" && (
+                      <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[11px] font-semibold text-amber-900 dark:bg-amber-900/30 dark:text-amber-200">
+                        {tOffline("badge_pending")}
+                      </span>
+                    )}
+                    {product.local_state === "failed" && (
+                      <span className="rounded-full bg-red-100 px-2 py-0.5 text-[11px] font-semibold text-red-800 dark:bg-red-900/30 dark:text-red-300">
+                        {tOffline("badge_failed")}
+                      </span>
+                    )}
                     {/* Two tills sold the last one during a power cut: both sales were kept. */}
                     {product.quantity_in_stock < 0 && (
                       <span className="rounded-full bg-red-100 px-2 py-0.5 text-[11px] font-semibold text-red-800 dark:bg-red-900/30 dark:text-red-300">

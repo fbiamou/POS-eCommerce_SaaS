@@ -1210,7 +1210,13 @@
     "needs_connection": "This action needs the internet.",
     "not_on_device": "This invoice is not on this device yet. It will appear at the next update.",
     "loading": "Loading the device's data…",
-    "stock_to_check": "Stock to check"
+    "stock_to_check": "Stock to check",
+    "kind_product_create": "New item {name}",
+    "kind_product_update": "Change to {name}",
+    "image_needs_connection": "The photo will be added with internet: the item is saved without a photo for now.",
+    "item_saved_offline": "Item saved on the device. It will be sent when the internet is back.",
+    "kind_po_receive": "Reception of order {reference}",
+    "po_received_offline": "Reception saved on the device: the items are already in stock. It will be sent when the internet is back."
   },
   "Cashier": {
     "selling_as": "Selling as",

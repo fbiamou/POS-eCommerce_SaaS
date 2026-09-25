@@ -1,6 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { feedbackFromError } from "@/lib/feedback";
-import type { LocalClient, LocalInvoiceItem, LocalMember, LocalPayment, LocalProduct } from "./db";
+import type { LocalClient, LocalInvoiceItem, LocalMember, LocalPayment, LocalProduct, LocalSupplier } from "./db";
 import type { Outcome, ServerInvoice, ShopSnapshot, SyncBackend } from "./sync";
 
 // The sync engine's link to Supabase, from the browser with the signed-in
@@ -141,6 +141,57 @@ export function supabaseBackend(supabase: SupabaseClient, shopId: string, option
           payments: (payments ?? []).map((payment) => ({ ...payment, invoice_id: row.id })),
         })),
       };
+    },
+
+    recordProduct: (p, offline) =>
+      rpc("record_product", {
+        _product_id: p.product_id,
+        _name: p.name,
+        _category: p.category,
+        _brand: p.brand,
+        _product_type: p.product_type,
+        _supplier_id: p.supplier_id,
+        _origin_country: p.origin_country,
+        _purchase_price: p.purchase_price,
+        _selling_price: p.selling_price,
+        _description: p.description,
+        _is_published_online: p.is_published_online,
+        _opening_stock: p.opening_stock,
+        _created_at: offline ? p.created_at : null,
+      }),
+
+    updateProductOffline: (p) =>
+      rpc("update_product_offline", {
+        _product_id: p.product_id,
+        _change_id: p.change_id,
+        _name: p.name,
+        _category: p.category,
+        _brand: p.brand,
+        _product_type: p.product_type,
+        _supplier_id: p.supplier_id,
+        _origin_country: p.origin_country,
+        _purchase_price: p.purchase_price,
+        _selling_price: p.selling_price,
+        _description: p.description,
+        _is_published_online: p.is_published_online,
+        _stock_delta: p.stock_delta,
+        _changed_at: p.changed_at,
+      }),
+
+    receivePurchaseOrderOffline: (p) =>
+      rpc("receive_purchase_order_offline", {
+        _shop_id: shopId,
+        _order_id: p.order_id,
+        _received: p.entries,
+        _received_at: p.received_at,
+      }),
+
+    pullSuppliers() {
+      return guarded(async () => {
+        const response = await supabase.from("suppliers").select("id, name, is_active").order("name").abortSignal(timeout());
+        if (response.error) return refusal(response);
+        return { ok: true, data: (response.data ?? []) as LocalSupplier[] };
+      });
     },
 
     pullMembers() {

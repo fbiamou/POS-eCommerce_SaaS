@@ -7,15 +7,20 @@ import { useTranslations } from "next-intl";
 import { addProduct, uploadProductImage } from "../actions";
 import { useToast } from "@/components/ui/Toast";
 import { Select } from "@/components/ui/Select";
+import { useOptionalOfflineContext } from "@/features/offline/OfflineProvider";
+import { createProductOffline, productFieldsFromForm } from "@/features/offline/localActions";
 
 export function AddProductButton({
   label,
   hasShopSlug,
   suppliers,
+  itemLimit = null,
 }: {
   label: string;
   hasShopSlug: boolean;
   suppliers: { id: string; name: string }[];
+  /** The plan's number of items, checked on the device when offline. */
+  itemLimit?: number | null;
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
@@ -25,6 +30,8 @@ export function AddProductButton({
   const t = useTranslations("Stock");
   const showToast = useToast((state) => state.show);
   const tFeedback = useTranslations("Feedback");
+  const tOffline = useTranslations("Offline");
+  const offline = useOptionalOfflineContext();
 
   const close = () => {
     setIsOpen(false);
@@ -42,8 +49,42 @@ export function AddProductButton({
     const formData = new FormData(e.currentTarget);
     const imageFile = imageInputRef.current?.files?.[0];
 
+    // Offline mode: the item is kept on the device and sent later (without
+    // its photo, which needs the internet).
+    const saveOnDevice = async () => {
+      if (!offline) return;
+      if (itemLimit !== null) {
+        const count = await offline.db.products.filter((p) => p.is_active).count();
+        if (count >= itemLimit) {
+          setError(tFeedback("plan_limit_items"));
+          return;
+        }
+      }
+      const opening = parseInt((formData.get("stock_qty") as string) || "0", 10) || 0;
+      const saved = await createProductOffline(offline, productFieldsFromForm(formData, "price"), opening);
+      if (!saved.ok) {
+        setError(tFeedback(saved.code));
+        return;
+      }
+      showToast(tOffline(imageFile ? "image_needs_connection" : "item_saved_offline"));
+      close();
+    };
+
     startTransition(async () => {
-      const result = await addProduct(formData);
+      if (offline && !offline.status.online) {
+        await saveOnDevice();
+        return;
+      }
+      let result: Awaited<ReturnType<typeof addProduct>>;
+      try {
+        result = await addProduct(formData);
+      } catch {
+        // The server did not answer: no network after all.
+        if (offline) await saveOnDevice();
+        else setError(tFeedback("generic_error"));
+        return;
+      }
+      offline?.requestSync();
       if (!result?.productId) {
         setError(tFeedback(result?.error ?? "product_save_failed"));
         return;
