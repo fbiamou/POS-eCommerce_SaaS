@@ -449,7 +449,26 @@
     "powered_by": "Propulsé par",
     "one_less": "Un de moins",
     "one_more": "Un de plus",
-    "remove": "Retirer"
+    "remove": "Retirer",
+    "report_link": "Signaler un contenu",
+    "report_product": "Signaler cet article",
+    "report_title": "Signaler un contenu",
+    "report_intro": "Contrefaçon, produit interdit, contenu trompeur : votre signalement est adressé à WISHOP, qui héberge cette vitrine, et non à la boutique.",
+    "report_about": "Article concerné : {name}",
+    "report_reason": "Motif",
+    "report_reason_COUNTERFEIT": "Contrefaçon",
+    "report_reason_PROHIBITED": "Produit interdit",
+    "report_reason_MISLEADING": "Contenu trompeur",
+    "report_reason_OTHER": "Autre",
+    "report_details": "Précisions (facultatif)",
+    "report_details_placeholder": "Ce qui pose problème, en quelques mots",
+    "report_contact": "Votre téléphone ou email (facultatif)",
+    "report_contact_hint": "Seulement si vous souhaitez une réponse.",
+    "report_send": "Envoyer le signalement",
+    "report_sending": "Envoi…",
+    "report_sent_title": "Merci",
+    "report_sent_body": "WISHOP examinera votre signalement et prendra les mesures nécessaires.",
+    "report_close": "Fermer"
   },
   "Invoices": {
     "list_title": "Factures",
@@ -716,7 +735,9 @@
     "terms_required": "Cochez la case pour accepter les conditions d'utilisation.",
     "purchase_order_has_shipment": "Ce bon est suivi par un arrivage : réceptionnez la marchandise en pointant l'arrivage.",
     "loyalty_reward_unavailable": "La récompense de fidélité n'est plus disponible pour ce client. Décochez-la et réessayez.",
-    "loyalty_invalid": "Carte de fidélité : entre 2 et 50 achats, et une remise entre 1 et 100 %."
+    "loyalty_invalid": "Carte de fidélité : entre 2 et 50 achats, et une remise entre 1 et 100 %.",
+    "report_invalid": "Choisissez un motif ; les précisions ne doivent pas dépasser 1 000 caractères.",
+    "report_rate_limited": "Trop de signalements pour cette vitrine en ce moment. Réessayez dans une heure."
   },
   "Suppliers": {
     "title": "Fournisseurs",

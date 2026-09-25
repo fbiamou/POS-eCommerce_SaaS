@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
-import { Plus, Minus, Trash2, ShoppingBag, CheckCircle2, MapPin, Phone, Store } from "lucide-react";
+import { Plus, Minus, Trash2, ShoppingBag, CheckCircle2, MapPin, Phone, Store, Flag } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { LocaleSwitcher } from "@/components/LocaleSwitcher";
 import { WishopMark } from "@/components/brand/WishopMark";
@@ -12,6 +12,7 @@ import { PhoneCountryCodeSelect } from "@/components/PhoneCountryCodeSelect";
 import { formatMoney } from "@/lib/format";
 import { feedbackFromError, type FeedbackCode } from "@/lib/feedback";
 import type { PublicProduct, PublicShopProfile } from "../actions";
+import { ReportContent } from "./ReportContent";
 
 type CartItem = { productId: string; quantity: number };
 
@@ -36,9 +37,11 @@ function ShopThread() {
 // A shop's public storefront, for its own customers: its name, logo, accent
 // colour and font come first; WISHOP only signs the footer.
 export default function StorefrontShop({
+  slug,
   shop,
   products,
 }: {
+  slug: string;
   shop: PublicShopProfile;
   products: PublicProduct[];
 }) {
@@ -66,6 +69,7 @@ export default function StorefrontShop({
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [openProduct, setOpenProduct] = useState<PublicProduct | null>(null);
+  const [report, setReport] = useState<{ open: boolean; product: PublicProduct | null }>({ open: false, product: null });
 
   const [cart, setCart] = useState<CartItem[]>(() => {
     if (typeof window !== "undefined") {
@@ -303,6 +307,13 @@ export default function StorefrontShop({
           <p>
             © {new Date().getFullYear()} {shopName}. {t("footer_rights")}
           </p>
+          <button
+            type="button"
+            onClick={() => setReport({ open: true, product: null })}
+            className="flex items-center gap-1.5 text-zinc-500 underline-offset-2 hover:text-zinc-800 hover:underline"
+          >
+            <Flag className="h-3.5 w-3.5" /> {t("report_link")}
+          </button>
           {/* The WISHOP site is a static page (public/landing), not an app route. */}
           {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
           <a href="/landing" className="flex items-center gap-1.5 text-zinc-500 hover:text-zinc-800">
@@ -356,9 +367,26 @@ export default function StorefrontShop({
             ) : (
               <p className="rounded-xl bg-zinc-100 py-3 text-center text-[14px] font-semibold text-zinc-600">{t("out_of_stock")}</p>
             )}
+            <button
+              type="button"
+              onClick={() => {
+                setReport({ open: true, product: openProduct });
+                setOpenProduct(null);
+              }}
+              className="flex items-center justify-center gap-1.5 self-center text-[13px] text-zinc-500 underline-offset-2 hover:text-zinc-800 hover:underline"
+            >
+              <Flag className="h-3.5 w-3.5" /> {t("report_product")}
+            </button>
           </div>
         )}
       </Modal>
+
+      <ReportContent
+        slug={slug}
+        product={report.product}
+        isOpen={report.open}
+        onClose={() => setReport({ open: false, product: null })}
+      />
 
       {/* Basket and order */}
       <Modal

@@ -449,7 +449,26 @@
     "powered_by": "Powered by",
     "one_less": "One less",
     "one_more": "One more",
-    "remove": "Remove"
+    "remove": "Remove",
+    "report_link": "Report content",
+    "report_product": "Report this item",
+    "report_title": "Report content",
+    "report_intro": "Counterfeit, prohibited product, misleading content: your report goes to WISHOP, which hosts this storefront, not to the shop.",
+    "report_about": "Item concerned: {name}",
+    "report_reason": "Reason",
+    "report_reason_COUNTERFEIT": "Counterfeit",
+    "report_reason_PROHIBITED": "Prohibited product",
+    "report_reason_MISLEADING": "Misleading content",
+    "report_reason_OTHER": "Other",
+    "report_details": "Details (optional)",
+    "report_details_placeholder": "What is wrong, in a few words",
+    "report_contact": "Your phone or email (optional)",
+    "report_contact_hint": "Only if you would like a reply.",
+    "report_send": "Send the report",
+    "report_sending": "Sending…",
+    "report_sent_title": "Thank you",
+    "report_sent_body": "WISHOP will review your report and take the necessary action.",
+    "report_close": "Close"
   },
   "Invoices": {
     "list_title": "Invoices",
@@ -716,7 +735,9 @@
     "terms_required": "Tick the box to accept the terms of use.",
     "purchase_order_has_shipment": "This order is followed by a shipment: receive the goods by checking off the shipment.",
     "loyalty_reward_unavailable": "The loyalty reward is no longer available for this customer. Untick it and try again.",
-    "loyalty_invalid": "Loyalty card: between 2 and 50 purchases, and a discount between 1 and 100%."
+    "loyalty_invalid": "Loyalty card: between 2 and 50 purchases, and a discount between 1 and 100%.",
+    "report_invalid": "Choose a reason; details must not exceed 1,000 characters.",
+    "report_rate_limited": "Too many reports for this storefront right now. Please try again in an hour."
   },
   "Suppliers": {
     "title": "Suppliers",

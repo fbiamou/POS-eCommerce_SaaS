@@ -28,7 +28,7 @@ export default async function StorefrontPage({
       {/* Only the storefront lets a shop customize its own look — the admin
           app keeps a fixed identity, set in globals.css. */}
       <ThemeStyle accentColor={shop.theme_accent_color} fontFamily={shop.theme_font} />
-      <StorefrontShop shop={shop} products={products} />
+      <StorefrontShop slug={slug} shop={shop} products={products} />
     </>
   );
 }

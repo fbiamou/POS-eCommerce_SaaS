@@ -83,6 +83,9 @@ export const FEEDBACK_CODES = [
   // Loyalty
   "loyalty_reward_unavailable",
   "loyalty_invalid",
+  // Storefront reports
+  "report_invalid",
+  "report_rate_limited",
 ] as const;
 
 export type FeedbackCode = (typeof FEEDBACK_CODES)[number];
