@@ -805,9 +805,13 @@
     "plan_credit_locked": "La venta a crédito está incluida a partir del plan Essentiel.",
     "plan_limit_items": "Límite de artículos de tu plan alcanzado.",
     "plan_limit_accounts": "Tu plan no permite añadir una cuenta más.",
-    "password_weak": "Contraseña demasiado débil: 8 caracteres como mínimo, con una mayúscula, una minúscula, un número y un carácter especial.",
+    "password_weak": "Contraseña demasiado débil: 8 caracteres como mínimo, con una mayúscula y una minúscula sin tilde, un número y un símbolo (! @ # $ % & * - _ ?).",
     "reset_email_sent": "Si existe una cuenta con esta dirección, acaba de salir un correo con un enlace para elegir una nueva contraseña. Revisa también el correo no deseado.",
-    "password_updated": "Contraseña guardada."
+    "password_updated": "Contraseña guardada.",
+    "email_taken": "Ya existe una cuenta con esta dirección. Inicia sesión o usa «¿Olvidaste tu contraseña?».",
+    "email_invalid_signup": "Esta dirección de correo no se acepta: revísala.",
+    "signup_rate_limited": "Demasiados intentos en poco tiempo. Inténtalo de nuevo en unos minutos.",
+    "email_send_failed": "No se pudo crear la tienda: el correo de confirmación no pudo salir. Inténtalo en unos minutos; si sigue igual, escribe a WISHOP."
   },
   "Suppliers": {
     "title": "Proveedores",
@@ -1136,10 +1140,12 @@
     "format_invalid": "El formato no es válido.",
     "password_weak": "La contraseña aún no cumple todas las condiciones de abajo.",
     "password_rule_length": "{min} caracteres como mínimo",
-    "password_rule_upper": "Una mayúscula",
-    "password_rule_lower": "Una minúscula",
+    "password_rule_upper": "Una mayúscula sin tilde (A-Z)",
+    "password_rule_lower": "Una minúscula sin tilde (a-z)",
     "password_rule_digit": "Un número",
-    "password_rule_special": "Un carácter especial (! @ # - …)"
+    "password_rule_special": "Un símbolo: ! @ # $ % & * - _ ? …",
+    "password_show": "Mostrar la contraseña",
+    "password_hide": "Ocultar la contraseña"
   },
   "Messages": {
     "from_wishop": "Mensaje de WISHOP",

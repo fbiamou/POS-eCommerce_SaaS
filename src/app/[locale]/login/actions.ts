@@ -9,6 +9,7 @@ import { redirectLocalized } from '@/lib/navigation'
 import { TERMS_VERSION } from '@/lib/terms'
 import { findShopCountry } from '@/lib/countries'
 import { isStrongPassword } from '@/lib/password'
+import type { FeedbackCode } from '@/lib/feedback'
 
 export async function login(formData: FormData) {
   const supabase = await createClient()
@@ -87,6 +88,26 @@ export async function updatePassword(formData: FormData) {
   return redirectLocalized('/settings', { message: 'password_updated' })
 }
 
+// Why Supabase refused a sign-up, in words the owner can act on (instead of
+// a bare "failed"): a password its own rule refuses, an address already
+// used, too many attempts, or the confirmation email that could not leave.
+function signupFailure(error: { code?: string; message?: string; status?: number }): FeedbackCode {
+  switch (error.code) {
+    case 'weak_password':
+      return 'password_weak'
+    case 'user_already_exists':
+    case 'email_exists':
+      return 'email_taken'
+    case 'email_address_invalid':
+      return 'email_invalid_signup'
+    case 'over_email_send_rate_limit':
+    case 'over_request_rate_limit':
+      return 'signup_rate_limited'
+  }
+  if (/sending confirmation email|smtp|mail/i.test(error.message ?? '')) return 'email_send_failed'
+  return 'signup_failed'
+}
+
 export async function signup(formData: FormData) {
   // Creating a shop requires accepting the terms of use; the browser already
   // enforces the checkbox, this is the server-side guarantee.
@@ -132,8 +153,8 @@ export async function signup(formData: FormData) {
   })
 
   if (error) {
-    console.error("Signup error:", error);
-    return redirectLocalized('/login', { mode: 'signup', error: 'signup_failed' })
+    console.error('Signup error:', error.code, error.status, error.message)
+    return redirectLocalized('/login', { mode: 'signup', error: signupFailure(error) })
   }
 
   // Email confirmation is required before the first sign-in.

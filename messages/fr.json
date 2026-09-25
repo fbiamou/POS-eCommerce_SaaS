@@ -805,9 +805,13 @@
     "plan_credit_locked": "La vente à crédit est comprise à partir de la formule Essentiel.",
     "plan_limit_items": "Limite d’articles de votre formule atteinte.",
     "plan_limit_accounts": "Votre formule ne permet pas d’ajouter un compte de plus.",
-    "password_weak": "Mot de passe trop faible : 8 caractères minimum, avec une majuscule, une minuscule, un chiffre et un caractère spécial.",
+    "password_weak": "Mot de passe trop faible : 8 caractères minimum, avec une majuscule et une minuscule sans accent, un chiffre et un symbole (! @ # $ % & * - _ ?).",
     "reset_email_sent": "Si un compte existe avec cette adresse, un e-mail vient de partir avec un lien pour choisir un nouveau mot de passe. Pensez à regarder dans les spams.",
-    "password_updated": "Mot de passe enregistré."
+    "password_updated": "Mot de passe enregistré.",
+    "email_taken": "Un compte existe déjà avec cette adresse. Connectez-vous, ou utilisez « Mot de passe oublié ».",
+    "email_invalid_signup": "Cette adresse e-mail n’est pas acceptée : vérifiez-la.",
+    "signup_rate_limited": "Trop de tentatives en peu de temps. Réessayez dans quelques minutes.",
+    "email_send_failed": "La boutique n’a pas pu être créée : l’e-mail de confirmation n’a pas pu partir. Réessayez dans quelques minutes ; si cela continue, écrivez à WISHOP."
   },
   "Suppliers": {
     "title": "Fournisseurs",
@@ -1136,10 +1140,12 @@
     "format_invalid": "Le format n’est pas valide.",
     "password_weak": "Le mot de passe ne remplit pas encore toutes les conditions ci-dessous.",
     "password_rule_length": "{min} caractères minimum",
-    "password_rule_upper": "Une majuscule",
-    "password_rule_lower": "Une minuscule",
+    "password_rule_upper": "Une majuscule sans accent (A-Z)",
+    "password_rule_lower": "Une minuscule sans accent (a-z)",
     "password_rule_digit": "Un chiffre",
-    "password_rule_special": "Un caractère spécial (! @ # - …)"
+    "password_rule_special": "Un symbole : ! @ # $ % & * - _ ? …",
+    "password_show": "Afficher le mot de passe",
+    "password_hide": "Masquer le mot de passe"
   },
   "Messages": {
     "from_wishop": "Message de WISHOP",

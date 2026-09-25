@@ -10,6 +10,7 @@ import { termsPathFor } from '@/lib/terms'
 import { Select } from '@/components/ui/Select'
 import { SHOP_COUNTRIES } from '@/lib/countries'
 import { PasswordField } from '@/components/PasswordField'
+import { PasswordInput } from '@/components/PasswordInput'
 import { MailCheck } from 'lucide-react'
 
 export async function generateMetadata() {
@@ -232,7 +233,7 @@ export default async function LoginPage({
               </div>
               <div className="flex flex-col gap-1.5">
                 <label className={labelClass} htmlFor="password">{t('password')}</label>
-                <input id="password" name="password" type="password" autoComplete="current-password" required className={inputClass} />
+                <PasswordInput id="password" name="password" autoComplete="current-password" required className={inputClass} />
                 <Link href="/login?mode=reset" className="self-end text-[13px] font-semibold text-violet-700 hover:underline dark:text-violet-300">
                   {t('forgot_password')}
                 </Link>

@@ -805,9 +805,13 @@
     "plan_credit_locked": "Credit sales come with the Essentiel plan and above.",
     "plan_limit_items": "Your plan’s item limit is reached.",
     "plan_limit_accounts": "Your plan does not allow one more account.",
-    "password_weak": "Password too weak: at least 8 characters, with an uppercase letter, a lowercase letter, a digit and a special character.",
+    "password_weak": "Password too weak: at least 8 characters, with an uppercase and a lowercase letter (no accents), a digit and a symbol (! @ # $ % & * - _ ?).",
     "reset_email_sent": "If an account exists with this address, an email is on its way with a link to choose a new password. Check your spam folder too.",
-    "password_updated": "Password saved."
+    "password_updated": "Password saved.",
+    "email_taken": "An account already exists with this address. Sign in, or use “Forgot your password?”.",
+    "email_invalid_signup": "This email address is not accepted: please check it.",
+    "signup_rate_limited": "Too many attempts in a short time. Try again in a few minutes.",
+    "email_send_failed": "The shop could not be created: the confirmation email could not be sent. Try again in a few minutes; if it keeps happening, contact WISHOP."
   },
   "Suppliers": {
     "title": "Suppliers",
@@ -1136,10 +1140,12 @@
     "format_invalid": "The format is not valid.",
     "password_weak": "The password does not meet all the conditions below yet.",
     "password_rule_length": "At least {min} characters",
-    "password_rule_upper": "An uppercase letter",
-    "password_rule_lower": "A lowercase letter",
+    "password_rule_upper": "An uppercase letter (A-Z)",
+    "password_rule_lower": "A lowercase letter (a-z)",
     "password_rule_digit": "A digit",
-    "password_rule_special": "A special character (! @ # - …)"
+    "password_rule_special": "A symbol: ! @ # $ % & * - _ ? …",
+    "password_show": "Show password",
+    "password_hide": "Hide password"
   },
   "Messages": {
     "from_wishop": "Message from WISHOP",

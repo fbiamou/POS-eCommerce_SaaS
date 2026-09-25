@@ -8,9 +8,16 @@ describe("password strength", () => {
     expect(passwordIssues("Boutique2026")).toEqual(["special"]);
   });
 
-  it("accepts a password with all five ingredients, accents included", () => {
+  it("accepts a password with all five ingredients", () => {
     expect(isStrongPassword("Boutique-2026")).toBe(true);
-    expect(isStrongPassword("Éclat#9mamá")).toBe(true);
+    expect(isStrongPassword("Mama#B2026!")).toBe(true);
     expect(isStrongPassword("Ab1!")).toBe(false);
+  });
+
+  it("follows Supabase: only unaccented letters and keyboard symbols count", () => {
+    // "É" is not an uppercase A-Z, "€" and "¿" are not in Supabase's symbols.
+    expect(passwordIssues("Éclat#9mama")).toEqual(["upper"]);
+    expect(passwordIssues("Boutique2026€")).toEqual(["special"]);
+    expect(passwordIssues("¿Boutique2026?")).toEqual([]);
   });
 });

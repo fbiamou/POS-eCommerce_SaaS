@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { Check, X } from "lucide-react";
 import { PASSWORD_MIN_LENGTH, PASSWORD_RULES, passwordIssues } from "@/lib/password";
+import { PasswordInput } from "./PasswordInput";
 
 // A new password with its five rules shown as they are met, instead of a
 // form that only says "invalid" after the fact.
@@ -14,10 +15,9 @@ export function PasswordField({ id, name, inputClassName }: { id: string; name: 
 
   return (
     <div className="flex flex-col gap-2">
-      <input
+      <PasswordInput
         id={id}
         name={name}
-        type="password"
         autoComplete="new-password"
         required
         data-own-validity="true"
