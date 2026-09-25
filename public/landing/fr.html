@@ -1,0 +1,1320 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>WISHOP · Ne perdez plus le fil de votre boutique</title>
+<meta name="description" content="Encaissez, suivez chaque crédit jusqu'au dernier franc, surveillez le stock et relancez vos clients sur WhatsApp. Tout depuis votre téléphone. Gratuit pour commencer.">
+<meta name="theme-color" content="#141C45">
+<!-- PREVIEW: aperçu non indexé. Au lancement public, retirer cette ligne et l'en-tête X-Robots-Tag de next.config.ts -->
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='15' fill='%232B44A0'/%3E%3Cpolyline points='12,21 23,45 32,29 41,45 52,21' fill='none' stroke='%23fff' stroke-width='6.5'/%3E%3Cpath d='M32 9l5.5 5.5L32 20l-5.5-5.5z' fill='%23F4B63F'/%3E%3C/svg%3E">
+<meta property="og:title" content="WISHOP · Ne perdez plus le fil de votre boutique">
+<meta property="og:description" content="Ventes, stock, crédits clients et relances WhatsApp, depuis votre téléphone. Gratuit pour commencer.">
+<meta property="og:locale" content="fr_FR">
+<meta property="og:type" content="website">
+<!-- Aperçu des liens (WhatsApp, Facebook) : adresses complètes obligatoires. À changer si l'adresse du site change. -->
+<meta property="og:site_name" content="WISHOP">
+<meta property="og:url" content="https://wishop-saa-s.vercel.app/fr">
+<meta property="og:image" content="https://wishop-saa-s.vercel.app/landing/assets/hero-ending.jpg">
+<meta property="og:image:type" content="image/jpeg">
+<meta property="og:image:width" content="2560">
+<meta property="og:image:height" content="1448">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Figtree:wght@400;600&family=Spline+Sans+Mono:wght@500&display=swap">
+<style>
+:root{
+  --canvas:#F2F3F8; --panel:#FBFBFE; --ink:#141C45; --ink-2:#4F5780; --brand:#2B44A0;
+  --night:#141C45; --night-2:#0D1336; --mist:#D7DBEA; --line-strong:#6D77A6;
+  --accent:#F4B63F; --accent-hover:#E9A623; --accent-muted:rgba(244,182,63,.22); --on-accent:#141C45;
+  --ok:#1E7F4F; --late:#C2412D; --light:#F4F5FB;
+  --f-display:"Bricolage Grotesque","Segoe UI",system-ui,sans-serif;
+  --f-body:"Figtree","Segoe UI",system-ui,sans-serif;
+  --f-mono:"Spline Sans Mono",ui-monospace,Consolas,monospace;
+  --ease-out:cubic-bezier(.2,.7,.2,1); --ease-io:cubic-bezier(.65,0,.35,1);
+  --tshadow:0 1px 2px rgba(5,8,28,.92),0 3px 12px rgba(5,8,28,.72),0 10px 44px rgba(5,8,28,.78);
+  --gutter:clamp(16px,4.2vw,56px);
+  --nav-h:68px;
+}
+*{box-sizing:border-box}
+html{overflow-x:hidden;overflow-x:clip;scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{margin:0;overflow-x:hidden;overflow-x:clip;background:var(--canvas);color:var(--ink);font-family:var(--f-body);font-size:17px;line-height:1.6;-webkit-font-smoothing:antialiased;animation:pagein .7s var(--ease-out) both}
+@keyframes pagein{from{opacity:0}to{opacity:1}}
+img,svg,video{display:block;max-width:100%}
+h1,h2,h3{font-family:var(--f-display);font-weight:800;letter-spacing:-.022em;line-height:1.04;text-wrap:balance;margin:0}
+p{margin:0;text-wrap:pretty}
+a{color:inherit}
+button{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--accent);outline-offset:3px;border-radius:6px}
+[hidden]{display:none !important}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+.skip{position:fixed;left:12px;top:-60px;z-index:100;background:var(--accent);color:var(--on-accent);padding:10px 16px;border-radius:10px;font-weight:600;text-decoration:none;transition:top .3s var(--ease-out)}
+.skip:focus{top:12px}
+.mono{font-family:var(--f-mono);font-weight:500}
+.kicker{font-family:var(--f-mono);font-weight:500;font-size:12.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--brand)}
+.num{font-variant-numeric:tabular-nums;white-space:nowrap}
+
+/* The one environment: faint cotton weave drifting behind the light sections */
+.env{position:fixed;inset:-40px;z-index:-1;pointer-events:none;background-color:var(--canvas);
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14'%3E%3Cpath d='M0 3.5h14M0 10.5h14' stroke='%232B44A0' stroke-opacity='.045'/%3E%3Cpath d='M3.5 0v14M10.5 0v14' stroke='%232B44A0' stroke-opacity='.03'/%3E%3C/svg%3E");
+  animation:drift 90s linear infinite;animation-delay:-20s}
+@keyframes drift{from{transform:translate3d(0,0,0)}to{transform:translate3d(28px,28px,0)}}
+
+/* Buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:.5em;border:0;border-radius:999px;padding:.95em 1.55em;font-family:var(--f-body);font-weight:600;font-size:16px;line-height:1.1;text-decoration:none;cursor:pointer;text-shadow:none;transition:background-color .25s var(--ease-out),transform .25s var(--ease-out),box-shadow .25s var(--ease-out)}
+.btn-accent{background:var(--accent);color:var(--on-accent);box-shadow:0 10px 30px -12px rgba(244,182,63,.65)}
+.btn-accent:hover{background:var(--accent-hover);transform:translateY(-1px)}
+.btn-ghost{background:transparent;color:inherit;box-shadow:inset 0 0 0 1.5px currentColor}
+.btn-ghost:hover{background:rgba(255,255,255,.08)}
+@media (pointer:coarse){.btn,.lang button,.nav-links a{min-height:44px;display:inline-flex;align-items:center;justify-content:center}}
+
+/* Navigation */
+.nav{position:fixed;top:0;left:0;right:0;z-index:40;padding-top:env(safe-area-inset-top,0px);color:var(--light);transition:background-color .35s var(--ease-out),color .35s var(--ease-out),box-shadow .35s var(--ease-out)}
+.nav.solid{background:rgba(242,243,248,.95);color:var(--ink);box-shadow:0 1px 0 rgba(20,28,69,.08);-webkit-backdrop-filter:saturate(1.2) blur(14px);backdrop-filter:saturate(1.2) blur(14px)}
+.nav-in{height:var(--nav-h);display:flex;align-items:center;gap:20px;padding-inline:var(--gutter)}
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none;font-family:var(--f-display);font-weight:800;font-size:21px;letter-spacing:-.02em}
+.brand svg{width:28px;height:auto}
+.nav-links{display:flex;gap:26px;margin-left:auto;font-weight:600;font-size:15px}
+.nav-links a{text-decoration:none;opacity:.85;transition:opacity .2s}
+.nav-links a:hover{opacity:1}
+.nav-right{display:flex;align-items:center;gap:14px}
+.nav .btn{padding:.7em 1.15em;font-size:15px}
+.login{font-weight:600;font-size:15px;text-decoration:none;opacity:.85}
+.login:hover{opacity:1}
+.lang{display:flex;gap:2px;font-family:var(--f-mono);font-size:12.5px;font-weight:500}
+.lang button{background:none;border:0;padding:6px 7px;border-radius:8px;cursor:pointer;opacity:.6;letter-spacing:.06em}
+.lang button[aria-pressed="true"]{opacity:1;box-shadow:inset 0 -2px 0 currentColor;border-radius:0}
+@media (max-width:980px){.nav-links{display:none}.nav-right{margin-left:auto}}
+@media (max-width:560px){.login{display:none}.nav .btn{padding:.62em .95em;font-size:14px}.brand span{display:none}.nav-in{gap:10px}}
+
+/* ============ HERO (scroll-scrubbed) ============ */
+.hero{position:relative;height:600vh;background:var(--night-2)}
+.stage{position:sticky;top:0;height:100vh;height:100svh;overflow:hidden;isolation:isolate;background:#0F1A55}
+.poster{position:absolute;inset:0;z-index:-3;background:#12206a center/cover no-repeat;background-position:38% 50%}
+#hero-video{position:absolute;inset:0;z-index:-2;width:100%;height:100%;object-fit:cover;object-position:38% 50%;opacity:0;transition:opacity .7s var(--ease-out);transform:translateZ(0);will-change:transform}
+.stage.video-ready #hero-video{opacity:1}
+.scrim-base{position:absolute;inset:0;z-index:-1;pointer-events:none;background:radial-gradient(ellipse 120% 95% at 62% 45%,rgba(6,10,36,0) 40%,rgba(6,10,36,.55) 100%)}
+.scrim-left{position:absolute;inset:0;z-index:-1;pointer-events:none;background:linear-gradient(90deg,rgba(7,11,38,.82) 0%,rgba(7,11,38,.58) 30%,rgba(7,11,38,.18) 50%,rgba(7,11,38,0) 62%)}
+.bands{position:absolute;inset:0;pointer-events:none}
+.band{position:absolute;left:var(--gutter);top:52%;transform:translateY(-50%);width:min(40vw,600px);color:var(--light);text-shadow:var(--tshadow);opacity:0}
+.band::before{content:"";position:absolute;inset:-18% -14%;z-index:-1;pointer-events:none;opacity:calc(.3 + .7*var(--k,1));background:radial-gradient(ellipse 70% 62% at 45% 50%,rgba(5,8,30,.5) 0%,rgba(5,8,30,.3) 48%,rgba(5,8,30,0) 76%)}
+.band.live{pointer-events:auto}
+.b1 p{font-family:var(--f-display);font-weight:800;font-size:clamp(28px,3.9vw,56px);line-height:1.08;letter-spacing:-.022em}
+.b1 p + p{margin-top:.28em}
+.b2 .big,.b3 .big{font-family:var(--f-display);font-weight:800;font-size:clamp(32px,4.6vw,66px);line-height:1.04;letter-spacing:-.025em}
+.b3 .small{margin-top:22px;font-size:clamp(17px,1.45vw,21px);line-height:1.5;max-width:30ch;opacity:calc(var(--ks,1))}
+.settle{width:min(36vw,540px)}
+.settle::before{background:radial-gradient(ellipse 72% 64% at 42% 52%,rgba(5,8,30,.62) 0%,rgba(5,8,30,.4) 50%,rgba(5,8,30,0) 78%)}
+.settle h1{font-size:clamp(36px,4.8vw,70px)}
+.settle .sub{margin-top:18px;font-size:clamp(17px,1.35vw,20px);line-height:1.55;max-width:38ch;opacity:var(--ks,1);transform:translateY(calc((1 - var(--ks,1))*10px))}
+.settle .cta-row{margin-top:28px;display:flex;flex-wrap:wrap;align-items:center;gap:14px 22px;opacity:var(--kb,1);transform:translateY(calc((1 - var(--kb,1))*10px))}
+.settle .free{margin-top:12px;font-family:var(--f-mono);font-size:13px;letter-spacing:.04em;color:#FFE3A6;opacity:var(--kb,1)}
+.link-more{font-weight:600;text-decoration:none;border-bottom:1.5px solid rgba(244,245,251,.45);padding-bottom:2px;transition:border-color .2s}
+.link-more:hover{border-color:currentColor}
+.fil-draw{width:min(100%,420px);height:auto;margin-top:18px;overflow:visible}
+.fil-draw .line{stroke-dasharray:1;stroke-dashoffset:var(--fd,0)}
+.fil-draw .gem{opacity:var(--fg,1);transform-box:fill-box;transform-origin:center;transform:scale(calc(.4 + .6*var(--fg,1)))}
+
+/* split text */
+.vis{display:inline}
+.w{display:inline-block;white-space:nowrap}
+.c{display:inline-block}
+.fx-drift .w{--kc:clamp(0,(var(--k,0) - var(--th,0))*2.8,1);opacity:var(--kc);transform:translateY(calc((1 - var(--kc))*-26px))}
+.fx-grid .c{--kc:clamp(0,(var(--k,0) - var(--th,0))*3,1);opacity:var(--kc);transform:translateX(calc((1 - var(--kc))*var(--jx,-18px)))}
+.fx-rise .w{--kc:clamp(0,(var(--k,0) - var(--th,0))*3,1);opacity:var(--kc);transform:translateY(calc((1 - var(--kc))*30px))}
+.fx-blur{display:grid;transform:translateY(calc((1 - var(--k,1))*-16px))}
+.fx-blur > span{grid-area:1/1}
+.fx-blur .soft{filter:blur(10px);opacity:calc(1 - var(--k,1))}
+.fx-blur .sharp{opacity:var(--k,1)}
+
+.cue{position:absolute;left:50%;bottom:26px;width:26px;height:40px;margin-left:-13px;border-radius:14px;box-shadow:inset 0 0 0 2px rgba(244,245,251,.55);opacity:var(--cue,1);transition:opacity .4s}
+.cue::after{content:"";position:absolute;left:50%;top:9px;width:4px;height:8px;margin-left:-2px;border-radius:2px;background:rgba(244,245,251,.8);animation:cue 2.4s var(--ease-io) infinite}
+@keyframes cue{0%{transform:translateY(0);opacity:0}30%{opacity:1}80%{transform:translateY(12px);opacity:0}100%{opacity:0}}
+
+/* The five static-hero gates: identical strings in the script below */
+@media (max-width: 720px){
+  .hero{height:100vh;height:100svh}
+  #hero-video,.cue,.band:not(.settle){display:none}
+  .poster{background-image:url('/landing/assets/hero-mobile.jpg');background-position:52% 30%}
+  .scrim-left{background:linear-gradient(0deg,rgba(7,11,38,.94) 0%,rgba(7,11,38,.78) 34%,rgba(7,11,38,.2) 62%,rgba(7,11,38,0) 78%)}
+  .settle{opacity:1;top:auto;bottom:max(28px,env(safe-area-inset-bottom,0px));transform:none;width:auto;right:var(--gutter);--k:1;--ks:1;--kb:1;--fd:0;--fg:1;pointer-events:auto}
+  .settle::before{display:none}
+}
+@media (orientation: portrait) and (max-width: 1024px){
+  .hero{height:100vh;height:100svh}
+  #hero-video,.cue,.band:not(.settle){display:none}
+  .poster{background-image:url('/landing/assets/hero-mobile.jpg');background-position:52% 30%}
+  .scrim-left{background:linear-gradient(0deg,rgba(7,11,38,.94) 0%,rgba(7,11,38,.78) 34%,rgba(7,11,38,.2) 62%,rgba(7,11,38,0) 78%)}
+  .settle{opacity:1;top:auto;bottom:max(28px,env(safe-area-inset-bottom,0px));transform:none;width:auto;right:var(--gutter);--k:1;--ks:1;--kb:1;--fd:0;--fg:1;pointer-events:auto}
+  .settle::before{display:none}
+}
+@media (orientation: portrait) and (pointer: coarse){
+  .hero{height:100vh;height:100svh}
+  #hero-video,.cue,.band:not(.settle){display:none}
+  .poster{background-image:url('/landing/assets/hero-mobile.jpg');background-position:52% 30%}
+  .scrim-left{background:linear-gradient(0deg,rgba(7,11,38,.94) 0%,rgba(7,11,38,.78) 34%,rgba(7,11,38,.2) 62%,rgba(7,11,38,0) 78%)}
+  .settle{opacity:1;top:auto;bottom:max(28px,env(safe-area-inset-bottom,0px));transform:none;width:auto;right:var(--gutter);--k:1;--ks:1;--kb:1;--fd:0;--fg:1;pointer-events:auto}
+  .settle::before{display:none}
+}
+@media (orientation: landscape) and (pointer: coarse) and (max-height: 560px){
+  .hero{height:100vh;height:100svh}
+  #hero-video,.cue,.band:not(.settle){display:none}
+  .poster{background-image:url('/landing/assets/hero-ending.jpg')}
+  .settle{opacity:1;--k:1;--ks:1;--kb:1;--fd:0;--fg:1;pointer-events:auto;top:54%}
+  .settle h1{font-size:clamp(26px,4.2vw,40px)}
+  .settle .sub{display:none}
+}
+@media (prefers-reduced-motion: reduce){
+  .hero{height:100vh;height:100svh}
+  #hero-video,.cue,.band:not(.settle){display:none}
+  .poster{background-image:url('/landing/assets/hero-ending.jpg')}
+  .settle{opacity:1;--k:1;--ks:1;--kb:1;--fd:0;--fg:1;pointer-events:auto}
+}
+@media (max-height:560px){.cue{display:none}}
+
+/* ============ SECTIONS ============ */
+main{display:block}
+.section{position:relative;padding-inline:var(--gutter)}
+.wrap{max-width:1180px;margin-inline:auto}
+.seam{display:block;width:100%;height:36px;margin-top:-18px;position:relative;z-index:2;overflow:visible}
+.seam .line{stroke-dasharray:1;stroke-dashoffset:1;transition:stroke-dashoffset 2.2s var(--ease-io)}
+.seam.in .line{stroke-dashoffset:0}
+
+/* reveal choreography */
+.reveal > *{opacity:0;transform:translateY(22px);transition:opacity .8s var(--ease-out),transform .8s var(--ease-out);transition-delay:calc(var(--i,0)*110ms)}
+.reveal.in > *{opacity:1;transform:none}
+.reveal.done > *{transition-delay:0s}
+
+/* How it works */
+#comment{padding-block:clamp(72px,10vw,140px) clamp(40px,6vw,80px)}
+.how-head{max-width:720px;display:grid;gap:18px}
+.how-head h2{font-size:clamp(34px,4.6vw,60px)}
+.steps{position:relative;margin-top:clamp(48px,7vw,96px);display:grid;gap:clamp(56px,8vw,120px);padding-left:64px}
+.spine{position:absolute;left:10px;top:8px;width:24px;height:calc(100% - 16px);overflow:visible}
+.spine polyline{stroke-dasharray:1;stroke-dashoffset:var(--sp,1)}
+.step{position:relative;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:32px 64px;align-items:center}
+.step:nth-of-type(odd) .step-text{order:0}
+.step:nth-of-type(even) .step-text{order:2}
+.step-text{display:grid;gap:12px;max-width:440px}
+.step-gem{position:absolute;left:-55px;top:calc(50% - 13px);width:26px;height:26px}
+.step-gem path{fill:var(--canvas);stroke:var(--brand);stroke-width:2;transition:fill .6s var(--ease-out)}
+.step.in .step-gem path{fill:var(--brand)}
+.step:last-of-type.in .step-gem path{fill:var(--accent);stroke:var(--ink)}
+.step-no{font-family:var(--f-mono);font-size:13px;letter-spacing:.14em;color:var(--ink-2)}
+.step h3{font-size:clamp(28px,3vw,40px)}
+.step-text p{font-size:18px;color:var(--ink-2);max-width:38ch}
+.step .phone-wrap{display:flex;justify-content:center}
+@media (max-width:860px){
+  .steps{padding-left:44px}
+  .spine{left:0}
+  .step-gem{left:-45px;top:4px}
+  .step{grid-template-columns:1fr}
+  .step:nth-of-type(even) .step-text{order:0}
+}
+
+/* Phone mockups (the redesigned app) */
+.phone{width:100%;max-width:300px;border-radius:40px;padding:9px;background:#0B0F2A;box-shadow:0 40px 70px -40px rgba(20,28,69,.55),0 2px 0 rgba(255,255,255,.06) inset}
+.screen{position:relative;border-radius:32px;background:var(--canvas);min-height:560px;padding:22px 16px 16px;display:flex;flex-direction:column;gap:12px;font-size:13px;line-height:1.4;color:var(--ink);overflow:hidden}
+.ex{position:absolute;right:14px;top:14px;font-family:var(--f-mono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-2);background:var(--mist);padding:3px 7px;border-radius:6px}
+.scr-title{font-family:var(--f-display);font-weight:800;font-size:21px;line-height:1.1;letter-spacing:-.02em;padding-right:62px}
+.scr-sub{font-size:12px;color:var(--ink-2);margin-top:-8px}
+.card{background:var(--panel);border-radius:16px;padding:12px;display:grid;gap:10px;box-shadow:0 1px 0 rgba(20,28,69,.05)}
+.row{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.row b{font-weight:600;font-size:13px}
+.row small{display:block;font-size:11.5px;color:var(--ink-2)}
+.amt{font-family:var(--f-mono);font-weight:500;font-variant-numeric:tabular-nums;white-space:nowrap}
+.big-amt{font-family:var(--f-display);font-weight:800;font-size:30px;letter-spacing:-.02em;font-variant-numeric:tabular-nums;white-space:nowrap}
+.seg{display:grid;grid-template-columns:1fr 1fr;background:var(--mist);border-radius:12px;padding:3px;font-weight:600;font-size:12px;text-align:center}
+.seg span{padding:8px;border-radius:10px}
+.seg .on{background:var(--panel);box-shadow:0 1px 3px rgba(20,28,69,.12)}
+.mbtn{margin-top:auto;background:var(--brand);color:#fff;border-radius:14px;padding:14px;text-align:center;font-weight:600;font-size:14px}
+.mbtn.alt{background:transparent;color:var(--brand);box-shadow:inset 0 0 0 1.5px var(--brand);margin-top:0;padding:10px}
+.chip-late{display:inline-block;margin-top:4px;font-size:10.5px;font-weight:600;color:var(--late);background:rgba(194,65,45,.1);padding:2px 8px;border-radius:999px}
+.bubble{background:#E4F3E9;border-radius:14px 14px 14px 4px;padding:10px 12px;font-size:12px;line-height:1.45;color:#15311F}
+.bubble b{display:block;margin-top:4px;font-weight:600}
+.mini-fil{width:100%;height:auto}
+.pay-list{display:grid;gap:8px}
+.tk{background:#FFFFFD;border-radius:4px;padding:6px 12px 8px;font-family:var(--f-mono);font-size:10.5px;line-height:1.45;color:#1B2250;box-shadow:0 8px 18px -12px rgba(20,28,69,.35)}
+.tk-edge{display:block;width:100%;height:8px;margin:0 0 6px}
+.tk-edge.bottom{margin:8px 0 0}
+.tk-shop{font-family:var(--f-display);font-weight:800;font-size:15px;text-align:center;letter-spacing:-.01em}
+.tk-meta{text-align:center;color:var(--ink-2);font-size:9.5px;margin-bottom:6px}
+.tk-line{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:0 8px;padding-block:5px;border-bottom:1px dashed #C3C9DE}
+.tk-line span:first-child{font-family:var(--f-body);font-weight:600;font-size:11px}
+.tk-line em{font-style:normal;color:var(--ink-2)}
+.tk-sum,.tk-paid{display:flex;justify-content:space-between;gap:8px;padding-top:6px;white-space:nowrap}
+.tk-sum{font-size:12px;font-weight:500}
+.tk-paid{color:var(--ok);padding-top:2px}
+.pdf-chip{font-family:var(--f-mono);font-size:9.5px;letter-spacing:.06em;background:var(--brand);color:#fff;border-radius:4px;padding:2px 5px;margin-right:4px}
+.mbtn + .mbtn{margin-top:0}
+.auto-chip{font-size:10.5px;font-weight:600;color:var(--brand);background:rgba(43,68,160,.1);padding:3px 8px;border-radius:999px;white-space:nowrap}
+.tl{list-style:none;margin:0;padding:0 0 0 14px;display:grid;gap:8px;border-left:2px dashed var(--mist)}
+.tl li{position:relative;display:flex;justify-content:space-between;gap:8px;font-size:12px;font-weight:600}
+.tl li::before{content:"";position:absolute;left:-21px;top:3px;width:12px;height:12px;border-radius:50%;background:var(--panel);box-shadow:inset 0 0 0 2px var(--line-strong)}
+.tl li.done::before{background:var(--ok);box-shadow:none}
+.tl li small{font-weight:400;color:var(--ink-2);white-space:nowrap}
+.tl-stop{font-size:11.5px;color:var(--ink-2);text-align:center;margin-top:auto}
+.low{color:var(--late) !important}
+.qty{font-family:var(--f-mono);font-weight:500;font-size:12px;white-space:nowrap}
+.qty.part{color:var(--late)}
+.grow{flex:1;min-width:0}
+.check{flex:none;width:18px;height:18px;border-radius:6px;box-shadow:inset 0 0 0 2px var(--line-strong)}
+.check.on{background:var(--ok) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 18 18'%3E%3Cpath d='M4.5 9.5l3 3 6-7' fill='none' stroke='%23fff' stroke-width='2.2'/%3E%3C/svg%3E") center/100% no-repeat;box-shadow:none}
+.parcel-card{grid-template-columns:auto 1fr;align-items:center}
+.parcel{width:96px;height:auto;border-radius:10px}
+.transit{display:inline-block;font-size:11px;font-weight:600;color:#8A5A00;background:#FBEBC8;padding:3px 9px;border-radius:999px;margin-bottom:4px}
+.parcel-card small{display:block;font-size:11px;color:var(--ink-2)}
+.step-note{justify-self:start;max-width:40ch;font-size:14px;font-weight:600;color:var(--brand);text-decoration:underline;text-decoration-color:rgba(43,68,160,.35);text-decoration-thickness:1.5px;text-underline-offset:4px}
+.step-note::before{content:"* ";}
+.step-note:hover{text-decoration-color:var(--brand)}
+.demo-hint{display:flex;align-items:center;gap:8px;font-size:15px;color:#FFE3A6;font-weight:600}
+.demo-hint svg{width:18px;height:18px;flex:none;animation:nudge 1.6s var(--ease-io) infinite}
+@keyframes nudge{0%,100%{transform:translateY(0)}50%{transform:translateY(4px)}}
+.btn-demo{position:relative;background:var(--light);color:var(--ink);box-shadow:0 12px 30px -14px rgba(0,0,0,.6)}
+.btn-demo:hover{background:#fff;transform:translateY(-1px)}
+.btn-demo::after{content:"";position:absolute;inset:-6px;border-radius:999px;box-shadow:0 0 0 2px rgba(244,245,251,.55);opacity:0;animation:halo 2.2s var(--ease-out) infinite;pointer-events:none}
+@keyframes halo{0%{opacity:.9;transform:scale(.96)}70%,100%{opacity:0;transform:scale(1.12)}}
+.demo.used .btn-demo::after,.demo.used .demo-hint{display:none}
+.stock-n{font-family:var(--f-mono);font-size:11.5px;color:var(--late);white-space:nowrap}
+.po{font-family:var(--f-mono);font-size:11px;color:var(--ink-2);background:var(--mist);border-radius:10px;padding:8px 10px}
+
+/* Interactive credit (the one designed moment) */
+#credit{padding-block:clamp(48px,7vw,96px)}
+.credit-panel{position:relative;max-width:1180px;margin-inline:auto;background:var(--night);color:var(--light);border-radius:36px;padding:clamp(28px,5vw,72px);overflow:hidden;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:40px 64px;align-items:center}
+.credit-panel::before{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse 60% 70% at 85% 20%,rgba(43,68,160,.55),rgba(43,68,160,0) 70%)}
+.credit-panel > *{position:relative}
+.credit-copy{display:grid;gap:16px}
+.credit-copy .kicker{color:#AFC0FF}
+.credit-copy h2{font-size:clamp(32px,4vw,54px)}
+.credit-copy p{font-size:18px;color:#C9CFEA;max-width:36ch}
+.tag-ex{justify-self:start;font-family:var(--f-mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#C9CFEA;box-shadow:inset 0 0 0 1px rgba(201,207,234,.4);padding:4px 9px;border-radius:7px}
+.credit-demo{display:grid;gap:22px;background:rgba(255,255,255,.04);border-radius:24px;padding:clamp(20px,3vw,36px);box-shadow:inset 0 0 0 1px rgba(255,255,255,.08)}
+.demo-head{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap}
+.demo-name{font-family:var(--f-display);font-weight:800;font-size:26px;letter-spacing:-.02em}
+.demo-total{font-family:var(--f-mono);font-size:15px;color:#C9CFEA;font-variant-numeric:tabular-nums}
+.demo-fil{width:100%;height:auto;overflow:visible}
+.demo-fil .prog{stroke-dasharray:1;stroke-dashoffset:var(--cp,.3333)}
+.demo-fil .gem3{opacity:var(--g3,0);transform-box:fill-box;transform-origin:center;transform:scale(calc(.3 + .7*var(--g3,0)))}
+.demo-state{min-height:1.6em;font-size:19px;font-weight:600}
+.demo-state .ok{color:#8FE3B5}
+.demo-actions{display:flex;gap:16px;align-items:center;flex-wrap:wrap}
+.reset{background:none;border:0;padding:6px 2px;cursor:pointer;font-weight:600;color:#C9CFEA;border-bottom:1.5px solid rgba(201,207,234,.4)}
+.reset[hidden]{display:none}
+@media (max-width:860px){.credit-panel{grid-template-columns:1fr;border-radius:28px}}
+
+/* Storefront */
+#vitrine{padding-block:clamp(72px,10vw,140px)}
+.vit{max-width:1180px;margin-inline:auto;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:48px 72px;align-items:center}
+.vit-copy{display:grid;gap:18px;max-width:480px}
+.vit-copy h2{font-size:clamp(34px,4.4vw,58px)}
+.vit-copy p{font-size:19px;color:var(--ink-2)}
+.shop-screen{--shop:#0E7C86;padding:0;gap:0}
+.shop-top{display:flex;align-items:center;gap:10px;padding:22px 16px 12px}
+.shop-logo{width:32px;height:32px;border-radius:50%;background:var(--shop);color:#fff;display:grid;place-items:center;font-family:var(--f-display);font-weight:800}
+.shop-name{font-family:var(--f-display);font-weight:800;font-size:18px;letter-spacing:-.02em}
+.shop-fil{padding:0 16px 10px}
+.shop-fil svg{width:100%;height:auto}
+.shop-tab{margin:0 16px 12px;font-size:12px;font-weight:600;color:var(--shop)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 12px 12px}
+.prod{background:var(--panel);border-radius:14px;overflow:hidden;display:grid}
+.prod img{width:100%;height:auto;aspect-ratio:1/1;object-fit:cover}
+.prod div{padding:8px 9px 10px;display:grid;gap:4px}
+.prod b{font-size:11.5px;font-weight:600;line-height:1.25}
+.prod .amt{font-size:11.5px}
+.prod span.o{margin-top:2px;background:var(--shop);color:#fff;border-radius:9px;padding:6px;text-align:center;font-size:11px;font-weight:600}
+.powered{display:flex;align-items:center;justify-content:center;gap:6px;padding:10px 0 14px;font-size:10.5px;color:var(--ink-2)}
+.powered svg{width:13px;height:auto}
+@media (max-width:860px){.vit{grid-template-columns:1fr}.vit .phone-wrap{display:flex;justify-content:center}}
+
+/* Team */
+#equipe{padding-block:clamp(56px,8vw,112px);background:linear-gradient(180deg,rgba(215,219,234,0),rgba(215,219,234,.55) 22%,rgba(215,219,234,.55) 78%,rgba(215,219,234,0))}
+.team{max-width:1180px;margin-inline:auto;display:grid;gap:40px}
+.team h2{font-size:clamp(32px,4.2vw,56px);max-width:18ch}
+.team-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px}
+.team-card{background:var(--panel);border-radius:28px;padding:clamp(22px,3vw,36px);display:grid;gap:22px;align-content:start}
+.team-card p{font-size:18px;color:var(--ink-2);max-width:40ch}
+.roles{display:grid;gap:14px}
+.role{display:grid;gap:8px}
+.role-name{font-family:var(--f-mono);font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink)}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chips span{font-size:12.5px;font-weight:600;padding:6px 10px;border-radius:999px;background:var(--mist);color:var(--ink-2);opacity:.55}
+.chips span.on{background:var(--brand);color:#fff;opacity:1}
+.devices{display:flex;align-items:flex-end;gap:14px}
+.devices svg{height:90px;width:auto}
+@media (max-width:860px){.team-grid{grid-template-columns:1fr}}
+
+/* Pricing */
+#tarifs{padding-block:clamp(72px,10vw,140px) clamp(40px,6vw,80px)}
+.pricing{max-width:1180px;margin-inline:auto;display:grid;gap:36px}
+.price-head{display:grid;gap:16px;max-width:780px}
+.price-head h2{font-size:clamp(34px,4.6vw,60px)}
+.price-head p{font-size:18px;color:var(--ink-2);max-width:62ch}
+.plans{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;align-items:start}
+.plan{background:var(--panel);border-radius:28px;padding:26px 22px;display:grid;gap:12px;align-content:start;box-shadow:inset 0 0 0 1.5px var(--mist)}
+.plan-pro{box-shadow:inset 0 0 0 2px var(--brand)}
+.plan-plus{background:var(--night);color:#F4F5FB;box-shadow:none}
+.plan-top{display:flex;justify-content:space-between;align-items:center;gap:8px;min-height:24px}
+.plan-name{font-family:var(--f-mono);font-size:12.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-2)}
+.plan-badge{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;background:var(--brand);color:#fff;padding:4px 9px;border-radius:999px}
+.plan-plus .plan-badge{background:var(--accent);color:var(--on-accent)}
+.plan-price{display:flex;flex-wrap:wrap;align-items:baseline;column-gap:6px;font-family:var(--f-display);font-weight:800;font-size:clamp(30px,2.6vw,38px);letter-spacing:-.02em;line-height:1.05}
+.plan-price small{font-family:var(--f-body);font-weight:500;font-size:14px;letter-spacing:0;color:var(--ink-2);white-space:nowrap}
+.plan{min-width:0}
+.plan-then{font-size:14px;color:var(--ink-2);margin-top:-4px}
+.plan-plus .plan-name,.plan-plus .plan-then,.plan-plus .plan-price small,.plan-plus .plus-of{color:#C9CFEA}
+.plan ul{list-style:none;margin:6px 0 0;padding:0;display:grid;gap:9px;font-size:15px;line-height:1.45}
+.plan li{position:relative;padding-left:22px}
+.plan li::before{content:"";position:absolute;left:2px;top:.5em;width:8px;height:8px;transform:rotate(45deg);background:var(--brand);border-radius:1.5px}
+.plan-plus li::before{background:var(--accent)}
+.plan li.plus-of{padding-left:0;font-weight:600;font-size:14px;color:var(--ink-2)}
+.plan li.plus-of::before{display:none}
+.plan-plus li.plus-of{color:#C9CFEA}
+.soon{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;background:var(--accent-muted);color:var(--ink);padding:2px 6px;border-radius:6px;margin-left:4px;white-space:nowrap}
+.plan-plus .soon{color:#F4F5FB}
+.plan a{color:inherit;text-decoration:underline;text-underline-offset:3px}
+.price-foot{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:18px}
+.price-note{font-size:14px;color:var(--ink-2);max-width:70ch;margin:0}
+@media (max-width:1080px){.plans{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:620px){.plans{grid-template-columns:1fr}}
+
+/* FAQ */
+#questions{padding-block:clamp(72px,10vw,140px)}
+.faq{max-width:900px;margin-inline:auto;display:grid;gap:36px}
+.faq h2{font-size:clamp(34px,4.4vw,58px)}
+.faq-list{border-top:1.5px solid var(--mist)}
+.faq details{border-bottom:1.5px solid var(--mist);scroll-margin-top:calc(var(--nav-h) + 20px)}
+.faq summary{list-style:none;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:20px;padding:22px 4px;font-family:var(--f-display);font-weight:600;font-size:clamp(19px,1.8vw,23px);letter-spacing:-.01em}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary .pm{flex:none;width:28px;height:28px;border-radius:50%;box-shadow:inset 0 0 0 1.5px var(--line-strong);position:relative;transition:transform .35s var(--ease-out),background-color .35s}
+.faq summary .pm::before,.faq summary .pm::after{content:"";position:absolute;left:50%;top:50%;width:11px;height:1.8px;margin:-.9px 0 0 -5.5px;background:var(--ink);border-radius:2px}
+.faq summary .pm::after{transform:rotate(90deg);transition:transform .35s var(--ease-out)}
+.faq details[open] summary .pm{background:var(--brand);box-shadow:none}
+.faq details[open] summary .pm::before,.faq details[open] summary .pm::after{background:#fff}
+.faq details[open] summary .pm::after{transform:rotate(0)}
+.faq .answer{padding:0 4px 24px;font-size:18px;color:var(--ink-2);max-width:62ch}
+
+/* Final call */
+#final{position:relative;min-height:88vh;display:grid;align-items:center;justify-items:start;padding-block:clamp(80px,12vw,160px);color:var(--light);overflow:hidden;isolation:isolate}
+#final::before{content:"";position:absolute;inset:0;z-index:-2;background:#12206a url('/landing/assets/hero-ending.jpg') center/cover no-repeat;background-position:22% 50%}
+#final::after{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(90deg,rgba(7,11,38,.9) 0%,rgba(7,11,38,.66) 40%,rgba(7,11,38,.12) 72%)}
+.final-in{width:100%;max-width:1180px;margin-inline:auto;display:grid;gap:20px;text-shadow:var(--tshadow)}
+.final-in h2{font-size:clamp(36px,5vw,72px);max-width:14ch}
+.final-in p{font-size:19px;max-width:34ch;color:#DDE1F3}
+.final-in .btn{justify-self:start;margin-top:8px}
+.final-in .free{font-family:var(--f-mono);font-size:13px;letter-spacing:.04em;color:#FFE3A6}
+.final-fil{width:min(100%,380px);height:auto}
+.final-fil .line{stroke-dasharray:1;stroke-dashoffset:1;transition:stroke-dashoffset 2s var(--ease-io) .2s}
+.final-in.in .final-fil .line{stroke-dashoffset:0}
+@media (max-width:720px){#final::before{background-position:64% 40%}#final::after{background:linear-gradient(0deg,rgba(7,11,38,.94) 0%,rgba(7,11,38,.8) 50%,rgba(7,11,38,.35) 100%)}#final{align-items:end}}
+
+/* Footer */
+footer{background:var(--night-2);color:#C9CFEA;padding:48px var(--gutter) calc(32px + env(safe-area-inset-bottom,0px))}
+.foot{max-width:1180px;margin-inline:auto;display:grid;gap:28px}
+.foot-top{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:20px}
+.foot .brand{color:var(--light)}
+.foot-tag{font-family:var(--f-display);font-weight:600;font-size:18px;color:var(--light)}
+.foot-links{display:flex;flex-wrap:wrap;gap:10px 24px;font-size:15px}
+.foot-links a{text-decoration:none;opacity:.85}
+.foot-links a:hover{opacity:1}
+.foot-fil{width:100%;height:14px}
+.foot-bottom{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px;font-family:var(--f-mono);font-size:12px}
+
+/* Pause everything on hidden tabs; living loops only when on screen */
+body.paused *,body.paused *::before,body.paused *::after{animation-play-state:paused !important}
+
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation:none !important;transition:none !important;transition-delay:0s !important;scroll-behavior:auto !important}
+  .reveal > *{opacity:1;transform:none}
+  .seam .line,.final-fil .line{stroke-dashoffset:0}
+  .spine polyline{stroke-dashoffset:0}
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#main" data-i18n="skip">Aller au contenu</a>
+<div class="env" aria-hidden="true"></div>
+
+<header class="nav" id="nav">
+  <div class="nav-in">
+    <a class="brand" href="#top" aria-label="WISHOP">
+      <svg viewBox="0 -2 48 44" aria-hidden="true"><polyline points="4,9 14,33 24,17 34,33 44,9" fill="none" stroke="currentColor" stroke-width="6" stroke-miterlimit="4"/><path d="M24 0l5 5-5 5-5-5z" fill="#F4B63F"/></svg>
+      <span>WISHOP</span>
+    </a>
+    <nav class="nav-links" aria-label="Sections">
+      <a href="#comment" data-i18n="nav.how">Comment ça marche</a>
+      <a href="#vitrine" data-i18n="nav.store">Vitrine</a>
+      <a href="#tarifs" data-i18n="nav.price">Tarifs</a>
+      <a href="#questions" data-i18n="nav.faq">Questions</a>
+    </nav>
+    <div class="nav-right">
+      <a class="login" data-app="login" href="/fr/login" data-i18n="nav.login">Se connecter</a>
+      <a class="btn btn-accent" data-app="signup" href="/fr/login?mode=signup" data-i18n="cta.create">Créer ma boutique</a>
+      <div class="lang" role="group" aria-label="Langue">
+        <button type="button" data-lang="fr" aria-pressed="true">FR</button>
+        <button type="button" data-lang="en" aria-pressed="false">EN</button>
+        <button type="button" data-lang="es" aria-pressed="false">ES</button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main id="main" tabindex="-1">
+  <section class="hero" id="top" aria-label="WISHOP">
+    <div class="stage" id="stage">
+      <div class="poster" id="poster" aria-hidden="true"></div>
+      <video id="hero-video" muted playsinline preload="none" aria-hidden="true" tabindex="-1"></video>
+      <div class="scrim-base" aria-hidden="true"></div>
+      <div class="scrim-left" aria-hidden="true"></div>
+      <div class="bands">
+        <div class="band b1" data-a="0" data-b="0.2">
+          <p class="split fx-drift" data-line="0" data-i18n="b1.l1">Un cahier de crédits.</p>
+          <p class="split fx-drift" data-line="1" data-i18n="b1.l2">Un téléphone qui chauffe.</p>
+          <p class="split fx-drift" data-line="2" data-i18n="b1.l3">Une caisse qui ne tombe pas juste.</p>
+        </div>
+        <div class="band b2" data-a="0.26" data-b="0.46">
+          <p class="big blur fx-blur" data-i18n="b2">Toute votre boutique tient à un fil.</p>
+        </div>
+        <div class="band b3" data-a="0.52" data-b="0.72" data-ramp="0.05">
+          <p class="big split fx-grid" data-spread="0.5" data-i18n="b3.t">WISHOP le tient pour vous.</p>
+          <p class="small" data-i18n="b3.s">Ventes, stock, crédits et relances WhatsApp, reliés dans une seule app.</p>
+        </div>
+        <div class="band settle" data-a="0.8" data-b="1" data-ramp="0.12">
+          <h1 class="split fx-rise" data-i18n="h1">Ne perdez plus le fil de votre boutique.</h1>
+          <svg class="fil-draw" viewBox="0 0 420 34" aria-hidden="true">
+            <polyline class="line" pathLength="1" points="2,24 16,10 30,24 44,10 58,24 72,10 86,24 100,10 114,24 128,10 142,24 156,10 170,24 184,10 198,24 212,10 226,24 240,10 254,24 268,10 282,24 296,10 310,24 324,10 338,24 352,10 366,24 380,10 394,24 408,10" fill="none" stroke="#F4F5FB" stroke-width="3"/>
+            <path d="M72 -1l6 6-6 6-6-6z" fill="#F4F5FB" opacity=".9"/>
+            <path d="M184 -1l6 6-6 6-6-6z" fill="#F4F5FB" opacity=".9"/>
+            <path d="M296 -1l6 6-6 6-6-6z" fill="#F4F5FB" opacity=".9"/>
+            <path class="gem" d="M408 -3l7 7-7 7-7-7z" fill="#F4B63F"/>
+          </svg>
+          <p class="sub" data-i18n="hero.sub">Encaissez, suivez chaque crédit jusqu'au dernier franc, surveillez le stock et relancez vos clients sur WhatsApp. Tout depuis votre téléphone.</p>
+          <div class="cta-row">
+            <a class="btn btn-accent" data-app="signup" href="/fr/login?mode=signup" data-i18n="cta.create">Créer ma boutique</a>
+            <a class="link-more" href="#comment" data-i18n="hero.more">Voir comment ça marche</a>
+          </div>
+          <p class="free" data-i18n="cta.free">Gratuit pour commencer.</p>
+        </div>
+      </div>
+      <div class="cue" id="cue" aria-hidden="true"></div>
+    </div>
+  </section>
+
+  <svg class="seam" id="seam" aria-hidden="true"><polyline class="line" pathLength="1" points="" fill="none" stroke="#2B44A0" stroke-width="2.5"/></svg>
+
+  <section class="section" id="comment" aria-labelledby="how-t">
+    <div class="wrap">
+      <div class="how-head reveal">
+        <p class="kicker" style="--i:0" data-i18n="how.kicker">Comment ça marche</p>
+        <h2 id="how-t" style="--i:1" data-i18n="how.title">Un seul fil, de la vente à la relance.</h2>
+      </div>
+      <div class="steps" id="steps">
+        <svg class="spine" id="spine" aria-hidden="true"><polyline pathLength="1" points="" fill="none" stroke="#2B44A0" stroke-width="2"/></svg>
+
+        <article class="step reveal">
+          <div class="step-text" style="--i:0">
+            <svg class="step-gem" viewBox="0 0 26 26" aria-hidden="true"><path d="M13 2l11 11-11 11L2 13z"/></svg>
+            <span class="step-no">01</span>
+            <h3 data-i18n="s1.t">Vendez</h3>
+            <p data-i18n="s1.p">Encaissez en quelques touches, comptant ou à crédit. Le ticket de caisse s'imprime aussitôt, et la facture existe aussi en PDF pour la partager avec votre client.</p>
+          </div>
+          <div class="phone-wrap" style="--i:1">
+            <div class="phone" aria-hidden="true"><div class="screen">
+              <span class="ex" data-i18n="ex">Exemple</span>
+              <p class="scr-title" data-i18n="m.ticket">Ticket de caisse</p>
+              <div class="tk">
+                <svg class="tk-edge" viewBox="0 0 240 8" preserveAspectRatio="none" aria-hidden="true"><polyline points="0,0 8,7 16,0 24,7 32,0 40,7 48,0 56,7 64,0 72,7 80,0 88,7 96,0 104,7 112,0 120,7 128,0 136,7 144,0 152,7 160,0 168,7 176,0 184,7 192,0 200,7 208,0 216,7 224,0 232,7 240,0" fill="none" stroke="#C3C9DE" stroke-width="1.2"/></svg>
+                <p class="tk-shop">Boss MaMa B</p>
+                <p class="tk-meta">FAC-2026-0042 · <span data-dt="2026-09-24T14:32:00"></span></p>
+                <div class="tk-line"><span data-i18n="m.p1">Robe satin champagne</span><span data-amount="45000" data-plain></span><em>1 × <span data-amount="45000" data-plain></span></em></div>
+                <div class="tk-line"><span data-i18n="m.p2">Parfum en cristal 50&nbsp;ml</span><span data-amount="28000" data-plain></span><em>1 × <span data-amount="28000" data-plain></span></em></div>
+                <div class="tk-sum"><span data-i18n="m.total">Total</span><span data-amount="73000"></span></div>
+                <div class="tk-paid"><span data-i18n="m.paidcash">Payé comptant</span><span data-amount="73000"></span></div>
+                <svg class="tk-edge bottom" viewBox="0 0 240 8" preserveAspectRatio="none" aria-hidden="true"><polyline points="0,0 8,7 16,0 24,7 32,0 40,7 48,0 56,7 64,0 72,7 80,0 88,7 96,0 104,7 112,0 120,7 128,0 136,7 144,0 152,7 160,0 168,7 176,0 184,7 192,0 200,7 208,0 216,7 224,0 232,7 240,0" fill="none" stroke="#C3C9DE" stroke-width="1.2"/></svg>
+              </div>
+              <div class="mbtn" data-i18n="m.print">Imprimer le ticket</div>
+              <div class="mbtn alt"><span class="pdf-chip">PDF</span> <span data-i18n="m.pdf">Télécharger le PDF</span></div>
+            </div></div>
+          </div>
+        </article>
+
+        <article class="step reveal">
+          <div class="step-text" style="--i:0">
+            <svg class="step-gem" viewBox="0 0 26 26" aria-hidden="true"><path d="M13 2l11 11-11 11L2 13z"/></svg>
+            <span class="step-no">02</span>
+            <h3 data-i18n="s2.t">Suivez</h3>
+            <p data-i18n="s2.p">Chaque crédit a sa barre de remboursement&#8239;: ce qui est payé, ce qui reste, et depuis quand.</p>
+          </div>
+          <div class="phone-wrap" style="--i:1">
+            <div class="phone" aria-hidden="true"><div class="screen">
+              <span class="ex" data-i18n="ex">Exemple</span>
+              <p class="scr-title">Mireille K.</p>
+              <p class="scr-sub" data-i18n="m.ongoing">Crédit en cours</p>
+              <div class="card">
+                <div class="row"><span class="big-amt" data-amount="12000" data-plain></span><span class="amt" style="color:var(--ink-2)">/ <span data-amount="18000"></span></span></div>
+                <svg class="mini-fil" viewBox="0 0 240 30"><polyline points="4,20 18.5,8 33,20 47.5,8 62,20 76.5,8 91,20 105.5,8 120,20 134.5,8 149,20 163.5,8 178,20 192.5,8 207,20 221.5,8 236,20" fill="none" stroke="#D7DBEA" stroke-width="3"/><polyline points="4,20 18.5,8 33,20 47.5,8 62,20 76.5,8 91,20 105.5,8 120,20 134.5,8 149,20 163.5,8 163.5,8" fill="none" stroke="#2B44A0" stroke-width="3"/><path d="M81 7.5l6.5 6.5-6.5 6.5-6.5-6.5z" fill="#2B44A0" stroke="#FBFBFE" stroke-width="1.5"/><path d="M159 7.5l6.5 6.5-6.5 6.5-6.5-6.5z" fill="#2B44A0" stroke="#FBFBFE" stroke-width="1.5"/></svg>
+              </div>
+              <div class="card pay-list">
+                <div class="row"><div><b data-i18n="m.payment">Paiement</b><small data-date="2026-09-12"></small></div><span class="amt" style="color:var(--ok)">+ <span data-amount="6000"></span></span></div>
+                <div class="row"><div><b data-i18n="m.payment">Paiement</b><small data-date="2026-09-19"></small></div><span class="amt" style="color:var(--ok)">+ <span data-amount="6000"></span></span></div>
+              </div>
+              <div class="row" style="padding-inline:4px;margin-top:auto"><b data-i18n="credit.left">Reste 6&#8239;000&nbsp;FCFA</b></div>
+            </div></div>
+          </div>
+        </article>
+
+        <article class="step reveal">
+          <div class="step-text" style="--i:0">
+            <svg class="step-gem" viewBox="0 0 26 26" aria-hidden="true"><path d="M13 2l11 11-11 11L2 13z"/></svg>
+            <span class="step-no">03</span>
+            <h3 data-i18n="s3.t">Relancez</h3>
+            <p data-i18n="s3.p">Un client vous doit de l'argent&#8239;? WISHOP le relance tout seul sur WhatsApp, au rythme que vous choisissez, jusqu'à ce que sa dette soit soldée. Le message est déjà écrit, avec son nom et le montant.</p>
+            <a class="step-note" href="#q-relances" data-faq="q-relances" data-i18n="s3.note">En attente du feu vert de Meta dans notre région. Voir pourquoi</a>
+          </div>
+          <div class="phone-wrap" style="--i:1">
+            <div class="phone" aria-hidden="true"><div class="screen">
+              <span class="ex" data-i18n="ex">Exemple</span>
+              <p class="scr-title" data-i18n="m.autorem">Relances automatiques</p>
+              <div class="card">
+                <div class="row"><div><b>Aïcha N.</b><small><span data-amount="9500"></span> <span data-i18n="m.due">à régler</span></small></div><span class="auto-chip" data-i18n="m.every">Tous les 7&nbsp;jours</span></div>
+                <ol class="tl">
+                  <li class="done"><span data-i18n="m.sent1">1er rappel envoyé</span><small data-date="2026-09-12"></small></li>
+                  <li class="done"><span data-i18n="m.sent2">2e rappel envoyé</span><small data-date="2026-09-19"></small></li>
+                  <li><span data-i18n="m.next">Prochain rappel</span><small data-date="2026-09-26"></small></li>
+                </ol>
+              </div>
+              <div class="bubble"><span data-i18n="m.msg">Bonjour Aïcha, nous vous rappelons qu'il reste 9&#8239;500&nbsp;FCFA à régler chez Boss MaMa B. Merci de nous contacter pour convenir du règlement.</span><b>Boss MaMa B</b></div>
+              <p class="tl-stop" data-i18n="m.stops">Les rappels s'arrêtent dès que la dette est soldée.</p>
+            </div></div>
+          </div>
+        </article>
+
+        <article class="step reveal">
+          <div class="step-text" style="--i:0">
+            <svg class="step-gem" viewBox="0 0 26 26" aria-hidden="true"><path d="M13 2l11 11-11 11L2 13z"/></svg>
+            <span class="step-no">04</span>
+            <h3 data-i18n="s4.t">Réapprovisionnez</h3>
+            <p data-i18n="s4.p">Le stock bas saute aux yeux. Quand vous savez ce qu'il manque, WISHOP prépare un bon de commande par fournisseur, à envoyer par WhatsApp ou en PDF. À la livraison, vous validez la réception et le stock se met à jour.</p>
+          </div>
+          <div class="phone-wrap" style="--i:1">
+            <div class="phone" aria-hidden="true"><div class="screen">
+              <span class="ex" data-i18n="ex">Exemple</span>
+              <p class="scr-title" data-i18n="m.po">Bon de commande</p>
+              <p class="scr-sub">BC-2026-0004 · Grossiste Mboppi</p>
+              <div class="card">
+                <div class="row"><div><b data-i18n="m.p3">Perruque lisse 22&nbsp;pouces</b><small class="low">2 <span data-i18n="m.instock">en stock</span></small></div><span class="qty">× 8</span></div>
+                <div class="row"><div><b data-i18n="m.p4">Rouge à lèvres rubis</b><small class="low">1 <span data-i18n="m.instock">en stock</span></small></div><span class="qty">× 9</span></div>
+                <div class="row"><div><b data-i18n="m.p5">Manchette dorée</b><small class="low">3 <span data-i18n="m.instock">en stock</span></small></div><span class="qty">× 7</span></div>
+              </div>
+              <div class="mbtn" data-i18n="m.sendwa">Envoyer par WhatsApp</div>
+              <div class="mbtn alt"><span class="pdf-chip">PDF</span> <span data-i18n="m.pdf">Télécharger le PDF</span></div>
+            </div></div>
+          </div>
+        </article>
+
+        <article class="step reveal">
+          <div class="step-text" style="--i:0">
+            <svg class="step-gem" viewBox="0 0 26 26" aria-hidden="true"><path d="M13 2l11 11-11 11L2 13z"/></svg>
+            <span class="step-no">05</span>
+            <h3 data-i18n="s5.t">Achetez à distance</h3>
+            <p data-i18n="s5.p">Pour un nouvel arrivage ou des achats selon la tendance, envoyez un lien à la personne qui achète pour vous sur place. Elle note chaque article au fil de ses achats et joint la photo du colis. À l'arrivée, vous cochez ce que vous recevez, et le stock se met à jour tout seul.</p>
+          </div>
+          <div class="phone-wrap" style="--i:1">
+            <div class="phone" aria-hidden="true"><div class="screen">
+              <span class="ex" data-i18n="ex">Exemple</span>
+              <p class="scr-title" data-i18n="m.shipment">Arrivage</p>
+              <p class="scr-sub">ARR-2026-0007 · <span data-i18n="m.from">Déclaré depuis Dubaï</span></p>
+              <div class="card parcel-card"><svg class="parcel" viewBox="0 0 120 80" aria-hidden="true"><rect width="120" height="80" rx="10" fill="#E6E1D6"/><path d="M30 30l30-12 30 12v32l-30 12-30-12z" fill="#C9A36B"/><path d="M30 30l30 12 30-12M60 42v32" fill="none" stroke="#A9834D" stroke-width="1.5"/><path d="M44 24l30 12v10" fill="none" stroke="#EDE3CF" stroke-width="5"/></svg><div><span class="transit" data-i18n="m.transit">En transit</span><small data-i18n="m.photo">Photo du colis scellé</small></div></div>
+              <div class="card">
+                <div class="row"><span class="check on" aria-hidden="true"></span><b class="grow" data-i18n="m.p1">Robe satin champagne</b><span class="qty">6/6</span></div>
+                <div class="row"><span class="check on" aria-hidden="true"></span><b class="grow" data-i18n="m.p6">Sac cuir noir</b><span class="qty">4/4</span></div>
+                <div class="row"><span class="check" aria-hidden="true"></span><b class="grow" data-i18n="m.p2">Parfum en cristal 50&nbsp;ml</b><span class="qty part">10/12</span></div>
+              </div>
+              <div class="mbtn" data-i18n="m.receive">Valider la réception</div>
+            </div></div>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="credit" aria-labelledby="credit-t">
+    <div class="credit-panel reveal">
+      <div class="credit-copy" style="--i:0">
+        <span class="tag-ex" data-i18n="ex">Exemple</span>
+        <p class="kicker" data-i18n="credit.kicker">Essayez</p>
+        <h2 id="credit-t" data-i18n="credit.title">Regardez un crédit se refermer.</h2>
+        <p data-i18n="credit.text">Mireille doit encore 6&#8239;000&nbsp;FCFA sur ses achats. Encaissez son dernier paiement.</p>
+      </div>
+      <div class="credit-demo demo" style="--i:1" id="demo">
+        <div class="demo-head">
+          <span class="demo-name">Mireille K.</span>
+          <span class="demo-total"><span id="demo-paid" data-amount="12000" data-plain></span> / <span data-amount="18000"></span></span>
+        </div>
+        <svg class="demo-fil" viewBox="0 0 480 44" aria-hidden="true">
+          <polyline pathLength="1" points="4,30 24,12 44,30 64,12 84,30 104,12 124,30 144,12 164,30 184,12 204,30 224,12 244,30 264,12 284,30 304,12 324,30 344,12 364,30 384,12 404,30 424,12 444,30 464,12 476,24" fill="none" stroke="rgba(244,245,251,.18)" stroke-width="4"/>
+          <polyline class="prog" pathLength="1" points="4,30 24,12 44,30 64,12 84,30 104,12 124,30 144,12 164,30 184,12 204,30 224,12 244,30 264,12 284,30 304,12 324,30 344,12 364,30 384,12 404,30 424,12 444,30 464,12 476,24" fill="none" stroke="#F4F5FB" stroke-width="4"/>
+          <path d="M164 12l9 9-9 9-9-9z" fill="#F4F5FB" stroke="#141C45" stroke-width="2"/>
+          <path d="M324 12l9 9-9 9-9-9z" fill="#F4F5FB" stroke="#141C45" stroke-width="2"/>
+          <path class="gem3" d="M470 13l10 10-10 10-10-10z" fill="#F4B63F" stroke="#141C45" stroke-width="2"/>
+        </svg>
+        <p class="demo-state" id="demo-state" aria-live="polite"><span data-i18n="credit.left">Reste 6&#8239;000&nbsp;FCFA</span></p>
+        <p class="demo-hint" id="demo-hint"><svg viewBox="0 0 18 18" aria-hidden="true"><path d="M9 2v11M4 9l5 5 5-5" fill="none" stroke="currentColor" stroke-width="2"/></svg><span data-i18n="credit.hint">À vous&#8239;: appuyez sur le bouton pour encaisser.</span></p>
+        <div class="demo-actions">
+          <button class="btn btn-demo" type="button" id="demo-btn" data-i18n="credit.btn">Encaisser 6&#8239;000&nbsp;FCFA</button>
+          <button class="reset" type="button" id="demo-reset" hidden data-i18n="credit.reset">Recommencer</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="vitrine" aria-labelledby="vit-t">
+    <div class="vit">
+      <div class="vit-copy reveal">
+        <p class="kicker" style="--i:0" data-i18n="vit.kicker">Votre vitrine</p>
+        <h2 id="vit-t" style="--i:1" data-i18n="vit.title">Une boutique en ligne à votre nom.</h2>
+        <p style="--i:2" data-i18n="vit.text">Chaque boutique WISHOP a sa page publique, à ses couleurs. Vos clients parcourent vos articles et passent commande&#8239;; ils paient et récupèrent en boutique.</p>
+      </div>
+      <div class="phone-wrap reveal">
+        <div class="phone" style="--i:0" aria-hidden="true"><div class="screen shop-screen">
+          <span class="ex" data-i18n="ex">Exemple</span>
+          <div class="shop-top"><span class="shop-logo">B</span><span class="shop-name">Boss MaMa B</span></div>
+          <div class="shop-fil"><svg viewBox="0 0 260 12"><polyline points="1,9 9,3 17,9 25,3 33,9 41,3 49,9 57,3 65,9 73,3 81,9 89,3 97,9 105,3 113,9 121,3 129,9 137,3 145,9 153,3 161,9 169,3 177,9 185,3 193,9 201,3 209,9 217,3 225,9 233,3 241,9 249,3 257,9" fill="none" stroke="#0E7C86" stroke-width="1.8"/></svg></div>
+          <p class="shop-tab" data-i18n="m.new">Nouveautés</p>
+          <div class="grid2">
+            <div class="prod"><img src="/landing/assets/thumb-robe.jpg" alt="" width="480" height="480" loading="lazy" decoding="async"><div><b data-i18n="m.p1s">Robe satin champagne</b><span class="amt" data-amount="45000"></span><span class="o" data-i18n="m.order">Commander</span></div></div>
+            <div class="prod"><img src="/landing/assets/thumb-sac.jpg" alt="" width="480" height="480" loading="lazy" decoding="async"><div><b data-i18n="m.p6">Sac cuir noir</b><span class="amt" data-amount="60000"></span><span class="o" data-i18n="m.order">Commander</span></div></div>
+            <div class="prod"><img src="/landing/assets/thumb-parfum.jpg" alt="" width="480" height="480" loading="lazy" decoding="async"><div><b data-i18n="m.p2s">Parfum en cristal</b><span class="amt" data-amount="28000"></span><span class="o" data-i18n="m.order">Commander</span></div></div>
+            <div class="prod"><img src="/landing/assets/thumb-perruque.jpg" alt="" width="480" height="480" loading="lazy" decoding="async"><div><b data-i18n="m.p3">Perruque lisse 22&nbsp;pouces</b><span class="amt" data-amount="85000"></span><span class="o" data-i18n="m.order">Commander</span></div></div>
+          </div>
+          <div class="powered"><svg viewBox="0 -2 48 44"><polyline points="4,9 14,33 24,17 34,33 44,9" fill="none" stroke="#4F5780" stroke-width="6"/><path d="M24 0l5 5-5 5-5-5z" fill="#F4B63F"/></svg><span data-i18n="m.powered">Propulsé par WISHOP</span></div>
+        </div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="equipe" aria-labelledby="team-t">
+    <div class="team">
+      <h2 id="team-t" class="reveal"><span style="--i:0;display:block" data-i18n="team.title">Chacun sa place dans la boutique.</span></h2>
+      <div class="team-grid reveal">
+        <div class="team-card" style="--i:0">
+          <div class="roles" aria-hidden="true">
+            <div class="role"><span class="role-name" data-i18n="r.owner">Propriétaire</span>
+              <div class="chips"><span class="on" data-i18n="pg.dash">Tableau de bord</span><span class="on" data-i18n="pg.sales">Ventes</span><span class="on" data-i18n="pg.stock">Stock</span><span class="on" data-i18n="pg.clients">Clients</span><span class="on" data-i18n="pg.inv">Factures</span><span class="on" data-i18n="pg.set">Paramètres</span></div></div>
+            <div class="role"><span class="role-name" data-i18n="r.cashier">Caissier(e)</span>
+              <div class="chips"><span data-i18n="pg.dash">Tableau de bord</span><span class="on" data-i18n="pg.sales">Ventes</span><span data-i18n="pg.stock">Stock</span><span data-i18n="pg.clients">Clients</span><span data-i18n="pg.inv">Factures</span><span data-i18n="pg.set">Paramètres</span></div></div>
+          </div>
+          <p data-i18n="team.b1">Vous voyez tout. Vos employés n'accèdent qu'aux pages que vous leur ouvrez, la caisse par exemple.</p>
+        </div>
+        <div class="team-card" style="--i:1">
+          <div class="devices" aria-hidden="true">
+            <svg viewBox="0 0 60 100"><rect x="3" y="3" width="54" height="94" rx="12" fill="#FBFBFE" stroke="#141C45" stroke-width="3"/><rect x="11" y="16" width="38" height="8" rx="3" fill="#D7DBEA"/><polyline points="11,40 17,34 23,40 29,34 35,40 41,34 47,40" fill="none" stroke="#2B44A0" stroke-width="2.5"/><rect x="11" y="52" width="38" height="8" rx="3" fill="#D7DBEA"/><rect x="11" y="76" width="38" height="10" rx="5" fill="#2B44A0"/></svg>
+            <svg viewBox="0 0 150 100"><rect x="3" y="3" width="144" height="88" rx="10" fill="#FBFBFE" stroke="#141C45" stroke-width="3"/><rect x="14" y="16" width="44" height="8" rx="3" fill="#D7DBEA"/><polyline points="14,44 24,34 34,44 44,34 54,44 64,34 74,44 84,34 94,44 104,34 114,44 124,34 134,44" fill="none" stroke="#2B44A0" stroke-width="2.5"/><rect x="14" y="60" width="120" height="8" rx="3" fill="#D7DBEA"/><rect x="96" y="74" width="38" height="10" rx="5" fill="#2B44A0"/></svg>
+          </div>
+          <p data-i18n="team.b2">Sur le téléphone que vous avez déjà&#8239;: WISHOP s'ouvre dans le navigateur, rien à installer.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="tarifs" aria-labelledby="price-t">
+    <div class="pricing">
+      <div class="price-head reveal">
+        <h2 id="price-t" style="--i:0" data-i18n="price.title">Gratuit pour commencer.</h2>
+        <p style="--i:1" data-i18n="price.lead">Tout le monde commence avec la formule Standard, gratuite et sans limite de durée. Les formules payantes s'ouvriront dans l'application quand votre boutique en aura besoin&#8239;; leurs prix de lancement sont gardés 12&nbsp;mois pour les boutiques qui s'abonnent pendant le lancement.</p>
+      </div>
+      <div class="plans reveal">
+        <article class="plan" style="--i:0">
+          <div class="plan-top"><p class="plan-name">Standard</p></div>
+          <p class="plan-price" data-i18n="price.free">Gratuit</p>
+          <p class="plan-then" data-i18n="price.forever">Sans limite de durée</p>
+          <ul>
+            <li data-i18n="p.s1">1 compte, 100 articles</li>
+            <li data-i18n="p.s2">Stock et caisse au comptant</li>
+            <li data-i18n="p.s3">Ticket de caisse imprimé</li>
+          </ul>
+        </article>
+        <article class="plan" style="--i:1">
+          <div class="plan-top"><p class="plan-name">Essentiel</p></div>
+          <p class="plan-price"><span data-amount="5000"></span><small data-i18n="price.month">/ mois</small></p>
+          <p class="plan-then"><span data-i18n="price.launch">Prix de lancement, puis</span> <span data-amount="7500"></span></p>
+          <ul>
+            <li class="plus-of" data-i18n="p.e0">Tout le Standard, plus&#8239;:</li>
+            <li data-i18n="p.e1">2 comptes, 500 articles</li>
+            <li data-i18n="p.e2">Ventes à crédit et paiements en plusieurs fois</li>
+            <li data-i18n="p.e3">Factures PDF et suivi des dettes</li>
+            <li data-i18n="p.e4">Relance WhatsApp en un clic, message prêt</li>
+          </ul>
+        </article>
+        <article class="plan plan-pro" style="--i:2">
+          <div class="plan-top"><p class="plan-name">Pro</p><span class="plan-badge" data-i18n="price.complete">Le plus complet</span></div>
+          <p class="plan-price"><span data-amount="12500"></span><small data-i18n="price.month">/ mois</small></p>
+          <p class="plan-then"><span data-i18n="price.launch">Prix de lancement, puis</span> <span data-amount="17500"></span></p>
+          <ul>
+            <li class="plus-of" data-i18n="p.p0">Tout l'Essentiel, plus&#8239;:</li>
+            <li data-i18n="p.p1">5 comptes, accès page par page, 2&#8239;000 articles</li>
+            <li data-i18n="p.p2">Vitrine en ligne et commandes à retirer</li>
+            <li data-i18n="p.p3">Bons de commande et réception pointée</li>
+            <li data-i18n="p.p4">Carte de fidélité <span class="soon">bientôt</span></li>
+            <li data-i18n="p.p5">Relances automatiques, <a href="#q-relances">dès l'accord de Meta</a></li>
+          </ul>
+        </article>
+        <article class="plan plan-plus" style="--i:3">
+          <div class="plan-top"><p class="plan-name">Pro Plus</p><span class="plan-badge">Premium</span></div>
+          <p class="plan-price"><span data-amount="25000"></span><small data-i18n="price.month">/ mois</small></p>
+          <p class="plan-then"><span data-i18n="price.launch">Prix de lancement, puis</span> <span data-amount="35000"></span></p>
+          <ul>
+            <li class="plus-of" data-i18n="p.x0">Tout le Pro, plus&#8239;:</li>
+            <li data-i18n="p.x1">Comptes et articles illimités</li>
+            <li data-i18n="p.x2">Achats à distance par lien, avec photo du colis</li>
+            <li data-i18n="p.x3">Vitrine sans mention WISHOP</li>
+            <li data-i18n="p.x4">Nouveautés en avant-première</li>
+            <li data-i18n="p.x5">Aide prioritaire, votre stock importé pour vous</li>
+          </ul>
+        </article>
+      </div>
+      <div class="price-foot reveal">
+        <p class="price-note" style="--i:0" data-i18n="price.note">Prix en FCFA, toutes taxes comprises. Le mode hors ligne arrive bientôt dans toutes les formules, gratuite comprise. Tout changement de prix est annoncé 30&nbsp;jours avant.</p>
+        <a class="btn btn-accent" style="--i:1" data-app="signup" href="/fr/login?mode=signup" data-i18n="cta.create">Créer ma boutique</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="questions" aria-labelledby="faq-t">
+    <div class="faq">
+      <h2 id="faq-t" class="reveal"><span style="--i:0;display:block" data-i18n="faq.title">Vos questions.</span></h2>
+      <div class="faq-list" id="faq-list">
+        <details><summary><span data-i18n="q1">Combien ça coûte&#8239;?</span><span class="pm" aria-hidden="true"></span></summary><p class="answer" data-i18n="a1">La formule Standard est gratuite, sans limite de durée. Les formules payantes vont de 5&#8239;000 à 25&#8239;000&nbsp;FCFA par mois au lancement, toutes taxes comprises (voir les tarifs plus haut). Tout changement de prix est annoncé 30&nbsp;jours avant.</p></details>
+        <details><summary><span data-i18n="q2">Est-ce compliqué à prendre en main&#8239;?</span><span class="pm" aria-hidden="true"></span></summary><p class="answer" data-i18n="a2">Au quotidien, non&#8239;: vendre, suivre un crédit ou relancer se fait en quelques touches. Le vrai travail est au départ&#8239;: enregistrer votre stock. Vous pouvez ajouter vos articles un par un depuis l'application, ce qui prend du temps, ou importer d'un coup votre stock existant depuis un fichier Excel (au format CSV), ce qui demande d'être à l'aise avec un tableur. Selon les cas, des vidéos d'explication ou une aide au démarrage peuvent vous être proposées.</p></details>
+        <details><summary><span data-i18n="q3">Faut-il une connexion internet&#8239;?</span><span class="pm" aria-hidden="true"></span></summary><p class="answer" data-i18n="a3">Oui, WISHOP fonctionne en ligne. Une connexion mobile ordinaire suffit.</p></details>
+        <details id="q-relances"><summary><span data-i18n="q4">Les relances partent-elles toutes seules&#8239;?</span><span class="pm" aria-hidden="true"></span></summary><p class="answer" data-i18n="a4">C'est tout l'intérêt&#8239;: WISHOP relance automatiquement sur WhatsApp chaque client qui vous doit de l'argent, au rythme que vous choisissez, jusqu'à ce que sa dette soit soldée. La fonction est prête dans l'application, mais elle attend le feu vert de Meta, la société derrière WhatsApp, dont l'accès est encore restreint dans notre région. En attendant, WISHOP prépare le message et vous n'avez plus qu'à l'envoyer. Dès que Meta lèvera cette restriction, les relances automatiques seront activées.</p></details>
+        <details><summary><span data-i18n="q5">Mes employés peuvent-ils l'utiliser&#8239;?</span><span class="pm" aria-hidden="true"></span></summary><p class="answer" data-i18n="a5">Oui. Vous créez leur accès et vous choisissez les pages qu'ils voient.</p></details>
+        <details><summary><span data-i18n="q6">Mes chiffres sont-ils à l'abri&#8239;?</span><span class="pm" aria-hidden="true"></span></summary><p class="answer" data-i18n="a6">Chaque boutique ne voit que ses propres données. Les ventes, factures et paiements ne peuvent pas être effacés depuis l'app&#8239;: votre historique reste juste.</p></details>
+        <details><summary><span data-i18n="q7">Et si je ne vends pas en FCFA&#8239;?</span><span class="pm" aria-hidden="true"></span></summary><p class="answer" data-i18n="a7">Le FCFA est proposé par défaut. Vous pouvez choisir une autre devise dans les réglages de la boutique.</p></details>
+      </div>
+    </div>
+  </section>
+
+  <section id="final" aria-labelledby="final-t" class="section">
+    <div class="final-in reveal" id="final-in">
+      <h2 id="final-t" style="--i:0" data-i18n="final.title">Votre boutique mérite mieux qu'un cahier.</h2>
+      <svg class="final-fil" style="--i:1" viewBox="0 0 380 30" aria-hidden="true"><polyline class="line" pathLength="1" points="2,22 15,8 28,22 41,8 54,22 67,8 80,22 93,8 106,22 119,8 132,22 145,8 158,22 171,8 184,22 197,8 210,22 223,8 236,22 249,8 262,22 275,8 288,22 301,8 314,22 327,8 340,22 353,8 366,22" fill="none" stroke="#F4F5FB" stroke-width="3"/><path d="M372 9l6 6-6 6-6-6z" fill="#F4B63F"/></svg>
+      <p style="--i:2" data-i18n="final.text">Créez-la en ligne, gratuitement pour commencer. Il suffit d'une adresse e-mail.</p>
+      <a class="btn btn-accent" style="--i:3" data-app="signup" href="/fr/login?mode=signup" data-i18n="cta.create">Créer ma boutique</a>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="foot">
+    <div class="foot-top">
+      <a class="brand" href="#top" aria-label="WISHOP"><svg viewBox="0 -2 48 44" aria-hidden="true"><polyline points="4,9 14,33 24,17 34,33 44,9" fill="none" stroke="currentColor" stroke-width="6"/><path d="M24 0l5 5-5 5-5-5z" fill="#F4B63F"/></svg><span>WISHOP</span></a>
+      <p class="foot-tag" data-i18n="foot.tag">Le fil de votre boutique.</p>
+    </div>
+    <svg class="foot-fil" viewBox="0 0 1200 14" preserveAspectRatio="none" aria-hidden="true"><polyline vector-effect="non-scaling-stroke" points="0,11 10,3 20,11 30,3 40,11 50,3 60,11 70,3 80,11 90,3 100,11 110,3 120,11 130,3 140,11 150,3 160,11 170,3 180,11 190,3 200,11 210,3 220,11 230,3 240,11 250,3 260,11 270,3 280,11 290,3 300,11 310,3 320,11 330,3 340,11 350,3 360,11 370,3 380,11 390,3 400,11 410,3 420,11 430,3 440,11 450,3 460,11 470,3 480,11 490,3 500,11 510,3 520,11 530,3 540,11 550,3 560,11 570,3 580,11 590,3 600,11 610,3 620,11 630,3 640,11 650,3 660,11 670,3 680,11 690,3 700,11 710,3 720,11 730,3 740,11 750,3 760,11 770,3 780,11 790,3 800,11 810,3 820,11 830,3 840,11 850,3 860,11 870,3 880,11 890,3 900,11 910,3 920,11 930,3 940,11 950,3 960,11 970,3 980,11 990,3 1000,11 1010,3 1020,11 1030,3 1040,11 1050,3 1060,11 1070,3 1080,11 1090,3 1100,11 1110,3 1120,11 1130,3 1140,11 1150,3 1160,11 1170,3 1180,11 1190,3 1200,11" fill="none" stroke="rgba(201,207,234,.35)" stroke-width="1.5"/></svg>
+    <div class="foot-bottom">
+      <nav class="foot-links" aria-label="Pied de page">
+        <a href="#comment" data-i18n="nav.how">Comment ça marche</a>
+        <a href="#vitrine" data-i18n="nav.store">Vitrine</a>
+        <a href="#tarifs" data-i18n="nav.price">Tarifs</a>
+        <a href="#questions" data-i18n="nav.faq">Questions</a>
+        <a data-app="login" href="/fr/login" data-i18n="nav.login">Se connecter</a>
+      </nav>
+      <span>© 2026 WISHOP</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function(){
+'use strict';
+var APP = '';  /* same domain as the app */
+var LANGS = ['fr','en','es'];
+
+/* ---------------- i18n (French is the source, snapshotted from the DOM) ---------------- */
+var DICT = {
+en:{
+ 'skip':'Skip to content','nav.how':'How it works','nav.store':'Storefront','nav.faq':'Questions','nav.login':'Sign in','cta.create':'Create my shop','cta.free':'Free to start.',
+ 'b1.l1':'A notebook full of IOUs.','b1.l2':'A phone that never stops buzzing.','b1.l3':"A till that doesn't add up.",
+ 'b2':'Your whole shop hangs by a thread.','b3.t':'WISHOP holds it for you.','b3.s':'Sales, stock, credit and WhatsApp reminders, tied together in one app.',
+ 'h1':'Never lose the thread of your shop.','hero.sub':'Ring up sales, track every credit down to the last franc, keep an eye on stock and remind customers on WhatsApp. All from your phone.','hero.more':'See how it works',
+ 'how.kicker':'How it works','how.title':'One thread, from sale to reminder.',
+ 's1.t':'Sell','s1.p':'Ring up a sale in a few taps, cash or on credit. The receipt prints right away, and the invoice also comes as a PDF to share with your customer.',
+ 's2.t':'Track','s2.p':"Every credit has its own repayment bar: what's paid, what's left, and since when.",
+ 's3.t':'Remind','s3.p':'A customer owes you money? WISHOP reminds them on WhatsApp by itself, at the pace you choose, until the debt is paid off. The message is already written, with their name and the amount.','s3.note':"Waiting for Meta's green light in our region. See why",
+ 's4.t':'Restock','s4.p':"Low stock stands out. When you know what's missing, WISHOP drafts a purchase order per supplier, to send via WhatsApp or as a PDF. On delivery, you confirm the reception and the stock updates.",
+ 's5.t':'Buy remotely','s5.p':'For a new arrival or trend-driven buying, send a link to the person shopping for you on site. They record each item as they buy it and attach a photo of the parcel. When it arrives, you tick off what you receive, and the stock updates by itself.',
+ 'ex':'Example','m.ticket':'Receipt','m.p1':'Champagne satin dress','m.p2':'Crystal perfume 50&nbsp;ml','m.total':'Total','m.paidcash':'Paid in cash','m.print':'Print receipt','m.pdf':'Download PDF',
+ 'm.ongoing':'Open credit','m.payment':'Payment','m.autorem':'Automatic reminders','m.due':'due','m.every':'Every 7&nbsp;days','m.sent1':'1st reminder sent','m.sent2':'2nd reminder sent','m.next':'Next reminder','m.stops':'Reminders stop as soon as the debt is paid off.',
+ 'm.msg':'Hello Aïcha, this is a reminder that 9,500&nbsp;FCFA is still due at Boss MaMa B. Please contact us to arrange the payment.',
+ 'm.po':'Purchase order','m.p3':'Straight wig 22&nbsp;inches','m.p4':'Ruby lipstick','m.p5':'Gold cuff','m.instock':'in stock','m.sendwa':'Send via WhatsApp',
+ 'm.shipment':'Shipment','m.from':'Declared from Dubai','m.transit':'In transit','m.photo':'Photo of the sealed parcel','m.receive':'Confirm the reception',
+ 'm.new':'New in','m.p1s':'Champagne satin dress','m.p6':'Black leather bag','m.p2s':'Crystal perfume','m.order':'Order','m.powered':'Powered by WISHOP',
+ 'credit.kicker':'Try it','credit.title':'Watch a credit close.','credit.text':'Mireille still owes 6,000&nbsp;FCFA on her purchases. Record her last payment.','credit.hint':'Your turn: press the button to record the payment.','credit.btn':'Record 6,000&nbsp;FCFA','credit.done':'Paid in full. The thread is complete.','credit.reset':'Start again','credit.left':'6,000&nbsp;FCFA left',
+ 'vit.kicker':'Your storefront','vit.title':'An online shop in your name.','vit.text':'Every WISHOP shop has its own public page, in its own colours. Your customers browse your items and place an order; they pay and pick up in store.',
+ 'team.title':'Everyone in their place.','team.b1':'You see everything. Your staff only reach the pages you open to them, the till for example.','team.b2':'On the phone you already have: WISHOP opens in the browser, nothing to install.',
+ 'r.owner':'Owner','r.cashier':'Cashier','pg.dash':'Dashboard','pg.sales':'Sales','pg.stock':'Stock','pg.clients':'Clients','pg.inv':'Invoices','pg.set':'Settings',
+ 'nav.price':'Pricing','price.title':'Free to start.','price.lead':"Everyone starts on the Standard plan, free with no time limit. Paid plans will open in the app when your shop needs them; their launch prices are kept for 12&nbsp;months for shops that subscribe during the launch.",'price.free':'Free','price.forever':'No time limit','price.month':'/ month','price.launch':'Launch price, then','price.complete':'Most complete','p.s1':'1 account, 100 items','p.s2':'Stock and cash sales','p.s3':'Printed till receipt','p.e0':'Everything in Standard, plus:','p.e1':'2 accounts, 500 items','p.e2':'Credit sales and payments in instalments','p.e3':'PDF invoices and debt tracking','p.e4':'One-tap WhatsApp reminder, message ready','p.p0':'Everything in Essentiel, plus:','p.p1':'5 accounts, page-by-page access, 2,000 items','p.p2':'Online storefront and pick-up orders','p.p3':'Purchase orders, checked off on delivery','p.p4':'Loyalty card <span class="soon">soon</span>','p.p5':'Automatic reminders, <a href="#q-relances">once Meta gives the go-ahead</a>','p.x0':'Everything in Pro, plus:','p.x1':'Unlimited accounts and items','p.x2':'Remote buying by link, with a photo of the parcel','p.x3':'Storefront without the WISHOP mention','p.x4':'New features first','p.x5':'Priority help, your stock imported for you','price.note':'Prices in FCFA, all taxes included. Offline mode is coming soon to every plan, the free one included. Any price change is announced 30&nbsp;days ahead.',
+ 'faq.title':'Your questions.',
+ 'q1':'How much does it cost?','a1':'The Standard plan is free, with no time limit. Paid plans range from 5,000 to 25,000&nbsp;FCFA a month at launch, all taxes included (see pricing above). Any price change is announced 30&nbsp;days ahead.',
+ 'q2':'Is it hard to learn?','a2':'Day to day, no: selling, tracking a credit or sending a reminder takes a few taps. The real work is at the start: entering your stock. You can add your items one by one in the app, which takes time, or import your existing stock in one go from an Excel file (saved as CSV), which requires being comfortable with spreadsheets. Depending on your situation, explanation videos or help getting started may be offered.',
+ 'q3':'Do I need an internet connection?','a3':'Yes, WISHOP works online. An ordinary mobile connection is enough.',
+ 'q4':'Do reminders go out on their own?','a4':"That's the whole point: WISHOP automatically reminds every customer who owes you money on WhatsApp, at the pace you choose, until the debt is paid off. The feature is ready in the app, but it is waiting for the green light from Meta, the company behind WhatsApp, whose access is still restricted in our region. Meanwhile, WISHOP prepares the message and all you do is send it. As soon as Meta lifts this restriction, automatic reminders will be switched on.",
+ 'q5':'Can my staff use it?','a5':'Yes. You create their access and choose which pages they see.',
+ 'q6':'Are my figures safe?','a6':"Each shop only sees its own data. Sales, invoices and payments can't be deleted from the app, so your history stays accurate.",
+ 'q7':"What if I don't sell in FCFA?",'a7':'FCFA is the default. You can pick another currency in the shop settings.',
+ 'final.title':'Your shop deserves better than a notebook.','final.text':'Create it online, free to start. All you need is an email address.',
+ 'foot.tag':'The thread of your shop.',
+ '_title':'WISHOP · Never lose the thread of your shop','_desc':'Ring up sales, track every credit down to the last franc, keep an eye on stock and remind customers on WhatsApp. All from your phone. Free to start.','_lang':'Language'
+},
+es:{
+ 'skip':'Ir al contenido','nav.how':'Cómo funciona','nav.store':'Escaparate','nav.faq':'Preguntas','nav.login':'Iniciar sesión','cta.create':'Crear mi tienda','cta.free':'Gratis para empezar.',
+ 'b1.l1':'Un cuaderno de fiados.','b1.l2':'Un teléfono que no para de sonar.','b1.l3':'Una caja que no cuadra.',
+ 'b2':'Toda tu tienda pende de un hilo.','b3.t':'WISHOP lo sostiene por ti.','b3.s':'Ventas, stock, créditos y recordatorios por WhatsApp, unidos en una sola app.',
+ 'h1':'No pierdas el hilo de tu tienda.','hero.sub':'Cobra, sigue cada crédito hasta el último franco, vigila el stock y recuerda a tus clientes por WhatsApp. Todo desde tu teléfono.','hero.more':'Ver cómo funciona',
+ 'how.kicker':'Cómo funciona','how.title':'Un solo hilo, de la venta al recordatorio.',
+ 's1.t':'Venta','s1.p':'Cobra en pocos toques, al contado o a crédito. El ticket se imprime al instante, y la factura también está en PDF para compartirla con tu cliente.',
+ 's2.t':'Sigue','s2.p':'Cada crédito tiene su barra de pago: lo pagado, lo pendiente y desde cuándo.',
+ 's3.t':'Recuerda','s3.p':'¿Un cliente te debe dinero? WISHOP se lo recuerda solo por WhatsApp, al ritmo que elijas, hasta que salde su deuda. El mensaje ya está escrito, con su nombre y el importe.','s3.note':'A la espera de la luz verde de Meta en nuestra región. Ver por qué',
+ 's4.t':'Reaprovisiona','s4.p':'El stock bajo salta a la vista. Cuando sabes lo que falta, WISHOP prepara una orden de compra por proveedor, para enviar por WhatsApp o en PDF. Al recibir la entrega, confirmas la recepción y el stock se actualiza.',
+ 's5.t':'Compra a distancia','s5.p':'Para una nueva llegada o compras según la tendencia, envía un enlace a la persona que compra por ti en el lugar. Anota cada artículo a medida que lo compra y adjunta la foto del paquete. Al llegar, marcas lo que recibes y el stock se actualiza solo.',
+ 'ex':'Ejemplo','m.ticket':'Ticket','m.p1':'Vestido de satén champán','m.p2':'Perfume de cristal 50&nbsp;ml','m.total':'Total','m.paidcash':'Pagado al contado','m.print':'Imprimir el ticket','m.pdf':'Descargar el PDF',
+ 'm.ongoing':'Crédito en curso','m.payment':'Pago','m.autorem':'Recordatorios automáticos','m.due':'pendiente','m.every':'Cada 7&nbsp;días','m.sent1':'1.er recordatorio enviado','m.sent2':'2.º recordatorio enviado','m.next':'Próximo recordatorio','m.stops':'Los recordatorios se detienen en cuanto se salda la deuda.',
+ 'm.msg':'Hola Aïcha, le recordamos que tiene 9.500&nbsp;FCFA pendientes de pago en Boss MaMa B. Contáctenos para acordar el pago.',
+ 'm.po':'Orden de compra','m.p3':'Peluca lisa 22&nbsp;pulgadas','m.p4':'Pintalabios rubí','m.p5':'Brazalete dorado','m.instock':'en stock','m.sendwa':'Enviar por WhatsApp',
+ 'm.shipment':'Llegada','m.from':'Declarado desde Dubái','m.transit':'En tránsito','m.photo':'Foto del paquete sellado','m.receive':'Confirmar la recepción',
+ 'm.new':'Novedades','m.p1s':'Vestido de satén champán','m.p6':'Bolso de piel negro','m.p2s':'Perfume de cristal','m.order':'Pedir','m.powered':'Con la tecnología de WISHOP',
+ 'credit.kicker':'Pruébalo','credit.title':'Mira cómo se cierra un crédito.','credit.text':'Mireille todavía debe 6.000&nbsp;FCFA de sus compras. Cobra su último pago.','credit.hint':'Tu turno: pulsa el botón para cobrar.','credit.btn':'Cobrar 6.000&nbsp;FCFA','credit.done':'Saldado. El hilo está completo.','credit.reset':'Empezar de nuevo','credit.left':'Quedan 6.000&nbsp;FCFA',
+ 'vit.kicker':'Tu escaparate','vit.title':'Una tienda en línea con tu nombre.','vit.text':'Cada tienda WISHOP tiene su página pública, con sus colores. Tus clientes ven tus artículos y hacen su pedido; pagan y recogen en la tienda.',
+ 'team.title':'Cada uno en su lugar.','team.b1':'Tú lo ves todo. Tus empleados solo acceden a las páginas que les abres, la caja por ejemplo.','team.b2':'En el teléfono que ya tienes: WISHOP se abre en el navegador, sin instalar nada.',
+ 'r.owner':'Propietario','r.cashier':'Cajero(a)','pg.dash':'Panel','pg.sales':'Ventas','pg.stock':'Inventario','pg.clients':'Clientes','pg.inv':'Facturas','pg.set':'Configuración',
+ 'nav.price':'Precios','price.title':'Gratis para empezar.','price.lead':'Todo el mundo empieza con el plan Standard, gratis y sin límite de tiempo. Los planes de pago se abrirán en la aplicación cuando tu tienda los necesite; sus precios de lanzamiento se mantienen 12&nbsp;meses para las tiendas que se suscriban durante el lanzamiento.','price.free':'Gratis','price.forever':'Sin límite de tiempo','price.month':'/ mes','price.launch':'Precio de lanzamiento, luego','price.complete':'El más completo','p.s1':'1 cuenta, 100 artículos','p.s2':'Stock y caja al contado','p.s3':'Ticket de caja impreso','p.e0':'Todo lo del Standard, más:','p.e1':'2 cuentas, 500 artículos','p.e2':'Ventas a crédito y pagos en varias veces','p.e3':'Facturas PDF y seguimiento de deudas','p.e4':'Recordatorio por WhatsApp en un toque, mensaje listo','p.p0':'Todo lo del Essentiel, más:','p.p1':'5 cuentas, acceso página por página, 2.000 artículos','p.p2':'Escaparate en línea y pedidos para recoger','p.p3':'Pedidos a proveedores, marcados a la entrega','p.p4':'Tarjeta de fidelidad <span class="soon">pronto</span>','p.p5':'Recordatorios automáticos, <a href="#q-relances">en cuanto Meta dé luz verde</a>','p.x0':'Todo lo del Pro, más:','p.x1':'Cuentas y artículos ilimitados','p.x2':'Compras a distancia por enlace, con foto del paquete','p.x3':'Escaparate sin la mención WISHOP','p.x4':'Novedades en primicia','p.x5':'Ayuda prioritaria, tu stock importado por ti','price.note':'Precios en FCFA, impuestos incluidos. El modo sin conexión llega pronto a todos los planes, el gratuito incluido. Cualquier cambio de precio se anuncia con 30&nbsp;días de antelación.',
+ 'faq.title':'Tus preguntas.',
+ 'q1':'¿Cuánto cuesta?','a1':'El plan Standard es gratis, sin límite de tiempo. Los planes de pago van de 5.000 a 25.000&nbsp;FCFA al mes en el lanzamiento, impuestos incluidos (mira los precios más arriba). Cualquier cambio de precio se anuncia con 30&nbsp;días de antelación.',
+ 'q2':'¿Es complicado de usar?','a2':'En el día a día, no: vender, seguir un crédito o enviar un recordatorio se hace en pocos toques. El verdadero trabajo está al principio: registrar tu stock. Puedes añadir tus artículos uno a uno desde la app, lo que lleva tiempo, o importar de una vez tu stock existente desde un archivo de Excel (en formato CSV), lo que requiere manejar una hoja de cálculo. Según el caso, se te pueden ofrecer vídeos explicativos o ayuda para empezar.',
+ 'q3':'¿Hace falta conexión a internet?','a3':'Sí, WISHOP funciona en línea. Basta con una conexión móvil normal.',
+ 'q4':'¿Los recordatorios se envían solos?','a4':'Para eso está pensado: WISHOP recuerda automáticamente por WhatsApp a cada cliente que te debe dinero, al ritmo que elijas, hasta que salde su deuda. La función ya está lista en la app, pero espera la luz verde de Meta, la empresa detrás de WhatsApp, cuyo acceso sigue restringido en nuestra región. Mientras tanto, WISHOP prepara el mensaje y solo tienes que enviarlo. En cuanto Meta levante esta restricción, los recordatorios automáticos se activarán.',
+ 'q5':'¿Pueden usarlo mis empleados?','a5':'Sí. Tú creas su acceso y eliges qué páginas ven.',
+ 'q6':'¿Están seguras mis cifras?','a6':'Cada tienda solo ve sus propios datos. Las ventas, facturas y pagos no se pueden borrar desde la app: tu historial sigue siendo exacto.',
+ 'q7':'¿Y si no vendo en FCFA?','a7':'El FCFA viene por defecto. Puedes elegir otra moneda en los ajustes de la tienda.',
+ 'final.title':'Tu tienda merece algo mejor que un cuaderno.','final.text':'Créala en línea, gratis para empezar. Solo necesitas un correo electrónico.',
+ 'foot.tag':'El hilo de tu tienda.',
+ '_title':'WISHOP · No pierdas el hilo de tu tienda','_desc':'Cobra, sigue cada crédito hasta el último franco, vigila el stock y recuerda a tus clientes por WhatsApp. Todo desde tu teléfono. Gratis para empezar.','_lang':'Idioma'
+}};
+var FR = {};
+var keyed = [].slice.call(document.querySelectorAll('[data-i18n]'));
+keyed.forEach(function(el){ var k = el.getAttribute('data-i18n'); if (!(k in FR)) FR[k] = el.innerHTML; });
+FR.credit_done = 'Soldé. Le fil est complet.';
+FR._title = document.title;
+FR._desc = document.querySelector('meta[name="description"]').getAttribute('content');
+FR._lang = 'Langue';
+DICT.fr = FR; DICT.fr['credit.done'] = FR.credit_done;
+
+var lang = 'fr';
+function t(k){ var d = DICT[lang] || FR; return (k in d) ? d[k] : FR[k]; }
+
+var SEP = {fr:'\u202F', en:',', es:'.'};
+function fmtNum(n, wide){ var sep = SEP[lang] || '\u202F'; if (wide && sep === '\u202F') sep = '\u00A0'; return String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, sep); }
+/* Display-size amounts get a full no-break space: the narrow one almost vanishes in the display face */
+function fmtMoney(n){ return fmtNum(n) + '\u00A0FCFA'; }
+function renderAmounts(root){
+  [].forEach.call((root || document).querySelectorAll('[data-amount]'), function(el){
+    var n = +el.getAttribute('data-amount');
+    var wide = !!el.closest('.big-amt, .demo-total, .plan-price');
+    el.textContent = el.hasAttribute('data-plain') ? fmtNum(n, wide) : fmtNum(n, wide) + '\u00A0FCFA';
+  });
+  [].forEach.call(document.querySelectorAll('[data-dt]'), function(el){
+    var d = new Date(el.getAttribute('data-dt'));
+    try { el.textContent = new Intl.DateTimeFormat(lang, {day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit'}).format(d); } catch(e){ el.textContent = el.getAttribute('data-dt'); }
+  });
+  [].forEach.call(document.querySelectorAll('[data-date]'), function(el){
+    var d = new Date(el.getAttribute('data-date') + 'T12:00:00');
+    try { el.textContent = new Intl.DateTimeFormat(lang, {day:'numeric', month:'short'}).format(d); } catch(e){ el.textContent = el.getAttribute('data-date'); }
+  });
+}
+
+function applyLang(next, persist){
+  if (LANGS.indexOf(next) < 0) next = 'fr';
+  lang = next;
+  document.documentElement.lang = lang;
+  keyed.forEach(function(el){
+    var k = el.getAttribute('data-i18n');
+    var v = t(k);
+    if (el.classList.contains('split') || el.classList.contains('blur')) { el.setAttribute('data-src', v); }
+    else el.innerHTML = v;
+  });
+  document.title = t('_title');
+  document.querySelector('meta[name="description"]').setAttribute('content', t('_desc'));
+  document.querySelector('.lang').setAttribute('aria-label', t('_lang'));
+  [].forEach.call(document.querySelectorAll('[data-app]'), function(a){ a.href = APP + '/' + lang + '/login' + (a.getAttribute('data-app') === 'signup' ? '?mode=signup' : ''); });
+  [].forEach.call(document.querySelectorAll('.lang button'), function(b){ b.setAttribute('aria-pressed', b.getAttribute('data-lang') === lang ? 'true' : 'false'); });
+  splitAll();
+  renderAmounts();
+  demoRender(true);
+  if (persist) { try { localStorage.setItem('wishop-lang', lang); } catch(e){} }
+  if (typeof refreshBands === 'function') refreshBands();
+}
+
+/* ---------------- text splitting (seeded, identical on every load) ---------------- */
+function rng(seed){ var s = seed >>> 0; return function(){ s = (s * 1664525 + 1013904223) >>> 0; return s / 4294967296; }; }
+function textOf(html){ var d = document.createElement('div'); d.innerHTML = html; return d.textContent; }
+function splitAll(){
+  [].forEach.call(document.querySelectorAll('.split'), function(el, idx){
+    var src = el.getAttribute('data-src') || el.innerHTML;
+    el.setAttribute('data-src', src);
+    var text = textOf(src);
+    var r = rng(97 + idx * 31);
+    var line = +(el.getAttribute('data-line') || 0);
+    var spread = +(el.getAttribute('data-spread') || 0.5);
+    var words = text.split(/\s+/).filter(Boolean);
+    var totalChars = text.replace(/\s+/g,'').length || 1;
+    var ci = 0;
+    var vis = document.createElement('span'); vis.className = 'vis'; vis.setAttribute('aria-hidden','true');
+    words.forEach(function(w, wi){
+      var ws = document.createElement('span'); ws.className = 'w';
+      if (el.classList.contains('fx-drift')) ws.style.setProperty('--th', (line * 0.2 + wi * 0.035).toFixed(3));
+      if (el.classList.contains('fx-rise')) ws.style.setProperty('--th', (wi / Math.max(1, words.length) * 0.32).toFixed(3));
+      if (el.classList.contains('fx-grid')) {
+        Array.from(w).forEach(function(ch){
+          var cs = document.createElement('span'); cs.className = 'c'; cs.textContent = ch;
+          cs.style.setProperty('--th', (ci / totalChars * spread + r() * 0.06).toFixed(3));
+          cs.style.setProperty('--jx', (-10 - r() * 22).toFixed(1) + 'px');
+          ws.appendChild(cs); ci++;
+        });
+      } else { ws.textContent = w; }
+      vis.appendChild(ws);
+      if (wi < words.length - 1) vis.appendChild(document.createTextNode(' '));
+    });
+    var sr = document.createElement('span'); sr.className = 'sr-only'; sr.textContent = text;
+    el.textContent = ''; el.appendChild(sr); el.appendChild(vis);
+  });
+  [].forEach.call(document.querySelectorAll('.blur'), function(el){
+    var src = el.getAttribute('data-src') || el.innerHTML;
+    el.setAttribute('data-src', src);
+    var text = textOf(src);
+    el.innerHTML = '';
+    var sr = document.createElement('span'); sr.className = 'sr-only'; sr.textContent = text;
+    var soft = document.createElement('span'); soft.className = 'soft'; soft.setAttribute('aria-hidden','true'); soft.textContent = text;
+    var sharp = document.createElement('span'); sharp.className = 'sharp'; sharp.setAttribute('aria-hidden','true'); sharp.textContent = text;
+    el.appendChild(sr); el.appendChild(soft); el.appendChild(sharp);
+  });
+}
+
+/* ---------------- hero scrub ---------------- */
+var hero = document.getElementById('top');
+var stage = document.getElementById('stage');
+var video = document.getElementById('hero-video');
+var posterEl = document.getElementById('poster');
+var cue = document.getElementById('cue');
+var bandEls = [].slice.call(document.querySelectorAll('.band'));
+var bands = bandEls.map(function(el){ return { el:el, a:+el.getAttribute('data-a'), b:+el.getAttribute('data-b'), ramp:el.hasAttribute('data-ramp') ? +el.getAttribute('data-ramp') : null, op:-1, k:-1, live:null }; });
+var smooth = function(p, e0, e1){ var x = Math.min(1, Math.max(0, (p - e0) / (e1 - e0))); return x * x * (3 - 2 * x); };
+var clamp = function(v, lo, hi){ return Math.min(hi, Math.max(lo, v)); };
+var loadK = 0, loadStart = performance.now();
+
+function heroProgress(){
+  var r = hero.getBoundingClientRect();
+  var range = hero.offsetHeight - innerHeight;
+  return range > 0 ? clamp(-r.top / range, 0, 1) : 0;
+}
+function updateCaptions(p){
+  bands.forEach(function(B, i){
+    var first = i === 0, last = i === bands.length - 1;
+    var f = Math.min(0.02, (B.b - B.a) / 3);
+    var op = (first ? (p <= B.b ? 1 : 0) : smooth(p, B.a, B.a + f)) * (last ? 1 : (1 - smooth(p, B.b - f, B.b)));
+    if (first) op = p < B.b - f ? 1 : (1 - smooth(p, B.b - f, B.b));
+    if (last && p < B.a) op = 0;
+    var ramp = B.ramp || Math.min(0.025, (B.b - B.a) * 0.35);
+    var k = clamp((p - B.a) / ramp, 0, 1);
+    if (first) k = Math.max(k, loadK);
+    if (Math.abs(op - B.op) > 0.004) { B.op = op; B.el.style.opacity = op.toFixed(3); }
+    if (Math.abs(k - B.k) > 0.008 || (k === 1 && B.k !== 1) || (k === 0 && B.k !== 0)) {
+      B.k = k; B.el.style.setProperty('--k', k.toFixed(3));
+      if (last) {
+        B.el.style.setProperty('--ks', clamp((k - 0.5) * 3.2, 0, 1).toFixed(3));
+        B.el.style.setProperty('--kb', clamp((k - 0.68) * 4.2, 0, 1).toFixed(3));
+        B.el.style.setProperty('--fd', (1 - clamp((k - 0.42) * 2.2, 0, 1)).toFixed(3));
+        B.el.style.setProperty('--fg', clamp((k - 0.86) * 7, 0, 1).toFixed(3));
+      }
+      if (B.el.classList.contains('b3')) B.el.style.setProperty('--ks', clamp((k - 0.55) * 2.6, 0, 1).toFixed(3));
+    }
+    var live = op > 0.6;
+    if (live !== B.live) { B.live = live; B.el.classList.toggle('live', live); }
+  });
+  var c = p < 0.02 ? 1 : 0;
+  if (cue && c !== cueShown) { cueShown = c; cue.style.setProperty('--cue', c); }
+}
+var cueShown = -1;
+function refreshBands(){ bands.forEach(function(B){ B.op = -1; B.k = -1; B.live = null; }); if (scrubOn) updateCaptions(shown); }
+
+var target = 0, shown = 0, rafId = null, lastTick = 0, heroOnScreen = true;
+var seekBusy = false, pendingTime = null;
+function requestSeek(tm){
+  if (!video.duration || !videoReady) return;
+  tm = Math.min(tm, video.duration - 0.04);
+  if (seekBusy) { pendingTime = tm; return; }
+  seekBusy = true; video.currentTime = tm;
+}
+function onSeeked(){ seekBusy = false; if (pendingTime !== null) { var tm = pendingTime; pendingTime = null; requestSeek(tm); } }
+video.addEventListener('seeked', onSeeked);
+video.addEventListener('error', function(){ if (videoReady) giveUpVideo(); });
+function giveUpVideo(){ seekBusy = false; pendingTime = null; stage.classList.remove('video-ready'); video.style.display = 'none'; }
+
+function tick(now){
+  var dt = Math.min(100, now - (lastTick || now)); lastTick = now;
+  if (loadK < 1) loadK = clamp((now - loadStart) / 1100, 0, 1);
+  shown += (target - shown) * (1 - Math.pow(1 - 0.16, dt / 16.667));
+  if (Math.abs(target - shown) < 0.0005 && loadK >= 1) { shown = target; rafId = null; lastTick = 0; }
+  else rafId = requestAnimationFrame(tick);
+  requestSeek(shown * (video.duration || 0));
+  updateCaptions(shown);
+}
+function onScroll(){
+  target = heroProgress();
+  if (rafId === null && heroOnScreen && scrubOn) rafId = requestAnimationFrame(tick);
+}
+if ('IntersectionObserver' in window) {
+  new IntersectionObserver(function(es){ heroOnScreen = es[0].isIntersecting; if (heroOnScreen) onScroll(); }).observe(hero);
+}
+
+var videoReady = false, heroInit = false;
+function initHeroOnce(){
+  if (heroInit) return; heroInit = true;
+  posterEl.style.backgroundImage = "url('/landing/assets/hero-poster.jpg')";
+  streamVideo();
+}
+/* The host answers byte-range requests (checked: HTTP 206 on Vercel), so the
+   1080p video streams: the first frames arrive quickly and the rest downloads
+   while the visitor reads the first caption. The whole-file Blob loader stays
+   as the fallback for a host that would not serve ranges. */
+var VIDEO_URL = '/landing/assets/hero-scrub.mp4';
+/* Computer screens from about 1800 physical pixels wide then upgrade to the 2K
+   upscale, downloaded in the background and swapped in without a cut once it is
+   ready. Measured at 4 Mbit/s on a 1920 screen, loading the 2K first delayed the
+   start from 4-5 s to 6-9 s; this way the start stays fast. Data-saving mode and
+   2G never download it. The browser's own speed estimate is not used to decide:
+   Chrome reports about 1.5 Mbit/s at load whatever the line, and labels any line
+   with more than about 270 ms of round trip as "3g", which is the normal case
+   from Central Africa to the host even on a good connection. */
+var VIDEO_2K_URL = '/landing/assets/hero-scrub-2k.mp4';
+var WANT_2K = (function(){
+  var px = Math.max(innerWidth, innerHeight * 16 / 9) * (window.devicePixelRatio || 1);
+  var c = navigator.connection || {};
+  return px > 1800 && !c.saveData && !/(^|-)2g/.test(c.effectiveType || '');
+})();
+var upgraded = false, streamStart = 0;
+function markReady(){
+  if (videoReady) return;
+  videoReady = true;
+  requestSeek(heroProgress() * video.duration);
+  stage.classList.add('video-ready');
+  if (WANT_2K) afterFullBuffer(upgradeTo2k);
+}
+/* The 2K download waits until the 1080p file is fully buffered, so the two never
+   share the bandwidth while the visitor scrolls. The time that took is the real
+   speed of the line: the 1080p file is 27.5 Mbit and the 2K 33.8 Mbit, so the 2K
+   only follows when the 1080p arrived within about 20 s (1.35 Mbit/s or more),
+   which brings the 2K in under about 25 s. Slower lines keep the 1080p. */
+function afterFullBuffer(cb){
+  (function check(){
+    var b = video.buffered, secs = (performance.now() - streamStart) / 1000;
+    if (b.length && b.end(b.length - 1) >= video.duration - 0.2) { if (27.5 / Math.max(secs, 0.1) >= 1.35) cb(); }
+    else if (secs < 40) setTimeout(check, 1000);
+  })();
+}
+function streamVideo(){
+  var fellBack = false;
+  function fallback(){
+    if (fellBack || videoReady) return; fellBack = true;
+    video.removeAttribute('src'); video.load();
+    loadVideoBlob().catch(giveUpVideo);
+  }
+  video.preload = 'auto';
+  video.addEventListener('loadeddata', markReady, { once:true });
+  video.addEventListener('error', fallback, { once:true });
+  setTimeout(function(){ if (!videoReady && video.readyState < 1) fallback(); }, 12000);
+  streamStart = performance.now();
+  video.src = VIDEO_URL;
+  video.load();
+}
+function loadVideoBlob(){
+  return fetch(VIDEO_URL).then(function(res){ if (!res.ok) throw new Error('video'); return res.blob(); }).then(function(blob){
+    video.src = URL.createObjectURL(blob);
+    video.load();
+    video.addEventListener('canplay', markReady, { once:true });
+    video.addEventListener('error', giveUpVideo, { once:true });
+  });
+}
+function upgradeTo2k(){
+  if (upgraded || !scrubOn) return; upgraded = true;
+  var ctrl = ('AbortController' in window) ? new AbortController() : null;
+  var timer = setTimeout(function(){ if (ctrl) ctrl.abort(); }, 45000);
+  fetch(VIDEO_2K_URL, ctrl ? { signal: ctrl.signal } : {}).then(function(res){ if (!res.ok) throw new Error('2k'); return res.blob(); }).then(function(blob){
+    clearTimeout(timer);
+    var v2 = video.cloneNode(false);
+    v2.removeAttribute('src');
+    v2.muted = true;
+    v2.preload = 'auto';
+    v2.style.visibility = 'hidden';
+    v2.addEventListener('loadeddata', function(){
+      v2.addEventListener('seeked', function(){
+        var old = video;
+        v2.addEventListener('seeked', onSeeked);
+        video = v2; seekBusy = false; pendingTime = null;
+        v2.style.visibility = '';
+        if (old.parentNode) old.parentNode.removeChild(old);
+        requestSeek(shown * video.duration);
+      }, { once:true });
+      v2.currentTime = Math.min(shown * v2.duration, v2.duration - 0.04);
+    }, { once:true });
+    v2.addEventListener('error', function(){ if (v2.parentNode) v2.parentNode.removeChild(v2); }, { once:true });
+    video.parentNode.insertBefore(v2, video.nextSibling);
+    v2.src = URL.createObjectURL(blob);
+    v2.load();
+  }).catch(function(){ clearTimeout(timer); });
+}
+
+var GATES = [
+  '(max-width: 720px)',
+  '(orientation: portrait) and (max-width: 1024px)',
+  '(orientation: portrait) and (pointer: coarse)',
+  '(orientation: landscape) and (pointer: coarse) and (max-height: 560px)',
+  '(prefers-reduced-motion: reduce)'
+];
+var scrubOn = null;
+function clearBandStyles(){
+  bands.forEach(function(B){ B.el.style.opacity = ''; ['--k','--ks','--kb','--fd','--fg'].forEach(function(v){ B.el.style.removeProperty(v); }); B.el.classList.remove('live'); B.op = -1; B.k = -1; B.live = null; });
+}
+function enableScrub(){
+  if (scrubOn === true) return; scrubOn = true;
+  initHeroOnce();
+  addEventListener('scroll', onScroll, { passive:true });
+  addEventListener('resize', onScroll, { passive:true });
+  refreshBands();
+  shown = target = heroProgress();
+  loadStart = performance.now();
+  updateCaptions(shown);
+  if (rafId === null) rafId = requestAnimationFrame(tick);
+}
+function disableScrub(){
+  if (scrubOn === false) return; scrubOn = false;
+  removeEventListener('scroll', onScroll); removeEventListener('resize', onScroll);
+  if (rafId !== null) { cancelAnimationFrame(rafId); rafId = null; }
+  clearBandStyles();
+}
+function applyHeroMode(){ if (GATES.some(function(q){ return matchMedia(q).matches; })) disableScrub(); else enableScrub(); }
+var MQLS = GATES.map(function(q){ return matchMedia(q); });
+
+/* ---------------- nav, reveals, spine ---------------- */
+var nav = document.getElementById('nav'), navSolid = null;
+function onNav(){
+  /* The header turns opaque as soon as the hero starts to leave the screen, before any
+     caption can slide under it (desktop: end of the pinned scroll; phones: first swipe). */
+  var solid = hero.getBoundingClientRect().bottom < innerHeight - 2;
+  if (solid !== navSolid) { navSolid = solid; nav.classList.toggle('solid', solid); }
+}
+addEventListener('scroll', onNav, { passive:true }); addEventListener('resize', onNav, { passive:true });
+
+var reduce = matchMedia('(prefers-reduced-motion: reduce)');
+var revealIO = 'IntersectionObserver' in window ? new IntersectionObserver(function(es){
+  es.forEach(function(e){
+    if (!e.isIntersecting) return;
+    var el = e.target; el.classList.add('in');
+    setTimeout(function(){ el.classList.add('done'); }, 1400);
+    revealIO.unobserve(el);
+  });
+}, { threshold:0.18, rootMargin:'0px 0px -6% 0px' }) : null;
+[].forEach.call(document.querySelectorAll('.reveal, .seam'), function(el){ if (revealIO) revealIO.observe(el); else el.classList.add('in','done'); });
+
+var steps = document.getElementById('steps'), spine = document.getElementById('spine'), spineVal = -1;
+var seam = document.getElementById('seam');
+function layoutFils(){
+  var h = Math.max(40, Math.round(spine.getBoundingClientRect().height)), pts = [], y = 0, i = 0;
+  for (y = 0; y <= h; y += 20) pts.push((i++ % 2 ? 22 : 2) + ',' + y);
+  spine.setAttribute('viewBox', '0 0 24 ' + h);
+  spine.firstElementChild.setAttribute('points', pts.join(' '));
+  var w = Math.max(100, Math.round(seam.getBoundingClientRect().width)), sp = [], x = 0, j = 0;
+  for (x = 0; x <= w + 25; x += 25) sp.push(x + ',' + (j++ % 2 ? 10 : 26));
+  seam.setAttribute('viewBox', '0 0 ' + w + ' 36');
+  seam.firstElementChild.setAttribute('points', sp.join(' '));
+}
+var fitTimer = null;
+addEventListener('resize', function(){ clearTimeout(fitTimer); fitTimer = setTimeout(layoutFils, 150); }, { passive:true });
+function onSpine(){
+  if (reduce.matches) return;
+  var r = steps.getBoundingClientRect();
+  var p = clamp((innerHeight * 0.62 - r.top) / r.height, 0, 1);
+  if (Math.abs(p - spineVal) > 0.004) { spineVal = p; spine.style.setProperty('--sp', (1 - p).toFixed(3)); }
+}
+addEventListener('scroll', onSpine, { passive:true }); addEventListener('resize', onSpine, { passive:true });
+
+/* ---------------- the credit demo (the one interactive moment) ---------------- */
+var demo = document.getElementById('demo'), demoBtn = document.getElementById('demo-btn'), demoReset = document.getElementById('demo-reset');
+var demoState = document.getElementById('demo-state'), demoPaid = document.getElementById('demo-paid');
+var demoP = 2/3, demoDone = false, demoRaf = null;
+function demoApply(){
+  demo.style.setProperty('--cp', (1 - demoP).toFixed(4));
+  demo.style.setProperty('--g3', clamp((demoP - 0.96) / 0.04, 0, 1).toFixed(3));
+  demoPaid.setAttribute('data-amount', String(Math.round(18000 * demoP / 500) * 500));
+  demoPaid.textContent = fmtNum(+demoPaid.getAttribute('data-amount'), true);
+}
+function demoRender(){
+  demoApply();
+  if (demoDone) demoState.innerHTML = '<span class="ok">' + t('credit.done') + '</span>';
+  else demoState.innerHTML = '<span>' + t('credit.left') + '</span>';
+  demoBtn.hidden = demoDone; demoReset.hidden = !demoDone;
+}
+demoBtn.addEventListener('click', function(){
+  if (demoDone || demoRaf) return;
+  demo.classList.add('used');
+  if (reduce.matches) { demoP = 1; demoDone = true; demoRender(); demoReset.focus(); return; }
+  var from = demoP, t0 = performance.now(), dur = 1500;
+  (function step(now){
+    var x = clamp((now - t0) / dur, 0, 1);
+    var e = x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
+    demoP = from + (1 - from) * e; demoApply();
+    if (x < 1) demoRaf = requestAnimationFrame(step);
+    else { demoRaf = null; demoDone = true; demoRender(); demoReset.focus(); }
+  })(t0);
+});
+demoReset.addEventListener('click', function(){ demoP = 2/3; demoDone = false; demoRender(); demoBtn.focus(); });
+
+/* ---------------- FAQ: one open at a time ---------------- */
+var faqs = [].slice.call(document.querySelectorAll('#faq-list details'));
+faqs.forEach(function(d){ d.addEventListener('toggle', function(){ if (d.open) faqs.forEach(function(o){ if (o !== d) o.open = false; }); }); });
+/* Links to an answer open it. Delegated: translated text is re-rendered
+   with innerHTML, so a listener bound to the first link would be lost. */
+function openAnswer(id){ var d = document.getElementById(id); if (d && d.tagName === 'DETAILS') d.open = true; }
+document.addEventListener('click', function(e){
+  var a = e.target.closest ? e.target.closest('[data-faq], a[href^="#q-"]') : null;
+  if (a) openAnswer(a.getAttribute('data-faq') || a.getAttribute('href').slice(1));
+});
+function openFromHash(){ if (location.hash.indexOf('#q-') === 0) openAnswer(location.hash.slice(1)); }
+addEventListener('hashchange', openFromHash);
+openFromHash();
+
+/* ---------------- reduced motion, live, both directions ---------------- */
+function pinToFinalStates(){ spine.style.setProperty('--sp', 0); [].forEach.call(document.querySelectorAll('.reveal, .seam'), function(el){ el.classList.add('in','done'); }); }
+function unpinFinalStates(){ spine.style.removeProperty('--sp'); spineVal = -1; onSpine(); }
+reduce.addEventListener('change', function(e){ if (e.matches) pinToFinalStates(); else { unpinFinalStates(); } applyHeroMode(); });
+MQLS.forEach(function(m){ m.addEventListener('change', applyHeroMode); });
+
+/* ---------------- pause loops on hidden tabs ---------------- */
+document.addEventListener('visibilitychange', function(){ document.body.classList.toggle('paused', document.hidden); });
+
+/* ---------------- boot ---------------- */
+var saved = null; try { saved = localStorage.getItem('wishop-lang'); } catch(e){}
+var nav0 = (navigator.language || 'fr').slice(0,2).toLowerCase();
+var path0 = (location.pathname.match(/^\/(fr|en|es)(\/|$)/) || [])[1];
+applyLang(path0 || saved || (LANGS.indexOf(nav0) >= 0 ? nav0 : 'fr'), false);
+[].forEach.call(document.querySelectorAll('.lang button'), function(b){ b.addEventListener('click', function(){ applyLang(b.getAttribute('data-lang'), true); }); });
+if (reduce.matches) pinToFinalStates();
+applyHeroMode();
+layoutFils();
+onNav(); onSpine();
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(layoutFils);
+})();
+</script>
+</body>
+</html>

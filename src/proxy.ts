@@ -71,8 +71,11 @@ export async function proxy(request: NextRequest) {
   // The home page for a visitor without a session is the WISHOP site
   // (static, public/landing). The first home page, built into the app, was
   // removed: typing the bare address used to show it instead.
+  // One copy per language (scripts/landing-locales.mjs): same page, but the
+  // <head> read by WhatsApp and Facebook link previews is in the visitor's
+  // language — Spanish for the bare address, which link robots open.
   if (!user && isLandingPage) {
-    return withSession(NextResponse.rewrite(new URL('/landing/index.html', request.url)))
+    return withSession(NextResponse.rewrite(new URL(`/landing/${locale}.html`, request.url)))
   }
 
   if (!user && !isAuthPage && !isPublicPage) {
