@@ -773,7 +773,10 @@
     "purchase_order_not_deletable": "Only a draft or cancelled order can be deleted.",
     "admin_invalid": "Check the plan, duration, amount and payment method.",
     "email_confirmed": "Address confirmed. Sign in to open your shop.",
-    "confirmation_link_invalid": "This confirmation link has expired or was already used. Try signing in; otherwise, sign up again."
+    "confirmation_link_invalid": "This confirmation link has expired or was already used. Try signing in; otherwise, sign up again.",
+    "shop_has_payments": "This shop has already paid: it cannot be deleted, only suspended.",
+    "shop_has_admin": "This shop contains a WISHOP admin account: it cannot be deleted.",
+    "delete_name_mismatch": "The name typed does not match the shop’s name."
   },
   "Suppliers": {
     "title": "Suppliers",
@@ -976,7 +979,15 @@
     "report_status_NEW": "New",
     "report_status_REVIEWED": "Reviewed",
     "report_status_REMOVED": "Content removed",
-    "report_status_DISMISSED": "Dismissed"
+    "report_status_DISMISSED": "Dismissed",
+    "delete_section": "Delete the shop",
+    "delete_hint": "For a test or fictitious shop: everything is permanently erased (accounts, items, sales, clients, photos). This cannot be undone.",
+    "delete_blocked_paid": "This shop has already paid: its history must be kept. Suspend it if needed.",
+    "delete_type_name": "Type “{name}” to confirm",
+    "delete_button": "Delete permanently",
+    "delete_confirm_title": "Delete {name}?",
+    "delete_confirm_body": "All the shop’s data and {count, plural, =0 {no account} one {its account} other {its # accounts}} will be erased. This is permanent.",
+    "deleted": "Shop deleted."
   },
   "Suspension": {
     "title": "Your account is suspended",

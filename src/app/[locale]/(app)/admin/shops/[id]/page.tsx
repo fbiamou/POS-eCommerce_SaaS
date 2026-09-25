@@ -8,6 +8,7 @@ import { effectivePlan } from "@/features/billing/plans";
 import { PLAN_BADGE_CLASS, countryName } from "@/features/admin/components/planStyle";
 import { PlanActions } from "@/features/admin/components/PlanActions";
 import { SuspendShop } from "@/features/admin/components/SuspendShop";
+import { DeleteShop } from "@/features/admin/components/DeleteShop";
 
 export async function generateMetadata() {
   const t = await getTranslations("Admin");
@@ -29,6 +30,7 @@ export default async function AdminShopPage({ params }: { params: Promise<{ id: 
   if (!shop) notFound();
 
   const plan = effectivePlan(shop, new Date());
+  const hasPayments = events.some((event) => event.kind === "PAYMENT");
   const expired = shop.plan !== "STANDARD" && plan === "STANDARD";
 
   const describe = (event: SubscriptionEvent) => {
@@ -139,6 +141,16 @@ export default async function AdminShopPage({ params }: { params: Promise<{ id: 
           </p>
         </div>
         <SuspendShop shopId={shop.shop_id} suspended={Boolean(shop.suspended_at)} />
+      </section>
+
+      <section aria-labelledby="admin-delete" className="flex flex-col gap-3 rounded-2xl bg-[var(--surface-1)] p-5 shadow-card ring-1 ring-red-200 dark:ring-red-900/40 sm:p-6">
+        <div>
+          <h2 id="admin-delete" className="text-lg font-bold text-red-700 dark:text-red-400">{t("delete_section")}</h2>
+          <p className="mt-1 text-[14px] text-zinc-500">{hasPayments ? t("delete_blocked_paid") : t("delete_hint")}</p>
+        </div>
+        {!hasPayments && (
+          <DeleteShop shopId={shop.shop_id} shopName={shop.shop_name || t("unnamed_shop")} memberCount={shop.member_count} />
+        )}
       </section>
 
       <section aria-labelledby="admin-history" className="flex flex-col gap-3">

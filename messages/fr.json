@@ -773,7 +773,10 @@
     "purchase_order_not_deletable": "Seul un bon en brouillon ou annulé peut être supprimé.",
     "admin_invalid": "Vérifiez la formule, la durée, le montant et le moyen de paiement.",
     "email_confirmed": "Adresse confirmée. Connectez-vous pour ouvrir votre boutique.",
-    "confirmation_link_invalid": "Ce lien de confirmation a expiré ou a déjà servi. Essayez de vous connecter ; sinon, inscrivez-vous à nouveau."
+    "confirmation_link_invalid": "Ce lien de confirmation a expiré ou a déjà servi. Essayez de vous connecter ; sinon, inscrivez-vous à nouveau.",
+    "shop_has_payments": "Cette boutique a déjà payé : elle ne peut pas être supprimée, seulement suspendue.",
+    "shop_has_admin": "Cette boutique contient un compte administrateur WISHOP : elle ne peut pas être supprimée.",
+    "delete_name_mismatch": "Le nom tapé ne correspond pas à celui de la boutique."
   },
   "Suppliers": {
     "title": "Fournisseurs",
@@ -976,7 +979,15 @@
     "report_status_NEW": "Nouveau",
     "report_status_REVIEWED": "Examiné",
     "report_status_REMOVED": "Contenu retiré",
-    "report_status_DISMISSED": "Sans suite"
+    "report_status_DISMISSED": "Sans suite",
+    "delete_section": "Supprimer la boutique",
+    "delete_hint": "Pour une boutique de test ou fictive : tout est effacé définitivement (comptes, articles, ventes, clients, photos). Impossible à annuler.",
+    "delete_blocked_paid": "Cette boutique a déjà payé : son historique doit être conservé. Suspendez-la si nécessaire.",
+    "delete_type_name": "Tapez « {name} » pour confirmer",
+    "delete_button": "Supprimer définitivement",
+    "delete_confirm_title": "Supprimer {name} ?",
+    "delete_confirm_body": "Toutes les données de la boutique et {count, plural, =0 {aucun compte} one {son compte} other {ses # comptes}} seront effacés. C'est définitif.",
+    "deleted": "Boutique supprimée."
   },
   "Suspension": {
     "title": "Votre compte est suspendu",

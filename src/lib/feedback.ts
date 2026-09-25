@@ -85,6 +85,9 @@ export const FEEDBACK_CODES = [
   "purchase_order_not_deletable",
   // Platform admin console
   "admin_invalid",
+  "shop_has_payments",
+  "shop_has_admin",
+  "delete_name_mismatch",
   // Loyalty
   "loyalty_reward_unavailable",
   "loyalty_invalid",

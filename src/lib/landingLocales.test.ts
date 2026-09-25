@@ -3,9 +3,11 @@ import { buildLocaleHtml, landingCopy, landingSource, LANDING_HEADS } from "../.
 
 describe("home page copies per language", () => {
   it("are up to date with public/landing/index.html (run: node scripts/landing-locales.mjs)", () => {
+    // Line endings aside: Git may store LF and check out CRLF on Windows.
+    const lf = (text: string) => text.replace(/\r\n/g, "\n");
     const source = landingSource();
     for (const locale of Object.keys(LANDING_HEADS)) {
-      expect(landingCopy(locale), `${locale}.html`).toBe(buildLocaleHtml(source, locale));
+      expect(lf(landingCopy(locale)), `${locale}.html`).toBe(lf(buildLocaleHtml(source, locale)));
     }
   });
 

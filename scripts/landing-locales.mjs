@@ -55,6 +55,8 @@ function replaceOnce(html, pattern, replacement) {
 
 export function buildLocaleHtml(html, locale) {
   const head = LANDING_HEADS[locale];
+  // Keep the page's own line endings (Git checks files out as CRLF on Windows).
+  const eol = html.includes("\r\n") ? "\r\n" : "\n";
   let out = html;
   out = replaceOnce(out, /<html lang="[a-z]+">/, `<html lang="${head.lang}">`);
   out = replaceOnce(out, /<title>[^<]*<\/title>/, `<title>${head.title}</title>`);
@@ -63,7 +65,7 @@ export function buildLocaleHtml(html, locale) {
   out = replaceOnce(
     out,
     /<meta property="og:description" content="[^"]*">/,
-    `<meta property="og:description" content="${escapeAttr(head.preview)}">\n<meta property="og:locale" content="${head.ogLocale}">`,
+    `<meta property="og:description" content="${escapeAttr(head.preview)}">${eol}<meta property="og:locale" content="${head.ogLocale}">`,
   );
   out = replaceOnce(out, /<meta property="og:url" content="[^"]*">/, `<meta property="og:url" content="${head.url}">`);
   return out;

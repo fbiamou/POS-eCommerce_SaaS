@@ -4,6 +4,8 @@ import { revalidatePath } from "next/cache";
 import { createClient } from "@/utils/supabase/server";
 import { feedbackFromError, type FeedbackCode } from "@/lib/feedback";
 import { MAX_MONTHS, isPaidPlan, isPaymentMethod } from "@/features/billing/plans";
+import { createServiceRoleClient } from "@/utils/supabase/service";
+import { isPlatformAdmin, listShops } from "./queries";
 
 // Platform admin actions. The database functions check is_platform_admin()
 // themselves; the checks here only avoid a pointless round-trip.
@@ -86,5 +88,49 @@ export async function setReportStatus(reportId: string, status: string): Promise
   }
   revalidatePath("/admin");
   revalidatePath("/admin/reports");
+  return { success: true };
+}
+
+// Permanently deletes a shop that has never paid (test or fictitious shops),
+// after its name has been typed to confirm. The database function erases the
+// data and refuses a shop with a payment or a platform admin; the service
+// role then removes its files and its sign-in accounts.
+export async function deleteShop(shopId: string, typedName: string): Promise<Result> {
+  if (!(await isPlatformAdmin())) return { error: "access_denied" };
+  const shop = (await listShops()).find((s) => s.shop_id === shopId);
+  if (!shop) return { error: "shop_not_found" };
+  if (typedName.trim().toLocaleLowerCase() !== (shop.shop_name ?? "").trim().toLocaleLowerCase()) {
+    return { error: "delete_name_mismatch" };
+  }
+
+  const supabase = await createClient();
+  const { data, error } = await supabase.rpc("admin_delete_shop", { _shop_id: shopId });
+  if (error) {
+    console.error("admin_delete_shop failed:", error);
+    return { error: feedbackFromError(error) };
+  }
+  const leftovers = (data ?? {}) as { members?: string[]; shipment_photos?: string[] };
+
+  // The data is gone: what follows only cleans up. A failure is logged and
+  // does not undo the deletion.
+  const service = createServiceRoleClient();
+  for (const bucket of ["shop-assets", "product-images"]) {
+    const { data: files } = await service.storage.from(bucket).list(shopId, { limit: 1000 });
+    const paths = (files ?? []).map((file) => `${shopId}/${file.name}`);
+    if (paths.length > 0) {
+      const { error: removeError } = await service.storage.from(bucket).remove(paths);
+      if (removeError) console.error(`deleteShop: ${bucket} cleanup failed:`, removeError);
+    }
+  }
+  if (leftovers.shipment_photos?.length) {
+    const { error: removeError } = await service.storage.from("shipment-photos").remove(leftovers.shipment_photos);
+    if (removeError) console.error("deleteShop: shipment-photos cleanup failed:", removeError);
+  }
+  for (const userId of leftovers.members ?? []) {
+    const { error: userError } = await service.auth.admin.deleteUser(userId);
+    if (userError) console.error(`deleteShop: sign-in account ${userId} not deleted:`, userError);
+  }
+
+  revalidatePath("/admin");
   return { success: true };
 }
