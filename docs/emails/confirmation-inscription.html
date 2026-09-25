@@ -1,0 +1,36 @@
+<!--
+  E-mail « Confirm signup » de Supabase, dans la langue de l'inscription.
+  À coller dans Supabase : Authentication > Emails > Templates > Confirm signup
+  (champ « Message body »). L'application enregistre la langue de la page
+  d'inscription dans les données de l'utilisatrice ({{ .Data.locale }} :
+  es, fr ou en) ; sans langue, l'e-mail est en espagnol (marché prioritaire).
+
+  Objet (champ « Subject ») à coller :
+  {{ if eq .Data.locale "fr" }}Confirmez votre boutique WISHOP{{ else if eq .Data.locale "en" }}Confirm your WISHOP shop{{ else }}Confirma tu tienda WISHOP{{ end }}
+-->
+<div style="margin:0;padding:24px 12px;background:#F2F3F8;font-family:Arial,Helvetica,sans-serif;color:#141C45;">
+  <div style="max-width:520px;margin:0 auto;background:#FBFBFE;border-radius:16px;overflow:hidden;border:1px solid #D7DBEA;">
+    <div style="background:#141C45;padding:20px 24px;">
+      <span style="color:#FFFFFF;font-size:20px;font-weight:800;letter-spacing:-0.3px;">WISHOP</span>
+      <span style="display:inline-block;width:8px;height:8px;background:#F4B63F;transform:rotate(45deg);margin-left:6px;"></span>
+    </div>
+    <div style="padding:28px 24px;">
+      {{ if eq .Data.locale "fr" }}
+      <h1 style="margin:0 0 12px;font-size:22px;">Bienvenue sur WISHOP</h1>
+      <p style="margin:0 0 20px;font-size:15px;line-height:1.5;color:#4F5780;">Votre boutique est créée. Il reste une étape : confirmer votre adresse e-mail.</p>
+      <a href="{{ .ConfirmationURL }}" style="display:inline-block;background:#2B44A0;color:#FFFFFF;text-decoration:none;font-weight:700;font-size:15px;padding:14px 22px;border-radius:12px;">Confirmer et ouvrir ma boutique</a>
+      <p style="margin:20px 0 0;font-size:13px;line-height:1.5;color:#6D77A6;">Si vous n'avez pas créé de boutique sur WISHOP, ignorez cet e-mail.</p>
+      {{ else if eq .Data.locale "en" }}
+      <h1 style="margin:0 0 12px;font-size:22px;">Welcome to WISHOP</h1>
+      <p style="margin:0 0 20px;font-size:15px;line-height:1.5;color:#4F5780;">Your shop is created. One step left: confirm your email address.</p>
+      <a href="{{ .ConfirmationURL }}" style="display:inline-block;background:#2B44A0;color:#FFFFFF;text-decoration:none;font-weight:700;font-size:15px;padding:14px 22px;border-radius:12px;">Confirm and open my shop</a>
+      <p style="margin:20px 0 0;font-size:13px;line-height:1.5;color:#6D77A6;">If you did not create a shop on WISHOP, you can ignore this email.</p>
+      {{ else }}
+      <h1 style="margin:0 0 12px;font-size:22px;">Te damos la bienvenida a WISHOP</h1>
+      <p style="margin:0 0 20px;font-size:15px;line-height:1.5;color:#4F5780;">Tu tienda está creada. Queda un paso: confirmar tu correo electrónico.</p>
+      <a href="{{ .ConfirmationURL }}" style="display:inline-block;background:#2B44A0;color:#FFFFFF;text-decoration:none;font-weight:700;font-size:15px;padding:14px 22px;border-radius:12px;">Confirmar y abrir mi tienda</a>
+      <p style="margin:20px 0 0;font-size:13px;line-height:1.5;color:#6D77A6;">Si no creaste una tienda en WISHOP, ignora este correo.</p>
+      {{ end }}
+    </div>
+  </div>
+</div>
