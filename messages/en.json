@@ -817,7 +817,8 @@
     "device_sequence_missing": "The sale number is missing. Try again.",
     "device_sequence_conflict": "This sale number already exists for this till. The sale was not recorded twice.",
     "device_not_ready": "This device is not registered as a till yet. Connect it to the internet once.",
-    "needs_connection": "This action needs the internet. Try again when the connection is back."
+    "needs_connection": "This action needs the internet. Try again when the connection is back.",
+    "pin_invalid": "The code must have exactly 4 digits."
   },
   "Suppliers": {
     "title": "Suppliers",
@@ -1210,5 +1211,25 @@
     "not_on_device": "This invoice is not on this device yet. It will appear at the next update.",
     "loading": "Loading the device's data…",
     "stock_to_check": "Stock to check"
+  },
+  "Cashier": {
+    "selling_as": "Selling as",
+    "switch": "Switch",
+    "no_name": "No name",
+    "title": "Who is selling?",
+    "intro": "Choose your name, then type your 4-digit code. Sales made on this device will be in your name, even offline.",
+    "code_of": "{name}'s code",
+    "wrong_pin": "Wrong code.",
+    "no_pin": "No code",
+    "no_pin_hint": "The owner sets the codes in Settings › Team.",
+    "no_members": "The team is not on this device yet: it needs the internet once.",
+    "back": "Back",
+    "delete": "Delete",
+    "pin_button": "Till code",
+    "pin_set": "Till code set",
+    "pin_title": "{name}'s till code",
+    "pin_intro": "4 digits, to take the till on a shared device, even offline. Sales are then recorded in this name.",
+    "pin_save": "Save",
+    "pin_remove": "Remove the code"
   }
 }

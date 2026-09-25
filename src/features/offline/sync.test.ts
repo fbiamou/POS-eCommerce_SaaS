@@ -26,6 +26,7 @@ function fakeBackend(overrides: Partial<SyncBackend> = {}) {
     pullClients: async (s) => (since.clients.push(s), { ok: true, data: [] }),
     pullInvoices: async (s) => (since.invoices.push(s), { ok: true, data: [] }),
     pullShop: async () => ({ ok: true, data: null }),
+    pullMembers: async () => ({ ok: true, data: [] }),
     ...overrides,
   };
   return { backend, calls, since };

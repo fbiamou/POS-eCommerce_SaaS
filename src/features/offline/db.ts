@@ -29,6 +29,16 @@ export type LocalProduct = {
   is_active: boolean;
 };
 
+/** A team member, for choosing who sells on a shared device (till code). */
+export type LocalMember = {
+  id: string;
+  full_name: string | null;
+  role: "MANAGER" | "SELLER";
+  is_active: boolean;
+  pin_salt: string | null;
+  pin_hash: string | null;
+};
+
 export type LocalClient = {
   id: string;
   name: string;
@@ -135,6 +145,7 @@ export class ShopDatabase extends Dexie {
   payments!: EntityTable<LocalPayment, "id">;
   outbox!: EntityTable<OutboxEntry, "seq">;
   meta!: EntityTable<MetaEntry, "key">;
+  members!: EntityTable<LocalMember, "id">;
 
   constructor(name: string) {
     super(name);
@@ -147,6 +158,8 @@ export class ShopDatabase extends Dexie {
       outbox: "++seq, ref_id, state",
       meta: "key",
     });
+    // Till codes: the team, to check a code without internet.
+    this.version(2).stores({ members: "id" });
   }
 }
 

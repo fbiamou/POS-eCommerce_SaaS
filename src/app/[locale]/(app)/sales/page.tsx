@@ -6,6 +6,7 @@ import { getTranslations } from "next-intl/server";
 import { createClient } from "@/utils/supabase/server";
 import { getShopSettings } from "@/features/settings/queries";
 import { loyaltyCard, type LoyaltyInvoice } from "@/features/clients/loyalty";
+import { CashierSwitcher } from "@/features/offline/components/CashierSwitcher";
 
 export async function generateMetadata() {
   const t = await getTranslations("Sales");
@@ -71,8 +72,9 @@ export default async function SalesPage() {
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-2xl font-bold tracking-tight">{t("title")}</h1>
+        <CashierSwitcher />
       </div>
 
       <CreateSaleForm

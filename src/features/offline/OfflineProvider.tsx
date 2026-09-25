@@ -10,6 +10,7 @@ import { registerDevice, supabaseBackend } from "./backend";
 import { outboxCounts } from "./records";
 import { syncNow, type SyncBackend } from "./sync";
 import { registerServiceWorker, warmOfflinePages } from "./serviceWorker";
+import { readCashier, writeCashier, type Cashier } from "./pin";
 
 // Runs the offline mode for every page of the app: keeps this device's copy
 // of the shop up to date, sends what was done without internet as soon as
@@ -36,6 +37,9 @@ export type OfflineContextValue = {
   userId: string;
   /** Printed on the ticket of a sale made on this device. */
   userName: string | null;
+  /** Who is selling on this device: the account, or a colleague who typed their till code. */
+  cashier: Cashier;
+  setCashier: (cashier: Cashier) => void;
   db: ShopDatabase;
   status: OfflineStatus;
   /** Background exchanges (long timeout) and till exchanges (short timeout). */
@@ -69,6 +73,10 @@ export function OfflineProvider({
   const [browserOnline, setBrowserOnline] = useState(true);
   const [serverReachable, setServerReachable] = useState(true);
   const [syncing, setSyncing] = useState(false);
+  // The person selling survives a reload of the page, not a change of account.
+  const [cashierOverride, setCashierOverride] = useState<Cashier | null>(() =>
+    typeof window === "undefined" ? null : readCashier(window.localStorage, shopId, userId)
+  );
   const running = useRef(false);
   const again = useRef(false);
   const fullDone = useRef(false);
@@ -119,6 +127,15 @@ export function OfflineProvider({
     }
   }, [db, backend, shopId, ensureDevice, locale]);
 
+  const cashier: Cashier = useMemo(() => cashierOverride ?? { id: userId, name: userName }, [cashierOverride, userId, userName]);
+  const setCashier = useCallback(
+    (next: Cashier) => {
+      writeCashier(window.localStorage, shopId, userId, next);
+      setCashierOverride(next.id === userId ? null : next);
+    },
+    [shopId, userId]
+  );
+
   useEffect(() => {
     const update = () => {
       setBrowserOnline(navigator.onLine);
@@ -148,6 +165,8 @@ export function OfflineProvider({
       shopId,
       userId,
       userName,
+      cashier,
+      setCashier,
       db,
       backend,
       tillBackend,
@@ -162,7 +181,7 @@ export function OfflineProvider({
       requestSync: () => void runSync(),
       markOffline: () => setServerReachable(false),
     }),
-    [shopId, userId, userName, db, backend, tillBackend, browserOnline, serverReachable, syncing, counts.pending, counts.failed, lastPullAt, runSync]
+    [shopId, userId, userName, cashier, setCashier, db, backend, tillBackend, browserOnline, serverReachable, syncing, counts.pending, counts.failed, lastPullAt, runSync]
   );
 
   return <OfflineContext.Provider value={value}>{children}</OfflineContext.Provider>;

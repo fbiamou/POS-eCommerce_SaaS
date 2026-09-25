@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { UserCircle, Ban, RotateCcw, KeyRound, Copy, ShieldCheck } from "lucide-react";
+import { UserCircle, Ban, RotateCcw, KeyRound, Copy, ShieldCheck, Hash } from "lucide-react";
 import { useTranslations } from "next-intl";
 import type { FeedbackCode } from "@/lib/feedback";
 import {
@@ -10,7 +10,9 @@ import {
   updateTeamMemberRole,
   updateTeamMemberAllowedPages,
   resetTeamMemberPassword,
+  setTeamMemberPin,
 } from "../actions";
+import { Modal } from "@/components/ui/Modal";
 import type { Profile } from "@/features/auth/actions";
 import { APP_PAGES, type AppPageKey } from "@/lib/appPages";
 import { Select } from "@/components/ui/Select";
@@ -44,6 +46,42 @@ export function TeamMemberRow({
   const [revealedPassword, setRevealedPassword] = useState<string | null>(null);
   const [confirmReset, setConfirmReset] = useState(false);
   const [showAccess, setShowAccess] = useState(false);
+  const tCashier = useTranslations("Cashier");
+  const [pinOpen, setPinOpen] = useState(false);
+  const [pin, setPin] = useState("");
+  const [pinError, setPinError] = useState<FeedbackCode | null>(null);
+
+  const savePin = (value: string | null) => {
+    setPinError(null);
+    startTransition(async () => {
+      const result = await setTeamMemberPin(member.id, value);
+      if (result.error) {
+        setPinError(result.error);
+        return;
+      }
+      setPinOpen(false);
+      setPin("");
+    });
+  };
+
+  const pinButton = (
+    <button
+      type="button"
+      onClick={() => {
+        setPin("");
+        setPinError(null);
+        setPinOpen(true);
+      }}
+      disabled={isPending}
+      title={tCashier("pin_button")}
+      className={`rounded-md p-1.5 hover:bg-zinc-100 dark:hover:bg-zinc-800 disabled:opacity-50 ${
+        member.has_pin ? "text-emerald-600 dark:text-emerald-400" : "text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200"
+      }`}
+    >
+      <Hash className="h-4 w-4" />
+      <span className="sr-only">{member.has_pin ? tCashier("pin_set") : tCashier("pin_button")}</span>
+    </button>
+  );
   const [selectedPages, setSelectedPages] = useState<Set<AppPageKey>>(
     new Set((member.allowed_pages ?? []) as AppPageKey[])
   );
@@ -116,11 +154,14 @@ export function TeamMemberRow({
         </div>
 
         {isSelf ? (
-          <span
-            className={`inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-full ${ROLE_STYLES[member.role]}`}
-          >
-            {roleLabels[member.role]}
-          </span>
+          <>
+            <span
+              className={`inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-full ${ROLE_STYLES[member.role]}`}
+            >
+              {roleLabels[member.role]}
+            </span>
+            {pinButton}
+          </>
         ) : (
           <>
             <Select
@@ -146,6 +187,8 @@ export function TeamMemberRow({
                 <ShieldCheck className="h-4 w-4" />
               </button>
             )}
+
+            {pinButton}
 
             <button
               type="button"
@@ -235,6 +278,43 @@ export function TeamMemberRow({
           </button>
         </div>
       )}
+
+      <Modal isOpen={pinOpen} onClose={() => setPinOpen(false)} title={tCashier("pin_title", { name: member.full_name || t("no_name") })}>
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            savePin(pin);
+          }}
+          className="flex flex-col gap-4 text-[14px]"
+        >
+          <p className="text-zinc-600 dark:text-zinc-300">{tCashier("pin_intro")}</p>
+          <input
+            type="password"
+            inputMode="numeric"
+            autoComplete="off"
+            pattern="[0-9]{4}"
+            maxLength={4}
+            required
+            value={pin}
+            onChange={(e) => setPin(e.target.value.replace(/\D/g, "").slice(0, 4))}
+            aria-label={tCashier("pin_button")}
+            className="rounded-xl border border-zinc-200 bg-[var(--surface-1)] px-4 py-3 text-center font-mono text-2xl tracking-[0.5em] dark:border-[var(--line)]"
+          />
+          {pinError && <p className="text-sm font-medium text-red-600">{tFeedback(pinError)}</p>}
+          <div className="flex flex-wrap justify-between gap-2">
+            {member.has_pin ? (
+              <button type="button" onClick={() => savePin(null)} disabled={isPending} className="rounded-xl px-3 py-2.5 text-[13px] font-semibold text-red-600 hover:bg-red-50 disabled:opacity-50 dark:hover:bg-red-900/20">
+                {tCashier("pin_remove")}
+              </button>
+            ) : (
+              <span />
+            )}
+            <button type="submit" disabled={isPending || pin.length !== 4} className="rounded-xl bg-violet-600 px-5 py-2.5 text-[14px] font-bold text-white hover:bg-violet-700 disabled:opacity-50">
+              {tCashier("pin_save")}
+            </button>
+          </div>
+        </form>
+      </Modal>
 
       <ConfirmDialog
         isOpen={confirmReset}

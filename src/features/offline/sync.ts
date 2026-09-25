@@ -6,6 +6,7 @@ import {
   type LocalClient,
   type LocalInvoice,
   type LocalInvoiceItem,
+  type LocalMember,
   type LocalPayment,
   type LocalProduct,
   type OutboxEntry,
@@ -59,6 +60,8 @@ export interface SyncBackend {
   pullClients(since: string | null): Promise<Outcome<(LocalClient & { updated_at: string })[]>>;
   pullInvoices(since: string | null): Promise<Outcome<ServerInvoice[]>>;
   pullShop(): Promise<Outcome<ShopSnapshot | null>>;
+  /** The whole team (a few rows): names and till code fingerprints. */
+  pullMembers(): Promise<Outcome<LocalMember[]>>;
 }
 
 export type PushResult = { sent: number; failed: number; offline: boolean };
@@ -180,21 +183,25 @@ export async function pullChanges(db: ShopDatabase, backend: SyncBackend, option
     invoices: (await getMeta<string>(db, CURSOR.invoices)) ?? null,
   };
 
-  const [shop, products, clients, invoices] = await Promise.all([
+  const [shop, products, clients, invoices, members] = await Promise.all([
     backend.pullShop(),
     backend.pullProducts(cursors.products),
     backend.pullClients(cursors.clients),
     backend.pullInvoices(cursors.invoices),
+    backend.pullMembers(),
   ]);
-  for (const outcome of [shop, products, clients, invoices]) {
+  for (const outcome of [shop, products, clients, invoices, members]) {
     if (!outcome.ok) return { ok: false, network: outcome.network };
   }
-  if (!shop.ok || !products.ok || !clients.ok || !invoices.ok) return { ok: false, network: true };
+  if (!shop.ok || !products.ok || !clients.ok || !invoices.ok || !members.ok) return { ok: false, network: true };
 
-  await db.transaction("rw", [db.meta, db.products, db.clients, db.invoices, db.invoice_items, db.payments, db.outbox], async () => {
+  await db.transaction("rw", [db.meta, db.products, db.clients, db.invoices, db.invoice_items, db.payments, db.outbox, db.members], async () => {
     const overlay = await pendingOverlay(db);
 
     if (shop.data) await setMeta(db, "shop", shop.data);
+    // The team is small: replaced as a whole, so a removed code disappears.
+    await db.members.clear();
+    await db.members.bulkPut(members.data);
 
     await db.products.bulkPut(
       products.data.map((row) => ({

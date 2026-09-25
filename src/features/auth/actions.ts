@@ -12,6 +12,8 @@ export type Profile = {
   is_active: boolean
   allowed_pages: string[]
   created_at: string
+  /** A till code is set (team page only; the code itself never leaves the database). */
+  has_pin?: boolean
 }
 
 /**
@@ -40,7 +42,7 @@ export async function getTeamMembers(): Promise<Profile[]> {
 
   const { data, error } = await supabase
     .from('profiles')
-    .select('id, full_name, role, shop_id, is_active, allowed_pages, created_at')
+    .select('id, full_name, role, shop_id, is_active, allowed_pages, created_at, pin_hash')
     .order('role', { ascending: true })
 
   if (error) {
@@ -48,5 +50,5 @@ export async function getTeamMembers(): Promise<Profile[]> {
     return []
   }
 
-  return data || []
+  return (data || []).map(({ pin_hash, ...member }) => ({ ...member, has_pin: Boolean(pin_hash) }))
 }

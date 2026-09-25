@@ -817,7 +817,8 @@
     "device_sequence_missing": "Numéro de vente manquant. Réessayez.",
     "device_sequence_conflict": "Ce numéro de vente existe déjà pour cette caisse. La vente n'a pas été enregistrée deux fois.",
     "device_not_ready": "Cet appareil n'est pas encore enregistré comme caisse. Connectez-le une fois à internet.",
-    "needs_connection": "Cette action demande internet. Réessayez quand la connexion revient."
+    "needs_connection": "Cette action demande internet. Réessayez quand la connexion revient.",
+    "pin_invalid": "Le code doit avoir exactement 4 chiffres."
   },
   "Suppliers": {
     "title": "Fournisseurs",
@@ -1210,5 +1211,25 @@
     "not_on_device": "Cette facture n'est pas encore sur cet appareil. Elle apparaîtra à la prochaine mise à jour.",
     "loading": "Chargement des données de l'appareil…",
     "stock_to_check": "Stock à vérifier"
+  },
+  "Cashier": {
+    "selling_as": "Vente au nom de",
+    "switch": "Changer",
+    "no_name": "Sans nom",
+    "title": "Qui vend ?",
+    "intro": "Choisissez votre nom, puis tapez votre code à 4 chiffres. Les ventes faites sur cet appareil seront à votre nom, même sans internet.",
+    "code_of": "Code de {name}",
+    "wrong_pin": "Code incorrect.",
+    "no_pin": "Pas de code",
+    "no_pin_hint": "La propriétaire définit les codes dans Réglages › Équipe.",
+    "no_members": "L'équipe n'est pas encore sur cet appareil : il faut internet une première fois.",
+    "back": "Retour",
+    "delete": "Effacer",
+    "pin_button": "Code de caisse",
+    "pin_set": "Code de caisse défini",
+    "pin_title": "Code de caisse de {name}",
+    "pin_intro": "4 chiffres, pour se mettre à la caisse sur un appareil partagé, même sans internet. Les ventes sont alors enregistrées à ce nom.",
+    "pin_save": "Enregistrer",
+    "pin_remove": "Retirer le code"
   }
 }

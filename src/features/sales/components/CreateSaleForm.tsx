@@ -285,7 +285,7 @@ export default function CreateSaleForm({
         client,
         paidAmount: paidValue,
         loyalty: { use: rewardApplied, percent: loyalty.rewardPercent },
-        sellerName: offline.userName,
+        sellerName: offline.cashier.name,
       });
 
       if (!result.ok) {

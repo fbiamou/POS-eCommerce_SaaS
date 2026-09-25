@@ -86,7 +86,7 @@ export async function sellAtTill(
     seq: taken.seq,
     soldAt: now,
     client,
-    sellerId: ctx.userId,
+    sellerId: ctx.cashier.id,
     sellerName: input.sellerName,
     lines: input.lines,
     paidAmount: input.paidAmount,
@@ -128,7 +128,7 @@ export async function sellAtTill(
 export async function payDebt(ctx: OfflineContextValue, invoiceId: string, amount: number): Promise<ActionResult> {
   const { db } = ctx;
   const invoice = await db.invoices.get(invoiceId);
-  const built = buildLocalPayment({ paymentId: newId(), invoiceId, amount, paidAt: new Date(), recordedBy: ctx.userId });
+  const built = buildLocalPayment({ paymentId: newId(), invoiceId, amount, paidAt: new Date(), recordedBy: ctx.cashier.id });
 
   if (invoice) {
     const problem = paymentProblem(invoice, amount);

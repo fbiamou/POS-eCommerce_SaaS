@@ -1,6 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { feedbackFromError } from "@/lib/feedback";
-import type { LocalClient, LocalInvoiceItem, LocalPayment, LocalProduct } from "./db";
+import type { LocalClient, LocalInvoiceItem, LocalMember, LocalPayment, LocalProduct } from "./db";
 import type { Outcome, ServerInvoice, ShopSnapshot, SyncBackend } from "./sync";
 
 // The sync engine's link to Supabase, from the browser with the signed-in
@@ -141,6 +141,18 @@ export function supabaseBackend(supabase: SupabaseClient, shopId: string, option
           payments: (payments ?? []).map((payment) => ({ ...payment, invoice_id: row.id })),
         })),
       };
+    },
+
+    pullMembers() {
+      return guarded(async () => {
+        const response = await supabase
+          .from("profiles")
+          .select("id, full_name, role, is_active, pin_salt, pin_hash")
+          .order("full_name")
+          .abortSignal(timeout());
+        if (response.error) return refusal(response);
+        return { ok: true, data: (response.data ?? []) as LocalMember[] };
+      });
     },
 
     pullShop() {

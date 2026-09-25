@@ -9,6 +9,7 @@ import { createServiceRoleClient } from '@/utils/supabase/service'
 import { getCurrentProfile } from '@/features/auth/actions'
 import { APP_PAGE_KEYS, type AppPageKey } from '@/lib/appPages'
 import { redirectLocalized } from '@/lib/navigation'
+import { revalidatePath } from 'next/cache'
 import type { FeedbackCode } from '@/lib/feedback'
 
 type ActionResult = { success?: true; error?: FeedbackCode }
@@ -229,6 +230,21 @@ export async function updateTeamMemberAllowedPages(
     return { error: 'access_update_failed' }
   }
 
+  return { success: true }
+}
+
+// Till code (set_member_pin): 4 digits to switch who is selling on a shared
+// device, even offline. null removes the code. The database checks that the
+// caller is the shop's manager, or the member changing their own code.
+export async function setTeamMemberPin(memberId: string, pin: string | null): Promise<ActionResult> {
+  if (pin !== null && !/^[0-9]{4}$/.test(pin)) return { error: 'pin_invalid' }
+  const supabase = await createClient()
+  const { error } = await supabase.rpc('set_member_pin', { _member_id: memberId, _pin: pin })
+  if (error) {
+    console.error('Error setting till code:', error)
+    return { error: error.message === 'pin_invalid' ? 'pin_invalid' : error.message === 'access_denied' ? 'access_denied' : 'update_failed' }
+  }
+  revalidatePath('/settings')
   return { success: true }
 }
 

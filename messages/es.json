@@ -817,7 +817,8 @@
     "device_sequence_missing": "Falta el número de venta. Inténtalo de nuevo.",
     "device_sequence_conflict": "Este número de venta ya existe para esta caja. La venta no se ha registrado dos veces.",
     "device_not_ready": "Este aparato todavía no está registrado como caja. Conéctalo una vez a internet.",
-    "needs_connection": "Esta acción necesita internet. Inténtalo de nuevo cuando vuelva la conexión."
+    "needs_connection": "Esta acción necesita internet. Inténtalo de nuevo cuando vuelva la conexión.",
+    "pin_invalid": "El código debe tener exactamente 4 cifras."
   },
   "Suppliers": {
     "title": "Proveedores",
@@ -1210,5 +1211,25 @@
     "not_on_device": "Esta factura todavía no está en este aparato. Aparecerá en la próxima actualización.",
     "loading": "Cargando los datos del aparato…",
     "stock_to_check": "Stock por revisar"
+  },
+  "Cashier": {
+    "selling_as": "Venta a nombre de",
+    "switch": "Cambiar",
+    "no_name": "Sin nombre",
+    "title": "¿Quién vende?",
+    "intro": "Elige tu nombre y escribe tu código de 4 cifras. Las ventas hechas en este aparato quedarán a tu nombre, incluso sin internet.",
+    "code_of": "Código de {name}",
+    "wrong_pin": "Código incorrecto.",
+    "no_pin": "Sin código",
+    "no_pin_hint": "La propietaria define los códigos en Ajustes › Equipo.",
+    "no_members": "El equipo todavía no está en este aparato: hace falta internet una primera vez.",
+    "back": "Volver",
+    "delete": "Borrar",
+    "pin_button": "Código de caja",
+    "pin_set": "Código de caja definido",
+    "pin_title": "Código de caja de {name}",
+    "pin_intro": "4 cifras, para ponerse en la caja en un aparato compartido, incluso sin internet. Las ventas quedan entonces a este nombre.",
+    "pin_save": "Guardar",
+    "pin_remove": "Quitar el código"
   }
 }

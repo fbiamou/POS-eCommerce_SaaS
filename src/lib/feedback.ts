@@ -113,6 +113,8 @@ export const FEEDBACK_CODES = [
   "device_sequence_conflict",
   "device_not_ready",
   "needs_connection",
+  // Till codes (set_member_pin)
+  "pin_invalid",
 ] as const;
 
 export type FeedbackCode = (typeof FEEDBACK_CODES)[number];
