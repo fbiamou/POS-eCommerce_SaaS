@@ -240,7 +240,7 @@ Les textes anglais et espagnols sont à faire relire par une personne de langue 
 | « Nous vous préviendrons avant tout changement » | **Promesse en votre nom** | Vous, avant la mise en ligne |
 | Témoignages, nombre de boutiques, chiffres d'usage | **Volontairement absents** : aucun n'existe | À ajouter quand ils existeront |
 | Nom WISHOP | À vérifier : déjà utilisé hors d'Afrique centrale | Recherche d'antériorité OAPI avant la mise en ligne publique |
-| Adresse de l'application derrière « Créer ma boutique » | Actuelle : pos-e-commerce-saa-s.vercel.app | À changer si l'app passe sur un domaine WISHOP |
+| Adresse de l'application derrière « Créer ma boutique » | Actuelle : wishop-saa-s.vercel.app (depuis le 25/09/2026, l'ancienne pos-e-commerce-saa-s.vercel.app redirige) | À changer si l'app passe sur un domaine WISHOP |
 | Données de la démo (Mireille, montants) | Exemple, affiché comme tel | Fait |
 | Produits montrés dans le héros | Images générées, génériques, sans marque ni logo (vérifié au zoom) | Fait |
 
