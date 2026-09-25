@@ -41,6 +41,8 @@ export type InvoiceDetail = {
   paid_amount: number;
   status: "PAID" | "PARTIAL" | "UNPAID";
   created_at: string;
+  /** Loyalty reward taken off the sum of the lines (0 when none). */
+  discount_amount: number;
   client: { name: string; phone: string | null } | null;
   items: {
     id: string;
@@ -59,7 +61,7 @@ export async function getInvoiceDetail(id: string): Promise<InvoiceDetail | null
     .from("invoices")
     .select(
       `
-      id, invoice_number, total_amount, paid_amount, status, created_at,
+      id, invoice_number, total_amount, paid_amount, status, created_at, discount_amount,
       clients ( name, phone ),
       invoice_items ( id, quantity, unit_price, total_price, products ( name ) ),
       payments ( id, amount, payment_date )
@@ -85,6 +87,7 @@ export async function getInvoiceDetail(id: string): Promise<InvoiceDetail | null
     invoice_number: data.invoice_number,
     total_amount: data.total_amount,
     paid_amount: data.paid_amount,
+    discount_amount: data.discount_amount ?? 0,
     status: data.status,
     created_at: data.created_at,
     client: client ? { name: client.name, phone: client.phone } : null,

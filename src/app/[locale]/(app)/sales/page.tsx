@@ -2,6 +2,7 @@ import CreateSaleForm from "@/features/sales/components/CreateSaleForm";
 import { getTranslations } from "next-intl/server";
 import { createClient } from "@/utils/supabase/server";
 import { getShopSettings } from "@/features/settings/queries";
+import { loyaltyCard, type LoyaltyInvoice } from "@/features/clients/loyalty";
 
 export async function generateMetadata() {
   const t = await getTranslations("Sales");
@@ -33,7 +34,7 @@ export default async function SalesPage() {
   // Fetch real clients from DB
   const { data: clientsData } = await supabase
     .from("clients")
-    .select("id, name")
+    .select("id, name, invoices(status, loyalty_reward_used)")
     .eq("is_active", true)
     .order("name", { ascending: true });
 
@@ -49,9 +50,16 @@ export default async function SalesPage() {
     image_url: p.image_url,
   }));
 
+  const loyalty = {
+    enabled: shopSettings?.loyalty_enabled ?? true,
+    stampsRequired: shopSettings?.loyalty_stamps_required ?? 10,
+    rewardPercent: shopSettings?.loyalty_reward_percent ?? 10,
+  };
+
   const clients = (clientsData ?? []).map((c) => ({
     id: c.id,
     name: c.name,
+    card: loyaltyCard((c.invoices ?? []) as LoyaltyInvoice[], loyalty.stampsRequired, loyalty.enabled),
   }));
 
   return (
@@ -64,6 +72,7 @@ export default async function SalesPage() {
         products={products}
         clients={clients}
         defaultPhoneCountryCode={shopSettings?.default_phone_country_code || "+237"}
+        loyalty={loyalty}
       />
     </div>
   );

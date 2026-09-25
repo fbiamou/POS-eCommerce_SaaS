@@ -269,6 +269,27 @@ export default async function SettingsPage({
               </div>
 
               <div className="border-t border-zinc-100 dark:border-[var(--line)] pt-6">
+                <p className="text-[13px] font-bold text-zinc-900 dark:text-white mb-1">{t('loyalty_section')}</p>
+                <p className="text-[11px] text-zinc-400 mb-4">{t('loyalty_section_subtitle')}</p>
+                <div className="flex flex-col gap-4">
+                  <label htmlFor="loyalty_enabled" className="flex items-center gap-3 text-[13px] font-bold text-zinc-700 dark:text-zinc-300">
+                    <input id="loyalty_enabled" name="loyalty_enabled" type="checkbox" value="true" defaultChecked={shopSettings?.loyalty_enabled ?? true}
+                      className="h-4 w-4 rounded border-zinc-300 text-violet-600 focus:ring-violet-500" />
+                    {t('loyalty_enabled')}
+                  </label>
+                  <div className="flex flex-wrap items-center gap-2 text-[13px] font-bold text-zinc-700 dark:text-zinc-300">
+                    <label htmlFor="loyalty_stamps_required">{t('loyalty_after')}</label>
+                    <input id="loyalty_stamps_required" name="loyalty_stamps_required" type="number" min="2" max="50" step="1"
+                      defaultValue={shopSettings?.loyalty_stamps_required ?? 10} className="w-24 rounded-xl border border-zinc-200 bg-white px-3 py-2 text-[13px] font-medium transition-colors focus:border-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-500 dark:border-[var(--line)] dark:bg-[var(--surface-1)]" />
+                    <label htmlFor="loyalty_reward_percent">{t('loyalty_purchases_then')}</label>
+                    <input id="loyalty_reward_percent" name="loyalty_reward_percent" type="number" min="1" max="100" step="1"
+                      defaultValue={shopSettings?.loyalty_reward_percent ?? 10} className="w-24 rounded-xl border border-zinc-200 bg-white px-3 py-2 text-[13px] font-medium transition-colors focus:border-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-500 dark:border-[var(--line)] dark:bg-[var(--surface-1)]" />
+                    <span>{t('loyalty_percent_off')}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="border-t border-zinc-100 dark:border-[var(--line)] pt-6">
                 <p className="text-[13px] font-bold text-zinc-900 dark:text-white mb-1">{t('whatsapp_section')}</p>
                 <p className="text-[11px] text-zinc-400 mb-4">{t('whatsapp_section_subtitle')}</p>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">

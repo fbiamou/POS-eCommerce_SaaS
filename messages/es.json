@@ -167,7 +167,11 @@
     "new_sale": "Nueva venta",
     "unit_price": "{price} c/u",
     "all_types": "Todos los tipos",
-    "all_brands": "Todas las marcas"
+    "all_brands": "Todas las marcas",
+    "subtotal": "Subtotal",
+    "loyalty_discount": "Descuento de fidelidad ({percent} %)",
+    "loyalty_reward_ready": "Tarjeta de fidelidad llena: −{percent} % en esta compra",
+    "loyalty_card_progress": "Tarjeta de fidelidad: {stamps} de {required}"
   },
   "Clients": {
     "title": "Clientes y deudas",
@@ -199,7 +203,9 @@
     "loyal_missing": "{count, plural, one {Falta # compra para ser fiel} other {Faltan # compras para ser fiel}}",
     "owes": "por pagar",
     "up_to_date": "Al día",
-    "no_phone": "Sin teléfono"
+    "no_phone": "Sin teléfono",
+    "loyalty_card": "Tarjeta: {stamps} de {required}",
+    "loyalty_ready": "Recompensa lista"
   },
   "Reminders": {
     "title": "Recordatorios de WhatsApp",
@@ -478,7 +484,9 @@
     "filter_paid": "Pagadas",
     "summary_due": "Pendiente de cobro",
     "remaining_short": "faltan {amount}",
-    "paid_progress": "{paid} pagados de {total}"
+    "paid_progress": "{paid} pagados de {total}",
+    "subtotal": "Subtotal",
+    "loyalty_discount": "Descuento de fidelidad"
   },
   "Auth": {
     "title": "WISHOP",
@@ -506,7 +514,9 @@
     "no_account": "¿Todavía no tienes cuenta?",
     "already_signed_in": "Ya has iniciado sesión en la tienda <strong>{shop}</strong>.",
     "open_my_shop": "Abrir mi tienda",
-    "sign_out_create_other": "Cerrar sesión para crear otra tienda"
+    "sign_out_create_other": "Cerrar sesión para crear otra tienda",
+    "shop_name": "Nombre de la tienda",
+    "shop_name_placeholder": "Ej.: Boss MaMa B"
   },
   "Settings": {
     "title": "Configuración",
@@ -612,36 +622,13 @@
     "country_other": "Otro país",
     "tax_id_NIU": "NIU (número de identificación único)",
     "tax_id_NIF": "NIF (número de identificación fiscal)",
-    "tax_id_generic": "Identificación fiscal"
-  },
-  "Landing": {
-    "hero_title_1": "Tu negocio,",
-    "hero_title_2": "organizado.",
-    "hero_subtitle": "La plataforma todo en uno diseñada para comerciantes y tiendas. Gestiona tus ventas, inventario y clientes con elegancia, sea cual sea tu actividad.",
-    "cta_create": "Crear mi tienda",
-    "cta_features": "Descubrir funcionalidades",
-    "features_title": "Pensado para tu día a día",
-    "features_subtitle": "Todo lo que necesitas para hacer crecer tu negocio, sin complejidad.",
-    "feature_sales_title": "Ventas y Facturación",
-    "feature_sales_desc": "Genera tickets y facturas en segundos. Haz seguimiento de pagos y deudas de clientes fácilmente.",
-    "feature_shop_title": "Tienda en línea",
-    "feature_shop_desc": "Tu escaparate público generado automáticamente a partir de tu inventario. Permite a tus clientes hacer pedidos 24/7.",
-    "feature_whatsapp_title": "Recordatorios WhatsApp",
-    "feature_whatsapp_desc": "No dejes que se acumulen los impagos. Envía recordatorios profesionales con un clic vía WhatsApp.",
-    "cta_demo": "Ver una demo",
-    "mock_header": "Tienda POS",
-    "mock_ca": "Ingresos diarios",
-    "mock_dettes": "Deudas",
-    "mock_stock": "Stock bajo",
-    "mock_articles": "3 artículos",
-    "mock_relance": "Recordatorio enviado",
-    "footer_100_title": "100%",
-    "footer_100_desc": "montos en FCFA",
-    "footer_lang_title": "ES",
-    "footer_lang_desc": "interfaz totalmente localizada",
-    "footer_mobile_title": "Móvil",
-    "footer_mobile_desc": "diseñado primero para móviles",
-    "footer_rights": "Todos los derechos reservados."
+    "tax_id_generic": "Identificación fiscal",
+    "loyalty_section": "Tarjeta de fidelidad",
+    "loyalty_section_subtitle": "Un sello por venta pagada por completo a un cliente (una venta a crédito cuenta una vez saldada). Tarjeta llena: descuento en la compra siguiente, propuesto en la caja.",
+    "loyalty_enabled": "Activar la tarjeta de fidelidad",
+    "loyalty_after": "Después de",
+    "loyalty_purchases_then": "compras,",
+    "loyalty_percent_off": "% de descuento en la siguiente"
   },
   "Feedback": {
     "generic_error": "Se produjo un error inesperado. Inténtelo de nuevo.",
@@ -710,7 +697,9 @@
     "purchase_order_not_editable": "Esta orden ya no se puede modificar: ya fue enviada.",
     "invalid_status_change": "Este cambio de estado no es posible.",
     "terms_required": "Marca la casilla para aceptar las condiciones de uso.",
-    "purchase_order_has_shipment": "Este pedido tiene un envío asociado: recibe la mercancía marcando ese envío."
+    "purchase_order_has_shipment": "Este pedido tiene un envío asociado: recibe la mercancía marcando ese envío.",
+    "loyalty_reward_unavailable": "La recompensa de fidelidad ya no está disponible para este cliente. Desmárcala y vuelve a intentarlo.",
+    "loyalty_invalid": "Tarjeta de fidelidad: entre 2 y 50 compras, y un descuento entre 1 y 100 %."
   },
   "Suppliers": {
     "title": "Proveedores",

@@ -167,7 +167,11 @@
     "new_sale": "New sale",
     "unit_price": "{price} each",
     "all_types": "All types",
-    "all_brands": "All brands"
+    "all_brands": "All brands",
+    "subtotal": "Subtotal",
+    "loyalty_discount": "Loyalty discount ({percent}%)",
+    "loyalty_reward_ready": "Loyalty card full: {percent}% off this purchase",
+    "loyalty_card_progress": "Loyalty card: {stamps} of {required}"
   },
   "Clients": {
     "title": "Customers and debts",
@@ -199,7 +203,9 @@
     "loyal_missing": "{count, plural, one {# more purchase to become loyal} other {# more purchases to become loyal}}",
     "owes": "to pay",
     "up_to_date": "Up to date",
-    "no_phone": "No phone"
+    "no_phone": "No phone",
+    "loyalty_card": "Card: {stamps} of {required}",
+    "loyalty_ready": "Reward ready"
   },
   "Reminders": {
     "title": "WhatsApp Reminders",
@@ -478,7 +484,9 @@
     "filter_paid": "Paid",
     "summary_due": "Left to collect",
     "remaining_short": "{amount} left",
-    "paid_progress": "{paid} paid out of {total}"
+    "paid_progress": "{paid} paid out of {total}",
+    "subtotal": "Subtotal",
+    "loyalty_discount": "Loyalty discount"
   },
   "Auth": {
     "title": "WISHOP",
@@ -506,7 +514,9 @@
     "no_account": "No account yet?",
     "already_signed_in": "You're already signed in to <strong>{shop}</strong>.",
     "open_my_shop": "Open my shop",
-    "sign_out_create_other": "Sign out to create another shop"
+    "sign_out_create_other": "Sign out to create another shop",
+    "shop_name": "Shop's name",
+    "shop_name_placeholder": "E.g. Boss MaMa B"
   },
   "Settings": {
     "title": "Settings",
@@ -612,36 +622,13 @@
     "country_other": "Other country",
     "tax_id_NIU": "NIU (unique tax ID)",
     "tax_id_NIF": "NIF (tax ID number)",
-    "tax_id_generic": "Tax ID"
-  },
-  "Landing": {
-    "hero_title_1": "Your business,",
-    "hero_title_2": "organized.",
-    "hero_subtitle": "The all-in-one platform designed for merchants and shops. Manage your sales, inventory, and customers with elegance, whatever your activity.",
-    "cta_create": "Create my shop",
-    "cta_features": "Discover features",
-    "features_title": "Designed for your daily life",
-    "features_subtitle": "Everything you need to grow your business, without the complexity.",
-    "feature_sales_title": "Sales & Billing",
-    "feature_sales_desc": "Generate receipts and invoices in seconds. Easily track payments and customer debts.",
-    "feature_shop_title": "Online Shop",
-    "feature_shop_desc": "Your public storefront automatically generated from your inventory. Let your customers order 24/7.",
-    "feature_whatsapp_title": "WhatsApp Reminders",
-    "feature_whatsapp_desc": "Don't let unpaid bills pile up. Send professional reminders in one click via WhatsApp.",
-    "cta_demo": "View a demo",
-    "mock_header": "POS Shop",
-    "mock_ca": "Daily Rev",
-    "mock_dettes": "Debts",
-    "mock_stock": "Low Stock",
-    "mock_articles": "3 items",
-    "mock_relance": "Reminder sent",
-    "footer_100_title": "100%",
-    "footer_100_desc": "amounts in FCFA",
-    "footer_lang_title": "EN",
-    "footer_lang_desc": "fully localized interface",
-    "footer_mobile_title": "Mobile",
-    "footer_mobile_desc": "mobile-first design",
-    "footer_rights": "All rights reserved."
+    "tax_id_generic": "Tax ID",
+    "loyalty_section": "Loyalty card",
+    "loyalty_section_subtitle": "One stamp per sale paid in full to a customer (a credit sale counts once settled). Full card: a discount on the next purchase, offered at the till.",
+    "loyalty_enabled": "Turn on the loyalty card",
+    "loyalty_after": "After",
+    "loyalty_purchases_then": "purchases,",
+    "loyalty_percent_off": "% off the next one"
   },
   "Feedback": {
     "generic_error": "Something went wrong. Please try again.",
@@ -710,7 +697,9 @@
     "purchase_order_not_editable": "This order can no longer be changed: it has already been sent.",
     "invalid_status_change": "This status change is not possible.",
     "terms_required": "Tick the box to accept the terms of use.",
-    "purchase_order_has_shipment": "This order is followed by a shipment: receive the goods by checking off the shipment."
+    "purchase_order_has_shipment": "This order is followed by a shipment: receive the goods by checking off the shipment.",
+    "loyalty_reward_unavailable": "The loyalty reward is no longer available for this customer. Untick it and try again.",
+    "loyalty_invalid": "Loyalty card: between 2 and 50 purchases, and a discount between 1 and 100%."
   },
   "Suppliers": {
     "title": "Suppliers",

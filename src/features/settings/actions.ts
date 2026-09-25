@@ -38,11 +38,23 @@ export async function updateShopProfile(formData: FormData) {
   const timeZoneInput = formData.get('timezone') as string
   const timeZone = SHOP_TIME_ZONES.some((z) => z.value === timeZoneInput) ? timeZoneInput : DEFAULT_TIME_ZONE
 
+  // Stamp card: a whole number of stamps (2 to 50) and a reward of 1 to 100 %.
+  const loyaltyEnabled = formData.get('loyalty_enabled') === 'true'
+  const stampsRequired = Number(formData.get('loyalty_stamps_required') ?? 10)
+  const rewardPercent = Number(formData.get('loyalty_reward_percent') ?? 10)
+  if (!Number.isInteger(stampsRequired) || stampsRequired < 2 || stampsRequired > 50 ||
+      !Number.isInteger(rewardPercent) || rewardPercent < 1 || rewardPercent > 100) {
+    return redirectLocalized('/settings', { tab: 'profil', error: 'loyalty_invalid' })
+  }
+
   // Only a country from the list is stored; "other country" leaves it empty.
   const countryCode = findShopCountry(formData.get('country_code') as string)?.code ?? null
 
   const updates: Record<string, string | number | boolean | null> = {
     country_code: countryCode,
+    loyalty_enabled: loyaltyEnabled,
+    loyalty_stamps_required: stampsRequired,
+    loyalty_reward_percent: rewardPercent,
     shop_name: formData.get('shop_name') as string || null,
     shop_phone: formData.get('shop_phone') as string || null,
     shop_address: formData.get('shop_address') as string || null,

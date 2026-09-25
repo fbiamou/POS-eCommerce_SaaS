@@ -117,6 +117,18 @@ export default async function InvoicePage({
         </ul>
 
         <dl className="ml-auto w-full max-w-xs space-y-1.5 text-[14px]">
+          {invoice.discount_amount > 0 && (
+            <>
+              <div className="flex justify-between text-zinc-500">
+                <dt>{t("subtotal")}</dt>
+                <dd className="font-mono tabular-nums">{format.money(invoice.total_amount + invoice.discount_amount)}</dd>
+              </div>
+              <div className="flex justify-between font-semibold text-amber-800 dark:text-saffron">
+                <dt>{t("loyalty_discount")}</dt>
+                <dd className="font-mono tabular-nums">−{format.money(invoice.discount_amount)}</dd>
+              </div>
+            </>
+          )}
           {shop?.vat_registered && (
             <>
               <div className="flex justify-between text-zinc-500">

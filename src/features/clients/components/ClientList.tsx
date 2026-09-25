@@ -11,6 +11,8 @@ import { addClient, updateClient } from "../actions";
 import { useToast } from "@/components/ui/Toast";
 import { getInitials } from "@/components/layout/ShopAvatar";
 import { LOYALTY_MIN_PURCHASES } from "../stats";
+import type { LoyaltyCard } from "../loyalty";
+import { StampDots } from "./StampCard";
 
 export type ClientData = {
   id: string;
@@ -22,6 +24,7 @@ export type ClientData = {
   total_debt: number;
   first_purchase_date: string | null;
   is_loyal: boolean;
+  card?: LoyaltyCard;
 };
 
 // Existing clients created before the country-code selector existed may have
@@ -37,9 +40,11 @@ function splitPhone(phone: string | null | undefined, fallbackCode: string): { c
 export default function ClientList({
   clients,
   defaultPhoneCountryCode = "+237",
+  loyaltyEnabled = false,
 }: {
   clients: ClientData[];
   defaultPhoneCountryCode?: string;
+  loyaltyEnabled?: boolean;
 }) {
   const t = useTranslations("Clients");
   const showToast = useToast((state) => state.show);
@@ -214,6 +219,21 @@ export default function ClientList({
                     </span>
                     {!client.is_loyal && client.recent_purchases > 0 && missing > 0 && (
                       <span className="block text-[12px] text-zinc-500">{t("loyal_missing", { count: missing })}</span>
+                    )}
+                    {loyaltyEnabled && client.card && (client.card.stamps > 0 || client.card.rewardAvailable) && (
+                      <span className="mt-1 flex items-center gap-2 text-[12px] text-zinc-500">
+                        <StampDots
+                          stamps={client.card.stamps}
+                          required={client.card.stampsRequired}
+                          size="sm"
+                          label={t("loyalty_card", { stamps: client.card.stamps, required: client.card.stampsRequired })}
+                        />
+                        {client.card.rewardAvailable ? (
+                          <span className="font-semibold text-amber-800 dark:text-saffron">{t("loyalty_ready")}</span>
+                        ) : (
+                          <span className="font-mono tabular-nums">{client.card.stamps}/{client.card.stampsRequired}</span>
+                        )}
+                      </span>
                     )}
                   </span>
                   <span className="shrink-0 text-right">

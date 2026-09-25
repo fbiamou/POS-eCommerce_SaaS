@@ -2,6 +2,7 @@ import ClientList from "@/features/clients/components/ClientList";
 import { getTranslations } from "next-intl/server";
 import { createClient } from "@/utils/supabase/server";
 import { getFormatters, getShopSettings } from "@/features/settings/queries";
+import { loyaltyCard, type LoyaltyInvoice } from "@/features/clients/loyalty";
 import { computeClientStats, isLoyalClient, LOYALTY_MIN_PURCHASES, LOYALTY_WINDOW_DAYS, type ClientInvoice } from "@/features/clients/stats";
 
 export async function generateMetadata() {
@@ -25,7 +26,7 @@ export default async function ClientsPage() {
       name,
       phone,
       created_at,
-      invoices(total_amount, paid_amount, status, created_at)
+      invoices(total_amount, paid_amount, status, created_at, loyalty_reward_used)
     `)
     .eq("is_active", true)
     .order("name", { ascending: true });
@@ -39,6 +40,11 @@ export default async function ClientsPage() {
       phone: c.phone as string | null,
       ...stats,
       is_loyal: isLoyalClient(stats),
+      card: loyaltyCard(
+        (c.invoices ?? []) as LoyaltyInvoice[],
+        shopSettings?.loyalty_stamps_required ?? 10,
+        shopSettings?.loyalty_enabled ?? true
+      ),
     };
   });
 
@@ -71,7 +77,11 @@ export default async function ClientsPage() {
         </div>
       </dl>
 
-      <ClientList clients={clients} defaultPhoneCountryCode={shopSettings?.default_phone_country_code || "+237"} />
+      <ClientList
+        clients={clients}
+        defaultPhoneCountryCode={shopSettings?.default_phone_country_code || "+237"}
+        loyaltyEnabled={shopSettings?.loyalty_enabled ?? true}
+      />
     </div>
   );
 }

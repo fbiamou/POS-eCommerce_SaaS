@@ -37,6 +37,8 @@ export async function GET(
     unit_price: t("unit_price"),
     total: t("total"),
     subtotal_ht: t("subtotal_ht"),
+    subtotal: t("subtotal"),
+    loyalty_discount: t("loyalty_discount"),
     vat: t("vat"),
     total_ttc: t("total_ttc"),
     paid_amount: t("paid_amount"),

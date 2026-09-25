@@ -40,6 +40,8 @@ export type InvoiceLabels = {
   unit_price: string;
   total: string;
   subtotal_ht: string;
+  subtotal: string;
+  loyalty_discount: string;
   vat: string;
   total_ttc: string;
   paid_amount: string;
@@ -131,6 +133,18 @@ export function InvoiceDocument({
         </View>
 
         <View style={styles.totals}>
+          {invoice.discount_amount > 0 && (
+            <>
+              <View style={styles.totalRow}>
+                <Text>{labels.subtotal}</Text>
+                <Text>{formatAmount(invoice.total_amount + invoice.discount_amount)}</Text>
+              </View>
+              <View style={styles.totalRow}>
+                <Text>{labels.loyalty_discount}</Text>
+                <Text>-{formatAmount(invoice.discount_amount)}</Text>
+              </View>
+            </>
+          )}
           {shop?.vat_registered && (
             <>
               <View style={styles.totalRow}>

@@ -1300,7 +1300,8 @@ document.addEventListener('visibilitychange', function(){ document.body.classLis
 /* ---------------- boot ---------------- */
 var saved = null; try { saved = localStorage.getItem('wishop-lang'); } catch(e){}
 var nav0 = (navigator.language || 'fr').slice(0,2).toLowerCase();
-applyLang(saved || (LANGS.indexOf(nav0) >= 0 ? nav0 : 'fr'), false);
+var path0 = (location.pathname.match(/^\/(fr|en|es)(\/|$)/) || [])[1];
+applyLang(path0 || saved || (LANGS.indexOf(nav0) >= 0 ? nav0 : 'fr'), false);
 [].forEach.call(document.querySelectorAll('.lang button'), function(b){ b.addEventListener('click', function(){ applyLang(b.getAttribute('data-lang'), true); }); });
 if (reduce.matches) pinToFinalStates();
 applyHeroMode();

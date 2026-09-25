@@ -98,6 +98,18 @@ export default async function InvoiceTicketPage({
 
         <div className="my-2 border-t border-dashed border-black" />
 
+        {invoice.discount_amount > 0 && (
+          <>
+            <div className="flex justify-between">
+              <span>{t("subtotal")}</span>
+              <span>{format(invoice.total_amount + invoice.discount_amount)}</span>
+            </div>
+            <div className="flex justify-between">
+              <span>{t("loyalty_discount")}</span>
+              <span>−{format(invoice.discount_amount)}</span>
+            </div>
+          </>
+        )}
         {vat && (
           <>
             <div className="flex justify-between">

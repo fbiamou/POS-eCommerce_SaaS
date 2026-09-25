@@ -35,6 +35,9 @@ const SETTINGS_COLUMNS = [
   "low_stock_threshold",
   "timezone",
   "country_code",
+  "loyalty_enabled",
+  "loyalty_stamps_required",
+  "loyalty_reward_percent",
 ].join(", ");
 
 export type ShopSettings = {
@@ -60,6 +63,9 @@ export type ShopSettings = {
   whatsapp_token_set: boolean;
   shop_slug: string | null;
   country_code: string | null;
+  loyalty_enabled: boolean;
+  loyalty_stamps_required: number;
+  loyalty_reward_percent: number;
   default_phone_country_code: string;
   low_stock_threshold: number;
   timezone: string;

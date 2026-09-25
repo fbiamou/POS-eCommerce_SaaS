@@ -80,6 +80,9 @@ export const FEEDBACK_CODES = [
   "purchase_order_not_editable",
   "invalid_status_change",
   "purchase_order_has_shipment",
+  // Loyalty
+  "loyalty_reward_unavailable",
+  "loyalty_invalid",
 ] as const;
 
 export type FeedbackCode = (typeof FEEDBACK_CODES)[number];

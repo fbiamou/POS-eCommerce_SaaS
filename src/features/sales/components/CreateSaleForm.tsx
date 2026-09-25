@@ -9,6 +9,8 @@ import { createClient } from "@/utils/supabase/client";
 import { PhoneCountryCodeSelect } from "@/components/PhoneCountryCodeSelect";
 import { useShopFormat } from "@/components/ShopFormatProvider";
 import { feedbackFromError, type FeedbackCode } from "@/lib/feedback";
+import { loyaltyDiscount, type LoyaltyCard } from "@/features/clients/loyalty";
+import { StampDots } from "@/features/clients/components/StampCard";
 import { Select } from "@/components/ui/Select";
 
 export type Product = {
@@ -25,6 +27,13 @@ export type Product = {
 export type Client = {
   id: string;
   name: string;
+  card?: LoyaltyCard;
+};
+
+export type LoyaltySettings = {
+  enabled: boolean;
+  stampsRequired: number;
+  rewardPercent: number;
 };
 
 type PayMode = "full" | "credit";
@@ -36,10 +45,12 @@ export default function CreateSaleForm({
   products,
   clients,
   defaultPhoneCountryCode = "+237",
+  loyalty = { enabled: false, stampsRequired: 10, rewardPercent: 10 },
 }: {
   products: Product[];
   clients: Client[];
   defaultPhoneCountryCode?: string;
+  loyalty?: LoyaltySettings;
 }) {
   const t = useTranslations("Sales");
   const tFeedback = useTranslations("Feedback");
@@ -100,10 +111,19 @@ export default function CreateSaleForm({
     }
   }, [newClientPhoneCountryCode, defaultPhoneCountryCode, setNewClientPhoneCountryCode]);
 
-  const totalAmount = cart.reduce((sum, item) => {
+  const subtotal = cart.reduce((sum, item) => {
     const product = products.find(p => p.id === item.productId);
     return sum + (product?.selling_price || 0) * item.quantity;
   }, 0);
+
+  // Stamp card: a customer with a full card gets the reward on this sale,
+  // unless the cashier unticks it. The database checks it again.
+  const [useReward, setUseReward] = useState(true);
+  const selectedClient = clients.find((c) => c.id === selectedClientId) ?? null;
+  const card = loyalty.enabled && selectedClient ? selectedClient.card ?? null : null;
+  const rewardApplied = Boolean(card?.rewardAvailable && useReward && !isCreatingClient);
+  const discount = rewardApplied ? loyaltyDiscount(subtotal, loyalty.rewardPercent) : 0;
+  const totalAmount = subtotal - discount;
   const itemCount = cart.reduce((sum, item) => sum + item.quantity, 0);
 
   const creditPaid = Math.max(0, parseInt(paidAmount, 10) || 0);
@@ -230,6 +250,7 @@ export default function CreateSaleForm({
         _client_id: finalClientId,
         _items: items,
         _paid_amount: paidValue,
+        _use_loyalty_reward: rewardApplied,
       });
 
       if (rpcError) {
@@ -242,6 +263,7 @@ export default function CreateSaleForm({
       clearCart();
       setPayMode("full");
       setCashReceived("");
+      setUseReward(true);
       router.refresh();
     } catch (err) {
       console.error("Sale failed:", err);
@@ -487,6 +509,18 @@ export default function CreateSaleForm({
             </div>
 
             <div className="border-t border-zinc-200 px-5 pt-4 pb-[calc(1.25rem+env(safe-area-inset-bottom))] dark:border-[var(--line)] lg:pb-5">
+              {discount > 0 && (
+                <div className="mb-1 flex flex-col gap-0.5 text-[13px] text-zinc-500">
+                  <div className="flex justify-between">
+                    <span>{t("subtotal")}</span>
+                    <span className="font-mono tabular-nums">{format.money(subtotal)}</span>
+                  </div>
+                  <div className="flex justify-between font-semibold text-amber-800 dark:text-saffron">
+                    <span>{t("loyalty_discount", { percent: loyalty.rewardPercent })}</span>
+                    <span className="font-mono tabular-nums">−{format.money(discount)}</span>
+                  </div>
+                </div>
+              )}
               <div className="flex items-baseline justify-between">
                 <span className="text-[13px] font-semibold uppercase tracking-wider text-zinc-500">{t("total")}</span>
                 <span className="font-mono text-[26px] font-semibold tabular-nums">{format.money(totalAmount)}</span>
@@ -589,6 +623,20 @@ export default function CreateSaleForm({
                     </button>
                   )}
                 </div>
+
+                {card && (
+                  card.rewardAvailable ? (
+                    <label htmlFor="use-reward" className="mt-2 flex items-center gap-3 rounded-xl bg-saffron/20 p-3 text-[13.5px] font-semibold text-amber-950 dark:text-saffron">
+                      <input id="use-reward" type="checkbox" checked={useReward} onChange={(e) => setUseReward(e.target.checked)} className="h-5 w-5 accent-[var(--accent-bg)]" />
+                      <span>{t("loyalty_reward_ready", { percent: loyalty.rewardPercent })}</span>
+                    </label>
+                  ) : (
+                    <div className="mt-2 flex items-center justify-between gap-3 rounded-xl bg-zinc-50 px-3 py-2.5 text-[12.5px] text-zinc-600 dark:bg-[var(--surface-2)] dark:text-zinc-300">
+                      <span>{t("loyalty_card_progress", { stamps: card.stamps, required: card.stampsRequired })}</span>
+                      <StampDots stamps={card.stamps} required={card.stampsRequired} size="sm" label={t("loyalty_card_progress", { stamps: card.stamps, required: card.stampsRequired })} />
+                    </div>
+                  )
+                )}
 
                 {isCreatingClient && (
                   <div className="mt-2 flex flex-col gap-2 rounded-xl bg-zinc-50 p-3 dark:bg-[var(--surface-2)]">

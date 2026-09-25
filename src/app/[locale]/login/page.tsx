@@ -7,6 +7,8 @@ import { LocaleSwitcher } from '@/components/LocaleSwitcher'
 import { WishopMark } from '@/components/brand/WishopMark'
 import { readFeedbackParam } from '@/lib/feedback'
 import { TERMS_PATH } from '@/lib/terms'
+import { Select } from '@/components/ui/Select'
+import { SHOP_COUNTRIES } from '@/lib/countries'
 
 export async function generateMetadata() {
   const t = await getTranslations('Auth')
@@ -27,6 +29,7 @@ export default async function LoginPage({
 }) {
   const t = await getTranslations('Auth')
   const tFeedback = await getTranslations('Feedback')
+  const tSettings = await getTranslations('Settings')
   const params = await searchParams
   // Only known feedback codes are displayed: a crafted link cannot make this
   // page show arbitrary text.
@@ -125,6 +128,23 @@ export default async function LoginPage({
               <div className="flex flex-col gap-1.5">
                 <label className={labelClass} htmlFor="full_name">{t('full_name')}</label>
                 <input id="full_name" name="full_name" type="text" autoComplete="name" required placeholder={t('full_name_placeholder')} className={inputClass} />
+              </div>
+              <div className="flex flex-col gap-1.5">
+                <label className={labelClass} htmlFor="shop_name">{t('shop_name')}</label>
+                <input id="shop_name" name="shop_name" type="text" autoComplete="organization" required placeholder={t('shop_name_placeholder')} className={inputClass} />
+              </div>
+              <div className="flex flex-col gap-1.5">
+                <label className={labelClass} htmlFor="country_code">{tSettings('country')}</label>
+                <Select
+                  id="country_code"
+                  name="country_code"
+                  defaultValue="GQ"
+                  triggerClassName="py-3 text-[15px]"
+                  options={[
+                    ...SHOP_COUNTRIES.map((c) => ({ value: c.code, label: tSettings(`country_${c.code}`) })),
+                    { value: '', label: tSettings('country_other') },
+                  ]}
+                />
               </div>
               <div className="flex flex-col gap-1.5">
                 <label className={labelClass} htmlFor="email">{t('email')}</label>

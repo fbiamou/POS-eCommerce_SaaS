@@ -68,6 +68,13 @@ export async function proxy(request: NextRequest) {
   const isLandingPage = isRootOrLocaleOnly
 
   // 2. Redirect logic
+  // The home page for a visitor without a session is the WISHOP site
+  // (static, public/landing). The first home page, built into the app, was
+  // removed: typing the bare address used to show it instead.
+  if (!user && isLandingPage) {
+    return withSession(NextResponse.rewrite(new URL('/landing/index.html', request.url)))
+  }
+
   if (!user && !isAuthPage && !isPublicPage) {
     const loginUrl = request.nextUrl.clone()
     loginUrl.pathname = `/${locale}/login`

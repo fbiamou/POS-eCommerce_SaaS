@@ -5,6 +5,7 @@ import { createClient } from '@/utils/supabase/server'
 import { isPageAllowed, firstAllowedPath } from '@/lib/appPages'
 import { redirectLocalized } from '@/lib/navigation'
 import { TERMS_VERSION } from '@/lib/terms'
+import { findShopCountry } from '@/lib/countries'
 
 export async function login(formData: FormData) {
   const supabase = await createClient()
@@ -50,15 +51,20 @@ export async function signup(formData: FormData) {
 
   const supabase = await createClient()
   const fullName = ((formData.get('full_name') as string | null) ?? '').trim()
+  const shopName = ((formData.get('shop_name') as string | null) ?? '').trim().slice(0, 80)
+  const countryCode = findShopCountry(formData.get('country_code') as string)?.code ?? ''
 
   const { error } = await supabase.auth.signUp({
     email: formData.get('email') as string,
     password: formData.get('password') as string,
     options: {
-      // full_name names the owner's profile (handle_new_user trigger); the
-      // terms fields record which version was accepted, and when.
+      // full_name names the owner's profile, shop_name and country_code set up
+      // the new shop (handle_new_user trigger); the terms fields record which
+      // version was accepted, and when.
       data: {
         full_name: fullName,
+        shop_name: shopName,
+        country_code: countryCode,
         terms_version: TERMS_VERSION,
         terms_accepted_at: new Date().toISOString(),
       },
