@@ -49,7 +49,20 @@
     "period_month": "30 jours",
     "no_sales_day": "Aucune vente aujourd'hui.",
     "no_sales_week": "Aucune vente sur les 7 derniers jours.",
-    "no_sales_month": "Aucune vente sur les 30 derniers jours."
+    "no_sales_month": "Aucune vente sur les 30 derniers jours.",
+    "first_steps_title": "Premiers pas",
+    "first_steps_progress": "{done} sur {total}",
+    "step_optional": "facultatif",
+    "step_shop": "Vérifier votre boutique",
+    "step_shop_hint": "Pays, téléphone et logo : ils apparaissent sur vos tickets et votre vitrine.",
+    "step_stock": "Enregistrer votre stock",
+    "step_stock_hint": "C'est l'étape la plus longue : article par article, ou d'un coup depuis un fichier Excel (CSV).",
+    "step_sale": "Faire votre première vente",
+    "step_sale_hint": "Depuis le bouton Vendre ; le ticket s’imprime ou se partage.",
+    "step_storefront": "Ouvrir votre vitrine en ligne",
+    "step_storefront_hint": "Choisissez l'adresse de votre vitrine dans les paramètres, puis publiez vos articles.",
+    "step_team": "Inviter votre équipe",
+    "step_team_hint": "Chaque membre de l'équipe a son accès, avec seulement les pages que vous choisissez."
   },
   "Stock": {
     "title": "Stock & Produits",

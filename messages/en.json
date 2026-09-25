@@ -49,7 +49,20 @@
     "period_month": "30 days",
     "no_sales_day": "No sales today.",
     "no_sales_week": "No sales in the last 7 days.",
-    "no_sales_month": "No sales in the last 30 days."
+    "no_sales_month": "No sales in the last 30 days.",
+    "first_steps_title": "First steps",
+    "first_steps_progress": "{done} of {total}",
+    "step_optional": "optional",
+    "step_shop": "Check your shop details",
+    "step_shop_hint": "Country, phone and logo: they appear on your receipts and your storefront.",
+    "step_stock": "Enter your stock",
+    "step_stock_hint": "This is the longest step: item by item, or all at once from an Excel file (CSV).",
+    "step_sale": "Make your first sale",
+    "step_sale_hint": "From the Sell button; the receipt can be printed or shared.",
+    "step_storefront": "Open your online storefront",
+    "step_storefront_hint": "Choose your storefront's address in the settings, then publish your items.",
+    "step_team": "Invite your team",
+    "step_team_hint": "Each team member gets their own access, with only the pages you choose."
   },
   "Stock": {
     "title": "Stock & Products",

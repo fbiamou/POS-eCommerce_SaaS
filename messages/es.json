@@ -49,7 +49,20 @@
     "period_month": "30 días",
     "no_sales_day": "Ninguna venta hoy.",
     "no_sales_week": "Ninguna venta en los últimos 7 días.",
-    "no_sales_month": "Ninguna venta en los últimos 30 días."
+    "no_sales_month": "Ninguna venta en los últimos 30 días.",
+    "first_steps_title": "Primeros pasos",
+    "first_steps_progress": "{done} de {total}",
+    "step_optional": "opcional",
+    "step_shop": "Revisar tu tienda",
+    "step_shop_hint": "País, teléfono y logotipo: aparecen en tus tickets y en tu escaparate.",
+    "step_stock": "Registrar tu stock",
+    "step_stock_hint": "Es el paso más largo: artículo por artículo, o de una vez desde un archivo de Excel (CSV).",
+    "step_sale": "Hacer tu primera venta",
+    "step_sale_hint": "Desde el botón Vender; el ticket se imprime o se comparte.",
+    "step_storefront": "Abrir tu escaparate en línea",
+    "step_storefront_hint": "Elige la dirección de tu escaparate en los ajustes y después publica tus artículos.",
+    "step_team": "Invitar a tu equipo",
+    "step_team_hint": "Cada persona del equipo tiene su acceso, solo con las páginas que tú elijas."
   },
   "Stock": {
     "title": "Inventario y Productos",

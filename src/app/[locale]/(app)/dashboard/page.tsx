@@ -2,7 +2,9 @@ import { Link, redirect } from "@/i18n/routing";
 import { getTranslations, getLocale } from "next-intl/server";
 import { createClient } from "@/utils/supabase/server";
 import { getCurrentProfile } from "@/features/auth/actions";
-import { getFormatters } from "@/features/settings/queries";
+import { getFormatters, getShopSettings } from "@/features/settings/queries";
+import { firstSteps, showFirstSteps } from "@/features/onboarding/steps";
+import { FirstSteps } from "@/features/onboarding/components/FirstSteps";
 import { isPageAllowed, firstAllowedPath } from "@/lib/appPages";
 import { dayRangeInTimeZone } from "@/lib/format";
 import { rankTopProducts, TOP_SALES_PERIODS, type TopSalesPeriod } from "@/features/sales/stats";
@@ -25,13 +27,14 @@ export default async function DashboardPage({
 }: {
   searchParams: Promise<{ period?: string }>;
 }) {
-  const [t, locale, format, profile, supabase, params] = await Promise.all([
+  const [t, locale, format, profile, supabase, params, shopSettings] = await Promise.all([
     getTranslations("Dashboard"),
     getLocale(),
     getFormatters(),
     getCurrentProfile(),
     createClient(),
     searchParams,
+    getShopSettings(),
   ]);
 
   if (profile && !isPageAllowed(profile.role, profile.allowed_pages, "/dashboard")) {
@@ -83,6 +86,24 @@ export default async function DashboardPage({
     if (res.error) console.error("Dashboard query failed:", res.error);
   }
 
+  // First steps guide, for the owner of a shop that is still being set up.
+  let steps = null;
+  if (profile?.role === "MANAGER") {
+    const [productsRes, invoicesRes, teamRes] = await Promise.all([
+      supabase.from("products").select("id", { count: "exact", head: true }).eq("is_active", true),
+      supabase.from("invoices").select("id", { count: "exact", head: true }),
+      supabase.from("profiles").select("id", { count: "exact", head: true }),
+    ]);
+    const all = firstSteps({
+      shopDetailsFilled: Boolean(shopSettings?.country_code && (shopSettings.shop_phone || shopSettings.shop_logo_url)),
+      productCount: productsRes.count ?? 0,
+      invoiceCount: invoicesRes.count ?? 0,
+      storefrontAddress: Boolean(shopSettings?.shop_slug),
+      teamSize: teamRes.count ?? 1,
+    });
+    if (showFirstSteps(all)) steps = all;
+  }
+
   const todayRevenue = (todayInvoicesRes.data ?? []).reduce((sum, inv) => sum + inv.total_amount, 0);
   const salesCount = todayInvoicesRes.data?.length ?? 0;
   const totalDebt = (debtRes.data ?? []).reduce((sum, inv) => sum + (inv.total_amount - inv.paid_amount), 0);
@@ -129,6 +150,8 @@ export default async function DashboardPage({
           </p>
         )}
       </div>
+
+      {steps && <FirstSteps steps={steps} />}
 
       {/* KPI Cards - Dense, 2 columns on mobile */}
       <div className="grid grid-cols-2 gap-3 md:gap-4 lg:grid-cols-4">
