@@ -60,6 +60,11 @@ export default async function InvoicePage({
             {invoice.invoice_number || t("title")} · {format.date(invoice.created_at)}
             <span className={`rounded-full px-2 py-0.5 font-sans text-[11px] font-semibold ${INVOICE_STATUS_CLASS[invoice.status]}`}>{statusLabel}</span>
           </p>
+          {invoice.seller_name && (
+            <p className="mt-1 text-[13px] text-zinc-500">
+              {t("served_by")} : <span className="font-semibold text-zinc-700 dark:text-zinc-300">{invoice.seller_name}</span>
+            </p>
+          )}
         </div>
       </div>
 
