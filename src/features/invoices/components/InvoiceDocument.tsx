@@ -2,7 +2,7 @@ import { Document, Page, View, Text, Image, StyleSheet } from "@react-pdf/render
 import type { InvoiceDetail } from "../actions";
 import type { ShopSettings } from "@/features/settings/queries";
 import { DEFAULT_TIME_ZONE, formatDate, formatMoney } from "@/lib/format";
-import { extractVat } from "../actions";
+import { extractVat } from "../vat";
 
 const styles = StyleSheet.create({
   page: { padding: 32, fontSize: 10, fontFamily: "Helvetica", color: "#1a1a1a" },

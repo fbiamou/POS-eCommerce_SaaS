@@ -8,6 +8,8 @@ import { PhoneCountryCodeSelect } from "@/components/PhoneCountryCodeSelect";
 import { PHONE_COUNTRY_CODES } from "@/lib/phoneCountryCodes";
 import { useShopFormat } from "@/components/ShopFormatProvider";
 import { addClient, updateClient } from "../actions";
+import { useOptionalOfflineContext } from "@/features/offline/OfflineProvider";
+import { addClientAnywhere } from "@/features/offline/localActions";
 import { useToast } from "@/components/ui/Toast";
 import { getInitials } from "@/components/layout/ShopAvatar";
 import { LOYALTY_MIN_PURCHASES } from "../stats";
@@ -50,6 +52,7 @@ export default function ClientList({
   const showToast = useToast((state) => state.show);
   const tFeedback = useTranslations("Feedback");
   const format = useShopFormat();
+  const offline = useOptionalOfflineContext();
   const [searchTerm, setSearchTerm] = useState("");
   const [filter, setFilter] = useState<"all" | "debt" | "loyal">("all");
   const [isPending, startTransition] = useTransition();
@@ -84,6 +87,18 @@ export default function ClientList({
     e.preventDefault();
     setCreateError(null);
     startTransition(async () => {
+      // Offline mode: created online, or kept on the device and sent later.
+      if (offline) {
+        const digits = newPhone.replace(/\D/g, "");
+        const created = await addClientAnywhere(offline, newName, digits ? `${newCountryCode}${digits}` : null);
+        if (!created.ok) {
+          setCreateError(tFeedback(created.code));
+          return;
+        }
+        showToast(t("new_client_success"));
+        closeNewClientModal();
+        return;
+      }
       const formData = new FormData();
       formData.set("name", newName);
       formData.set("phone", newPhone);
@@ -116,6 +131,11 @@ export default function ClientList({
     e.preventDefault();
     if (!editingClient) return;
     setEditError(null);
+    // Changing a customer's card is done online only (for now).
+    if (offline && !offline.status.online) {
+      setEditError(tFeedback("needs_connection"));
+      return;
+    }
     startTransition(async () => {
       const formData = new FormData();
       formData.set("name", editName);

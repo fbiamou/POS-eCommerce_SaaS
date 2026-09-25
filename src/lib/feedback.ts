@@ -107,6 +107,12 @@ export const FEEDBACK_CODES = [
   // Storefront reports
   "report_invalid",
   "report_rate_limited",
+  // Offline mode: tills numbered per device (register_device, record_sale)
+  "device_not_found",
+  "device_sequence_missing",
+  "device_sequence_conflict",
+  "device_not_ready",
+  "needs_connection",
 ] as const;
 
 export type FeedbackCode = (typeof FEEDBACK_CODES)[number];

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { extractVat } from "./actions";
+import { extractVat } from "./vat";
 
 describe("extractVat", () => {
   it("splits a VAT-inclusive total at the Cameroonian rate (19.25 %)", () => {

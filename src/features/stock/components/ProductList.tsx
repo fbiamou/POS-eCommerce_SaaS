@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState, useTransition } from "react";
+import { useMemo, useRef, useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
 import { Upload, Search, Globe, Pencil } from "lucide-react";
 import { Modal } from "@/components/ui/Modal";
@@ -8,6 +8,8 @@ import { useShopFormat } from "@/components/ShopFormatProvider";
 import { updateProduct, uploadProductImage } from "../actions";
 import { useToast } from "@/components/ui/Toast";
 import { Select } from "@/components/ui/Select";
+import { useOptionalOfflineContext } from "@/features/offline/OfflineProvider";
+import { useLocalProducts } from "@/features/offline/hooks";
 
 export type Product = {
   id: string;
@@ -26,7 +28,7 @@ export type Product = {
 };
 
 export default function ProductList({
-  products,
+  products: serverProducts,
   hasShopSlug,
   suppliers,
 }: {
@@ -38,6 +40,32 @@ export default function ProductList({
   const showToast = useToast((state) => state.show);
   const tFeedback = useTranslations("Feedback");
   const format = useShopFormat();
+  const tOffline = useTranslations("Offline");
+  // Offline mode: the device's copy of the stock, which already counts the
+  // sales made here without internet. Editing an item needs the internet.
+  const offline = useOptionalOfflineContext();
+  const localProducts = useLocalProducts();
+  const products: Product[] = useMemo(
+    () =>
+      localProducts
+        ? localProducts.map((p) => ({
+            id: p.id,
+            name: p.name,
+            brand: p.brand,
+            product_type: p.product_type,
+            supplier_id: p.supplier_id,
+            origin_country: p.origin_country,
+            category: p.category_name ? { name: p.category_name } : null,
+            quantity_in_stock: p.quantity_in_stock,
+            purchase_price: p.purchase_price,
+            selling_price: p.selling_price,
+            description: p.description,
+            image_url: p.image_url,
+            is_published_online: p.is_published_online,
+          }))
+        : serverProducts,
+    [localProducts, serverProducts]
+  );
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState<"all" | "low" | "online">("all");
@@ -61,6 +89,10 @@ export default function ProductList({
   const handleEditSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError(null);
+    if (offline && !offline.status.online) {
+      setError(tFeedback("needs_connection"));
+      return;
+    }
     const formData = new FormData(e.currentTarget);
 
     startTransition(async () => {
@@ -183,6 +215,12 @@ export default function ProductList({
                     >
                       {t("in_stock_count", { count: product.quantity_in_stock })}
                     </span>
+                    {/* Two tills sold the last one during a power cut: both sales were kept. */}
+                    {product.quantity_in_stock < 0 && (
+                      <span className="rounded-full bg-red-100 px-2 py-0.5 text-[11px] font-semibold text-red-800 dark:bg-red-900/30 dark:text-red-300">
+                        {tOffline("stock_to_check")}
+                      </span>
+                    )}
                   </span>
                   <Pencil className="hidden h-4 w-4 shrink-0 text-zinc-400 sm:block" />
                 </button>

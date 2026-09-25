@@ -812,7 +812,12 @@
     "email_taken": "Ya existe una cuenta con esta dirección. Inicia sesión o usa «¿Olvidaste tu contraseña?».",
     "email_invalid_signup": "Esta dirección de correo no se acepta: revísala.",
     "signup_rate_limited": "Demasiados intentos en poco tiempo. Inténtalo de nuevo en unos minutos.",
-    "email_send_failed": "No se pudo crear la tienda: el correo de confirmación no pudo salir. Inténtalo en unos minutos; si sigue igual, escribe a WISHOP."
+    "email_send_failed": "No se pudo crear la tienda: el correo de confirmación no pudo salir. Inténtalo en unos minutos; si sigue igual, escribe a WISHOP.",
+    "device_not_found": "Este aparato ya no se reconoce como caja. Vuelve a conectarlo a internet para registrarlo de nuevo.",
+    "device_sequence_missing": "Falta el número de venta. Inténtalo de nuevo.",
+    "device_sequence_conflict": "Este número de venta ya existe para esta caja. La venta no se ha registrado dos veces.",
+    "device_not_ready": "Este aparato todavía no está registrado como caja. Conéctalo una vez a internet.",
+    "needs_connection": "Esta acción necesita internet. Inténtalo de nuevo cuando vuelva la conexión."
   },
   "Suppliers": {
     "title": "Proveedores",
@@ -1174,5 +1179,36 @@
     "read_count": "{count, plural, =0 {Leído por ninguna tienda} one {Leído por # tienda} other {Leído por # tiendas}}",
     "withdraw": "Retirar",
     "withdraw_confirm": "El mensaje también desaparece de las tiendas que aún no lo han leído."
+  },
+  "Offline": {
+    "status_offline": "Sin conexión",
+    "status_to_send": "{count} por enviar",
+    "status_sending": "Enviando…",
+    "status_to_check": "{count} por revisar",
+    "status_up_to_date": "Al día",
+    "panel_title": "Sincronización",
+    "panel_online": "Conectado: lo que se hace en este aparato se envía enseguida a la tienda en línea.",
+    "panel_offline": "Sin conexión: puedes seguir vendiendo y cobrando. Todo se enviará cuando vuelva internet.",
+    "panel_last_sync": "Última actualización: {time}",
+    "panel_never": "Este aparato todavía no ha recibido los datos de la tienda. Hace falta internet una primera vez.",
+    "panel_pending": "{count, plural, =0 {Nada pendiente de envío.} one {# operación espera ser enviada.} other {# operaciones esperan ser enviadas.}}",
+    "panel_failed_title": "Por revisar",
+    "panel_failed_intro": "La tienda en línea rechazó estas operaciones hechas sin internet. No se han contado: revísalas y vuelve a hacerlas si hace falta.",
+    "kind_sale": "Venta {number}",
+    "kind_payment": "Pago de {amount}",
+    "kind_client": "Clienta {name}",
+    "retry": "Reintentar",
+    "dismiss": "Quitar",
+    "sync_now": "Actualizar ahora",
+    "logout_blocked": "{count, plural, one {# operación hecha sin internet todavía no se ha enviado.} other {# operaciones hechas sin internet todavía no se han enviado.}} Vuelve a conectar el aparato a internet y espera el envío antes de cerrar sesión; si no, se perderían.",
+    "sale_saved_offline": "Venta guardada en el aparato. Se enviará cuando vuelva internet.",
+    "payment_saved_offline": "Pago guardado en el aparato. Se enviará cuando vuelva internet.",
+    "badge_pending": "Por enviar",
+    "badge_failed": "Rechazada",
+    "loyalty_offline": "Recompensa de fidelidad disponible cuando vuelva internet: se queda en la tarjeta.",
+    "needs_connection": "Esta acción necesita internet.",
+    "not_on_device": "Esta factura todavía no está en este aparato. Aparecerá en la próxima actualización.",
+    "loading": "Cargando los datos del aparato…",
+    "stock_to_check": "Stock por revisar"
   }
 }

@@ -4,8 +4,8 @@ import { Link, usePathname } from "@/i18n/routing";
 import { useTranslations } from "next-intl";
 import { Settings, LogOut, ExternalLink, ShieldCheck, Lock } from "lucide-react";
 import { planAllows, type Plan } from "@/features/billing/plans";
-import { useState } from "react";
-import { logout } from "@/app/[locale]/login/actions";
+import { SyncStatus } from "@/features/offline/components/SyncStatus";
+import { LogoutBlockedDialog, useSafeLogout } from "@/features/offline/components/SafeLogout";
 import { LocaleSwitcher } from "@/components/LocaleSwitcher";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { WishopMark } from "@/components/brand/WishopMark";
@@ -36,14 +36,9 @@ type SidebarProps = {
 export default function Sidebar({ profile, shopName, shopLogoUrl, shopSlug, isPlatformAdmin = false, plan = "PRO_PLUS", storefrontNeedsAddress = false }: SidebarProps) {
   const t = useTranslations("Sidebar");
   const tSettings = useTranslations("Settings");
-  const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const safeLogout = useSafeLogout();
   const pathname = usePathname();
   const isActive = (path: string) => pathname === path || pathname.startsWith(path + "/");
-
-  const handleLogout = async () => {
-    setIsLoggingOut(true);
-    await logout();
-  };
 
   const roleLabel: Record<string, string> = {
     MANAGER: tSettings("role_manager"),
@@ -90,6 +85,10 @@ export default function Sidebar({ profile, shopName, shopLogoUrl, shopSlug, isPl
             </Link>
           )}
         </div>
+      </div>
+
+      <div className="mx-3 mb-3">
+        <SyncStatus tone="dark" />
       </div>
 
       <nav className="flex-1 overflow-y-auto px-3 pb-4" aria-label={t("app_name")}>
@@ -143,8 +142,8 @@ export default function Sidebar({ profile, shopName, shopLogoUrl, shopSlug, isPl
           <p className="text-xs text-[var(--nav-fg)]">{roleLabel[profile?.role || ""] || profile?.role || ""}</p>
         </div>
         <button
-          onClick={handleLogout}
-          disabled={isLoggingOut}
+          onClick={() => void safeLogout.run()}
+          disabled={safeLogout.loggingOut}
           title={t("logout")}
           aria-label={t("logout")}
           className="rounded-md p-1.5 text-[var(--nav-fg)] transition-colors hover:bg-[var(--nav-hover)] hover:text-white disabled:opacity-50"
@@ -152,6 +151,7 @@ export default function Sidebar({ profile, shopName, shopLogoUrl, shopSlug, isPl
           <LogOut className="h-4 w-4" />
         </button>
       </div>
+      <LogoutBlockedDialog count={safeLogout.blocked} onClose={safeLogout.closeBlocked} />
     </aside>
   );
 }

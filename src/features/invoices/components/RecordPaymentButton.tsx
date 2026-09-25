@@ -7,10 +7,15 @@ import { Modal } from "@/components/ui/Modal";
 import { useShopFormat } from "@/components/ShopFormatProvider";
 import type { FeedbackCode } from "@/lib/feedback";
 import { recordPayment } from "../payments";
+import { useOptionalOfflineContext } from "@/features/offline/OfflineProvider";
+import { payDebt } from "@/features/offline/localActions";
 
 export function RecordPaymentButton({ invoiceId, remaining }: { invoiceId: string; remaining: number }) {
   const t = useTranslations("Invoices");
   const tFeedback = useTranslations("Feedback");
+  const tOffline = useTranslations("Offline");
+  const offline = useOptionalOfflineContext();
+  const [savedOffline, setSavedOffline] = useState(false);
   const format = useShopFormat();
   const [isOpen, setIsOpen] = useState(false);
   const [amount, setAmount] = useState(String(remaining));
@@ -29,6 +34,17 @@ export function RecordPaymentButton({ invoiceId, remaining }: { invoiceId: strin
     e.preventDefault();
     setError(null);
     startTransition(async () => {
+      // Online first, kept on the device without a network (offline mode).
+      if (offline) {
+        const result = await payDebt(offline, invoiceId, value);
+        if (!result.ok) {
+          setError(result.code);
+          return;
+        }
+        setSavedOffline(result.offline);
+        setIsOpen(false);
+        return;
+      }
       const result = await recordPayment(invoiceId, value);
       if (result.error) {
         setError(result.error);
@@ -47,6 +63,9 @@ export function RecordPaymentButton({ invoiceId, remaining }: { invoiceId: strin
       >
         <Banknote className="h-4 w-4" /> {t("record_payment")}
       </button>
+      {savedOffline && (
+        <p className="mt-2 text-[13px] font-semibold text-amber-900 dark:text-amber-200">{tOffline("payment_saved_offline")}</p>
+      )}
 
       <Modal isOpen={isOpen} onClose={() => setIsOpen(false)} title={t("record_payment")}>
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">

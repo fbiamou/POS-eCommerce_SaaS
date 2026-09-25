@@ -12,6 +12,22 @@ import { planAllows } from "@/features/billing/plans";
 import { PlanBanner } from "@/features/billing/components/PlanBanner";
 import { getUnreadMessages } from "@/features/messages/queries";
 import { ShopMessages } from "@/features/messages/components/ShopMessages";
+import { OfflineProvider } from "@/features/offline/OfflineProvider";
+import type { Metadata, Viewport } from "next";
+
+// The signed-in app can be installed (home screen of a phone, desktop of a
+// computer) and opens offline (see features/offline). The public storefront
+// and the landing page are not part of it.
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+  const { locale } = await params;
+  return {
+    manifest: `/manifest-${locale}.webmanifest`,
+    icons: { apple: "/icons/apple-touch-icon.png" },
+    appleWebApp: { capable: true, title: "WISHOP", statusBarStyle: "default" },
+  };
+}
+
+export const viewport: Viewport = { themeColor: "#141C45" };
 
 // Shared chrome for every authenticated dashboard page. Desktop keeps the
 // persistent Sidebar; mobile — the primary usage per AGENTS.md — gets its
@@ -40,7 +56,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   // admin is never locked out of the console this way.
   const suspended = Boolean(subscription?.suspended_at) && !isAdmin;
 
-  return (
+  const shell = (
     <ShopFormatProvider value={shopFormat}>
       <div className="relative flex h-screen w-full flex-col overflow-hidden md:flex-row">
         <Sidebar
@@ -76,5 +92,15 @@ export default async function AppLayout({ children }: { children: React.ReactNod
         <Toaster />
       </div>
     </ShopFormatProvider>
+  );
+
+  // Every page of the app runs the offline mode: the device keeps its own
+  // copy of the shop and sends what it did without internet afterwards.
+  return profile ? (
+    <OfflineProvider shopId={profile.shop_id} userId={profile.id} userName={profile.full_name}>
+      {shell}
+    </OfflineProvider>
+  ) : (
+    shell
   );
 }

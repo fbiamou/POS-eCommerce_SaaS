@@ -2,13 +2,14 @@
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { useLiveQuery } from "dexie-react-hooks";
+import { useLocale } from "next-intl";
 import { createClient } from "@/utils/supabase/client";
 import { openShopDatabase, type ShopDatabase } from "./db";
 import { deviceLabel, readDevice, reconcileDevice, writeDevice } from "./device";
 import { registerDevice, supabaseBackend } from "./backend";
 import { outboxCounts } from "./records";
 import { syncNow, type SyncBackend } from "./sync";
-import { registerServiceWorker } from "./serviceWorker";
+import { registerServiceWorker, warmOfflinePages } from "./serviceWorker";
 
 // Runs the offline mode for every page of the app: keeps this device's copy
 // of the shop up to date, sends what was done without internet as soon as
@@ -30,9 +31,11 @@ export type OfflineStatus = {
   ready: boolean;
 };
 
-type OfflineContextValue = {
+export type OfflineContextValue = {
   shopId: string;
   userId: string;
+  /** Printed on the ticket of a sale made on this device. */
+  userName: string | null;
   db: ShopDatabase;
   status: OfflineStatus;
   /** Background exchanges (long timeout) and till exchanges (short timeout). */
@@ -46,7 +49,18 @@ type OfflineContextValue = {
 
 const OfflineContext = createContext<OfflineContextValue | null>(null);
 
-export function OfflineProvider({ shopId, userId, children }: { shopId: string; userId: string; children: React.ReactNode }) {
+export function OfflineProvider({
+  shopId,
+  userId,
+  userName,
+  children,
+}: {
+  shopId: string;
+  userId: string;
+  userName: string | null;
+  children: React.ReactNode;
+}) {
+  const locale = useLocale();
   const db = useMemo(() => openShopDatabase(shopId), [shopId]);
   const supabase = useMemo(() => createClient(), []);
   const backend = useMemo(() => supabaseBackend(supabase, shopId), [supabase, shopId]);
@@ -89,7 +103,12 @@ export function OfflineProvider({ shopId, userId, children }: { shopId: string; 
           const result = await syncNow(db, backend, { full: !fullDone.current });
           const reached = !result.push.offline && result.pull?.ok !== false;
           setServerReachable(reached);
-          if (reached) fullDone.current = true;
+          if (reached && !fullDone.current) {
+            fullDone.current = true;
+            // The main pages are kept now, so they open offline later even
+            // if nobody visited them on this device.
+            void warmOfflinePages(locale);
+          }
         };
         if (navigator.locks) await navigator.locks.request(`wishop-sync-${shopId}`, work);
         else await work();
@@ -98,7 +117,7 @@ export function OfflineProvider({ shopId, userId, children }: { shopId: string; 
       running.current = false;
       setSyncing(false);
     }
-  }, [db, backend, shopId, ensureDevice]);
+  }, [db, backend, shopId, ensureDevice, locale]);
 
   useEffect(() => {
     const update = () => {
@@ -128,6 +147,7 @@ export function OfflineProvider({ shopId, userId, children }: { shopId: string; 
     () => ({
       shopId,
       userId,
+      userName,
       db,
       backend,
       tillBackend,
@@ -142,7 +162,7 @@ export function OfflineProvider({ shopId, userId, children }: { shopId: string; 
       requestSync: () => void runSync(),
       markOffline: () => setServerReachable(false),
     }),
-    [shopId, userId, db, backend, tillBackend, browserOnline, serverReachable, syncing, counts.pending, counts.failed, lastPullAt, runSync]
+    [shopId, userId, userName, db, backend, tillBackend, browserOnline, serverReachable, syncing, counts.pending, counts.failed, lastPullAt, runSync]
   );
 
   return <OfflineContext.Provider value={value}>{children}</OfflineContext.Provider>;

@@ -1,10 +1,10 @@
-// Each phone (or browser) that sells is a numbered till with its own series
+// Each device that sells (a phone or a computer, one browser each) is a numbered till with its own series
 // of invoice numbers: FAC-2026-1-0042 on till 1, FAC-2026-2-0015 on till 2
 // (decided 25/09/2026, like Loyverse and Shopify POS). The number is given on
 // the phone, online or offline, and never changes afterwards.
 //
 // The till is kept in localStorage rather than in the shop database, so it
-// survives a logout: the same phone keeps its number and its series.
+// survives a logout: the same device keeps its number and its series.
 
 export type DeviceState = {
   id: string;

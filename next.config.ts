@@ -32,6 +32,15 @@ const nextConfig: NextConfig = {
         source: "/legal/:path*",
         headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow" }],
       },
+      // Offline mode (public/sw.js): the browser checks for a new version of
+      // the service worker on every visit instead of keeping an old one.
+      {
+        source: "/sw.js",
+        headers: [
+          { key: "Cache-Control", value: "no-cache, no-store, must-revalidate" },
+          { key: "Content-Type", value: "application/javascript; charset=utf-8" },
+        ],
+      },
     ];
   },
   images: {

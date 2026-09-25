@@ -122,7 +122,7 @@ describe("sending what was done offline", () => {
 
 describe("receiving the server's changes", () => {
   const serverInvoice = (paid: number): ServerInvoice => ({
-    id: "inv-server", invoice_number: "FAC-2026-2-0007", client_id: null, client_name: null, client_phone: null,
+    id: "inv-server", invoice_number: "FAC-2026-2-0007", client_id: null, client_name: null, client_phone: null, seller_name: "Awa",
     total_amount: 20000, paid_amount: paid, discount_amount: 0, loyalty_reward_used: false,
     status: paid >= 20000 ? "PAID" : paid > 0 ? "PARTIAL" : "UNPAID", created_at: "2026-09-26T08:00:00Z",
     recorded_offline: false, updated_at: "2026-09-26T08:05:00Z",

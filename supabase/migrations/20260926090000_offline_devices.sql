@@ -215,7 +215,11 @@ $function$;
 --                n'est pas enregistrée une deuxième fois ;
 --   _device_id, _device_seq  la caisse et son numéro dans la série ;
 --   _sold_at     heure de la vente, donnée seulement pour une vente faite
---                hors ligne.
+--                hors ligne ;
+--   _seller_id   la personne qui a vendu. Une vente faite hors ligne peut
+--                être envoyée plus tard par une collègue connectée sur le
+--                même appareil : elle reste au nom de celle qui l'a faite,
+--                si c'est bien un membre de la boutique.
 -- Sans caisse (commande de la vitrine confirmée), le numéro reste celui de
 -- la boutique : FAC-2026-0042.
 DROP FUNCTION public.record_sale(uuid, uuid, jsonb, integer, boolean);
@@ -229,7 +233,8 @@ CREATE FUNCTION public.record_sale(
     _invoice_id uuid DEFAULT NULL,
     _device_id uuid DEFAULT NULL,
     _device_seq integer DEFAULT NULL,
-    _sold_at timestamptz DEFAULT NULL
+    _sold_at timestamptz DEFAULT NULL,
+    _seller_id uuid DEFAULT NULL
 )
 RETURNS uuid
 LANGUAGE plpgsql
@@ -255,9 +260,15 @@ DECLARE
     _price INTEGER;
     _current_stock INTEGER;
     _inv_status invoice_status;
+    _author UUID := auth.uid();
 BEGIN
     IF _shop_id != get_current_shop_id() THEN
         RAISE EXCEPTION 'Unauthorized shop access';
+    END IF;
+
+    IF _seller_id IS NOT NULL AND _seller_id IS DISTINCT FROM auth.uid()
+       AND EXISTS (SELECT 1 FROM profiles WHERE id = _seller_id AND shop_id = _shop_id) THEN
+        _author := _seller_id;
     END IF;
 
     -- Déjà reçue (renvoi après une coupure) : on rend la même facture.
@@ -352,7 +363,7 @@ BEGIN
     INSERT INTO invoices (id, shop_id, client_id, invoice_number, total_amount, paid_amount, status, created_by,
                           discount_amount, loyalty_reward_used, device_id, device_seq, recorded_offline, created_at)
     VALUES (COALESCE(_invoice_id, gen_random_uuid()), _shop_id, _client_id, _invoice_number, _total_amount, _paid,
-            _inv_status, auth.uid(), _discount, COALESCE(_use_loyalty_reward, FALSE), _device_id, _device_seq,
+            _inv_status, _author, _discount, COALESCE(_use_loyalty_reward, FALSE), _device_id, _device_seq,
             _offline, _sale_time)
     RETURNING id INTO _new_id;
 
@@ -386,12 +397,12 @@ BEGIN
         WHERE id = _product_id AND shop_id = _shop_id;
 
         INSERT INTO stock_movements (shop_id, product_id, type, quantity_change, reference_id, created_by, created_at)
-        VALUES (_shop_id, _product_id, 'SALE', -_qty, _new_id, auth.uid(), _sale_time);
+        VALUES (_shop_id, _product_id, 'SALE', -_qty, _new_id, _author, _sale_time);
     END LOOP;
 
     IF _paid > 0 THEN
         INSERT INTO payments (shop_id, invoice_id, amount, recorded_by, payment_date, recorded_offline)
-        VALUES (_shop_id, _new_id, _paid, auth.uid(), _sale_time, _offline);
+        VALUES (_shop_id, _new_id, _paid, _author, _sale_time, _offline);
     END IF;
 
     IF _offline THEN
@@ -402,8 +413,8 @@ BEGIN
 END;
 $function$;
 
-REVOKE EXECUTE ON FUNCTION public.record_sale(uuid, uuid, jsonb, integer, boolean, uuid, uuid, integer, timestamptz) FROM PUBLIC, anon;
-GRANT EXECUTE ON FUNCTION public.record_sale(uuid, uuid, jsonb, integer, boolean, uuid, uuid, integer, timestamptz) TO authenticated, service_role;
+REVOKE EXECUTE ON FUNCTION public.record_sale(uuid, uuid, jsonb, integer, boolean, uuid, uuid, integer, timestamptz, uuid) FROM PUBLIC, anon;
+GRANT EXECUTE ON FUNCTION public.record_sale(uuid, uuid, jsonb, integer, boolean, uuid, uuid, integer, timestamptz, uuid) TO authenticated, service_role;
 
 
 -- ------------------------------------------------------------
@@ -411,7 +422,8 @@ GRANT EXECUTE ON FUNCTION public.record_sale(uuid, uuid, jsonb, integer, boolean
 -- ------------------------------------------------------------
 --   _payment_id  identifiant créé sur le téléphone ; un paiement déjà reçu
 --                n'est pas enregistré une deuxième fois ;
---   _paid_at     heure du paiement, donnée seulement hors ligne.
+--   _paid_at     heure du paiement, donnée seulement hors ligne ;
+--   _recorded_by la personne qui a encaissé (même règle que _seller_id).
 -- Un paiement plus grand que ce qui reste dû est refusé, même hors ligne :
 -- le téléphone le garde « à vérifier » pour que la propriétaire décide
 -- (ce peut être le même paiement saisi sur deux téléphones).
@@ -422,7 +434,8 @@ CREATE FUNCTION public.record_payment(
     _invoice_id uuid,
     _amount integer,
     _payment_id uuid DEFAULT NULL,
-    _paid_at timestamptz DEFAULT NULL
+    _paid_at timestamptz DEFAULT NULL,
+    _recorded_by uuid DEFAULT NULL
 )
 RETURNS integer
 LANGUAGE plpgsql
@@ -436,9 +449,15 @@ DECLARE
     _existing_shop UUID;
     _offline BOOLEAN := _paid_at IS NOT NULL;
     _pay_time TIMESTAMPTZ := COALESCE(offline_time(_paid_at), now());
+    _author UUID := auth.uid();
 BEGIN
     IF _shop_id != get_current_shop_id() THEN
         RAISE EXCEPTION 'Unauthorized shop access';
+    END IF;
+
+    IF _recorded_by IS NOT NULL AND _recorded_by IS DISTINCT FROM auth.uid()
+       AND EXISTS (SELECT 1 FROM profiles WHERE id = _recorded_by AND shop_id = _shop_id) THEN
+        _author := _recorded_by;
     END IF;
 
     IF _payment_id IS NOT NULL THEN
@@ -478,7 +497,7 @@ BEGIN
     END IF;
 
     INSERT INTO payments (id, shop_id, invoice_id, amount, recorded_by, payment_date, recorded_offline)
-    VALUES (COALESCE(_payment_id, gen_random_uuid()), _shop_id, _invoice_id, _amount, auth.uid(), _pay_time, _offline);
+    VALUES (COALESCE(_payment_id, gen_random_uuid()), _shop_id, _invoice_id, _amount, _author, _pay_time, _offline);
 
     UPDATE invoices
     SET paid_amount = _new_paid,
@@ -493,8 +512,8 @@ BEGIN
 END;
 $function$;
 
-REVOKE EXECUTE ON FUNCTION public.record_payment(uuid, uuid, integer, uuid, timestamptz) FROM PUBLIC, anon;
-GRANT EXECUTE ON FUNCTION public.record_payment(uuid, uuid, integer, uuid, timestamptz) TO authenticated, service_role;
+REVOKE EXECUTE ON FUNCTION public.record_payment(uuid, uuid, integer, uuid, timestamptz, uuid) FROM PUBLIC, anon;
+GRANT EXECUTE ON FUNCTION public.record_payment(uuid, uuid, integer, uuid, timestamptz, uuid) TO authenticated, service_role;
 
 
 -- ------------------------------------------------------------

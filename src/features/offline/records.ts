@@ -40,6 +40,9 @@ export function buildLocalSale(input: {
   seq: number;
   soldAt: Date;
   client: { id: string; name: string; phone: string | null } | null;
+  /** The signed-in team member, recorded as the invoice's created_by. */
+  sellerId?: string | null;
+  sellerName?: string | null;
   lines: SaleLine[];
   paidAmount: number;
   /** Discount already checked by the server (loyalty reward); 0 offline. */
@@ -58,6 +61,7 @@ export function buildLocalSale(input: {
     client_id: input.client?.id ?? null,
     client_name: input.client?.name ?? null,
     client_phone: input.client?.phone ?? null,
+    seller_name: input.sellerName?.trim() || null,
     total_amount: total,
     paid_amount: paid,
     discount_amount: discount,
@@ -89,6 +93,7 @@ export function buildLocalSale(input: {
     device_id: input.device.id,
     device_seq: input.seq,
     sold_at: createdAt,
+    seller_id: input.sellerId ?? null,
   };
 
   return { invoice, items, payment, payload };
@@ -108,14 +113,14 @@ export function paymentProblem(invoice: LocalInvoice, amount: number): "invalid_
   return null;
 }
 
-export function buildLocalPayment(input: { paymentId: string; invoiceId: string; amount: number; paidAt: Date }): {
+export function buildLocalPayment(input: { paymentId: string; invoiceId: string; amount: number; paidAt: Date; recordedBy?: string | null }): {
   payment: LocalPayment;
   payload: PaymentPayload;
 } {
   const paidAt = input.paidAt.toISOString();
   return {
     payment: { id: input.paymentId, invoice_id: input.invoiceId, amount: input.amount, payment_date: paidAt },
-    payload: { payment_id: input.paymentId, invoice_id: input.invoiceId, amount: input.amount, paid_at: paidAt },
+    payload: { payment_id: input.paymentId, invoice_id: input.invoiceId, amount: input.amount, paid_at: paidAt, recorded_by: input.recordedBy ?? null },
   };
 }
 

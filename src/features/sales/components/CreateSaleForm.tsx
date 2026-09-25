@@ -2,14 +2,16 @@
 
 import { useState, useMemo, useEffect, useSyncExternalStore } from "react";
 import { Link, useRouter } from "@/i18n/routing";
-import { Plus, Minus, Trash2, Search, ShoppingBag, X, Printer, FileText, CheckCircle2, Lock } from "lucide-react";
+import { Plus, Minus, Trash2, Search, ShoppingBag, X, Printer, FileText, CheckCircle2, Lock, CloudOff } from "lucide-react";
 import { useMessages, useTranslations } from "next-intl";
 import { useCartStore } from "../store/useCartStore";
-import { createClient } from "@/utils/supabase/client";
 import { PhoneCountryCodeSelect } from "@/components/PhoneCountryCodeSelect";
 import { useShopFormat } from "@/components/ShopFormatProvider";
-import { feedbackFromError, type FeedbackCode } from "@/lib/feedback";
-import { loyaltyDiscount, type LoyaltyCard } from "@/features/clients/loyalty";
+import type { FeedbackCode } from "@/lib/feedback";
+import { loyaltyCard, loyaltyDiscount, type LoyaltyCard, type LoyaltyInvoice } from "@/features/clients/loyalty";
+import { useOptionalOfflineContext } from "@/features/offline/OfflineProvider";
+import { useLocalClients, useLocalInvoices, useLocalProducts } from "@/features/offline/hooks";
+import { sellAtTill } from "@/features/offline/localActions";
 import { StampDots } from "@/features/clients/components/StampCard";
 import { Select } from "@/components/ui/Select";
 
@@ -27,6 +29,7 @@ export type Product = {
 export type Client = {
   id: string;
   name: string;
+  phone?: string | null;
   card?: LoyaltyCard;
 };
 
@@ -42,8 +45,8 @@ const inputClass =
   "w-full rounded-xl border border-zinc-200 bg-[var(--surface-1)] px-4 py-2.5 text-[14px] font-medium transition-colors focus:border-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-500 placeholder:text-zinc-400 dark:border-[var(--line)]";
 
 export default function CreateSaleForm({
-  products,
-  clients,
+  products: serverProducts,
+  clients: serverClients,
   defaultPhoneCountryCode = "+237",
   loyalty = { enabled: false, stampsRequired: 10, rewardPercent: 10 },
   creditAllowed = true,
@@ -63,6 +66,54 @@ export default function CreateSaleForm({
   const messages = useMessages();
   const dataMessages = (messages.Data ?? {}) as Record<string, string>;
   const translateData = (value: string) => dataMessages[value] ?? value;
+  const tOffline = useTranslations("Offline");
+
+  // Offline mode: the till reads the device's copy of the shop (items,
+  // customers, loyalty cards), so it keeps selling when the internet goes.
+  // Until the device has its first copy, it shows what the server sent.
+  const offline = useOptionalOfflineContext();
+  const online = offline ? offline.status.online : true;
+  const localProducts = useLocalProducts();
+  const localClients = useLocalClients();
+  const localInvoices = useLocalInvoices();
+
+  const products: Product[] = useMemo(
+    () =>
+      localProducts
+        ? localProducts
+            .filter((p) => p.quantity_in_stock > 0)
+            .map((p) => ({
+              id: p.id,
+              name: p.name,
+              category: p.category_name ?? "",
+              sub_category: p.product_type ?? "",
+              brand: p.brand ?? "",
+              selling_price: p.selling_price,
+              quantity_in_stock: p.quantity_in_stock,
+              image_url: p.image_url,
+            }))
+        : serverProducts,
+    [localProducts, serverProducts]
+  );
+
+  const clients: Client[] = useMemo(() => {
+    if (!localClients || !localInvoices) return serverClients;
+    const byClient = new Map<string, LoyaltyInvoice[]>();
+    for (const invoice of localInvoices) {
+      if (!invoice.client_id || invoice.local_state === "failed") continue;
+      const list = byClient.get(invoice.client_id) ?? [];
+      list.push({ status: invoice.status, loyalty_reward_used: invoice.loyalty_reward_used });
+      byClient.set(invoice.client_id, list);
+    }
+    return localClients
+      .filter((c) => c.local_state !== "failed")
+      .map((c) => ({
+        id: c.id,
+        name: c.name,
+        phone: c.phone,
+        card: loyaltyCard(byClient.get(c.id) ?? [], loyalty.stampsRequired, loyalty.enabled),
+      }));
+  }, [localClients, localInvoices, serverClients, loyalty.stampsRequired, loyalty.enabled]);
 
   // Local state for filters
   const [searchTerm, setSearchTerm] = useState("");
@@ -124,7 +175,9 @@ export default function CreateSaleForm({
   const [useReward, setUseReward] = useState(true);
   const selectedClient = clients.find((c) => c.id === selectedClientId) ?? null;
   const card = loyalty.enabled && selectedClient ? selectedClient.card ?? null : null;
-  const rewardApplied = Boolean(card?.rewardAvailable && useReward && !isCreatingClient);
+  // Offline, the card on the device may be behind another till's sales: the
+  // reward waits for the connection and stays on the card.
+  const rewardApplied = Boolean(card?.rewardAvailable && useReward && !isCreatingClient && online);
   const discount = rewardApplied ? loyaltyDiscount(subtotal, loyalty.rewardPercent) : 0;
   const totalAmount = subtotal - discount;
   const itemCount = cart.reduce((sum, item) => sum + item.quantity, 0);
@@ -173,6 +226,7 @@ export default function CreateSaleForm({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<FeedbackCode | null>(null);
   const [lastInvoiceId, setLastInvoiceId] = useState<string | null>(null);
+  const [lastSaleOffline, setLastSaleOffline] = useState(false);
 
   const selectCategory = (value: string) => {
     // Narrowing the category invalidates the type and brand picks.
@@ -200,74 +254,51 @@ export default function CreateSaleForm({
     setLastInvoiceId(null);
 
     try {
-      const supabase = createClient();
-
-      // Get current user's shop_id
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("shop_id")
-        .single();
-
-      if (!profile?.shop_id) {
-        setSubmitError("shop_not_found");
+      if (!offline) {
+        setSubmitError("device_not_ready");
         return;
       }
 
-      let finalClientId: string | null = selectedClientId || null;
-
-      // Create new client if needed
-      if (isCreatingClient && newClientName) {
-        const digits = newClientPhone.replace(/\D/g, "");
-        const fullPhone = digits ? `${newClientPhoneCountryCode || defaultPhoneCountryCode}${digits}` : null;
-        const { data: newClient, error: clientError } = await supabase
-          .from("clients")
-          .insert({
-            shop_id: profile.shop_id,
-            name: newClientName,
-            phone: fullPhone,
-          })
-          .select("id")
-          .single();
-
-        if (clientError) {
-          console.error("Client creation failed:", clientError);
-          setSubmitError("client_save_failed");
-          return;
-        }
-        finalClientId = newClient.id;
-      }
-
-      // Prepare items
-      const items = cart.map((item) => {
+      const lines = cart.map((item) => {
         const product = products.find((p) => p.id === item.productId);
         return {
           product_id: item.productId,
+          product_name: product?.name ?? "",
           quantity: item.quantity,
           unit_price: product?.selling_price ?? 0,
         };
       });
 
-      // Call the record_sale RPC
-      const { data: invoiceId, error: rpcError } = await supabase.rpc("record_sale", {
-        _shop_id: profile.shop_id,
-        _client_id: finalClientId,
-        _items: items,
-        _paid_amount: paidValue,
-        _use_loyalty_reward: rewardApplied,
+      const digits = newClientPhone.replace(/\D/g, "");
+      const fullPhone = digits ? `${newClientPhoneCountryCode || defaultPhoneCountryCode}${digits}` : null;
+      const client =
+        isCreatingClient && newClientName.trim()
+          ? { kind: "new" as const, name: newClientName, phone: fullPhone }
+          : selectedClient
+            ? { kind: "existing" as const, id: selectedClient.id, name: selectedClient.name, phone: selectedClient.phone ?? null }
+            : { kind: "none" as const };
+
+      // Online first (stock and loyalty checked at once), kept on the device
+      // when there is no network: see features/offline/localActions.
+      const result = await sellAtTill(offline, {
+        lines,
+        client,
+        paidAmount: paidValue,
+        loyalty: { use: rewardApplied, percent: loyalty.rewardPercent },
+        sellerName: offline.userName,
       });
 
-      if (rpcError) {
-        console.error("record_sale failed:", rpcError);
-        setSubmitError(feedbackFromError(rpcError));
+      if (!result.ok) {
+        setSubmitError(result.code);
         return;
       }
 
-      setLastInvoiceId(invoiceId as string);
+      setLastInvoiceId(result.id);
+      setLastSaleOffline(result.offline);
       clearCart();
       setPayMode("full");
       setCashReceived("");
       setUseReward(true);
-      router.refresh();
     } catch (err) {
       console.error("Sale failed:", err);
       setSubmitError("generic_error");
@@ -456,6 +487,12 @@ export default function CreateSaleForm({
           <div className="flex flex-col items-center gap-4 px-5 py-8 text-center pb-[calc(2rem+env(safe-area-inset-bottom))]">
             <CheckCircle2 className="h-12 w-12 text-emerald-600" />
             <p className="font-display text-xl font-bold">{t("success")}</p>
+            {lastSaleOffline && (
+              <p className="flex items-start gap-2 rounded-xl bg-amber-50 p-3 text-left text-[13px] font-semibold text-amber-900 dark:bg-amber-900/20 dark:text-amber-200">
+                <CloudOff className="mt-0.5 h-4 w-4 shrink-0" />
+                {tOffline("sale_saved_offline")}
+              </p>
+            )}
             <div className="grid w-full gap-2">
               <Link
                 href={`/invoices/${lastInvoiceId}/ticket`}
@@ -636,7 +673,11 @@ export default function CreateSaleForm({
                 </div>
 
                 {card && (
-                  card.rewardAvailable ? (
+                  card.rewardAvailable && !online ? (
+                    <p className="mt-2 rounded-xl bg-amber-50 p-3 text-[12.5px] font-semibold text-amber-900 dark:bg-amber-900/20 dark:text-amber-200">
+                      {tOffline("loyalty_offline")}
+                    </p>
+                  ) : card.rewardAvailable ? (
                     <label htmlFor="use-reward" className="mt-2 flex items-center gap-3 rounded-xl bg-saffron/20 p-3 text-[13.5px] font-semibold text-amber-950 dark:text-saffron">
                       <input id="use-reward" type="checkbox" checked={useReward} onChange={(e) => setUseReward(e.target.checked)} className="h-5 w-5 accent-[var(--accent-bg)]" />
                       <span>{t("loyalty_reward_ready", { percent: loyalty.rewardPercent })}</span>

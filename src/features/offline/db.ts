@@ -1,6 +1,6 @@
 import Dexie, { type EntityTable } from "dexie";
 
-// Local copy of the shop kept in the phone (IndexedDB), so the app keeps
+// Local copy of the shop kept in the device, phone or computer (IndexedDB), so the app keeps
 // working when the power or the internet goes (decided 25/09/2026: the whole
 // app works offline, not only the till). The server stays the reference:
 // every change made on the phone goes through the outbox, is sent to the
@@ -44,6 +44,8 @@ export type LocalInvoice = {
   client_id: string | null;
   client_name: string | null;
   client_phone: string | null;
+  /** Team member who recorded the sale, printed on the ticket. */
+  seller_name: string | null;
   total_amount: number;
   paid_amount: number;
   discount_amount: number;
@@ -82,8 +84,10 @@ export type SalePayload = {
   use_loyalty_reward: boolean;
   device_id: string;
   device_seq: number;
-  /** Time of the sale on the phone; sent only when it was made offline. */
+  /** Time of the sale on the device; sent only when it was made offline. */
   sold_at: string;
+  /** Who sold: the sale keeps their name even if a colleague sends it later. */
+  seller_id: string | null;
 };
 
 export type PaymentPayload = {
@@ -91,6 +95,8 @@ export type PaymentPayload = {
   invoice_id: string;
   amount: number;
   paid_at: string;
+  /** Who took the payment (same rule as a sale's seller). */
+  recorded_by: string | null;
 };
 
 export type ClientPayload = {

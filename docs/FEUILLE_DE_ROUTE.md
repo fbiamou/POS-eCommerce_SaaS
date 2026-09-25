@@ -20,7 +20,10 @@ Document vivant : ce qui est décidé pour les prochaines versions, pour le gard
 
 ## V3
 
-- Mode hors ligne, dans toutes les formules, gratuite comprise (coupures de courant et d'internet).
+- Mode hors ligne, dans toutes les formules, gratuite comprise (coupures de courant et d'internet). Avancé en première mise à jour après le pilote (décision du 25/09/2026), sur téléphone comme sur ordinateur :
+  - Étape 1 (construite en local, branche `hors-ligne`, pas encore publiée) : application installable ; caisse, stock, clientes, factures, tickets et encaissement des dettes sans internet ; une série de numéros de facture par appareil (FAC-2026-1-0042) ; envoi automatique au retour de la connexion, sans doublon ; vente toujours gardée, stock « à vérifier » s'il passe sous zéro ; déconnexion refusée tant que des ventes ne sont pas envoyées.
+  - Étape 2 : tableau de bord, création et modification d'articles, bons de commande hors ligne.
+  - À décider : changement de caissier sans internet sur un appareil partagé (code PIN, comme Loyverse).
 - Plusieurs boutiques par compte (Pro, Pro Plus).
 - Rapports par intelligence artificielle (Pro Plus).
 

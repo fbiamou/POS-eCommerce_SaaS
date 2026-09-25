@@ -30,6 +30,8 @@ describe("a sale made on the phone", () => {
     seq: 43,
     soldAt: new Date("2026-09-26T09:30:00Z"),
     client: { id: "c-awa", name: "Awa", phone: "+240555" },
+    sellerId: "user-nadege",
+    sellerName: " Nadège ",
     lines,
   };
 
@@ -37,10 +39,11 @@ describe("a sale made on the phone", () => {
     const sale = buildLocalSale({ ...base, paidAmount: 52000 });
     expect(sale.invoice.total_amount).toBe(52000);
     expect(sale.invoice.invoice_number).toBe("FAC-2026-1-0043");
+    expect(sale.invoice.seller_name).toBe("Nadège");
     expect(sale.invoice.status).toBe("PAID");
     expect(sale.items.map((i) => i.total_price)).toEqual([45000, 7000]);
     expect(sale.payment?.amount).toBe(52000);
-    expect(sale.payload).toMatchObject({ device_id: "dev-1", device_seq: 43, paid_amount: 52000, client_id: "c-awa" });
+    expect(sale.payload).toMatchObject({ device_id: "dev-1", device_seq: 43, paid_amount: 52000, client_id: "c-awa", seller_id: "user-nadege" });
   });
 
   it("records a credit sale: the part paid now, the rest owed", () => {
@@ -90,9 +93,9 @@ describe("a payment on a debt", () => {
   });
 
   it("keeps the phone's time for the server", () => {
-    const { payment, payload } = buildLocalPayment({ paymentId: "pay-9", invoiceId: "inv-2", amount: 5000, paidAt: new Date("2026-09-26T11:00:00Z") });
+    const { payment, payload } = buildLocalPayment({ paymentId: "pay-9", invoiceId: "inv-2", amount: 5000, paidAt: new Date("2026-09-26T11:00:00Z"), recordedBy: "user-awa" });
     expect(payment.payment_date).toBe("2026-09-26T11:00:00.000Z");
-    expect(payload).toEqual({ payment_id: "pay-9", invoice_id: "inv-2", amount: 5000, paid_at: "2026-09-26T11:00:00.000Z" });
+    expect(payload).toEqual({ payment_id: "pay-9", invoice_id: "inv-2", amount: 5000, paid_at: "2026-09-26T11:00:00.000Z", recorded_by: "user-awa" });
   });
 });
 

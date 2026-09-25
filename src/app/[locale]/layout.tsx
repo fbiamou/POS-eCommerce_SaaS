@@ -74,11 +74,14 @@ export default async function RootLayout({
               "try{if(localStorage.getItem('theme')==='dark'){document.documentElement.setAttribute('data-theme','dark')}}catch(e){}",
           }}
         />
+        {/* Removes stray service workers left on the domain (fix of 20/09/2026
+            for pages that no longer loaded on phones), except WISHOP's own
+            /sw.js, which lets the app open offline. */}
         <script
           id="unregister-sw"
           dangerouslySetInnerHTML={{
             __html:
-              "try{if('serviceWorker' in navigator){navigator.serviceWorker.getRegistrations().then(function(r){for(var i=0;i<r.length;i++){r[i].unregister()}})}}catch(e){}",
+              "try{if('serviceWorker' in navigator){navigator.serviceWorker.getRegistrations().then(function(r){for(var i=0;i<r.length;i++){var w=r[i].active||r[i].waiting||r[i].installing;if(!w||!/\\/sw\\.js$/.test(w.scriptURL)){r[i].unregister()}}})}}catch(e){}",
           }}
         />
       </head>

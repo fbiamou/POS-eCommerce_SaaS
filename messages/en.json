@@ -812,7 +812,12 @@
     "email_taken": "An account already exists with this address. Sign in, or use “Forgot your password?”.",
     "email_invalid_signup": "This email address is not accepted: please check it.",
     "signup_rate_limited": "Too many attempts in a short time. Try again in a few minutes.",
-    "email_send_failed": "The shop could not be created: the confirmation email could not be sent. Try again in a few minutes; if it keeps happening, contact WISHOP."
+    "email_send_failed": "The shop could not be created: the confirmation email could not be sent. Try again in a few minutes; if it keeps happening, contact WISHOP.",
+    "device_not_found": "This device is no longer recognised as a till. Reconnect it to the internet to register it again.",
+    "device_sequence_missing": "The sale number is missing. Try again.",
+    "device_sequence_conflict": "This sale number already exists for this till. The sale was not recorded twice.",
+    "device_not_ready": "This device is not registered as a till yet. Connect it to the internet once.",
+    "needs_connection": "This action needs the internet. Try again when the connection is back."
   },
   "Suppliers": {
     "title": "Suppliers",
@@ -1174,5 +1179,36 @@
     "read_count": "{count, plural, =0 {Read by no shop} one {Read by # shop} other {Read by # shops}}",
     "withdraw": "Withdraw",
     "withdraw_confirm": "The message also disappears for shops that have not read it yet."
+  },
+  "Offline": {
+    "status_offline": "Offline",
+    "status_to_send": "{count} to send",
+    "status_sending": "Sending…",
+    "status_to_check": "{count} to check",
+    "status_up_to_date": "Up to date",
+    "panel_title": "Sync",
+    "panel_online": "Connected: what is done on this device goes straight to the online shop.",
+    "panel_offline": "No connection: you can keep selling and taking payments. Everything will be sent when the internet is back.",
+    "panel_last_sync": "Last update: {time}",
+    "panel_never": "This device has not received the shop's data yet. It needs the internet once.",
+    "panel_pending": "{count, plural, =0 {Nothing waiting to be sent.} one {# operation is waiting to be sent.} other {# operations are waiting to be sent.}}",
+    "panel_failed_title": "To check",
+    "panel_failed_intro": "The online shop refused these operations made offline. They are not counted: check them, then redo them if needed.",
+    "kind_sale": "Sale {number}",
+    "kind_payment": "Payment of {amount}",
+    "kind_client": "Customer {name}",
+    "retry": "Try again",
+    "dismiss": "Remove",
+    "sync_now": "Update now",
+    "logout_blocked": "{count, plural, one {# operation made offline has not been sent yet.} other {# operations made offline have not been sent yet.}} Reconnect the device to the internet and wait for them to be sent before logging out, or they would be lost.",
+    "sale_saved_offline": "Sale saved on the device. It will be sent when the internet is back.",
+    "payment_saved_offline": "Payment saved on the device. It will be sent when the internet is back.",
+    "badge_pending": "To send",
+    "badge_failed": "Refused",
+    "loyalty_offline": "Loyalty reward available when the internet is back: it stays on the card.",
+    "needs_connection": "This action needs the internet.",
+    "not_on_device": "This invoice is not on this device yet. It will appear at the next update.",
+    "loading": "Loading the device's data…",
+    "stock_to_check": "Stock to check"
   }
 }

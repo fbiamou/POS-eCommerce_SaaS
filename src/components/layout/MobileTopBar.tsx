@@ -4,7 +4,8 @@ import { useEffect, useRef, useState } from "react";
 import { Link } from "@/i18n/routing";
 import { useTranslations } from "next-intl";
 import { ChevronDown, Settings, LogOut } from "lucide-react";
-import { logout } from "@/app/[locale]/login/actions";
+import { SyncStatus } from "@/features/offline/components/SyncStatus";
+import { LogoutBlockedDialog, useSafeLogout } from "@/features/offline/components/SafeLogout";
 import { LocaleSwitcher } from "@/components/LocaleSwitcher";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { isPageAllowed } from "@/lib/appPages";
@@ -26,7 +27,7 @@ export function MobileTopBar({ profile, shopName, shopLogoUrl }: MobileTopBarPro
   const t = useTranslations("Sidebar");
   const tSettings = useTranslations("Settings");
   const [open, setOpen] = useState(false);
-  const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const safeLogout = useSafeLogout();
   const panelRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -45,11 +46,6 @@ export function MobileTopBar({ profile, shopName, shopLogoUrl }: MobileTopBarPro
 
   const canSeeSettings = isPageAllowed(profile?.role || "SELLER", profile?.allowed_pages ?? [], "/settings");
 
-  const handleLogout = async () => {
-    setIsLoggingOut(true);
-    await logout();
-  };
-
   return (
     <div className="md:hidden fixed top-0 left-0 right-0 z-40 flex h-[calc(3.5rem+env(safe-area-inset-top))] items-center justify-between border-b border-zinc-200 bg-[var(--surface-1)] px-4 pt-[env(safe-area-inset-top)] dark:border-[var(--line)]">
       <div className="flex items-center gap-2.5 min-w-0">
@@ -57,7 +53,8 @@ export function MobileTopBar({ profile, shopName, shopLogoUrl }: MobileTopBarPro
         <span className="font-display text-[17px] font-extrabold tracking-tight truncate">{shopName || t("app_name")}</span>
       </div>
 
-      <div className="relative shrink-0" ref={panelRef}>
+      <div className="relative flex shrink-0 items-center gap-2" ref={panelRef}>
+        <SyncStatus />
         <button
           onClick={() => setOpen((v) => !v)}
           aria-label={t("app_name")}
@@ -89,8 +86,8 @@ export function MobileTopBar({ profile, shopName, shopLogoUrl }: MobileTopBarPro
               <ThemeToggle switchToLightLabel={t("switch_to_light")} switchToDarkLabel={t("switch_to_dark")} />
             </div>
             <button
-              onClick={handleLogout}
-              disabled={isLoggingOut}
+              onClick={() => void safeLogout.run()}
+              disabled={safeLogout.loggingOut}
               className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-[13px] font-bold text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20 transition-colors"
             >
               <LogOut className="h-4 w-4" /> {t("logout")}
@@ -98,6 +95,7 @@ export function MobileTopBar({ profile, shopName, shopLogoUrl }: MobileTopBarPro
           </div>
         )}
       </div>
+      <LogoutBlockedDialog count={safeLogout.blocked} onClose={safeLogout.closeBlocked} />
     </div>
   );
 }

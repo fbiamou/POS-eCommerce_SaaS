@@ -8,7 +8,7 @@ import type { Outcome, ServerInvoice, ShopSnapshot, SyncBackend } from "./sync";
 // same database functions as online; reads are paged, oldest change first.
 
 /** A request that never answers (Wi-Fi without internet) counts as offline. */
-const TIMEOUT_MS = 20_000;
+const DEFAULT_TIMEOUT_MS = 20_000;
 const PAGE_SIZE = 1000;
 const INVOICE_PAGE_SIZE = 500;
 
@@ -33,14 +33,12 @@ async function guarded<T>(run: () => Promise<Outcome<T>>): Promise<Outcome<T>> {
   }
 }
 
-function timeout() {
-  return AbortSignal.timeout(TIMEOUT_MS);
-}
 
 type ProductRow = Omit<LocalProduct, "category_name"> & { updated_at: string; categories: { name: string } | null };
 type ClientRow = LocalClient & { updated_at: string };
-type InvoiceRow = Omit<ServerInvoice, "client_name" | "client_phone" | "items" | "payments"> & {
+type InvoiceRow = Omit<ServerInvoice, "client_name" | "client_phone" | "seller_name" | "items" | "payments"> & {
   clients: { name: string; phone: string | null } | null;
+  seller: { full_name: string | null } | null;
   invoice_items: (Omit<LocalInvoiceItem, "invoice_id" | "product_name"> & { products: { name: string } | null })[];
   payments: Omit<LocalPayment, "invoice_id">[];
 };
@@ -51,12 +49,15 @@ const CLIENT_COLUMNS = "id, name, phone, is_active, created_at, updated_at";
 const INVOICE_COLUMNS = `id, invoice_number, client_id, total_amount, paid_amount, discount_amount, loyalty_reward_used, status,
   created_at, updated_at, recorded_offline,
   clients ( name, phone ),
+  seller:profiles!invoices_created_by_fkey ( full_name ),
   invoice_items ( id, product_id, quantity, unit_price, total_price, products ( name ) ),
   payments ( id, amount, payment_date )`;
 const SHOP_COLUMNS =
   "shop_name, shop_phone, shop_address, shop_email, shop_logo_url, tax_id, trade_register, country_code, vat_registered, vat_rate_bps, currency_symbol, default_phone_country_code, low_stock_threshold, timezone, loyalty_enabled, loyalty_stamps_required, loyalty_reward_percent";
 
-export function supabaseBackend(supabase: SupabaseClient, shopId: string): SyncBackend {
+export function supabaseBackend(supabase: SupabaseClient, shopId: string, options: { timeoutMs?: number } = {}): SyncBackend {
+  const timeout = () => AbortSignal.timeout(options.timeoutMs ?? DEFAULT_TIMEOUT_MS);
+
   async function rpc(fn: string, args: Record<string, unknown>): Promise<Outcome<null>> {
     return guarded(async () => {
       const response = await supabase.rpc(fn, args).abortSignal(timeout());
@@ -94,6 +95,7 @@ export function supabaseBackend(supabase: SupabaseClient, shopId: string): SyncB
         _device_id: p.device_id,
         _device_seq: p.device_seq,
         _sold_at: offline ? p.sold_at : null,
+        _seller_id: p.seller_id,
       }),
 
     recordPayment: (p, offline) =>
@@ -103,6 +105,7 @@ export function supabaseBackend(supabase: SupabaseClient, shopId: string): SyncB
         _amount: p.amount,
         _payment_id: p.payment_id,
         _paid_at: offline ? p.paid_at : null,
+        _recorded_by: p.recorded_by,
       }),
 
     async pullProducts(since) {
@@ -123,8 +126,9 @@ export function supabaseBackend(supabase: SupabaseClient, shopId: string): SyncB
       if (!outcome.ok) return outcome;
       return {
         ok: true,
-        data: outcome.data.map(({ clients, invoice_items, payments, ...row }) => ({
+        data: outcome.data.map(({ clients, seller, invoice_items, payments, ...row }) => ({
           ...row,
+          seller_name: seller?.full_name?.trim() || null,
           discount_amount: row.discount_amount ?? 0,
           recorded_offline: Boolean(row.recorded_offline),
           client_name: clients?.name ?? null,
@@ -158,7 +162,7 @@ export async function registerDevice(
   try {
     const { data, error } = await supabase
       .rpc("register_device", { _device_id: deviceId, _label: label })
-      .abortSignal(timeout());
+      .abortSignal(AbortSignal.timeout(DEFAULT_TIMEOUT_MS));
     if (error || !Array.isArray(data) || data.length === 0) return null;
     return data[0] as { device_id: string; device_number: number; last_seq: number };
   } catch {

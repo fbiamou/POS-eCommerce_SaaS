@@ -3,22 +3,45 @@
 import { useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/routing";
-import { ChevronRight, Search } from "lucide-react";
+import { ChevronRight, CloudOff, Search, TriangleAlert } from "lucide-react";
 import { useShopFormat } from "@/components/ShopFormatProvider";
+import { useLocalInvoices } from "@/features/offline/hooks";
+import type { LocalState } from "@/features/offline/db";
 import type { InvoiceListItem } from "../actions";
 import { INVOICE_STATUS_CLASS } from "../status";
 
 type Filter = "all" | "due" | "paid";
 
-export default function InvoiceList({ invoices }: { invoices: InvoiceListItem[] }) {
+export default function InvoiceList({ invoices: serverInvoices }: { invoices: InvoiceListItem[] }) {
   const t = useTranslations("Invoices");
+  const tOffline = useTranslations("Offline");
+  // The device's copy when it has one: it also lists the sales made offline.
+  const localInvoices = useLocalInvoices();
+  const invoices: (InvoiceListItem & { local_state?: LocalState })[] = useMemo(
+    () =>
+      localInvoices
+        ? localInvoices.map((inv) => ({
+            id: inv.id,
+            invoice_number: inv.invoice_number,
+            total_amount: inv.total_amount,
+            paid_amount: inv.paid_amount,
+            status: inv.status,
+            created_at: inv.created_at,
+            client_name: inv.client_name,
+            local_state: inv.local_state,
+          }))
+        : serverInvoices,
+    [localInvoices, serverInvoices]
+  );
   const format = useShopFormat();
   const [searchTerm, setSearchTerm] = useState("");
   const [filter, setFilter] = useState<Filter>("all");
 
-  const dueCount = invoices.filter((inv) => inv.status !== "PAID").length;
-  const paidCount = invoices.length - dueCount;
-  const totalDue = invoices.reduce((sum, inv) => sum + (inv.total_amount - inv.paid_amount), 0);
+  // A sale the server refused is not owed: it stays listed, apart.
+  const counted = invoices.filter((inv) => inv.local_state !== "failed");
+  const dueCount = counted.filter((inv) => inv.status !== "PAID").length;
+  const paidCount = counted.length - dueCount;
+  const totalDue = counted.reduce((sum, inv) => sum + (inv.total_amount - inv.paid_amount), 0);
 
   const filtered = useMemo(() => {
     const term = searchTerm.trim().toLowerCase();
@@ -97,6 +120,17 @@ export default function InvoiceList({ invoices }: { invoices: InvoiceListItem[] 
                     <span className={`shrink-0 rounded-full px-2 py-0.5 text-[11px] font-semibold ${INVOICE_STATUS_CLASS[invoice.status]}`}>
                       {statusLabel[invoice.status]}
                     </span>
+                    {invoice.local_state === "pending" && (
+                      <span title={tOffline("badge_pending")} className="shrink-0 text-amber-700 dark:text-amber-300">
+                        <CloudOff className="h-3.5 w-3.5" />
+                        <span className="sr-only">{tOffline("badge_pending")}</span>
+                      </span>
+                    )}
+                    {invoice.local_state === "failed" && (
+                      <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-red-100 px-2 py-0.5 text-[11px] font-semibold text-red-800 dark:bg-red-900/30 dark:text-red-300">
+                        <TriangleAlert className="h-3 w-3" /> {tOffline("badge_failed")}
+                      </span>
+                    )}
                   </span>
                   <span className="mt-0.5 block truncate font-mono text-[12px] text-zinc-500">
                     {invoice.invoice_number || "—"} · {format.date(invoice.created_at)}
