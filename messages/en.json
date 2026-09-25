@@ -535,6 +535,7 @@
     "ticket_title": "Receipt",
     "print": "Print",
     "thank_you": "Thank you for your visit!",
+    "served_by": "Served by",
     "not_found": "Invoice not found.",
     "tax_id_label": "Tax ID",
     "trade_register_label": "Trade Register",

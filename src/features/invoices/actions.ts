@@ -44,6 +44,8 @@ export type InvoiceDetail = {
   /** Loyalty reward taken off the sum of the lines (0 when none). */
   discount_amount: number;
   client: { name: string; phone: string | null } | null;
+  /** Name of the team member who recorded the sale, printed on the ticket. */
+  seller_name: string | null;
   items: {
     id: string;
     quantity: number;
@@ -63,6 +65,7 @@ export async function getInvoiceDetail(id: string): Promise<InvoiceDetail | null
       `
       id, invoice_number, total_amount, paid_amount, status, created_at, discount_amount,
       clients ( name, phone ),
+      seller:profiles!invoices_created_by_fkey ( full_name ),
       invoice_items ( id, quantity, unit_price, total_price, products ( name ) ),
       payments ( id, amount, payment_date )
     `
@@ -73,6 +76,9 @@ export async function getInvoiceDetail(id: string): Promise<InvoiceDetail | null
   if (error || !data) return null;
 
   const client = data.clients as unknown as { name: string; phone: string | null } | null;
+  // Every member of the shop can read the team's names (profiles RLS), so a
+  // seller reprinting a colleague's ticket still sees who made the sale.
+  const seller = data.seller as unknown as { full_name: string | null } | null;
   const items = data.invoice_items as unknown as {
     id: string;
     quantity: number;
@@ -91,6 +97,7 @@ export async function getInvoiceDetail(id: string): Promise<InvoiceDetail | null
     status: data.status,
     created_at: data.created_at,
     client: client ? { name: client.name, phone: client.phone } : null,
+    seller_name: seller?.full_name?.trim() || null,
     items: items.map((item) => ({
       id: item.id,
       quantity: item.quantity,

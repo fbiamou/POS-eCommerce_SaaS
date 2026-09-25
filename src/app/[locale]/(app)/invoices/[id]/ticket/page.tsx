@@ -83,6 +83,7 @@ export default async function InvoiceTicketPage({
         </div>
         <p>{invoiceDate}</p>
         <p>{t("client")} : {invoice.client?.name || t("walk_in_client")}</p>
+        {invoice.seller_name && <p>{t("served_by")} : {invoice.seller_name}</p>}
 
         <div className="my-2 border-t border-dashed border-black" />
 
