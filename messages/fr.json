@@ -1240,9 +1240,6 @@
     "pin_intro": "4 chiffres, pour se mettre à la caisse sur un appareil partagé, même sans internet. Les ventes sont alors enregistrées à ce nom.",
     "pin_save": "Enregistrer",
     "pin_remove": "Retirer le code",
-    "owner_pin_first": "Pour passer la caisse à une collègue, le compte connecté sur cet appareil doit d'abord avoir son propre code (Réglages › Équipe). Il servira à reprendre la caisse.",
-    "page_reserved": "Cette page n'est pas ouverte à {name}, qui tient la caisse.",
-    "page_reserved_hint": "Pour l'ouvrir, la personne qui a les droits reprend la caisse avec son code (Caisse › Changer).",
-    "go_to_allowed": "Aller à une page ouverte"
+    "owner_pin_first": "Pour passer la caisse à une collègue, le compte connecté sur cet appareil doit d'abord avoir son propre code (Réglages › Équipe). Il servira à reprendre la caisse."
   }
 }

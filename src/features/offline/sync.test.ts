@@ -260,3 +260,32 @@ describe("a delivery checked off offline", () => {
     expect((await db.products.get(perruque.id))?.quantity_in_stock).toBe(16);
   });
 });
+
+describe("invoice lines", () => {
+  it("shows each line once when the server's copy of a sale made on the device arrives", async () => {
+    const sale = await queueOfflineSale(2, 90000);
+    await pushOutbox(db, fakeBackend().backend);
+    const serverCopy: ServerInvoice = {
+      ...sale.invoice, recorded_offline: true, updated_at: "2026-09-26T09:05:00Z",
+      items: [{ ...sale.items[0], id: "server-line-id" }],
+      payments: sale.payment ? [{ ...sale.payment, id: "server-payment-id" }] : [],
+    };
+    await pullChanges(db, fakeBackend({ pullInvoices: async () => ({ ok: true, data: [serverCopy] }) }).backend);
+    const lines = await db.invoice_items.where("invoice_id").equals(sale.invoice.id).toArray();
+    expect(lines.map((l) => l.id)).toEqual(["server-line-id"]);
+    expect((await db.payments.where("invoice_id").equals(sale.invoice.id).toArray()).map((p) => p.id)).toEqual(["server-payment-id"]);
+  });
+
+  it("reads every invoice again once, to clean devices synced before the fix", async () => {
+    const { backend, since } = fakeBackend();
+    await pullChanges(db, backend);
+    await setMetaForTest("cursor:invoices", "2026-09-26T08:00:00Z");
+    await pullChanges(db, backend);
+    // First pull: from the beginning (repair). Afterwards: incremental.
+    expect(since.invoices).toEqual([null, "2026-09-26T08:00:00Z"]);
+  });
+});
+
+async function setMetaForTest(key: string, value: unknown) {
+  await db.meta.put({ key, value });
+}

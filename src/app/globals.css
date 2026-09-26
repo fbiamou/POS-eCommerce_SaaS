@@ -333,3 +333,10 @@ h1, h2, h3, .font-display {
 @media (prefers-reduced-motion: reduce) {
   [class*="animate-[wishop-"], .animate-ping { animation: none !important; }
 }
+
+/* A colleague holds the till (till code): the page content stays hidden
+   until the device has checked it is open to her (features/offline,
+   CashierGuard), so a closed page never shows, even for an instant. */
+html[data-till="held"] [data-till-guard]:not([data-till-ok]) {
+  visibility: hidden;
+}

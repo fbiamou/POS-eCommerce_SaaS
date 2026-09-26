@@ -1240,9 +1240,6 @@
     "pin_intro": "4 digits, to take the till on a shared device, even offline. Sales are then recorded in this name.",
     "pin_save": "Save",
     "pin_remove": "Remove the code",
-    "owner_pin_first": "To hand the till to a colleague, the account signed in on this device needs its own code first (Settings › Team). It is used to take the till back.",
-    "page_reserved": "This page is not open to {name}, who holds the till.",
-    "page_reserved_hint": "To open it, the person with the rights takes the till back with their code (Till › Switch).",
-    "go_to_allowed": "Go to an open page"
+    "owner_pin_first": "To hand the till to a colleague, the account signed in on this device needs its own code first (Settings › Team). It is used to take the till back."
   }
 }

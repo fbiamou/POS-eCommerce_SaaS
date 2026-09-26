@@ -13,11 +13,8 @@ export function UpdateBanner() {
   if (!offline?.status.updateAvailable || !offline.status.online) return null;
 
   const reload = () => {
-    try {
-      sessionStorage.removeItem("wishop-pages-warmed");
-    } catch {
-      // Storage blocked: the pages are kept again as they are visited.
-    }
+    // The new version registers its own service worker and keeps its own
+    // copies of the pages (serviceWorker.ts): a plain reload is enough.
     window.location.reload();
   };
 

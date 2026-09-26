@@ -209,6 +209,8 @@ async function pendingOverlay(db: ShopDatabase) {
   return { sold, paid };
 }
 
+const REPAIR_LINES = "repair:invoice-lines-1";
+
 const CURSOR = {
   products: "cursor:products",
   clients: "cursor:clients",
@@ -240,6 +242,11 @@ export async function pullChanges(db: ShopDatabase, backend: SyncBackend, option
     // and each change to an invoice (a payment) already moves its date.
     invoices: (await getMeta<string>(db, CURSOR.invoices)) ?? null,
   };
+  // Devices synced before the fix of 26/09/2026 showed every invoice line
+  // twice (the device's copy and the server's): their invoices are read
+  // again once, from the beginning, and the lines replaced.
+  const repairLines = !(await getMeta<boolean>(db, REPAIR_LINES));
+  if (repairLines) cursors.invoices = null;
 
   const [shop, products, clients, invoices, members, suppliers] = await Promise.all([
     backend.pullShop(),
@@ -289,6 +296,9 @@ export async function pullChanges(db: ShopDatabase, backend: SyncBackend, option
       const extra = overlay.paid.get(invoice.id) ?? 0;
       const paid = Math.min(invoice.total_amount, invoice.paid_amount + extra);
       await db.invoices.put({ ...invoice, paid_amount: paid, status: invoiceStatus(paid, invoice.total_amount), local_state: undefined });
+      // The server's lines replace the device's: the sale made here had its
+      // own line ids, kept they would show every line twice.
+      await db.invoice_items.where("invoice_id").equals(invoice.id).delete();
       await db.invoice_items.bulkPut(items);
       // Payments made on the phone and not sent yet stay, the others are the server's.
       const localPayments = await db.payments.where("invoice_id").equals(invoice.id).toArray();
@@ -301,6 +311,7 @@ export async function pullChanges(db: ShopDatabase, backend: SyncBackend, option
     await setMeta(db, CURSOR.clients, latest(clients.data, cursors.clients));
     await setMeta(db, CURSOR.invoices, latest(invoices.data, cursors.invoices));
     await setMeta(db, "lastPullAt", new Date().toISOString());
+    if (repairLines) await setMeta(db, REPAIR_LINES, true);
     }
   );
 

@@ -1240,9 +1240,6 @@
     "pin_intro": "4 cifras, para ponerse en la caja en un aparato compartido, incluso sin internet. Las ventas quedan entonces a este nombre.",
     "pin_save": "Guardar",
     "pin_remove": "Quitar el código",
-    "owner_pin_first": "Para pasar la caja a una compañera, la cuenta conectada en este aparato debe tener antes su propio código (Ajustes › Equipo). Servirá para recuperar la caja.",
-    "page_reserved": "Esta página no está abierta a {name}, que tiene la caja.",
-    "page_reserved_hint": "Para abrirla, la persona que tiene los derechos recupera la caja con su código (Caja › Cambiar).",
-    "go_to_allowed": "Ir a una página abierta"
+    "owner_pin_first": "Para pasar la caja a una compañera, la cuenta conectada en este aparato debe tener antes su propio código (Ajustes › Equipo). Servirá para recuperar la caja."
   }
 }

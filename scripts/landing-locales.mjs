@@ -22,8 +22,8 @@ export const LANDING_HEADS = {
     url: `${SITE_URL}/`,
     title: "WISHOP · No pierdas el hilo de tu tienda",
     description:
-      "Cobra, sigue cada crédito hasta el último franco, vigila el stock y recuerda a tus clientes por WhatsApp. Todo desde tu teléfono. Gratis para empezar.",
-    preview: "Ventas, stock, créditos de clientes y recordatorios por WhatsApp, desde tu teléfono. Gratis para empezar.",
+      "Cobra, sigue cada crédito hasta el último franco, vigila el stock y recuerda a tus clientes por WhatsApp. Todo desde tu teléfono, incluso sin internet. Gratis para empezar.",
+    preview: "Ventas, stock, créditos de clientes y recordatorios por WhatsApp, desde tu teléfono, incluso sin internet. Gratis para empezar.",
   },
   fr: {
     lang: "fr",
@@ -31,8 +31,8 @@ export const LANDING_HEADS = {
     url: `${SITE_URL}/fr`,
     title: "WISHOP · Ne perdez plus le fil de votre boutique",
     description:
-      "Encaissez, suivez chaque crédit jusqu'au dernier franc, surveillez le stock et relancez vos clients sur WhatsApp. Tout depuis votre téléphone. Gratuit pour commencer.",
-    preview: "Ventes, stock, crédits clients et relances WhatsApp, depuis votre téléphone. Gratuit pour commencer.",
+      "Encaissez, suivez chaque crédit jusqu'au dernier franc, surveillez le stock et relancez vos clients sur WhatsApp. Tout depuis votre téléphone, même sans internet. Gratuit pour commencer.",
+    preview: "Ventes, stock, crédits clients et relances WhatsApp, depuis votre téléphone, même sans internet. Gratuit pour commencer.",
   },
   en: {
     lang: "en",
@@ -40,8 +40,8 @@ export const LANDING_HEADS = {
     url: `${SITE_URL}/en`,
     title: "WISHOP · Never lose the thread of your shop",
     description:
-      "Ring up sales, track every credit down to the last franc, keep an eye on stock and remind customers on WhatsApp. All from your phone. Free to start.",
-    preview: "Sales, stock, customer credit and WhatsApp reminders, from your phone. Free to start.",
+      "Ring up sales, track every credit down to the last franc, keep an eye on stock and remind customers on WhatsApp. All from your phone, even offline. Free to start.",
+    preview: "Sales, stock, customer credit and WhatsApp reminders, from your phone, even offline. Free to start.",
   },
 };
 

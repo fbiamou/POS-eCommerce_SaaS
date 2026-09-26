@@ -4,13 +4,13 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>WISHOP · Ne perdez plus le fil de votre boutique</title>
-<meta name="description" content="Encaissez, suivez chaque crédit jusqu'au dernier franc, surveillez le stock et relancez vos clients sur WhatsApp. Tout depuis votre téléphone. Gratuit pour commencer.">
+<meta name="description" content="Encaissez, suivez chaque crédit jusqu'au dernier franc, surveillez le stock et relancez vos clients sur WhatsApp. Tout depuis votre téléphone, même sans internet. Gratuit pour commencer.">
 <meta name="theme-color" content="#141C45">
 <!-- PREVIEW: aperçu non indexé. Au lancement public, retirer cette ligne et l'en-tête X-Robots-Tag de next.config.ts -->
 <meta name="robots" content="noindex, nofollow">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='15' fill='%232B44A0'/%3E%3Cpolyline points='12,21 23,45 32,29 41,45 52,21' fill='none' stroke='%23fff' stroke-width='6.5'/%3E%3Cpath d='M32 9l5.5 5.5L32 20l-5.5-5.5z' fill='%23F4B63F'/%3E%3C/svg%3E">
 <meta property="og:title" content="WISHOP · Ne perdez plus le fil de votre boutique">
-<meta property="og:description" content="Ventes, stock, crédits clients et relances WhatsApp, depuis votre téléphone. Gratuit pour commencer.">
+<meta property="og:description" content="Ventes, stock, crédits clients et relances WhatsApp, depuis votre téléphone, même sans internet. Gratuit pour commencer.">
 <meta property="og:locale" content="fr_FR">
 <meta property="og:type" content="website">
 <!-- Aperçu des liens (WhatsApp, Facebook) : adresses complètes obligatoires. À changer si l'adresse du site change. -->
@@ -304,6 +304,46 @@ main{display:block}
 .reset[hidden]{display:none}
 @media (max-width:860px){.credit-panel{grid-template-columns:1fr;border-radius:28px}}
 
+/* Offline mode */
+#hors-ligne{padding-block:clamp(72px,10vw,140px) clamp(40px,6vw,80px)}
+.off{max-width:1180px;margin-inline:auto;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:48px 72px;align-items:center}
+.off .phone-wrap{display:flex;justify-content:center}
+.off-copy{display:grid;gap:18px;max-width:500px}
+.off-copy .kicker{justify-self:start;display:inline-flex;align-items:center;gap:8px;color:var(--ink);background:var(--accent-muted);padding:7px 13px;border-radius:999px}
+.off-copy .kicker svg{width:16px;height:16px}
+.off-copy h2{font-size:clamp(34px,4.4vw,58px)}
+.off-lead{font-size:19px;color:var(--ink-2)}
+.off-points{list-style:none;margin:4px 0 0;padding:0;display:grid;gap:14px}
+.off-points li{display:grid;grid-template-columns:36px minmax(0,1fr);gap:14px;align-items:center;font-size:17px;font-weight:600;line-height:1.4}
+.off-points .ico{width:36px;height:36px;border-radius:12px;background:var(--panel);display:grid;place-items:center;color:var(--brand);box-shadow:0 1px 0 rgba(20,28,69,.06)}
+.off-points svg{width:20px;height:20px}
+.off-fine{font-size:14.5px;color:var(--ink-2)}
+.off-screen{gap:12px;padding-top:26px;min-height:520px}
+.off-title{font-family:var(--f-display);font-weight:800;font-size:20px;letter-spacing:-.02em}
+.off-pill{display:grid;justify-items:start}
+.off-pill > span{grid-area:1/1;display:inline-flex;align-items:center;gap:6px;padding:6px 11px;border-radius:999px;font-size:12px;font-weight:600;white-space:nowrap}
+.off-pill svg{width:14px;height:14px;flex:none}
+.pill-off{background:#FCEBC8;color:#7A4B00;animation:offPA 9s infinite}
+.pill-on{background:#D9F1E4;color:var(--ok);opacity:0;animation:offPB 9s infinite}
+.off-sales{display:grid;gap:8px}
+.off-sale{display:grid;grid-template-columns:minmax(0,1fr) auto 22px;gap:10px;align-items:center;background:var(--panel);border-radius:14px;padding:11px 12px}
+.off-sale b{display:block;font-size:12.5px;font-weight:600;line-height:1.25}
+.off-sale small{font-family:var(--f-mono);font-size:10.5px;color:var(--ink-2)}
+.off-sale .amt{font-size:12px;font-weight:600}
+.off-st{display:grid;width:22px;height:22px}
+.off-st svg{grid-area:1/1;width:22px;height:22px}
+.off-st .c{color:#B7791F;animation:offA 9s infinite}
+.off-st .k{color:var(--ok);opacity:0;animation:offB 9s infinite}
+.off-total{display:flex;justify-content:space-between;align-items:baseline;padding:4px 4px 0;font-size:12.5px;color:var(--ink-2)}
+.off-total .amt{font-size:14px;font-weight:600;color:var(--ink)}
+.off-new{margin-top:auto;background:var(--brand);color:#fff;border-radius:14px;padding:12px;text-align:center;font-weight:600;font-size:13px}
+@keyframes offA{0%,56%{opacity:1}62%,94%{opacity:0}100%{opacity:1}}
+@keyframes offB{0%,56%{opacity:0}62%,94%{opacity:1}100%{opacity:0}}
+/* the badge turns green once the sales are through */
+@keyframes offPA{0%,62%{opacity:1}67%,94%{opacity:0}100%{opacity:1}}
+@keyframes offPB{0%,62%{opacity:0}67%,94%{opacity:1}100%{opacity:0}}
+@media (max-width:860px){.off{grid-template-columns:1fr}.off .phone-wrap{order:2}}
+
 /* Storefront */
 #vitrine{padding-block:clamp(72px,10vw,140px)}
 .vit{max-width:1180px;margin-inline:auto;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:48px 72px;align-items:center}
@@ -489,7 +529,7 @@ body.paused *,body.paused *::before,body.paused *::after{animation-play-state:pa
             <path d="M296 -1l6 6-6 6-6-6z" fill="#F4F5FB" opacity=".9"/>
             <path class="gem" d="M408 -3l7 7-7 7-7-7z" fill="#F4B63F"/>
           </svg>
-          <p class="sub" data-i18n="hero.sub">Encaissez, suivez chaque crédit jusqu'au dernier franc, surveillez le stock et relancez vos clients sur WhatsApp. Tout depuis votre téléphone.</p>
+          <p class="sub" data-i18n="hero.sub">Encaissez, suivez chaque crédit jusqu'au dernier franc, surveillez le stock et relancez vos clients sur WhatsApp. Tout depuis votre téléphone, même sans internet.</p>
           <div class="cta-row">
             <a class="btn btn-accent" data-app="signup" href="/fr/login?mode=signup" data-i18n="cta.create">Créer ma boutique</a>
             <a class="link-more" href="#comment" data-i18n="hero.more">Voir comment ça marche</a>
@@ -669,6 +709,41 @@ body.paused *,body.paused *::before,body.paused *::after{animation-play-state:pa
     </div>
   </section>
 
+  <section class="section" id="hors-ligne" aria-labelledby="off-t">
+    <div class="off">
+      <div class="phone-wrap reveal">
+        <div class="phone" style="--i:0" aria-hidden="true"><div class="screen off-screen">
+          <span class="ex" data-i18n="ex">Exemple</span>
+          <p class="off-title" data-i18n="off.m.title">Ventes du jour</p>
+          <div class="off-pill">
+            <span class="pill-off"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 2l20 20"/><path d="M8.5 16.4a5 5 0 0 1 7 0"/><path d="M5 12.9a10 10 0 0 1 5.2-2.8"/><path d="M19 12.9a10 10 0 0 0-2.2-1.6"/><path d="M2 8.8a15 15 0 0 1 4.2-2.7"/><path d="M22 8.8A15 15 0 0 0 10.7 5"/><circle cx="12" cy="20" r="1"/></svg><span data-i18n="off.m.off">Hors ligne · 4 en attente</span></span>
+            <span class="pill-on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span data-i18n="off.m.on">En ligne · tout est envoyé</span></span>
+          </div>
+          <div class="off-sales">
+            <div class="off-sale"><div><b data-i18n="m.p1s">Robe satin champagne</b><small>10:42</small></div><span class="amt" data-amount="45000"></span><span class="off-st"><svg class="c" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9.5"/><path d="M12 7v5l3.2 2"/></svg><svg class="k" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9.5"/><path d="M7.5 12.5l3 3 6-6.5"/></svg></span></div>
+            <div class="off-sale"><div><b data-i18n="m.p2s">Parfum en cristal</b><small>11:05</small></div><span class="amt" data-amount="28000"></span><span class="off-st"><svg class="c" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9.5"/><path d="M12 7v5l3.2 2"/></svg><svg class="k" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9.5"/><path d="M7.5 12.5l3 3 6-6.5"/></svg></span></div>
+            <div class="off-sale"><div><b data-i18n="m.p3">Perruque lisse 22&nbsp;pouces</b><small>11:31</small></div><span class="amt" data-amount="85000"></span><span class="off-st"><svg class="c" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9.5"/><path d="M12 7v5l3.2 2"/></svg><svg class="k" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9.5"/><path d="M7.5 12.5l3 3 6-6.5"/></svg></span></div>
+            <div class="off-sale"><div><b data-i18n="m.p6">Sac cuir noir</b><small>11:58</small></div><span class="amt" data-amount="60000"></span><span class="off-st"><svg class="c" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9.5"/><path d="M12 7v5l3.2 2"/></svg><svg class="k" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9.5"/><path d="M7.5 12.5l3 3 6-6.5"/></svg></span></div>
+          </div>
+          <div class="off-total"><span data-i18n="off.m.total">Total du jour</span><span class="amt" data-amount="218000"></span></div>
+          <div class="off-new" data-i18n="off.m.new">Nouvelle vente</div>
+        </div></div>
+      </div>
+      <div class="off-copy reveal">
+        <p class="kicker" style="--i:0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 2l20 20"/><path d="M8.5 16.4a5 5 0 0 1 7 0"/><path d="M5 12.9a10 10 0 0 1 5.2-2.8"/><path d="M19 12.9a10 10 0 0 0-2.2-1.6"/><path d="M2 8.8a15 15 0 0 1 4.2-2.7"/><path d="M22 8.8A15 15 0 0 0 10.7 5"/><circle cx="12" cy="20" r="1"/></svg><span data-i18n="off.kicker">Mode hors ligne</span></p>
+        <h2 id="off-t" style="--i:1" data-i18n="off.title">Internet coupé&#8239;? La caisse continue.</h2>
+        <p class="off-lead" style="--i:2" data-i18n="off.text">Quand le réseau tombe, WISHOP ne s'arrête pas. Dès que la connexion revient, tout s'envoie tout seul.</p>
+        <ul class="off-points" style="--i:3">
+          <li><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16l-1.5 11.5a2 2 0 0 1-2 1.5h-9a2 2 0 0 1-2-1.5z"/><path d="M8.5 7a3.5 3.5 0 0 1 7 0"/></svg></span><span data-i18n="off.p1">Vendre, imprimer le ticket, encaisser les crédits et gérer le stock, sans réseau.</span></li>
+          <li><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4.5" width="14" height="10" rx="1.5"/><path d="M1 18h16"/><rect x="17.5" y="8.5" width="5.5" height="11" rx="1.3"/></svg></span><span data-i18n="off.p2">Sur téléphone comme sur ordinateur, même avec plusieurs caisses.</span></li>
+          <li><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11a8 8 0 0 0-14.3-4.9L4 8"/><path d="M4 3v5h5"/><path d="M4 13a8 8 0 0 0 14.3 4.9L20 16"/><path d="M20 21v-5h-5"/></svg></span><span data-i18n="off.p3">Rien ne se perd, rien n'est compté deux fois.</span></li>
+          <li><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3l7.5 7.5L12 18l-7.5-7.5z" fill="#F4B63F" stroke="#141C45" stroke-width="1.8" stroke-linejoin="round"/></svg></span><span data-i18n="off.p4">Inclus dans toutes les formules, même la gratuite.</span></li>
+        </ul>
+        <p class="off-fine" style="--i:4" data-i18n="off.fine">Il faut internet seulement la première fois, pour vous connecter.</p>
+      </div>
+    </div>
+  </section>
+
   <section class="section" id="vitrine" aria-labelledby="vit-t">
     <div class="vit">
       <div class="vit-copy reveal">
@@ -733,6 +808,7 @@ body.paused *,body.paused *::before,body.paused *::after{animation-play-state:pa
             <li data-i18n="p.s1">1 compte, 100 articles</li>
             <li data-i18n="p.s2">Stock et caisse au comptant</li>
             <li data-i18n="p.s3">Ticket de caisse imprimé</li>
+            <li data-i18n="p.s4">Marche aussi sans internet</li>
           </ul>
         </article>
         <article class="plan" style="--i:1">
@@ -838,7 +914,7 @@ en:{
  'skip':'Skip to content','nav.how':'How it works','nav.store':'Storefront','nav.faq':'Questions','nav.login':'Sign in','cta.create':'Create my shop','cta.free':'Free to start.',
  'b1.l1':'A notebook full of IOUs.','b1.l2':'A phone that never stops buzzing.','b1.l3':"A till that doesn't add up.",
  'b2':'Your whole shop hangs by a thread.','b3.t':'WISHOP holds it for you.','b3.s':'Sales, stock, credit and WhatsApp reminders, tied together in one app.',
- 'h1':'Never lose the thread of your shop.','hero.sub':'Ring up sales, track every credit down to the last franc, keep an eye on stock and remind customers on WhatsApp. All from your phone.','hero.more':'See how it works',
+ 'h1':'Never lose the thread of your shop.','hero.sub':'Ring up sales, track every credit down to the last franc, keep an eye on stock and remind customers on WhatsApp. All from your phone, even offline.','hero.more':'See how it works',
  'how.kicker':'How it works','how.title':'One thread, from sale to reminder.',
  's1.t':'Sell','s1.p':'Ring up a sale in a few taps, cash or on credit. The receipt prints right away, and the invoice also comes as a PDF to share with your customer.',
  's2.t':'Track','s2.p':"Every credit has its own repayment bar: what's paid, what's left, and since when.",
@@ -852,6 +928,9 @@ en:{
  'm.shipment':'Shipment','m.from':'Declared from Dubai','m.transit':'In transit','m.photo':'Photo of the sealed parcel','m.receive':'Confirm the reception',
  'm.new':'New in','m.p1s':'Champagne satin dress','m.p6':'Black leather bag','m.p2s':'Crystal perfume','m.order':'Order','m.powered':'Powered by WISHOP',
  'credit.kicker':'Try it','credit.title':'Watch a credit close.','credit.text':'Mireille still owes 6,000&nbsp;FCFA on her purchases. Record her last payment.','credit.hint':'Your turn: press the button to record the payment.','credit.btn':'Record 6,000&nbsp;FCFA','credit.done':'Paid in full. The thread is complete.','credit.reset':'Start again','credit.left':'6,000&nbsp;FCFA left',
+ 'off.kicker':'Offline mode','off.title':'Internet down? The till keeps going.','off.text':'When the network drops, WISHOP keeps going. As soon as the connection is back, everything sends itself.',
+ 'off.p1':'Sell, print the receipt, collect credits and manage stock, with no network.','off.p2':'On a phone or a computer, even with several tills.','off.p3':'Nothing lost, nothing counted twice.','off.p4':'Included in every plan, even the free one.','off.fine':'You only need the internet the first time, to sign in.',
+ 'off.m.title':"Today's sales",'off.m.off':'Offline · 4 waiting','off.m.on':'Online · all sent','off.m.total':'Total for the day','off.m.new':'New sale','p.s4':'Works offline too',
  'vit.kicker':'Your storefront','vit.title':'An online shop in your name.','vit.text':'Every WISHOP shop has its own public page, in its own colours. Your customers browse your items and place an order; they pay and pick up in store.',
  'team.title':'Everyone in their place.','team.b1':'You see everything. Your staff only reach the pages you open to them, the till for example.','team.b2':'On the phone you already have: WISHOP opens in the browser, nothing to install.',
  'r.owner':'Owner','r.cashier':'Cashier','pg.dash':'Dashboard','pg.sales':'Sales','pg.stock':'Stock','pg.clients':'Clients','pg.inv':'Invoices','pg.set':'Settings',
@@ -866,13 +945,13 @@ en:{
  'q7':"What if I don't sell in FCFA?",'a7':'FCFA is the default. You can pick another currency in the shop settings.',
  'final.title':'Your shop deserves better than a notebook.','final.text':'Create it online, free to start. All you need is an email address.',
  'foot.tag':'The thread of your shop.',
- '_title':'WISHOP · Never lose the thread of your shop','_desc':'Ring up sales, track every credit down to the last franc, keep an eye on stock and remind customers on WhatsApp. All from your phone. Free to start.','_lang':'Language'
+ '_title':'WISHOP · Never lose the thread of your shop','_desc':'Ring up sales, track every credit down to the last franc, keep an eye on stock and remind customers on WhatsApp. All from your phone, even offline. Free to start.','_lang':'Language'
 },
 es:{
  'skip':'Ir al contenido','nav.how':'Cómo funciona','nav.store':'Escaparate','nav.faq':'Preguntas','nav.login':'Iniciar sesión','cta.create':'Crear mi tienda','cta.free':'Gratis para empezar.',
  'b1.l1':'Un cuaderno de fiados.','b1.l2':'Un teléfono que no para de sonar.','b1.l3':'Una caja que no cuadra.',
  'b2':'Toda tu tienda pende de un hilo.','b3.t':'WISHOP lo sostiene por ti.','b3.s':'Ventas, stock, créditos y recordatorios por WhatsApp, unidos en una sola app.',
- 'h1':'No pierdas el hilo de tu tienda.','hero.sub':'Cobra, sigue cada crédito hasta el último franco, vigila el stock y recuerda a tus clientes por WhatsApp. Todo desde tu teléfono.','hero.more':'Ver cómo funciona',
+ 'h1':'No pierdas el hilo de tu tienda.','hero.sub':'Cobra, sigue cada crédito hasta el último franco, vigila el stock y recuerda a tus clientes por WhatsApp. Todo desde tu teléfono, incluso sin internet.','hero.more':'Ver cómo funciona',
  'how.kicker':'Cómo funciona','how.title':'Un solo hilo, de la venta al recordatorio.',
  's1.t':'Venta','s1.p':'Cobra en pocos toques, al contado o a crédito. El ticket se imprime al instante, y la factura también está en PDF para compartirla con tu cliente.',
  's2.t':'Sigue','s2.p':'Cada crédito tiene su barra de pago: lo pagado, lo pendiente y desde cuándo.',
@@ -886,6 +965,9 @@ es:{
  'm.shipment':'Llegada','m.from':'Declarado desde Dubái','m.transit':'En tránsito','m.photo':'Foto del paquete sellado','m.receive':'Confirmar la recepción',
  'm.new':'Novedades','m.p1s':'Vestido de satén champán','m.p6':'Bolso de piel negro','m.p2s':'Perfume de cristal','m.order':'Pedir','m.powered':'Con la tecnología de WISHOP',
  'credit.kicker':'Pruébalo','credit.title':'Mira cómo se cierra un crédito.','credit.text':'Mireille todavía debe 6.000&nbsp;FCFA de sus compras. Cobra su último pago.','credit.hint':'Tu turno: pulsa el botón para cobrar.','credit.btn':'Cobrar 6.000&nbsp;FCFA','credit.done':'Saldado. El hilo está completo.','credit.reset':'Empezar de nuevo','credit.left':'Quedan 6.000&nbsp;FCFA',
+ 'off.kicker':'Modo sin conexión','off.title':'¿Se va internet? La caja sigue.','off.text':'Cuando se cae la red, WISHOP no se detiene. En cuanto vuelve la conexión, todo se envía solo.',
+ 'off.p1':'Vender, imprimir el ticket, cobrar créditos y gestionar el stock, sin red.','off.p2':'En el teléfono o en el ordenador, incluso con varias cajas.','off.p3':'Nada se pierde, nada se cuenta dos veces.','off.p4':'Incluido en todos los planes, también en el gratuito.','off.fine':'Solo hace falta internet la primera vez, para conectarte.',
+ 'off.m.title':'Ventas de hoy','off.m.off':'Sin conexión · 4 en espera','off.m.on':'En línea · todo enviado','off.m.total':'Total del día','off.m.new':'Nueva venta','p.s4':'Funciona también sin internet',
  'vit.kicker':'Tu escaparate','vit.title':'Una tienda en línea con tu nombre.','vit.text':'Cada tienda WISHOP tiene su página pública, con sus colores. Tus clientes ven tus artículos y hacen su pedido; pagan y recogen en la tienda.',
  'team.title':'Cada uno en su lugar.','team.b1':'Tú lo ves todo. Tus empleados solo acceden a las páginas que les abres, la caja por ejemplo.','team.b2':'En el teléfono que ya tienes: WISHOP se abre en el navegador, sin instalar nada.',
  'r.owner':'Propietario','r.cashier':'Cajero(a)','pg.dash':'Panel','pg.sales':'Ventas','pg.stock':'Inventario','pg.clients':'Clientes','pg.inv':'Facturas','pg.set':'Configuración',
@@ -900,7 +982,7 @@ es:{
  'q7':'¿Y si no vendo en FCFA?','a7':'El FCFA viene por defecto. Puedes elegir otra moneda en los ajustes de la tienda.',
  'final.title':'Tu tienda merece algo mejor que un cuaderno.','final.text':'Créala en línea, gratis para empezar. Solo necesitas un correo electrónico.',
  'foot.tag':'El hilo de tu tienda.',
- '_title':'WISHOP · No pierdas el hilo de tu tienda','_desc':'Cobra, sigue cada crédito hasta el último franco, vigila el stock y recuerda a tus clientes por WhatsApp. Todo desde tu teléfono. Gratis para empezar.','_lang':'Idioma'
+ '_title':'WISHOP · No pierdas el hilo de tu tienda','_desc':'Cobra, sigue cada crédito hasta el último franco, vigila el stock y recuerda a tus clientes por WhatsApp. Todo desde tu teléfono, incluso sin internet. Gratis para empezar.','_lang':'Idioma'
 }};
 var FR = {};
 var keyed = [].slice.call(document.querySelectorAll('[data-i18n]'));

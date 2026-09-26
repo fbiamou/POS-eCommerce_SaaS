@@ -1,31 +1,44 @@
 "use client";
 
-import { useTranslations } from "next-intl";
-import { Lock } from "lucide-react";
-import { Link, usePathname } from "@/i18n/routing";
-import { firstAllowedPath, isPageAllowed } from "@/lib/appPages";
+import { useEffect, useSyncExternalStore } from "react";
+import { routing, usePathname, useRouter } from "@/i18n/routing";
+import { APP_PAGES, firstAllowedPath, isPageAllowed } from "@/lib/appPages";
+import { forgetPages } from "../serviceWorker";
 import { useTillHolder } from "../useTillAccess";
+
+const noSubscription = () => () => {};
 
 // A colleague holding the till only sees the pages the owner opened to her
 // (decided 26/09/2026). The server enforces it online (proxy, signed
-// cookie); this guard does it on the device, offline included.
+// cookie); this guard does it on the device, offline included. Until the
+// device has checked, the content stays hidden (globals.css, data-till).
+// A closed page typed in the address bar sends her straight back to her own
+// pages, as the server does online.
 export function CashierGuard({ children }: { children: React.ReactNode }) {
   const holder = useTillHolder();
+  const mounted = useSyncExternalStore(noSubscription, () => true, () => false);
   const pathname = usePathname();
-  const t = useTranslations("Cashier");
-  if (!holder) return <>{children}</>;
+  const router = useRouter();
 
-  const allowed = !pathname.startsWith("/admin") && isPageAllowed(holder.role, holder.allowed_pages, pathname);
-  if (allowed) return <>{children}</>;
+  // The kept copies of her closed pages go, so they cannot show offline.
+  useEffect(() => {
+    if (!holder) return;
+    const closed = ["/admin", ...APP_PAGES.map((p) => p.path).filter((path) => !isPageAllowed(holder.role, holder.allowed_pages, path))];
+    void forgetPages(routing.locales.flatMap((locale) => closed.map((path) => `/${locale}${path}`)));
+  }, [holder]);
 
+  const allowed = !holder || (!pathname.startsWith("/admin") && isPageAllowed(holder.role, holder.allowed_pages, pathname));
+  const home = holder ? (holder.role === "MANAGER" ? "/dashboard" : firstAllowedPath(holder.allowed_pages)) : null;
+
+  useEffect(() => {
+    if (!allowed && home) router.replace(home);
+  }, [allowed, home, router]);
+
+  // Nothing of a closed page shows while she is sent back.
+  if (!allowed) return null;
   return (
-    <div className="mx-auto flex max-w-md flex-col items-center gap-3 rounded-2xl bg-[var(--surface-1)] p-8 text-center shadow-card">
-      <Lock className="h-8 w-8 text-zinc-400" />
-      <p className="font-semibold">{t("page_reserved", { name: holder.name || t("no_name") })}</p>
-      <p className="text-[13px] text-zinc-500">{t("page_reserved_hint")}</p>
-      <Link href={holder.role === "MANAGER" ? "/dashboard" : firstAllowedPath(holder.allowed_pages)} className="mt-2 rounded-xl bg-violet-600 px-4 py-2.5 text-[14px] font-bold text-white hover:bg-violet-700">
-        {t("go_to_allowed")}
-      </Link>
+    <div data-till-guard="" data-till-ok={mounted ? "" : undefined}>
+      {children}
     </div>
   );
 }

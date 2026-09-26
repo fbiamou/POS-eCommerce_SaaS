@@ -8,8 +8,11 @@
 //   alone: the service worker never answers for it.
 //
 // The pages are kept per user: logging out empties them (message "clear").
+// They are also kept per version of the app: the page registers this file
+// with its version (sw.js?v=...), so a new version replaces the old copies
+// instead of serving yesterday's code offline.
 
-const VERSION = "v1";
+const VERSION = new URL(self.location.href).searchParams.get("v") || "v1";
 const PAGES = `wishop-pages-${VERSION}`;
 const ASSETS = `wishop-assets-${VERSION}`;
 
@@ -163,11 +166,28 @@ async function warm(urls) {
   }
 }
 
+async function forget(paths) {
+  const cache = await caches.open(PAGES);
+  const keys = await cache.keys();
+  await Promise.all(
+    keys
+      .filter((request) => {
+        const path = new URL(request.url).pathname;
+        return paths.some((prefix) => path === prefix || path.startsWith(prefix + "/"));
+      })
+      .map((request) => cache.delete(request))
+  );
+}
+
 self.addEventListener("message", (event) => {
   const data = event.data || {};
   if (data.type === "warm" && Array.isArray(data.urls)) {
     event.waitUntil(warm(data.urls));
   } else if (data.type === "clear") {
     event.waitUntil(caches.delete(PAGES));
+  } else if (data.type === "forget" && Array.isArray(data.paths)) {
+    // A colleague holds the till: the kept copies of the pages she may not
+    // open go, so they cannot be shown offline.
+    event.waitUntil(forget(data.paths));
   }
 });

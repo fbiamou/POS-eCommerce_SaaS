@@ -74,6 +74,15 @@ export default async function RootLayout({
               "try{if(localStorage.getItem('theme')==='dark'){document.documentElement.setAttribute('data-theme','dark')}}catch(e){}",
           }}
         />
+        {/* A colleague may hold the till (till code): the page stays hidden
+            until the device has checked it is open to her (CashierGuard). */}
+        <script
+          id="till-held"
+          dangerouslySetInnerHTML={{
+            __html:
+              "try{for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(k&&k.indexOf('wishop-cashier-')===0&&k.indexOf('wishop-cashier-day-')!==0){document.documentElement.setAttribute('data-till','held');break}}}catch(e){}",
+          }}
+        />
         {/* Removes stray service workers left on the domain (fix of 20/09/2026
             for pages that no longer loaded on phones), except WISHOP's own
             /sw.js, which lets the app open offline. */}
@@ -81,7 +90,7 @@ export default async function RootLayout({
           id="unregister-sw"
           dangerouslySetInnerHTML={{
             __html:
-              "try{if('serviceWorker' in navigator){navigator.serviceWorker.getRegistrations().then(function(r){for(var i=0;i<r.length;i++){var w=r[i].active||r[i].waiting||r[i].installing;if(!w||!/\\/sw\\.js$/.test(w.scriptURL)){r[i].unregister()}}})}}catch(e){}",
+              "try{if('serviceWorker' in navigator){navigator.serviceWorker.getRegistrations().then(function(r){for(var i=0;i<r.length;i++){var w=r[i].active||r[i].waiting||r[i].installing;if(!w||!/\\/sw\\.js(\\?|$)/.test(w.scriptURL)){r[i].unregister()}}})}}catch(e){}",
           }}
         />
       </head>
