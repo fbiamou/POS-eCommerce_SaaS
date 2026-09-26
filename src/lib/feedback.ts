@@ -116,6 +116,7 @@ export const FEEDBACK_CODES = [
   // Till codes (set_member_pin, verify_member_pin)
   "pin_invalid",
   "pin_wrong",
+  "pin_locked",
 ] as const;
 
 export type FeedbackCode = (typeof FEEDBACK_CODES)[number];

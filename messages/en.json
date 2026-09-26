@@ -819,7 +819,8 @@
     "device_not_ready": "This device is not registered as a till yet. Connect it to the internet once.",
     "needs_connection": "This action needs the internet. Try again when the connection is back.",
     "pin_invalid": "The code must have exactly 4 digits.",
-    "pin_wrong": "Wrong code."
+    "pin_wrong": "Wrong code.",
+    "pin_locked": "Too many wrong codes: this code is locked for 15 minutes."
   },
   "Suppliers": {
     "title": "Suppliers",
@@ -1231,6 +1232,8 @@
     "intro": "Choose your name, then type your 4-digit code. Sales made on this device will be in your name, even offline.",
     "code_of": "{name}'s code",
     "wrong_pin": "Wrong code.",
+    "pin_locked": "Too many wrong codes: this code is locked for 15 minutes.",
+    "pin_online_only": "This code is checked online. Try again when the connection is back.",
     "no_pin": "No code",
     "no_pin_hint": "The owner sets the codes in Settings › Team.",
     "no_members": "The team is not on this device yet: it needs the internet once.",

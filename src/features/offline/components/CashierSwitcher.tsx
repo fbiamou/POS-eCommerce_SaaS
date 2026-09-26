@@ -8,6 +8,7 @@ import { Delete, UserRound } from "lucide-react";
 import { Modal } from "@/components/ui/Modal";
 import { useOptionalOfflineContext } from "../OfflineProvider";
 import { PIN_LENGTH, pinMatches, readCashierDay, shopDay, writeCashierDay } from "../pin";
+import { switchCashier } from "@/features/team/cashierActions";
 import type { LocalMember } from "../db";
 
 // "Sale in the name of Awa · Switch": on a device shared by the shop, the
@@ -76,28 +77,44 @@ function CashierPanel({ onClose, onChosen }: { onClose: () => void; onChosen: ()
   );
   const [chosen, setChosen] = useState<LocalMember | null>(null);
   const [code, setCode] = useState("");
-  const [wrong, setWrong] = useState(false);
+  // Why the last code was not accepted: wrong code, code locked after too
+  // many wrong ones, or a manager's code that needs the internet.
+  const [refusal, setRefusal] = useState<"wrong" | "locked" | "online_only" | null>(null);
   const [checking, setChecking] = useState(false);
 
   // The till can only be handed over when the signed-in account has its own
   // code: that code is what gives it back its rights (decided 26/09/2026).
   const account = members.find((m) => m.id === offline.userId);
-  const canHandOver = Boolean(account?.pin_hash) || offline.cashier.id !== offline.userId;
+  const canHandOver = Boolean(account?.has_pin) || offline.cashier.id !== offline.userId;
 
   const choose = (member: LocalMember) => {
     setChosen(member);
     setCode("");
-    setWrong(false);
+    setRefusal(null);
   };
 
   const press = async (digit: string) => {
     if (!chosen || checking) return;
     const next = (code + digit).slice(0, PIN_LENGTH);
     setCode(next);
-    setWrong(false);
+    setRefusal(null);
     if (next.length < PIN_LENGTH) return;
     setChecking(true);
-    const ok = await pinMatches(next, chosen.pin_salt, chosen.pin_hash);
+    let ok = false;
+    if (chosen.pin_hash) {
+      ok = await pinMatches(next, chosen.pin_salt, chosen.pin_hash);
+      if (!ok) setRefusal("wrong");
+    } else {
+      // A manager's code is not kept on the devices of the team: the server
+      // checks it, and locks it after five wrong codes.
+      try {
+        const result = await switchCashier(chosen.id, next);
+        ok = Boolean(result.ok);
+        if (!ok) setRefusal(result.error === "pin_locked" ? "locked" : "wrong");
+      } catch {
+        setRefusal("online_only");
+      }
+    }
     setChecking(false);
     if (ok) {
       // The server is told with this code (at once, or when the internet is back).
@@ -106,7 +123,6 @@ function CashierPanel({ onClose, onChosen }: { onClose: () => void; onChosen: ()
       onChosen();
       onClose();
     } else {
-      setWrong(true);
       setCode("");
     }
   };
@@ -122,7 +138,7 @@ function CashierPanel({ onClose, onChosen }: { onClose: () => void; onChosen: ()
           )}
           <ul className="flex flex-col gap-2">
             {members.map((member) => {
-              const usable = Boolean(member.pin_hash) && canHandOver;
+              const usable = member.has_pin && canHandOver;
               const current = member.id === offline.cashier.id;
               return (
                 <li key={member.id}>
@@ -150,7 +166,7 @@ function CashierPanel({ onClose, onChosen }: { onClose: () => void; onChosen: ()
               <span key={i} className={`h-4 w-4 rounded-full ${i < code.length ? "bg-night dark:bg-white" : "bg-zinc-200 dark:bg-zinc-700"}`} />
             ))}
           </div>
-          <p role="alert" className="h-5 text-[13px] font-semibold text-red-600">{wrong ? t("wrong_pin") : ""}</p>
+          <p role="alert" className="h-5 text-[13px] font-semibold text-red-600">{refusal === "wrong" ? t("wrong_pin") : refusal === "locked" ? t("pin_locked") : refusal === "online_only" ? t("pin_online_only") : ""}</p>
           <div className="grid w-full max-w-[260px] grid-cols-3 gap-2">
             {["1", "2", "3", "4", "5", "6", "7", "8", "9"].map((digit) => (
               <button key={digit} type="button" onClick={() => void press(digit)} className="rounded-2xl bg-zinc-100 py-4 font-mono text-xl font-semibold hover:bg-zinc-200 dark:bg-[var(--surface-2)]">

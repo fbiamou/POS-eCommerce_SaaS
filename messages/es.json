@@ -819,7 +819,8 @@
     "device_not_ready": "Este aparato todavía no está registrado como caja. Conéctalo una vez a internet.",
     "needs_connection": "Esta acción necesita internet. Inténtalo de nuevo cuando vuelva la conexión.",
     "pin_invalid": "El código debe tener exactamente 4 cifras.",
-    "pin_wrong": "Código incorrecto."
+    "pin_wrong": "Código incorrecto.",
+    "pin_locked": "Demasiados códigos erróneos: este código queda bloqueado 15 minutos."
   },
   "Suppliers": {
     "title": "Proveedores",
@@ -1231,6 +1232,8 @@
     "intro": "Elige tu nombre y escribe tu código de 4 cifras. Las ventas hechas en este aparato quedarán a tu nombre, incluso sin internet.",
     "code_of": "Código de {name}",
     "wrong_pin": "Código incorrecto.",
+    "pin_locked": "Demasiados códigos erróneos: este código queda bloqueado 15 minutos.",
+    "pin_online_only": "Este código se comprueba con internet. Vuelve a intentarlo cuando vuelva la conexión.",
     "no_pin": "Sin código",
     "no_pin_hint": "La propietaria define los códigos en Ajustes › Equipo.",
     "no_members": "El equipo todavía no está en este aparato: hace falta internet una primera vez.",

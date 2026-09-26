@@ -65,7 +65,7 @@ export async function getTeamMembers(): Promise<Profile[]> {
 
   const { data, error } = await supabase
     .from('profiles')
-    .select('id, full_name, role, shop_id, is_active, allowed_pages, created_at, pin_hash')
+    .select('id, full_name, role, shop_id, is_active, allowed_pages, created_at, has_pin')
     .order('role', { ascending: true })
 
   if (error) {
@@ -73,5 +73,5 @@ export async function getTeamMembers(): Promise<Profile[]> {
     return []
   }
 
-  return (data || []).map(({ pin_hash, ...member }) => ({ ...member, has_pin: Boolean(pin_hash) }))
+  return data || []
 }

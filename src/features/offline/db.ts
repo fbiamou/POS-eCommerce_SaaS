@@ -40,6 +40,13 @@ export type LocalMember = {
   is_active: boolean;
   /** Pages the owner opened to a seller (empty: every page but the settings). */
   allowed_pages: string[];
+  /** Whether this person has a till code at all. */
+  has_pin: boolean;
+  /**
+   * The code's print, only for the account itself and the sellers (to hand
+   * the till over without internet). A manager's code is checked by the
+   * server only (migration till_code_privacy).
+   */
   pin_salt: string | null;
   pin_hash: string | null;
 };

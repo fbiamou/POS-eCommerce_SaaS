@@ -15,8 +15,9 @@ export async function switchCashier(memberId: string, pin: string): Promise<Resu
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { error: 'unauthorized' }
 
+  // Five wrong codes lock that code for 15 minutes (verify_member_pin).
   const { data: valid, error } = await supabase.rpc('verify_member_pin', { _member_id: memberId, _pin: pin })
-  if (error) return { error: 'generic_error' }
+  if (error) return { error: error.message.includes('pin_locked') ? 'pin_locked' : 'generic_error' }
   if (valid !== true) return { error: 'pin_wrong' }
 
   const store = await cookies()

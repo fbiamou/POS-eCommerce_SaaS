@@ -819,7 +819,8 @@
     "device_not_ready": "Cet appareil n'est pas encore enregistré comme caisse. Connectez-le une fois à internet.",
     "needs_connection": "Cette action demande internet. Réessayez quand la connexion revient.",
     "pin_invalid": "Le code doit avoir exactement 4 chiffres.",
-    "pin_wrong": "Code incorrect."
+    "pin_wrong": "Code incorrect.",
+    "pin_locked": "Trop de codes faux : ce code est bloqué 15 minutes."
   },
   "Suppliers": {
     "title": "Fournisseurs",
@@ -1231,6 +1232,8 @@
     "intro": "Choisissez votre nom, puis tapez votre code à 4 chiffres. Les ventes faites sur cet appareil seront à votre nom, même sans internet.",
     "code_of": "Code de {name}",
     "wrong_pin": "Code incorrect.",
+    "pin_locked": "Trop de codes faux : ce code est bloqué 15 minutes.",
+    "pin_online_only": "Ce code se vérifie avec internet. Réessayez quand la connexion revient.",
     "no_pin": "Pas de code",
     "no_pin_hint": "La propriétaire définit les codes dans Réglages › Équipe.",
     "no_members": "L'équipe n'est pas encore sur cet appareil : il faut internet une première fois.",

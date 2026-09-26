@@ -198,11 +198,19 @@ export function supabaseBackend(supabase: SupabaseClient, shopId: string, option
       return guarded(async () => {
         const response = await supabase
           .from("profiles")
-          .select("id, full_name, role, is_active, allowed_pages, pin_salt, pin_hash")
+          .select("id, full_name, role, is_active, allowed_pages, has_pin")
           .order("full_name")
           .abortSignal(timeout());
         if (response.error) return refusal(response);
-        return { ok: true, data: (response.data ?? []) as LocalMember[] };
+        const pins = await supabase.rpc("get_team_pins").abortSignal(timeout());
+        if (pins.error) return refusal(pins);
+        const prints = new Map(((pins.data ?? []) as { id: string; pin_salt: string; pin_hash: string }[]).map((p) => [p.id, p]));
+        const members = ((response.data ?? []) as Omit<LocalMember, "pin_salt" | "pin_hash">[]).map((member) => ({
+          ...member,
+          pin_salt: prints.get(member.id)?.pin_salt ?? null,
+          pin_hash: prints.get(member.id)?.pin_hash ?? null,
+        }));
+        return { ok: true, data: members };
       });
     },
 
