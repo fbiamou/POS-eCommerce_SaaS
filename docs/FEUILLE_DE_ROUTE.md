@@ -1,6 +1,6 @@
 # Feuille de route WISHOP (cahier des charges des versions)
 
-Document vivant : ce qui est décidé pour les prochaines versions, pour le garder en tête à mesure qu'on avance. Mis à jour le 25/09/2026.
+Document vivant : ce qui est décidé pour les prochaines versions, pour le garder en tête à mesure qu'on avance. Mis à jour le 26/09/2026.
 
 ## Aujourd'hui (V1, pilote)
 
@@ -34,7 +34,7 @@ Préparé en local (branche `securite`), testé dans des transactions annulées,
   - Étape 1 (construite en local, branche `hors-ligne`, pas encore publiée) : application installable ; caisse, stock, clientes, factures, tickets et encaissement des dettes sans internet ; une série de numéros de facture par appareil (FAC-2026-1-0042) ; envoi automatique au retour de la connexion, sans doublon ; vente toujours gardée, stock « à vérifier » s'il passe sous zéro ; déconnexion refusée tant que des ventes ne sont pas envoyées.
   - Étape 2 (construite, en test sur l'adresse de la branche `hors-ligne`) : tableau de bord calculé sur l'appareil ; création et modification d'articles sans internet (le stock recompté devient une différence, pour ne pas effacer les ventes des autres caisses ; la photo s'ajoute avec internet) ; réception d'un bon de commande sans internet (bon déjà ouvert une fois avec internet).
   - Changement de caissier par code PIN à 4 chiffres (décision du 25/09/2026, comme Loyverse) : sur un appareil partagé, la vente est enregistrée au nom de la personne qui a tapé son code, même sans internet. Les codes se définissent dans Réglages › Équipe. La personne qui prend la caisse n'a que ses propres droits (décision du 26/09/2026) : une page fermée la renvoie à la Caisse, avant même de s'afficher, en ligne comme hors ligne.
-  - À corriger avant l'arrivée de vrais employés (revue de sécurité du 26/09/2026) : un employé peut lire l'empreinte du code de la propriétaire et le retrouver (4 chiffres) ; il faut réserver ces empreintes à leur titulaire et limiter les essais.
+  - Corrigé et publié le 26/09/2026 (revue de sécurité) : l'empreinte du code d'une collègue n'est plus lisible par l'équipe, le code d'une propriétaire se vérifie par le serveur, 5 codes faux bloquent ce code 15 minutes.
 - Mises à jour au choix de l'utilisateur (décision du 26/09/2026) : une nouvelle version n'arrive sur un appareil qu'au clic sur « Mettre à jour », ou toute seule la nuit à partir de minuit si personne n'utilise WISHOP (date et heure annoncées dans le bandeau). Code prêt ; s'active avec Vercel Pro : Settings › Advanced › Skew Protection activé, Maximum Age de 30 jours (voir `src/lib/versionPin.ts`).
 - Plusieurs boutiques par compte (Pro, Pro Plus).
 - Rapports par intelligence artificielle (Pro Plus).
