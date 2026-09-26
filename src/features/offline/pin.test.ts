@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto";
 import { describe, expect, it } from "vitest";
-import { isValidPin, pinMatches, readCashier, writeCashier } from "./pin";
+import { isValidPin, pinMatches, readCashier, readCashierDay, shopDay, writeCashier, writeCashierDay } from "./pin";
 
 // Same fingerprint as set_member_pin: sha256(salt || pin), in hexadecimal.
 const salt = "3f1c9a0b7e2d4c5a8b6f0e1d2c3b4a59";
@@ -27,6 +27,21 @@ describe("till codes", () => {
     expect(await pinMatches("4821", salt, hash)).toBe(true);
     expect(await pinMatches("4822", salt, hash)).toBe(false);
     expect(await pinMatches("4821", null, null)).toBe(false);
+  });
+});
+
+describe("who is selling today", () => {
+  it("follows the shop's own day, not the UTC day", () => {
+    // 23:30 UTC on the 25th is already the 26th in Malabo (UTC+1).
+    expect(shopDay(new Date("2026-09-25T23:30:00Z"), "Africa/Malabo")).toBe("2026-09-26");
+    expect(shopDay(new Date("2026-09-25T22:30:00Z"), "Africa/Malabo")).toBe("2026-09-25");
+  });
+
+  it("remembers the day someone answered", () => {
+    const storage = memoryStorage();
+    expect(readCashierDay(storage, "shop")).toBeNull();
+    writeCashierDay(storage, "shop", "2026-09-26");
+    expect(readCashierDay(storage, "shop")).toBe("2026-09-26");
   });
 });
 

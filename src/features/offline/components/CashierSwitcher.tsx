@@ -1,22 +1,31 @@
 "use client";
 
 import { useState } from "react";
+import { useShopFormat } from "@/components/ShopFormatProvider";
 import { useTranslations } from "next-intl";
 import { useLiveQuery } from "dexie-react-hooks";
 import { Delete, UserRound } from "lucide-react";
 import { Modal } from "@/components/ui/Modal";
 import { useOptionalOfflineContext } from "../OfflineProvider";
-import { PIN_LENGTH, pinMatches } from "../pin";
+import { PIN_LENGTH, pinMatches, readCashierDay, shopDay, writeCashierDay } from "../pin";
 import type { LocalMember } from "../db";
 
 // "Sale in the name of Awa · Switch": on a device shared by the shop, the
 // person selling types their 4-digit till code, and the sales and payments
 // taken on this device are recorded in their name, even offline (decided
 // 25/09/2026, like Loyverse). The signed-in account does not change.
+// The till asks on its own at its first opening of the day on the device,
+// and again at each opening until someone answers (decided 26/09/2026).
 export function CashierSwitcher() {
   const offline = useOptionalOfflineContext();
   const t = useTranslations("Cashier");
+  const format = useShopFormat();
   const [open, setOpen] = useState(false);
+  const [dismissed, setDismissed] = useState(false);
+  const [answeredDay, setAnsweredDay] = useState(() =>
+    typeof window === "undefined" || !offline ? null : readCashierDay(window.localStorage, offline.shopId)
+  );
+  const today = shopDay(new Date(), format.timeZone);
   const teamSize = useLiveQuery(
     async () => (offline ? (await offline.db.members.toArray()).filter((m) => m.is_active).length : 0),
     [offline?.db],
@@ -24,6 +33,12 @@ export function CashierSwitcher() {
   );
   // A shop run by one person has nobody to switch with.
   if (!offline || teamSize < 2) return null;
+
+  const askToday = answeredDay !== today && !dismissed;
+  const answered = () => {
+    writeCashierDay(window.localStorage, offline.shopId, today);
+    setAnsweredDay(today);
+  };
 
   return (
     <>
@@ -38,12 +53,20 @@ export function CashierSwitcher() {
         </span>
         <span className="shrink-0 font-semibold text-violet-700 dark:text-violet-300">{t("switch")}</span>
       </button>
-      {open && <CashierPanel onClose={() => setOpen(false)} />}
+      {(open || askToday) && (
+        <CashierPanel
+          onClose={() => {
+            setOpen(false);
+            setDismissed(true);
+          }}
+          onChosen={answered}
+        />
+      )}
     </>
   );
 }
 
-function CashierPanel({ onClose }: { onClose: () => void }) {
+function CashierPanel({ onClose, onChosen }: { onClose: () => void; onChosen: () => void }) {
   const offline = useOptionalOfflineContext()!;
   const t = useTranslations("Cashier");
   const members = useLiveQuery(
@@ -60,6 +83,7 @@ function CashierPanel({ onClose }: { onClose: () => void }) {
     // The signed-in account without a code takes the till back directly.
     if (member.id === offline.userId && !member.pin_hash) {
       offline.setCashier({ id: member.id, name: member.full_name });
+      onChosen();
       onClose();
       return;
     }
@@ -79,6 +103,7 @@ function CashierPanel({ onClose }: { onClose: () => void }) {
     setChecking(false);
     if (ok) {
       offline.setCashier({ id: chosen.id, name: chosen.full_name });
+      onChosen();
       onClose();
     } else {
       setWrong(true);

@@ -41,6 +41,33 @@ export function readCashier(storage: Storage, shopId: string, sessionUserId: str
   }
 }
 
+/** The shop's calendar day (YYYY-MM-DD), for "who is selling today". */
+export function shopDay(date: Date, timeZone: string): string {
+  return new Intl.DateTimeFormat("en-CA", { timeZone, year: "numeric", month: "2-digit", day: "2-digit" }).format(date);
+}
+
+// The till asks "who is selling?" at its first opening of the day on the
+// device (decided 26/09/2026); this remembers the day someone answered.
+function dayKey(shopId: string) {
+  return `wishop-cashier-day-${shopId}`;
+}
+
+export function readCashierDay(storage: Pick<Storage, "getItem">, shopId: string): string | null {
+  try {
+    return storage.getItem(dayKey(shopId));
+  } catch {
+    return null;
+  }
+}
+
+export function writeCashierDay(storage: Pick<Storage, "setItem">, shopId: string, day: string) {
+  try {
+    storage.setItem(dayKey(shopId), day);
+  } catch {
+    // Storage blocked: the question comes back at the next opening.
+  }
+}
+
 export function writeCashier(storage: Storage, shopId: string, sessionUserId: string, cashier: Cashier | null) {
   if (!cashier || cashier.id === sessionUserId) {
     storage.removeItem(key(shopId));
