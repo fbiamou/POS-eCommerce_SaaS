@@ -62,6 +62,17 @@ export function isPageAllowed(role: string, allowedPages: string[], pathWithoutL
   return allowedPages.includes(key);
 }
 
+/**
+ * The first page this person may really open, checked with isPageAllowed
+ * (a page list holding only manager pages gives none): where she is sent
+ * from a closed page. Null when no page is open to her.
+ */
+export function firstOpenPath(role: string, allowedPages: string[]): string | null {
+  if (role === "MANAGER") return "/dashboard";
+  const first = APP_PAGES.find((p) => isPageAllowed(role, allowedPages ?? [], p.path));
+  return first ? first.path : null;
+}
+
 export function firstAllowedPath(allowedPages: string[]): string {
   const first = APP_PAGES.find((p) => allowedPages.includes(p.key));
   return first ? first.path : "/dashboard";

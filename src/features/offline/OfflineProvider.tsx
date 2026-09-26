@@ -49,6 +49,11 @@ export type OfflineContextValue = {
    * pages (null while the signed-in account holds it).
    */
   tillHolder: TillHolder | null;
+  /**
+   * False while the team kept on the device is still being read: the
+   * holder's exact rights are not known yet (pages wait, CashierGuard).
+   */
+  tillReady: boolean;
   /** A code checked on the device, kept in memory to tell the server once online. */
   rememberSwitch: (memberId: string, pin: string) => void;
   db: ShopDatabase;
@@ -160,13 +165,17 @@ export function OfflineProvider({
 
   // The colleague holding the till and her rights (from the team kept on
   // the device, so it also works offline).
-  const members = useLiveQuery(() => db.members.toArray(), [db], []);
+  // Until it is read, and for a colleague missing from it, only the till is
+  // open: an empty page list would mean "every page but the settings".
+  const storedMembers = useLiveQuery(() => db.members.toArray(), [db]);
+  const members = useMemo(() => storedMembers ?? [], [storedMembers]);
+  const tillReady = cashier.id === userId || storedMembers !== undefined;
   const tillHolder: TillHolder | null = useMemo(() => {
     if (cashier.id === userId) return null;
     const member = members.find((m) => m.id === cashier.id);
     return member
       ? { id: member.id, name: member.full_name, role: member.role, allowed_pages: member.allowed_pages ?? [] }
-      : { id: cashier.id, name: cashier.name, role: "SELLER", allowed_pages: [] };
+      : { id: cashier.id, name: cashier.name, role: "SELLER", allowed_pages: ["sales"] };
   }, [cashier, userId, members]);
   const setCashier = useCallback(
     (next: Cashier) => {
@@ -257,6 +266,7 @@ export function OfflineProvider({
       cashier,
       setCashier,
       tillHolder,
+      tillReady,
       rememberSwitch,
       db,
       backend,
@@ -273,7 +283,7 @@ export function OfflineProvider({
       requestSync: () => void runSync(),
       markOffline: () => setServerReachable(false),
     }),
-    [shopId, userId, userName, cashier, setCashier, tillHolder, rememberSwitch, db, backend, tillBackend, browserOnline, serverReachable, syncing, updateAvailable, counts.pending, counts.failed, lastPullAt, runSync]
+    [shopId, userId, userName, cashier, setCashier, tillHolder, tillReady, rememberSwitch, db, backend, tillBackend, browserOnline, serverReachable, syncing, updateAvailable, counts.pending, counts.failed, lastPullAt, runSync]
   );
 
   return <OfflineContext.Provider value={value}>{children}</OfflineContext.Provider>;

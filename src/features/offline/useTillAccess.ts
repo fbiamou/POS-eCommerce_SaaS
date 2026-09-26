@@ -14,6 +14,13 @@ export function useTillHolder(): TillHolder | null {
   return mounted ? offline?.tillHolder ?? null : null;
 }
 
+/** The holder, and whether her exact rights are known yet on this device. */
+export function useTillState(): { holder: TillHolder | null; ready: boolean } {
+  const offline = useOptionalOfflineContext();
+  const holder = useTillHolder();
+  return { holder, ready: !holder || Boolean(offline?.tillReady) };
+}
+
 type Access = { role?: string; allowed_pages?: string[]; full_name?: string | null; session_user?: unknown } | null | undefined;
 
 /** Role and pages the menus follow: the till holder's, else the profile's. */

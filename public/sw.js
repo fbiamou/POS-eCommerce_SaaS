@@ -38,9 +38,19 @@ self.addEventListener("activate", (event) => {
   event.waitUntil(
     (async () => {
       const names = await caches.keys();
-      await Promise.all(
-        names.filter((name) => name.startsWith("wishop-") && name !== PAGES && name !== ASSETS).map((name) => caches.delete(name))
-      );
+      const older = names.filter((name) => name.startsWith("wishop-") && name !== PAGES && name !== ASSETS);
+      // Fonts and images keep their name from one version to the next: they
+      // move to the new version instead of being lost with the old one.
+      const assets = await caches.open(ASSETS);
+      for (const name of older.filter((n) => n.startsWith("wishop-assets-"))) {
+        const cache = await caches.open(name);
+        for (const request of await cache.keys()) {
+          if (!new URL(request.url).pathname.includes("/media/") || (await assets.match(request))) continue;
+          const response = await cache.match(request);
+          if (response) await assets.put(request, response);
+        }
+      }
+      await Promise.all(older.map((name) => caches.delete(name)));
       await self.clients.claim();
     })()
   );
@@ -142,11 +152,24 @@ self.addEventListener("fetch", (event) => {
   }
 });
 
+// Files named in a page. Next.js also names some inside its own data, where
+// they are written \"/_next/static/...\": the backslash ends the name.
+const STATIC_FILE = /\/_next\/static\/[^"'\s)\\]+/g;
+// Files named in a style sheet: the fonts, url(../media/...).
+const CSS_URL = /url\(\s*['"]?([^'")]+)['"]?\s*\)/g;
+
+async function keepFile(assets, file) {
+  if (await assets.match(file)) return;
+  const response = await fetch(file);
+  if (response.ok) await assets.put(file, response);
+}
+
 // Keeps the main pages and their files right after sign-in, so they open
 // offline even if they were never visited on this device.
 async function warm(urls) {
   const pages = await caches.open(PAGES);
   const assets = await caches.open(ASSETS);
+  const styles = new Set();
   for (const path of urls) {
     try {
       const url = new URL(path, self.location.origin);
@@ -154,14 +177,27 @@ async function warm(urls) {
       if (!keepable(response)) continue;
       const html = await response.clone().text();
       await pages.put(pageKey(url), response);
-      const files = new Set(html.match(/\/_next\/static\/[^"'\s)]+/g) || []);
-      for (const file of files) {
-        if (await assets.match(file)) continue;
-        const fileResponse = await fetch(file);
-        if (fileResponse.ok) await assets.put(file, fileResponse);
+      for (const file of new Set(html.match(STATIC_FILE) || [])) {
+        if (file.endsWith(".css")) styles.add(file);
+        await keepFile(assets, file);
       }
     } catch {
       // No connection: the next sign-in or visit will try again.
+    }
+  }
+  // Without its fonts kept too, the app shows other, bigger letters offline.
+  for (const style of styles) {
+    try {
+      const kept = await assets.match(style);
+      if (!kept) continue;
+      const base = new URL(style, self.location.origin);
+      for (const [, ref] of (await kept.text()).matchAll(CSS_URL)) {
+        if (ref.startsWith("data:")) continue;
+        const file = new URL(ref, base).pathname;
+        if (file.startsWith("/_next/static/")) await keepFile(assets, file);
+      }
+    } catch {
+      // No connection: tried again at the next sign-in or new version.
     }
   }
 }

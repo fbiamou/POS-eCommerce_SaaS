@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { firstAllowedPath, isPageAllowed, matchPageKey } from "./appPages";
+import { firstAllowedPath, firstOpenPath, isPageAllowed, matchPageKey } from "./appPages";
 
 describe("matchPageKey", () => {
   it("recognises nested pages", () => {
@@ -31,5 +31,18 @@ describe("firstAllowedPath", () => {
   it("sends a restricted cashier to their first page", () => {
     expect(firstAllowedPath(["invoices", "sales"])).toBe("/sales");
     expect(firstAllowedPath([])).toBe("/dashboard");
+  });
+});
+
+describe("firstOpenPath", () => {
+  it("sends the person holding the till to a page she can really open", () => {
+    expect(firstOpenPath("SELLER", ["invoices", "sales"])).toBe("/sales");
+    expect(firstOpenPath("SELLER", [])).toBe("/dashboard");
+    expect(firstOpenPath("MANAGER", [])).toBe("/dashboard");
+  });
+
+  it("never sends her to a page reserved to the owner (no endless redirect)", () => {
+    expect(firstOpenPath("SELLER", ["settings", "clients"])).toBe("/clients");
+    expect(firstOpenPath("SELLER", ["settings"])).toBeNull();
   });
 });
