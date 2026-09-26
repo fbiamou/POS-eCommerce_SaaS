@@ -3,6 +3,8 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { useLiveQuery } from "dexie-react-hooks";
 import { useLocale } from "next-intl";
+import { useRouter } from "@/i18n/routing";
+import { restrictToCashier, switchCashier } from "@/features/team/cashierActions";
 import { createClient } from "@/utils/supabase/client";
 import { openShopDatabase, type ShopDatabase } from "./db";
 import { deviceLabel, readDevice, reconcileDevice, writeDevice } from "./device";
@@ -42,6 +44,13 @@ export type OfflineContextValue = {
   /** Who is selling on this device: the account, or a colleague who typed their till code. */
   cashier: Cashier;
   setCashier: (cashier: Cashier) => void;
+  /**
+   * A colleague holding the till: her rights apply to the menu and the
+   * pages (null while the signed-in account holds it).
+   */
+  tillHolder: TillHolder | null;
+  /** A code checked on the device, kept in memory to tell the server once online. */
+  rememberSwitch: (memberId: string, pin: string) => void;
   db: ShopDatabase;
   status: OfflineStatus;
   /** Background exchanges (long timeout) and till exchanges (short timeout). */
@@ -53,17 +62,23 @@ export type OfflineContextValue = {
   markOffline: () => void;
 };
 
+export type TillHolder = { id: string; name: string | null; role: "MANAGER" | "SELLER"; allowed_pages: string[] };
+
 const OfflineContext = createContext<OfflineContextValue | null>(null);
 
 export function OfflineProvider({
   shopId,
   userId,
   userName,
+  serverCashierId,
   children,
 }: {
   shopId: string;
+  /** The account signed in on the device. */
   userId: string;
   userName: string | null;
+  /** The colleague the server knows as holding the till (signed cookie), if any. */
+  serverCashierId: string | null;
   children: React.ReactNode;
 }) {
   const locale = useLocale();
@@ -142,6 +157,17 @@ export function OfflineProvider({
   }, [db, backend, shopId, ensureDevice, locale]);
 
   const cashier: Cashier = useMemo(() => cashierOverride ?? { id: userId, name: userName }, [cashierOverride, userId, userName]);
+
+  // The colleague holding the till and her rights (from the team kept on
+  // the device, so it also works offline).
+  const members = useLiveQuery(() => db.members.toArray(), [db], []);
+  const tillHolder: TillHolder | null = useMemo(() => {
+    if (cashier.id === userId) return null;
+    const member = members.find((m) => m.id === cashier.id);
+    return member
+      ? { id: member.id, name: member.full_name, role: member.role, allowed_pages: member.allowed_pages ?? [] }
+      : { id: cashier.id, name: cashier.name, role: "SELLER", allowed_pages: [] };
+  }, [cashier, userId, members]);
   const setCashier = useCallback(
     (next: Cashier) => {
       writeCashier(window.localStorage, shopId, userId, next);
@@ -149,6 +175,55 @@ export function OfflineProvider({
     },
     [shopId, userId]
   );
+
+  // The server applies the till holder's rights too (signed cookie). A
+  // switch made offline reaches it once online: with the code kept in
+  // memory, or, for a seller, as a restriction the server accepts without
+  // the code. When neither is possible, the most restricted side wins: the
+  // device goes back to the holder the server knows.
+  const router = useRouter();
+  const pendingSwitch = useRef<{ memberId: string; pin: string } | null>(null);
+  const reconciling = useRef(false);
+  const rememberSwitch = useCallback((memberId: string, pin: string) => {
+    pendingSwitch.current = { memberId, pin };
+  }, []);
+  const online = browserOnline && serverReachable;
+  useEffect(() => {
+    if (!online || reconciling.current) return;
+    const wanted = cashier.id === userId ? null : cashier.id;
+    if (wanted === serverCashierId) {
+      pendingSwitch.current = null;
+      return;
+    }
+    reconciling.current = true;
+    void (async () => {
+      try {
+        const pending = pendingSwitch.current;
+        if (pending && pending.memberId === cashier.id) {
+          const result = await switchCashier(pending.memberId, pending.pin);
+          if (result.ok) {
+            router.refresh();
+            return;
+          }
+          pendingSwitch.current = null;
+        } else if (wanted && tillHolder?.role === "SELLER") {
+          const result = await restrictToCashier(wanted);
+          if (result.ok) {
+            router.refresh();
+            return;
+          }
+        }
+        if (serverCashierId) {
+          const holder = members.find((m) => m.id === serverCashierId);
+          setCashier({ id: serverCashierId, name: holder?.full_name ?? null });
+        }
+      } catch {
+        // No answer: tried again at the next change.
+      } finally {
+        reconciling.current = false;
+      }
+    })();
+  }, [online, cashier.id, userId, serverCashierId, tillHolder?.role, members, router, setCashier]);
 
   useEffect(() => {
     const update = () => {
@@ -181,6 +256,8 @@ export function OfflineProvider({
       userName,
       cashier,
       setCashier,
+      tillHolder,
+      rememberSwitch,
       db,
       backend,
       tillBackend,
@@ -196,7 +273,7 @@ export function OfflineProvider({
       requestSync: () => void runSync(),
       markOffline: () => setServerReachable(false),
     }),
-    [shopId, userId, userName, cashier, setCashier, db, backend, tillBackend, browserOnline, serverReachable, syncing, updateAvailable, counts.pending, counts.failed, lastPullAt, runSync]
+    [shopId, userId, userName, cashier, setCashier, tillHolder, rememberSwitch, db, backend, tillBackend, browserOnline, serverReachable, syncing, updateAvailable, counts.pending, counts.failed, lastPullAt, runSync]
   );
 
   return <OfflineContext.Provider value={value}>{children}</OfflineContext.Provider>;

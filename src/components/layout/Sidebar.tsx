@@ -6,6 +6,7 @@ import { Settings, LogOut, ExternalLink, ShieldCheck, Lock } from "lucide-react"
 import { planAllows, type Plan } from "@/features/billing/plans";
 import { SyncStatus } from "@/features/offline/components/SyncStatus";
 import { LogoutBlockedDialog, useSafeLogout } from "@/features/offline/components/SafeLogout";
+import { useNavAccess } from "@/features/offline/useTillAccess";
 import { LocaleSwitcher } from "@/components/LocaleSwitcher";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { WishopMark } from "@/components/brand/WishopMark";
@@ -17,6 +18,7 @@ type Profile = {
   full_name: string | null;
   role: string;
   allowed_pages?: string[];
+  session_user?: unknown;
 }
 
 type SidebarProps = {
@@ -45,8 +47,10 @@ export default function Sidebar({ profile, shopName, shopLogoUrl, shopSlug, isPl
     SELLER: tSettings("role_cashier"),
   };
 
-  const canSee = (path: string) =>
-    isPageAllowed(profile?.role || "SELLER", profile?.allowed_pages ?? [], path);
+  // A colleague holding the till with her code: her menu, her rights.
+  const access = useNavAccess(profile);
+  const canSee = (path: string) => isPageAllowed(access.role, access.allowedPages, path);
+  const showAdmin = isPlatformAdmin && !access.holdsTill;
 
   const NAV_ITEMS = buildNavItems(t);
   const displayName = shopName || t("app_name");
@@ -111,7 +115,7 @@ export default function Sidebar({ profile, shopName, shopLogoUrl, shopSlug, isPl
       </nav>
 
       <div className="border-t border-[var(--nav-line)] px-3 py-3">
-        {isPlatformAdmin && (
+        {showAdmin && (
           <Link href="/admin" aria-current={isActive("/admin") ? "page" : undefined} className={linkClass(isActive("/admin"))}>
             <ShieldCheck className="h-4 w-4 shrink-0" />
             {t("admin")}
@@ -135,11 +139,11 @@ export default function Sidebar({ profile, shopName, shopLogoUrl, shopSlug, isPl
 
       <div className="flex items-center gap-3 border-t border-[var(--nav-line)] px-4 py-3">
         <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white/10 text-xs font-bold text-white">
-          {getInitials(profile?.full_name)}
+          {getInitials(access.name)}
         </div>
         <div className="min-w-0 flex-1">
-          <p className="truncate text-sm font-semibold text-white">{profile?.full_name || tSettings("no_name")}</p>
-          <p className="text-xs text-[var(--nav-fg)]">{roleLabel[profile?.role || ""] || profile?.role || ""}</p>
+          <p className="truncate text-sm font-semibold text-white">{access.name || tSettings("no_name")}</p>
+          <p className="text-xs text-[var(--nav-fg)]">{roleLabel[access.role] || access.role}</p>
         </div>
         <button
           onClick={() => void safeLogout.run()}

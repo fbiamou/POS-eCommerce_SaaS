@@ -1,9 +1,10 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
-import { headers } from 'next/headers'
+import { cookies, headers } from 'next/headers'
 import { getLocale } from 'next-intl/server'
 import { createClient } from '@/utils/supabase/server'
+import { CASHIER_COOKIE } from '@/lib/cashierSession'
 import { isPageAllowed, firstAllowedPath } from '@/lib/appPages'
 import { redirectLocalized } from '@/lib/navigation'
 import { TERMS_VERSION } from '@/lib/terms'
@@ -172,6 +173,9 @@ export async function logoutToSignup() {
 
 export async function logout() {
   const supabase = await createClient()
+  // A colleague holding the till: signing out ends it, the next account
+  // starts with its own rights.
+  ;(await cookies()).delete(CASHIER_COOKIE)
   await supabase.auth.signOut()
   revalidatePath('/', 'layout')
   return redirectLocalized('/')

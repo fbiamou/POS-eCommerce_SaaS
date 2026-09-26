@@ -198,7 +198,7 @@ export function supabaseBackend(supabase: SupabaseClient, shopId: string, option
       return guarded(async () => {
         const response = await supabase
           .from("profiles")
-          .select("id, full_name, role, is_active, pin_salt, pin_hash")
+          .select("id, full_name, role, is_active, allowed_pages, pin_salt, pin_hash")
           .order("full_name")
           .abortSignal(timeout());
         if (response.error) return refusal(response);

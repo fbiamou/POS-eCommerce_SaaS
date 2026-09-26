@@ -3,6 +3,7 @@ import { routing } from './i18n/routing';
 import { NextRequest, NextResponse } from 'next/server';
 import { createServerClient, type CookieOptions } from '@supabase/ssr';
 import { isPageAllowed, firstAllowedPath } from './lib/appPages';
+import { CASHIER_COOKIE, cashierFromCookie } from './lib/cashierSession';
 
 const intlMiddleware = createMiddleware(routing);
 
@@ -99,11 +100,23 @@ export async function proxy(request: NextRequest) {
   // unrestricted until a manager explicitly configures allowed_pages for
   // them (empty array = unrestricted, see the migration comment).
   if (user && !isAuthPage && !isPublicPage) {
-    const { data: profile } = await supabase
+    let { data: profile } = await supabase
       .from('profiles')
       .select('role, allowed_pages')
       .eq('id', user.id)
       .single()
+
+    // A colleague holds the till with her code: her page access applies,
+    // not the account's (features/offline, decided 26/09/2026).
+    const holderId = await cashierFromCookie(request.cookies.get(CASHIER_COOKIE)?.value, user.id)
+    if (holderId) {
+      const { data: holder } = await supabase
+        .from('profiles')
+        .select('role, allowed_pages, is_active')
+        .eq('id', holderId)
+        .maybeSingle()
+      if (holder?.is_active) profile = { role: holder.role, allowed_pages: holder.allowed_pages }
+    }
 
     if (profile) {
       const pathWithoutLocale = request.nextUrl.pathname.replace(/^\/(es|fr|en)/, '') || '/'

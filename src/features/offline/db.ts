@@ -38,6 +38,8 @@ export type LocalMember = {
   full_name: string | null;
   role: "MANAGER" | "SELLER";
   is_active: boolean;
+  /** Pages the owner opened to a seller (empty: every page but the settings). */
+  allowed_pages: string[];
   pin_salt: string | null;
   pin_hash: string | null;
 };

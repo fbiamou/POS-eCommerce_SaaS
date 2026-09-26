@@ -14,6 +14,7 @@ import { getUnreadMessages } from "@/features/messages/queries";
 import { ShopMessages } from "@/features/messages/components/ShopMessages";
 import { OfflineProvider } from "@/features/offline/OfflineProvider";
 import { UpdateBanner } from "@/features/offline/components/UpdateBanner";
+import { CashierGuard } from "@/features/offline/components/CashierGuard";
 import type { Metadata, Viewport } from "next";
 
 // The signed-in app can be installed (home screen of a phone, desktop of a
@@ -86,7 +87,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
               <UpdateBanner />
               <ShopMessages messages={messages} />
               <PlanBanner access={access} isManager={isManager} />
-              {children}
+              <CashierGuard>{children}</CashierGuard>
             </>
           )}
         </main>
@@ -99,7 +100,12 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   // Every page of the app runs the offline mode: the device keeps its own
   // copy of the shop and sends what it did without internet afterwards.
   return profile ? (
-    <OfflineProvider shopId={profile.shop_id} userId={profile.id} userName={profile.full_name}>
+    <OfflineProvider
+      shopId={profile.shop_id}
+      userId={profile.session_user?.id ?? profile.id}
+      userName={profile.session_user ? profile.session_user.full_name : profile.full_name}
+      serverCashierId={profile.session_user ? profile.id : null}
+    >
       {shell}
     </OfflineProvider>
   ) : (

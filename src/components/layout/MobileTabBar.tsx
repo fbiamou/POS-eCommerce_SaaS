@@ -8,10 +8,12 @@ import { planAllows, type Plan } from "@/features/billing/plans";
 import { isPageAllowed, type AppPageKey } from "@/lib/appPages";
 import { buildNavItems } from "./navItems";
 import { Modal } from "@/components/ui/Modal";
+import { useNavAccess } from "@/features/offline/useTillAccess";
 
 type Profile = {
   role: string;
   allowed_pages?: string[];
+  session_user?: unknown;
 };
 
 type MobileTabBarProps = {
@@ -38,13 +40,16 @@ const TAB_LABEL_KEY: Record<string, string> = {
   invoices: "tab_invoices",
 };
 
-export function MobileTabBar({ profile, shopSlug, isPlatformAdmin = false, plan = "PRO_PLUS", storefrontNeedsAddress = false }: MobileTabBarProps) {
+export function MobileTabBar({ profile, shopSlug, isPlatformAdmin: isAdminAccount = false, plan = "PRO_PLUS", storefrontNeedsAddress = false }: MobileTabBarProps) {
   const t = useTranslations("Sidebar");
   const tSettings = useTranslations("Settings");
   const pathname = usePathname();
   const [showMore, setShowMore] = useState(false);
 
-  const canSee = (path: string) => isPageAllowed(profile?.role || "SELLER", profile?.allowed_pages ?? [], path);
+  // A colleague holding the till with her code: her menu, her rights.
+  const access = useNavAccess(profile);
+  const canSee = (path: string) => isPageAllowed(access.role, access.allowedPages, path);
+  const isPlatformAdmin = isAdminAccount && !access.holdsTill;
 
   const allItems = buildNavItems(t).filter((item) => canSee(item.path));
   const pick = (keys: AppPageKey[]) =>

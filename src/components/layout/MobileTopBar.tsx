@@ -6,6 +6,7 @@ import { useTranslations } from "next-intl";
 import { ChevronDown, Settings, LogOut } from "lucide-react";
 import { SyncStatus } from "@/features/offline/components/SyncStatus";
 import { LogoutBlockedDialog, useSafeLogout } from "@/features/offline/components/SafeLogout";
+import { useNavAccess } from "@/features/offline/useTillAccess";
 import { LocaleSwitcher } from "@/components/LocaleSwitcher";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { isPageAllowed } from "@/lib/appPages";
@@ -15,6 +16,7 @@ type Profile = {
   full_name: string | null;
   role: string;
   allowed_pages?: string[];
+  session_user?: unknown;
 };
 
 type MobileTopBarProps = {
@@ -44,7 +46,9 @@ export function MobileTopBar({ profile, shopName, shopLogoUrl }: MobileTopBarPro
     SELLER: tSettings("role_cashier"),
   };
 
-  const canSeeSettings = isPageAllowed(profile?.role || "SELLER", profile?.allowed_pages ?? [], "/settings");
+  // A colleague holding the till with her code: her rights.
+  const access = useNavAccess(profile);
+  const canSeeSettings = isPageAllowed(access.role, access.allowedPages, "/settings");
 
   return (
     <div className="md:hidden fixed top-0 left-0 right-0 z-40 flex h-[calc(3.5rem+env(safe-area-inset-top))] items-center justify-between border-b border-zinc-200 bg-[var(--surface-1)] px-4 pt-[env(safe-area-inset-top)] dark:border-[var(--line)]">
@@ -61,7 +65,7 @@ export function MobileTopBar({ profile, shopName, shopLogoUrl }: MobileTopBarPro
           className="flex items-center gap-1 rounded-full py-0.5 pl-0.5 pr-1.5 hover:bg-zinc-100 dark:hover:bg-[var(--line)]"
         >
           <div className="flex h-8 w-8 items-center justify-center rounded-full bg-night text-xs font-bold text-white dark:bg-[var(--surface-3)]">
-            {getInitials(profile?.full_name)}
+            {getInitials(access.name)}
           </div>
           <ChevronDown className="h-3.5 w-3.5 text-zinc-400" />
         </button>
@@ -69,8 +73,8 @@ export function MobileTopBar({ profile, shopName, shopLogoUrl }: MobileTopBarPro
         {open && (
           <div className="absolute right-0 top-full mt-2 w-56 rounded-2xl border border-zinc-100 bg-white p-2 shadow-sm dark:border-[var(--line)] dark:bg-[var(--surface-1)]">
             <div className="mb-1 border-b border-zinc-100 px-3 py-2 dark:border-[var(--line)]">
-              <p className="truncate text-sm font-medium">{profile?.full_name || tSettings("no_name")}</p>
-              <p className="text-xs text-zinc-500">{roleLabel[profile?.role || ""] || profile?.role || ""}</p>
+              <p className="truncate text-sm font-medium">{access.name || tSettings("no_name")}</p>
+              <p className="text-xs text-zinc-500">{roleLabel[access.role] || access.role}</p>
             </div>
             {canSeeSettings && (
               <Link

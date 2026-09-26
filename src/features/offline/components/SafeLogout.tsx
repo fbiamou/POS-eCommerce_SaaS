@@ -25,7 +25,11 @@ export function useSafeLogout() {
       }
     }
     setLoggingOut(true);
-    if (offline) await wipeDevice(offline.shopId);
+    if (offline) {
+      // The next account starts with its own rights: nobody holds the till.
+      offline.setCashier({ id: offline.userId, name: offline.userName });
+      await wipeDevice(offline.shopId);
+    }
     await logout();
   };
 

@@ -79,14 +79,12 @@ function CashierPanel({ onClose, onChosen }: { onClose: () => void; onChosen: ()
   const [wrong, setWrong] = useState(false);
   const [checking, setChecking] = useState(false);
 
+  // The till can only be handed over when the signed-in account has its own
+  // code: that code is what gives it back its rights (decided 26/09/2026).
+  const account = members.find((m) => m.id === offline.userId);
+  const canHandOver = Boolean(account?.pin_hash) || offline.cashier.id !== offline.userId;
+
   const choose = (member: LocalMember) => {
-    // The signed-in account without a code takes the till back directly.
-    if (member.id === offline.userId && !member.pin_hash) {
-      offline.setCashier({ id: member.id, name: member.full_name });
-      onChosen();
-      onClose();
-      return;
-    }
     setChosen(member);
     setCode("");
     setWrong(false);
@@ -102,6 +100,8 @@ function CashierPanel({ onClose, onChosen }: { onClose: () => void; onChosen: ()
     const ok = await pinMatches(next, chosen.pin_salt, chosen.pin_hash);
     setChecking(false);
     if (ok) {
+      // The server is told with this code (at once, or when the internet is back).
+      offline.rememberSwitch(chosen.id, next);
       offline.setCashier({ id: chosen.id, name: chosen.full_name });
       onChosen();
       onClose();
@@ -117,9 +117,12 @@ function CashierPanel({ onClose, onChosen }: { onClose: () => void; onChosen: ()
         <div className="flex flex-col gap-3 text-[14px]">
           <p className="text-zinc-600 dark:text-zinc-300">{t("intro")}</p>
           {members.length === 0 && <p className="text-zinc-500">{t("no_members")}</p>}
+          {members.length > 0 && !canHandOver && (
+            <p className="rounded-xl bg-amber-50 p-3 text-[13px] font-semibold text-amber-900 dark:bg-amber-900/20 dark:text-amber-200">{t("owner_pin_first")}</p>
+          )}
           <ul className="flex flex-col gap-2">
             {members.map((member) => {
-              const usable = Boolean(member.pin_hash) || member.id === offline.userId;
+              const usable = Boolean(member.pin_hash) && canHandOver;
               const current = member.id === offline.cashier.id;
               return (
                 <li key={member.id}>

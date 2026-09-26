@@ -1,6 +1,7 @@
 import "server-only";
 
 import { cache } from "react";
+import { getCurrentProfile } from "@/features/auth/actions";
 import { createClient } from "@/utils/supabase/server";
 import type { Plan } from "@/features/billing/plans";
 
@@ -9,6 +10,8 @@ import type { Plan } from "@/features/billing/plans";
 // (supabase: is_platform_admin, admin_list_shops...).
 
 export const isPlatformAdmin = cache(async (): Promise<boolean> => {
+  // A colleague holding the till on the owner's device is not the owner.
+  if ((await getCurrentProfile())?.session_user) return false;
   const supabase = await createClient();
   const { data, error } = await supabase.rpc("is_platform_admin");
   if (error) return false;
