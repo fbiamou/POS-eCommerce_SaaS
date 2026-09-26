@@ -4,6 +4,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createServerClient, type CookieOptions } from '@supabase/ssr';
 import { isPageAllowed, firstAllowedPath, firstOpenPath } from './lib/appPages';
 import { CASHIER_COOKIE, cashierFromCookie } from './lib/cashierSession';
+import { PIN_COOKIE, pinSeconds } from './lib/versionPin';
 
 const intlMiddleware = createMiddleware(routing);
 
@@ -40,8 +41,24 @@ export async function proxy(request: NextRequest) {
   // Every response leaving the proxy, redirects included, carries the
   // refreshed cookies: otherwise the browser keeps the old refresh token,
   // already consumed, and the session is lost on the next request.
+  // A signed-in device stays on this version of WISHOP until its user
+  // updates (lib/versionPin.ts, only with Vercel Skew Protection). Renewed at
+  // each page load, never beyond the version's window.
+  const deploymentId = process.env.VERCEL_DEPLOYMENT_ID
+  const keepVersion = (response: NextResponse) => {
+    if (!user || !deploymentId || process.env.VERCEL_SKEW_PROTECTION_ENABLED !== '1') return
+    if (request.headers.get('sec-fetch-dest') !== 'document') return
+    const seconds = pinSeconds(Number(process.env.NEXT_PUBLIC_BUILD_TIME), Date.now())
+    if (seconds > 0) {
+      response.cookies.set(PIN_COOKIE, deploymentId, { path: '/', httpOnly: true, sameSite: 'lax', secure: true, maxAge: seconds })
+    } else if (request.cookies.get(PIN_COOKIE)) {
+      response.cookies.delete(PIN_COOKIE)
+    }
+  }
+
   const withSession = (response: NextResponse) => {
     refreshedCookies.forEach(({ name, value, options }) => response.cookies.set(name, value, options))
+    keepVersion(response)
     return response
   }
 

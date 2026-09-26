@@ -5,6 +5,7 @@ import { cookies, headers } from 'next/headers'
 import { getLocale } from 'next-intl/server'
 import { createClient } from '@/utils/supabase/server'
 import { CASHIER_COOKIE } from '@/lib/cashierSession'
+import { PIN_COOKIE } from '@/lib/versionPin'
 import { isPageAllowed, firstAllowedPath } from '@/lib/appPages'
 import { redirectLocalized } from '@/lib/navigation'
 import { TERMS_VERSION } from '@/lib/terms'
@@ -176,6 +177,8 @@ export async function logout() {
   // A colleague holding the till: signing out ends it, the next account
   // starts with its own rights.
   ;(await cookies()).delete(CASHIER_COOKIE)
+  // The next account starts on the latest version of WISHOP (lib/versionPin.ts).
+  ;(await cookies()).delete(PIN_COOKIE)
   await supabase.auth.signOut()
   revalidatePath('/', 'layout')
   return redirectLocalized('/')

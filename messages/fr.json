@@ -1219,7 +1219,9 @@
     "kind_po_receive": "Réception du bon {reference}",
     "po_received_offline": "Réception enregistrée sur l'appareil : les articles sont déjà dans le stock. Elle sera envoyée au retour d'internet.",
     "update_available": "Une nouvelle version de WISHOP est prête.",
-    "update_now": "Mettre à jour"
+    "update_now": "Mettre à jour",
+    "update_kept": "Rien ne change tant que vous n'appuyez pas sur « Mettre à jour ».",
+    "update_auto": "Sinon, elle s'installera toute seule le {date} à {time} si WISHOP n'est pas utilisé, ou à la réouverture suivante."
   },
   "Cashier": {
     "selling_as": "Vente au nom de",

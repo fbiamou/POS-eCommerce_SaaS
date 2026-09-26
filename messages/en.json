@@ -1219,7 +1219,9 @@
     "kind_po_receive": "Reception of order {reference}",
     "po_received_offline": "Reception saved on the device: the items are already in stock. It will be sent when the internet is back.",
     "update_available": "A new version of WISHOP is ready.",
-    "update_now": "Update"
+    "update_now": "Update",
+    "update_kept": "Nothing changes until you press “Update”.",
+    "update_auto": "Otherwise it installs itself on {date} at {time} if WISHOP is not in use, or at the next opening."
   },
   "Cashier": {
     "selling_as": "Selling as",

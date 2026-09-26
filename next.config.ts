@@ -8,6 +8,10 @@ const nextConfig: NextConfig = {
   // one is out (features/offline: "Nouvelle version disponible").
   env: {
     NEXT_PUBLIC_BUILD_ID: process.env.VERCEL_GIT_COMMIT_SHA ?? "local",
+    // When this version was built, and whether Vercel keeps each device on
+    // it until its user updates (Skew Protection, paid plans): lib/versionPin.ts.
+    NEXT_PUBLIC_BUILD_TIME: String(Date.now()),
+    NEXT_PUBLIC_VERSION_PINNING: process.env.VERCEL_SKEW_PROTECTION_ENABLED === "1" ? "1" : "0",
   },
   // The WISHOP marketing page is a static site in public/landing (built with
   // the 10k-websites method). Files in public are not served for a bare

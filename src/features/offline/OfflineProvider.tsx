@@ -34,6 +34,8 @@ export type OfflineStatus = {
   ready: boolean;
   /** A newer version of the app is out: the page should be reloaded. */
   updateAvailable: boolean;
+  /** That newer version (its build id), once known. */
+  latestBuild: string | null;
 };
 
 export type OfflineContextValue = {
@@ -95,7 +97,8 @@ export function OfflineProvider({
   const [browserOnline, setBrowserOnline] = useState(true);
   const [serverReachable, setServerReachable] = useState(true);
   const [syncing, setSyncing] = useState(false);
-  const [updateAvailable, setUpdateAvailable] = useState(false);
+  const [latestBuild, setLatestBuild] = useState<string | null>(null);
+  const updateAvailable = latestBuild !== null && latestBuild !== process.env.NEXT_PUBLIC_BUILD_ID;
   // The person selling survives a reload of the page, not a change of account.
   const [cashierOverride, setCashierOverride] = useState<Cashier | null>(() =>
     typeof window === "undefined" ? null : readCashier(window.localStorage, shopId, userId)
@@ -138,9 +141,14 @@ export function OfflineProvider({
           // once online, it checks whether a newer one is out.
           if (reached) {
             try {
-              const response = await fetch("/api/version", { cache: "no-store" });
+              // Without its cookies: a device kept on its version would
+              // otherwise ask that same version (lib/versionPin.ts).
+              const response = await fetch("/api/version", {
+                cache: "no-store",
+                credentials: process.env.NEXT_PUBLIC_VERSION_PINNING === "1" ? "omit" : "same-origin",
+              });
               const { build } = (await response.json()) as { build?: string };
-              if (build && build !== process.env.NEXT_PUBLIC_BUILD_ID) setUpdateAvailable(true);
+              if (build) setLatestBuild(build);
             } catch {
               // No answer: checked again at the next sync.
             }
@@ -284,11 +292,12 @@ export function OfflineProvider({
         lastSyncAt: lastPullAt,
         ready: lastPullAt !== null,
         updateAvailable,
+        latestBuild,
       },
       requestSync: () => void runSync(),
       markOffline: () => setServerReachable(false),
     }),
-    [shopId, userId, userName, cashier, setCashier, tillHolder, tillReady, rememberSwitch, db, backend, tillBackend, browserOnline, serverReachable, syncing, updateAvailable, counts.pending, counts.failed, lastPullAt, runSync]
+    [shopId, userId, userName, cashier, setCashier, tillHolder, tillReady, rememberSwitch, db, backend, tillBackend, browserOnline, serverReachable, syncing, updateAvailable, latestBuild, counts.pending, counts.failed, lastPullAt, runSync]
   );
 
   return <OfflineContext.Provider value={value}>{children}</OfflineContext.Provider>;
