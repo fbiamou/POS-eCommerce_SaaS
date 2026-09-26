@@ -15,6 +15,7 @@ import { ShopMessages } from "@/features/messages/components/ShopMessages";
 import { OfflineProvider } from "@/features/offline/OfflineProvider";
 import { UpdateBanner } from "@/features/offline/components/UpdateBanner";
 import { CashierGuard } from "@/features/offline/components/CashierGuard";
+import { tillPrecheckScript } from "@/features/offline/tillPrecheck";
 import type { Metadata, Viewport } from "next";
 
 // The signed-in app can be installed (home screen of a phone, desktop of a
@@ -61,6 +62,14 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   const shell = (
     <ShopFormatProvider value={shopFormat}>
       <div className="relative flex h-screen w-full flex-col overflow-hidden md:flex-row">
+        {/* Before anything is drawn: a colleague holding the till who opens a
+            page closed to her goes straight to the till (offline included). */}
+        {profile && (
+          <script
+            id="till-precheck"
+            dangerouslySetInnerHTML={{ __html: tillPrecheckScript(profile.shop_id, profile.session_user?.id ?? profile.id) }}
+          />
+        )}
         <Sidebar
           profile={profile}
           shopName={shopSettings?.shop_name}

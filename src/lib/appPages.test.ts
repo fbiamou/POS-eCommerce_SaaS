@@ -35,9 +35,10 @@ describe("firstAllowedPath", () => {
 });
 
 describe("firstOpenPath", () => {
-  it("sends the person holding the till to a page she can really open", () => {
-    expect(firstOpenPath("SELLER", ["invoices", "sales"])).toBe("/sales");
-    expect(firstOpenPath("SELLER", [])).toBe("/dashboard");
+  it("sends an employee to the till when it is open to her, not to the dashboard", () => {
+    expect(firstOpenPath("SELLER", ["dashboard", "invoices", "sales"])).toBe("/sales");
+    expect(firstOpenPath("SELLER", [])).toBe("/sales");
+    expect(firstOpenPath("SELLER", ["stock", "invoices"])).toBe("/stock");
     expect(firstOpenPath("MANAGER", [])).toBe("/dashboard");
   });
 

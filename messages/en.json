@@ -3,7 +3,7 @@
     "app_name": "WISHOP",
     "dashboard": "Dashboard",
     "stock": "Stock & Products",
-    "sales": "Sales & Billing",
+    "sales": "Till",
     "invoices": "Invoices",
     "clients": "Clients & Debts",
     "reminders": "WhatsApp Reminders",
@@ -16,7 +16,7 @@
     "logout": "Log out",
     "more": "More",
     "tab_dashboard": "Home",
-    "tab_sales": "Sell",
+    "tab_sales": "Till",
     "tab_stock": "Stock",
     "tab_invoices": "Invoices",
     "admin": "WISHOP admin",
@@ -133,7 +133,7 @@
     "csv_title": "Import or export your stock"
   },
   "Sales": {
-    "title": "Sales & Invoicing",
+    "title": "Till",
     "available_products": "Available Products",
     "search": "Search for a product...",
     "category": "Category",

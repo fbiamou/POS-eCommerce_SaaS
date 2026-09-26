@@ -12,7 +12,7 @@ import { registerDevice, supabaseBackend } from "./backend";
 import { outboxCounts } from "./records";
 import { syncNow, type SyncBackend } from "./sync";
 import { registerServiceWorker, warmOfflinePages } from "./serviceWorker";
-import { readCashier, writeCashier, type Cashier } from "./pin";
+import { readCashier, writeCashier, writeTillRights, type Cashier } from "./pin";
 
 // Runs the offline mode for every page of the app: keeps this device's copy
 // of the shop up to date, sends what was done without internet as soon as
@@ -177,6 +177,11 @@ export function OfflineProvider({
       ? { id: member.id, name: member.full_name, role: member.role, allowed_pages: member.allowed_pages ?? [] }
       : { id: cashier.id, name: cashier.name, role: "SELLER", allowed_pages: ["sales"] };
   }, [cashier, userId, members]);
+  // Her rights are kept with her name for the check made before the page is
+  // drawn (tillPrecheck.ts), and follow the owner's changes once synced.
+  useEffect(() => {
+    if (tillHolder && tillReady) writeTillRights(window.localStorage, shopId, userId, tillHolder);
+  }, [tillHolder, tillReady, shopId, userId]);
   const setCashier = useCallback(
     (next: Cashier) => {
       writeCashier(window.localStorage, shopId, userId, next);

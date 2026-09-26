@@ -63,13 +63,16 @@ export function isPageAllowed(role: string, allowedPages: string[], pathWithoutL
 }
 
 /**
- * The first page this person may really open, checked with isPageAllowed
- * (a page list holding only manager pages gives none): where she is sent
- * from a closed page. Null when no page is open to her.
+ * Where an employee is sent from a page closed to her: the till when it is
+ * open to her (that is where she works, decided 26/09/2026), else the first
+ * page she may really open, checked with isPageAllowed (a page list holding
+ * only manager pages gives none). Null when no page is open to her.
  */
 export function firstOpenPath(role: string, allowedPages: string[]): string | null {
   if (role === "MANAGER") return "/dashboard";
-  const first = APP_PAGES.find((p) => isPageAllowed(role, allowedPages ?? [], p.path));
+  const pages = allowedPages ?? [];
+  if (isPageAllowed(role, pages, "/sales")) return "/sales";
+  const first = APP_PAGES.find((p) => isPageAllowed(role, pages, p.path));
   return first ? first.path : null;
 }
 

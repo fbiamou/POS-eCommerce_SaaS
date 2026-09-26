@@ -2,7 +2,7 @@ import createMiddleware from 'next-intl/middleware';
 import { routing } from './i18n/routing';
 import { NextRequest, NextResponse } from 'next/server';
 import { createServerClient, type CookieOptions } from '@supabase/ssr';
-import { isPageAllowed, firstAllowedPath } from './lib/appPages';
+import { isPageAllowed, firstAllowedPath, firstOpenPath } from './lib/appPages';
 import { CASHIER_COOKIE, cashierFromCookie } from './lib/cashierSession';
 
 const intlMiddleware = createMiddleware(routing);
@@ -140,7 +140,8 @@ export async function proxy(request: NextRequest) {
       const allowed = isPageAllowed(profile.role, profile.allowed_pages ?? [], pathWithoutLocale)
       if (!allowed) {
         const redirectUrl = request.nextUrl.clone()
-        redirectUrl.pathname = `/${locale}${firstAllowedPath(profile.allowed_pages ?? [])}`
+        // The till first for an employee (decided 26/09/2026).
+        redirectUrl.pathname = `/${locale}${firstOpenPath(profile.role, profile.allowed_pages ?? []) ?? firstAllowedPath(profile.allowed_pages ?? [])}`
         return withSession(NextResponse.redirect(redirectUrl))
       }
     }

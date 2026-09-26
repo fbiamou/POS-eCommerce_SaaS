@@ -31,7 +31,7 @@ const LEFT_KEYS: AppPageKey[] = ["dashboard", "stock"];
 const CENTER_KEY: AppPageKey = "sales";
 const RIGHT_KEYS: AppPageKey[] = ["invoices"];
 
-// The full nav labels ("Ventes & Facturation", "Tableau de Bord"...) wrap
+// The full nav labels ("Stock & Produits", "Tableau de Bord"...) wrap
 // awkwardly at tab-bar width — short, tab-specific labels instead.
 const TAB_LABEL_KEY: Record<string, string> = {
   dashboard: "tab_dashboard",

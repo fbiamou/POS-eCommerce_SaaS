@@ -68,6 +68,28 @@ export function writeCashierDay(storage: Pick<Storage, "setItem">, shopId: strin
   }
 }
 
+/**
+ * Keeps the holder's page access next to her name, so the page can check it
+ * before it is even drawn (tillPrecheck.ts), online and offline.
+ */
+export function writeTillRights(
+  storage: Storage,
+  shopId: string,
+  sessionUserId: string,
+  holder: { id: string; role: string; allowed_pages: string[] }
+) {
+  try {
+    const raw = storage.getItem(key(shopId));
+    if (!raw) return;
+    const value = JSON.parse(raw) as Record<string, unknown>;
+    if (value.sessionUserId !== sessionUserId || value.id !== holder.id) return;
+    if (value.role === holder.role && JSON.stringify(value.allowed_pages) === JSON.stringify(holder.allowed_pages)) return;
+    storage.setItem(key(shopId), JSON.stringify({ ...value, role: holder.role, allowed_pages: holder.allowed_pages }));
+  } catch {
+    // Storage blocked: the page guard (CashierGuard) still applies her rights.
+  }
+}
+
 export function writeCashier(storage: Storage, shopId: string, sessionUserId: string, cashier: Cashier | null) {
   if (!cashier || cashier.id === sessionUserId) {
     storage.removeItem(key(shopId));

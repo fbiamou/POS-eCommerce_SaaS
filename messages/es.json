@@ -3,7 +3,7 @@
     "app_name": "WISHOP",
     "dashboard": "Panel de Control",
     "stock": "Inventario y Productos",
-    "sales": "Ventas y Facturación",
+    "sales": "Caja",
     "invoices": "Facturas",
     "clients": "Clientes y Deudas",
     "reminders": "Recordatorios WhatsApp",
@@ -16,7 +16,7 @@
     "logout": "Cerrar sesión",
     "more": "Más",
     "tab_dashboard": "Inicio",
-    "tab_sales": "Vender",
+    "tab_sales": "Caja",
     "tab_stock": "Stock",
     "tab_invoices": "Facturas",
     "admin": "Administración WISHOP",
@@ -133,7 +133,7 @@
     "csv_title": "Importar o exportar tu stock"
   },
   "Sales": {
-    "title": "Ventas y Facturación",
+    "title": "Caja",
     "available_products": "Productos disponibles",
     "search": "Buscar un producto...",
     "category": "Categoría",
