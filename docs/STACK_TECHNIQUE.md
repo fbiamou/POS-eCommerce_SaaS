@@ -17,6 +17,18 @@
 - RLS (Row Level Security) activée dès la première migration : chaque requête est filtrée par `shop_id`, ce qui évite de réécrire la sécurité si une deuxième boutique est ajoutée plus tard.
 - Migrations gérées via la CLI Supabase, versionnées dans `/supabase/migrations` du dépôt Git — jamais de modification manuelle du schéma en production.
 
+## Deux bases de données : production et test (depuis le 26/09/2026)
+
+| Base | Projet Supabase | Utilisée par |
+|---|---|---|
+| Production | `mqlvqcbtisebslvtvscs` (« App GesCom eCommerce ») | l'adresse principale (Vercel, environnement Production, branche `master`) |
+| Test | `nrzwuboarfcwdowjrhxf` (« WISHOP test ») | les liens de test (Vercel, environnement Preview : toutes les autres branches) |
+
+- La base de test est une copie de la structure de la production (sans aucune donnée), vérifiée par empreinte le 26/09/2026 : colonnes, contraintes, index, fonctions, règles d'accès, déclencheurs, droits et espaces de stockage identiques.
+- Les premières migrations du dépôt ne suffisent pas à reconstruire la production (des colonnes de `settings` ont été ajoutées hors migration au début du projet) : pour une nouvelle base, copier la structure de la production plutôt que rejouer l'historique.
+- Une nouvelle migration s'applique d'abord à la base de test, pour le lien de test ; elle n'est appliquée à la production qu'à la mise en ligne décidée par le propriétaire.
+- Les comptes de la base de test sont séparés : l'accès à la console WISHOP s'y donne en ajoutant le compte de test dans `platform_admins`.
+
 ## Intégration WhatsApp (relances)
 
 - Nécessite un compte WhatsApp Business (WABA) vérifié auprès de Meta et un ou plusieurs templates de message approuvés (catégorie « utility », ex. rappel de facture) — à faire valider avant de développer cette brique ; le délai d'approbation peut prendre plusieurs jours.
