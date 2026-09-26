@@ -107,6 +107,10 @@ export const FEEDBACK_CODES = [
   // Storefront reports
   "report_invalid",
   "report_rate_limited",
+  // Storefront orders (place_online_order limits)
+  "order_rate_limited",
+  "order_too_large",
+  "order_contact_too_long",
   // Offline mode: tills numbered per device (register_device, record_sale)
   "device_not_found",
   "device_sequence_missing",
