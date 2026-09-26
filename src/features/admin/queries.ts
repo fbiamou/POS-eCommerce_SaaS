@@ -9,11 +9,24 @@ import type { Plan } from "@/features/billing/plans";
 // returns nothing unless the signed-in user is a platform admin
 // (supabase: is_platform_admin, admin_list_shops...).
 
+// The console's data and actions: a listed admin whose session passed the
+// second factor (6-digit code, migration admin_mfa). The database checks the
+// same in every admin_* function.
 export const isPlatformAdmin = cache(async (): Promise<boolean> => {
   // A colleague holding the till on the owner's device is not the owner.
   if ((await getCurrentProfile())?.session_user) return false;
   const supabase = await createClient();
   const { data, error } = await supabase.rpc("is_platform_admin");
+  if (error) return false;
+  return data === true;
+});
+
+// A listed admin, before the code: the menu shows the console, which then
+// asks for the code (AdminMfaGate).
+export const isPlatformAdminAccount = cache(async (): Promise<boolean> => {
+  if ((await getCurrentProfile())?.session_user) return false;
+  const supabase = await createClient();
+  const { data, error } = await supabase.rpc("is_platform_admin_account");
   if (error) return false;
   return data === true;
 });

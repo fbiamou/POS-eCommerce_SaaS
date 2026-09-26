@@ -18,6 +18,16 @@ Document vivant : ce qui est décidé pour les prochaines versions, pour le gard
 
 - Validation manuelle des vitrines avant leur mise en ligne (décision du 25/09/2026) : en cas d'abus, ou par simple contrôle, une vitrine nouvellement ouverte attend l'accord de l'administrateur dans la console avant d'être visible du public.
 
+## Sécurité et montée en charge (revue du 26/09/2026)
+
+Préparé en local (branche `securite`), testé dans des transactions annulées, pas encore appliqué ni publié :
+
+- Index par boutique et sur les clés étrangères, règles d'accès calculées une fois par requête : la base reste rapide avec des centaines de boutiques.
+- Vitrine : au plus 3 commandes par numéro en 15 minutes, 30 par boutique en 10 minutes, 50 lignes par commande (contre les fausses commandes). Un anti-robot (captcha) viendra ensuite, avec une clé Cloudflare Turnstile à créer.
+- Console WISHOP : code à 6 chiffres d'une application d'authentification en plus du mot de passe (double authentification), exigé aussi par la base pour chaque action de la console.
+- À décider : une base de données de test séparée de la vraie, pour que le lien de test ne touche plus les données réelles.
+- Plus tard : protection Supabase contre les mots de passe déjà piratés (formule Pro), surveillance des erreurs avec alertes, sauvegarde restaurable à la minute près, relances WhatsApp découpées par lots.
+
 ## V3
 
 - Mode hors ligne, dans toutes les formules, gratuite comprise (coupures de courant et d'internet). Avancé en première mise à jour après le pilote (décision du 25/09/2026), sur téléphone comme sur ordinateur :

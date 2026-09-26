@@ -1250,5 +1250,20 @@
     "pin_save": "Guardar",
     "pin_remove": "Quitar el código",
     "owner_pin_first": "Para pasar la caja a una compañera, la cuenta conectada en este aparato debe tener antes su propio código (Ajustes › Equipo). Servirá para recuperar la caja."
+  },
+  "AdminMfa": {
+    "loading": "Cargando…",
+    "enroll_title": "Protege la consola WISHOP",
+    "enroll_intro": "La consola actúa sobre todas las tiendas: ahora pide un código de 6 cifras además de la contraseña. Instala una aplicación de autenticación en tu teléfono (Google Authenticator, Microsoft Authenticator…), escanea este código y escribe el código que muestra.",
+    "qr_alt": "Código QR para escanear con la aplicación de autenticación",
+    "secret_label": "Sin cámara, escribe esta clave en la aplicación:",
+    "challenge_title": "Código de seguridad",
+    "challenge_intro": "Escribe el código de 6 cifras que muestra tu aplicación de autenticación.",
+    "code_label": "Código de 6 cifras",
+    "enroll_button": "Activar la protección",
+    "challenge_button": "Abrir la consola",
+    "wrong_code": "Código incorrecto o caducado. Escribe el código que se muestra ahora.",
+    "failed": "No se pudo hacer la verificación. Vuelve a intentarlo.",
+    "unavailable": "La doble autenticación no está disponible. Comprueba en Supabase: Authentication › Multi-Factor › TOTP activado."
   }
 }

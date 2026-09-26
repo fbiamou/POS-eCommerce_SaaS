@@ -1250,5 +1250,20 @@
     "pin_save": "Save",
     "pin_remove": "Remove the code",
     "owner_pin_first": "To hand the till to a colleague, the account signed in on this device needs its own code first (Settings › Team). It is used to take the till back."
+  },
+  "AdminMfa": {
+    "loading": "Loading…",
+    "enroll_title": "Protect the WISHOP console",
+    "enroll_intro": "The console acts on every shop: it now asks for a 6-digit code on top of the password. Install an authenticator app on your phone (Google Authenticator, Microsoft Authenticator…), scan this code, then type the code it shows.",
+    "qr_alt": "QR code to scan with the authenticator app",
+    "secret_label": "Without a camera, type this key in the app:",
+    "challenge_title": "Security code",
+    "challenge_intro": "Type the 6-digit code shown by your authenticator app.",
+    "code_label": "6-digit code",
+    "enroll_button": "Turn on protection",
+    "challenge_button": "Open the console",
+    "wrong_code": "Wrong or expired code. Type the code shown now.",
+    "failed": "The check could not be done. Try again.",
+    "unavailable": "Two-factor authentication is not available. Check in Supabase: Authentication › Multi-Factor › TOTP enabled."
   }
 }

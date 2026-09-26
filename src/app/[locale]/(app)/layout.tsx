@@ -5,7 +5,7 @@ import { ShopFormatProvider } from "@/components/ShopFormatProvider";
 import { Toaster } from "@/components/ui/Toast";
 import { getCurrentProfile } from "@/features/auth/actions";
 import { getShopFormat, getShopSettings } from "@/features/settings/queries";
-import { getOwnSubscription, isPlatformAdmin } from "@/features/admin/queries";
+import { getOwnSubscription, isPlatformAdminAccount } from "@/features/admin/queries";
 import { ShopSuspended } from "@/features/admin/components/ShopSuspended";
 import { getShopAccess } from "@/features/billing/access";
 import { planAllows } from "@/features/billing/plans";
@@ -42,7 +42,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     getCurrentProfile(),
     getShopSettings(),
     getShopFormat(),
-    isPlatformAdmin(),
+    isPlatformAdminAccount(),
     getOwnSubscription(),
     getShopAccess(),
   ]);
