@@ -1108,6 +1108,7 @@
     "limits_unlimited": "Unlimited accounts and items",
     "point_s2": "Stock and cash sales",
     "point_s3": "Printed till receipt",
+    "point_s4": "Works offline too",
     "point_e0": "Everything in Standard, plus:",
     "point_e2": "Credit sales and payments in instalments",
     "point_e3": "PDF invoices and debt tracking",

@@ -7,7 +7,7 @@ import { ChooseStandard } from "./ChooseStandard";
 
 // The same bullets as the public pricing grid (public/landing, "p.*" keys).
 const PLAN_POINTS: Record<Plan, string[]> = {
-  STANDARD: ["s2", "s3"],
+  STANDARD: ["s2", "s3", "s4"],
   ESSENTIEL: ["e0", "e2", "e3", "e4"],
   PRO: ["p0", "p2", "p3", "p4", "p6", "p5"],
   PRO_PLUS: ["x0", "x2", "x3", "x4", "x5"],

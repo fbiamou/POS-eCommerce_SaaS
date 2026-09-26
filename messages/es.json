@@ -1108,6 +1108,7 @@
     "limits_unlimited": "Cuentas y artículos ilimitados",
     "point_s2": "Stock y caja al contado",
     "point_s3": "Ticket de caja impreso",
+    "point_s4": "Funciona también sin internet",
     "point_e0": "Todo lo del Standard, más:",
     "point_e2": "Ventas a crédito y pagos en varias veces",
     "point_e3": "Facturas PDF y seguimiento de deudas",

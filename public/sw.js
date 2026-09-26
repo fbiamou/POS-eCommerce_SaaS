@@ -20,6 +20,8 @@ const ASSETS = `wishop-assets-${VERSION}`;
 // page are public and do not need to work offline.
 const APP_PATH = /^\/(es|fr|en)\/(dashboard|sales|stock|clients|invoices|reminders|purchase-orders|shipments|online-orders|settings|locked)(\/|$)/;
 
+const ONLINE_ONLY_PATH = /^\/(es|fr|en)\/(admin|paused)(\/|$)/;
+
 // Detail pages open on any id, even a sale made offline a minute ago: the
 // kept copy of one detail page serves them all, the page reads its id from
 // the address and its data from the device.
@@ -82,16 +84,23 @@ async function keepPage(key, response) {
   await cache.put(key, response);
 }
 
+// Shown for a page that needs the internet, or was never opened on this
+// device: it says so and offers the till, which works offline. It never
+// shows another page under this address (that looked like being sent to
+// the till, with two menu entries lit). A colleague holding the till goes
+// straight to the till, as the app does (tillPrecheck.ts).
 function offlinePage(url) {
-  const locale = (url.pathname.match(/^\/(es|fr|en)\//) || [])[1] || "es";
+  const locale = (url.pathname.match(/^\/(es|fr|en)(\/|$)/) || [])[1] || "es";
   const text = {
-    es: ["Sin conexión", "Esta página todavía no se ha abierto en este aparato. La caja funciona sin internet:", "Abrir la caja"],
-    fr: ["Hors ligne", "Cette page n'a pas encore été ouverte sur cet appareil. La caisse fonctionne sans internet :", "Ouvrir la caisse"],
-    en: ["Offline", "This page has not been opened on this device yet. The till works without internet:", "Open the till"],
+    es: ["Sin conexión", "Esta página necesita internet, o todavía no se ha abierto en este aparato.", "La caja funciona sin internet.", "Abrir la caja", "Reintentar"],
+    fr: ["Hors ligne", "Cette page a besoin d'internet, ou n'a pas encore été ouverte sur cet appareil.", "La caisse, elle, marche sans internet.", "Ouvrir la caisse", "Réessayer"],
+    en: ["Offline", "This page needs the internet, or has not been opened on this device yet.", "The till works without internet.", "Open the till", "Try again"],
   }[locale];
+  const tillHeld = `try{for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(k&&k.indexOf("wishop-cashier-")===0&&k.indexOf("wishop-cashier-day-")!==0){location.replace("/${locale}/sales");break}}}catch(e){}`;
   const html = `<!doctype html><html lang="${locale}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>WISHOP · ${text[0]}</title>
-<style>body{margin:0;min-height:100vh;display:grid;place-items:center;background:#F2F3F8;color:#141C45;font:16px/1.5 system-ui,sans-serif;padding:24px}main{max-width:360px;text-align:center}h1{font-size:22px;margin:0 0 8px}a{display:inline-block;margin-top:16px;background:#2B44A0;color:#fff;padding:12px 20px;border-radius:12px;text-decoration:none;font-weight:700}</style></head>
-<body><main><h1>${text[0]}</h1><p>${text[1]}</p><a href="/${locale}/sales">${text[2]}</a></main></body></html>`;
+<script>${tillHeld}</script>
+<style>body{margin:0;min-height:100vh;display:grid;place-items:center;background:#F2F3F8;color:#141C45;font:16px/1.5 system-ui,sans-serif;padding:24px}main{max-width:380px;text-align:center}h1{font-size:22px;margin:0 0 8px}p{margin:0 0 6px}.actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:18px}a{display:inline-block;background:#2B44A0;color:#fff;padding:12px 20px;border-radius:12px;text-decoration:none;font-weight:700}a.retry{background:transparent;color:#2B44A0;box-shadow:inset 0 0 0 1.5px #2B44A0}</style></head>
+<body><main><h1>${text[0]}</h1><p>${text[1]}</p><p>${text[2]}</p><div class="actions"><a href="/${locale}/sales">${text[3]}</a><a class="retry" href="${url.pathname}">${text[4]}</a></div></main></body></html>`;
   return new Response(html, { status: 200, headers: { "Content-Type": "text/html; charset=utf-8" } });
 }
 
@@ -99,11 +108,9 @@ async function fromDevice(url) {
   const cache = await caches.open(PAGES);
   const options = { ignoreSearch: true, ignoreVary: true };
   const shell = shellKey(url);
-  const locale = (url.pathname.match(/^\/(es|fr|en)\//) || [])[1] || "es";
   return (
     (await cache.match(pageKey(url), options)) ||
     (shell && (await cache.match(shell, options))) ||
-    (await cache.match(`${url.origin}/${locale}/sales`, options)) ||
     offlinePage(url)
   );
 }
@@ -149,6 +156,12 @@ self.addEventListener("fetch", (event) => {
   if (isRscRequest(request, url)) return;
   if (request.mode === "navigate" && APP_PATH.test(url.pathname)) {
     event.respondWith(page(event, url));
+    return;
+  }
+  // Pages that only work online (WISHOP console, paused account): without
+  // internet, the same clear page instead of the browser's own error.
+  if (request.mode === "navigate" && ONLINE_ONLY_PATH.test(url.pathname)) {
+    event.respondWith(fetch(request).catch(() => offlinePage(url)));
   }
 });
 

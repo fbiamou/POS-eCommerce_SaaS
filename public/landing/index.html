@@ -240,12 +240,13 @@ main{display:block}
 .tk-edge.bottom{margin:8px 0 0}
 .tk-shop{font-family:var(--f-display);font-weight:800;font-size:15px;text-align:center;letter-spacing:-.01em}
 .tk-meta{text-align:center;color:var(--ink-2);font-size:9.5px;margin-bottom:6px}
-.tk-line{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:0 8px;padding-block:5px;border-bottom:1px dashed #C3C9DE}
-.tk-line span:first-child{font-family:var(--f-body);font-weight:600;font-size:11px}
-.tk-line em{font-style:normal;color:var(--ink-2)}
-.tk-sum,.tk-paid{display:flex;justify-content:space-between;gap:8px;padding-top:6px;white-space:nowrap}
-.tk-sum{font-size:12px;font-weight:500}
-.tk-paid{color:var(--ok);padding-top:2px}
+.tk-band{display:block;width:100%;height:9px;margin:5px 0}
+.tk-row{display:flex;justify-content:space-between;gap:8px;white-space:nowrap}
+.tk-dash{border-top:1px dashed #1B2250;opacity:.55;margin:5px 0}
+.tk-item{margin-top:2px}
+.tk-total{font-size:12px;font-weight:700}
+.tk-center{text-align:center}
+.tk-strong{font-weight:700;margin-top:2px}
 .pdf-chip{font-family:var(--f-mono);font-size:9.5px;letter-spacing:.06em;background:var(--brand);color:#fff;border-radius:4px;padding:2px 5px;margin-right:4px}
 .mbtn + .mbtn{margin-top:0}
 .auto-chip{font-size:10.5px;font-weight:600;color:var(--brand);background:rgba(43,68,160,.1);padding:3px 8px;border-radius:999px;white-space:nowrap}
@@ -565,11 +566,23 @@ body.paused *,body.paused *::before,body.paused *::after{animation-play-state:pa
               <div class="tk">
                 <svg class="tk-edge" viewBox="0 0 240 8" preserveAspectRatio="none" aria-hidden="true"><polyline points="0,0 8,7 16,0 24,7 32,0 40,7 48,0 56,7 64,0 72,7 80,0 88,7 96,0 104,7 112,0 120,7 128,0 136,7 144,0 152,7 160,0 168,7 176,0 184,7 192,0 200,7 208,0 216,7 224,0 232,7 240,0" fill="none" stroke="#C3C9DE" stroke-width="1.2"/></svg>
                 <p class="tk-shop">Boss MaMa B</p>
-                <p class="tk-meta">FAC-2026-0042 · <span data-dt="2026-09-24T14:32:00"></span></p>
-                <div class="tk-line"><span data-i18n="m.p1">Robe satin champagne</span><span data-amount="45000" data-plain></span><em>1 × <span data-amount="45000" data-plain></span></em></div>
-                <div class="tk-line"><span data-i18n="m.p2">Parfum en cristal 50&nbsp;ml</span><span data-amount="28000" data-plain></span><em>1 × <span data-amount="28000" data-plain></span></em></div>
-                <div class="tk-sum"><span data-i18n="m.total">Total</span><span data-amount="73000"></span></div>
-                <div class="tk-paid"><span data-i18n="m.paidcash">Payé comptant</span><span data-amount="73000"></span></div>
+                <p class="tk-meta">Malabo</p>
+                <svg class="tk-band" viewBox="0 0 280 14" preserveAspectRatio="none" aria-hidden="true"><polyline points="0,11 10,3 20,11 30,3 40,11 50,3 60,11 70,3 80,11 90,3 100,11 110,3 120,11 130,3 140,11 150,3 160,11 170,3 180,11 190,3 200,11 210,3 220,11 230,3 240,11 250,3 260,11 270,3 280,11" fill="none" stroke="#1B2250" stroke-width="1.6"/><path d="M140 -1 L144 3 L140 7 L136 3Z" fill="#1B2250"/></svg>
+                <div class="tk-row"><span data-i18n="tk.title">Ticket</span><b>FAC-2026-1-0042</b></div>
+                <p><span data-dt="2026-09-24T14:32:00"></span></p>
+                <p data-i18n="tk.client">Client&#8239;: Client de passage</p>
+                <p data-i18n="tk.seller">Vendu par&#8239;: Awa</p>
+                <div class="tk-dash"></div>
+                <p class="tk-item" data-i18n="m.p1">Robe satin champagne</p>
+                <div class="tk-row"><span>1 × <span data-amount="45000" data-plain></span></span><span data-amount="45000" data-plain></span></div>
+                <p class="tk-item" data-i18n="m.p2">Parfum en cristal 50&nbsp;ml</p>
+                <div class="tk-row"><span>1 × <span data-amount="28000" data-plain></span></span><span data-amount="28000" data-plain></span></div>
+                <div class="tk-dash"></div>
+                <div class="tk-row tk-total"><span data-i18n="tk.total">Total TTC</span><span data-amount="73000"></span></div>
+                <div class="tk-row"><span data-i18n="tk.paid">Montant payé</span><span data-amount="73000"></span></div>
+                <p class="tk-center tk-strong" data-i18n="tk.status">Payée</p>
+                <svg class="tk-band" viewBox="0 0 280 14" preserveAspectRatio="none" aria-hidden="true"><polyline points="0,11 10,3 20,11 30,3 40,11 50,3 60,11 70,3 80,11 90,3 100,11 110,3 120,11 130,3 140,11 150,3 160,11 170,3 180,11 190,3 200,11 210,3 220,11 230,3 240,11 250,3 260,11 270,3 280,11" fill="none" stroke="#1B2250" stroke-width="1.6"/><path d="M140 -1 L144 3 L140 7 L136 3Z" fill="#1B2250"/></svg>
+                <p class="tk-center" data-i18n="tk.thanks">Merci de votre visite&#8239;!</p>
                 <svg class="tk-edge bottom" viewBox="0 0 240 8" preserveAspectRatio="none" aria-hidden="true"><polyline points="0,0 8,7 16,0 24,7 32,0 40,7 48,0 56,7 64,0 72,7 80,0 88,7 96,0 104,7 112,0 120,7 128,0 136,7 144,0 152,7 160,0 168,7 176,0 184,7 192,0 200,7 208,0 216,7 224,0 232,7 240,0" fill="none" stroke="#C3C9DE" stroke-width="1.2"/></svg>
               </div>
               <div class="mbtn" data-i18n="m.print">Imprimer le ticket</div>
@@ -920,6 +933,7 @@ en:{
  's3.t':'Remind','s3.p':'A customer owes you money? WISHOP reminds them on WhatsApp by itself, at the pace you choose, until the debt is paid off. The message is already written, with their name and the amount.','s3.note':"Waiting for Meta's green light in our region. See why",
  's4.t':'Restock','s4.p':"Low stock stands out. When you know what's missing, WISHOP drafts a purchase order per supplier, to send via WhatsApp or as a PDF. On delivery, you confirm the reception and the stock updates.",
  's5.t':'Buy remotely','s5.p':'For a new arrival or trend-driven buying, send a link to the person shopping for you on site. They record each item as they buy it and attach a photo of the parcel. When it arrives, you tick off what you receive, and the stock updates by itself.',
+ 'tk.title':'Receipt','tk.client':'Client: Walk-in client','tk.seller':'Served by: Awa','tk.total':'Total (incl. VAT)','tk.paid':'Amount paid','tk.status':'Paid','tk.thanks':'Thank you for your visit!',
  'ex':'Example','m.ticket':'Receipt','m.p1':'Champagne satin dress','m.p2':'Crystal perfume 50&nbsp;ml','m.total':'Total','m.paidcash':'Paid in cash','m.print':'Print receipt','m.pdf':'Download PDF',
  'm.ongoing':'Open credit','m.payment':'Payment','m.autorem':'Automatic reminders','m.due':'due','m.every':'Every 7&nbsp;days','m.sent1':'1st reminder sent','m.sent2':'2nd reminder sent','m.next':'Next reminder','m.stops':'Reminders stop as soon as the debt is paid off.',
  'm.msg':'Hello Aïcha, this is a reminder that 9,500&nbsp;FCFA is still due at Boss MaMa B. Please contact us to arrange the payment.',
@@ -957,6 +971,7 @@ es:{
  's3.t':'Recuerda','s3.p':'¿Un cliente te debe dinero? WISHOP se lo recuerda solo por WhatsApp, al ritmo que elijas, hasta que salde su deuda. El mensaje ya está escrito, con su nombre y el importe.','s3.note':'A la espera de la luz verde de Meta en nuestra región. Ver por qué',
  's4.t':'Reaprovisiona','s4.p':'El stock bajo salta a la vista. Cuando sabes lo que falta, WISHOP prepara una orden de compra por proveedor, para enviar por WhatsApp o en PDF. Al recibir la entrega, confirmas la recepción y el stock se actualiza.',
  's5.t':'Compra a distancia','s5.p':'Para una nueva llegada o compras según la tendencia, envía un enlace a la persona que compra por ti en el lugar. Anota cada artículo a medida que lo compra y adjunta la foto del paquete. Al llegar, marcas lo que recibes y el stock se actualiza solo.',
+ 'tk.title':'Ticket','tk.client':'Cliente: Cliente de paso','tk.seller':'Le atendió: Awa','tk.total':'Total (con IVA)','tk.paid':'Monto pagado','tk.status':'Pagada','tk.thanks':'¡Gracias por su visita!',
  'ex':'Ejemplo','m.ticket':'Ticket','m.p1':'Vestido de satén champán','m.p2':'Perfume de cristal 50&nbsp;ml','m.total':'Total','m.paidcash':'Pagado al contado','m.print':'Imprimir el ticket','m.pdf':'Descargar el PDF',
  'm.ongoing':'Crédito en curso','m.payment':'Pago','m.autorem':'Recordatorios automáticos','m.due':'pendiente','m.every':'Cada 7&nbsp;días','m.sent1':'1.er recordatorio enviado','m.sent2':'2.º recordatorio enviado','m.next':'Próximo recordatorio','m.stops':'Los recordatorios se detienen en cuanto se salda la deuda.',
  'm.msg':'Hola Aïcha, le recordamos que tiene 9.500&nbsp;FCFA pendientes de pago en Boss MaMa B. Contáctenos para acordar el pago.',
