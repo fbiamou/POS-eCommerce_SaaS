@@ -205,7 +205,7 @@
     "full_name": "Full Name",
     "full_name_placeholder": "E.g.: Marie Louise",
     "phone_whatsapp": "Phone (WhatsApp)",
-    "phone_placeholder": "E.g.: 699887766",
+    "phone_placeholder": "Number without the dialling code",
     "phone_country_code": "Country code",
     "cancel": "Cancel",
     "create": "Create",
@@ -504,7 +504,9 @@
     "report_close": "Close",
     "wishop_cta_title": "Sell online with WISHOP too",
     "wishop_cta_body": "Till, stock, customer credit and an online storefront, from your phone. Free to start.",
-    "wishop_cta_button": "Discover WISHOP"
+    "wishop_cta_button": "Discover WISHOP",
+    "contact_shop_whatsapp": "Contact the shop on WhatsApp",
+    "contact_shop_message": "Hello {shop}, I would like to order: {items}"
   },
   "Invoices": {
     "list_title": "Invoices",
@@ -720,7 +722,8 @@
     "tab_appearance": "Appearance",
     "tab_plan": "Plan",
     "member_paused": "Paused (plan)",
-    "choose_storefront_address": "Choose my storefront address"
+    "choose_storefront_address": "Choose my storefront address",
+    "shop_phone_placeholder": "{code} XXX XXX XXX"
   },
   "Feedback": {
     "generic_error": "Something went wrong. Please try again.",

@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
-import { Plus, Minus, Trash2, ShoppingBag, CheckCircle2, MapPin, Phone, Store, Flag } from "lucide-react";
+import { Plus, Minus, Trash2, ShoppingBag, CheckCircle2, MapPin, Phone, Store, Flag, MessageCircle } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { LocaleSwitcher } from "@/components/LocaleSwitcher";
 import { WishopMark } from "@/components/brand/WishopMark";
@@ -13,6 +13,17 @@ import { formatMoney } from "@/lib/format";
 import { feedbackFromError, type FeedbackCode } from "@/lib/feedback";
 import type { PublicProduct, PublicShopProfile } from "../actions";
 import { ReportContent } from "./ReportContent";
+
+// The shop's WhatsApp: its number as written in its settings, with its
+// dialling code added when the number was written without one.
+function shopWhatsAppUrl(phone: string | null | undefined, dialCode: string | null | undefined): string | null {
+  const raw = (phone ?? "").trim();
+  if (!raw) return null;
+  let digits = raw.replace(/\D/g, "");
+  if (raw.startsWith("00")) digits = digits.slice(2);
+  else if (!raw.startsWith("+")) digits = `${(dialCode ?? "").replace(/\D/g, "")}${digits.replace(/^0+/, "")}`;
+  return digits.length >= 8 ? `https://wa.me/${digits}` : null;
+}
 
 type CartItem = { productId: string; quantity: number };
 
@@ -121,6 +132,22 @@ export default function StorefrontShop({
   }, [cart, products]);
 
   const cartItemCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+
+  // When the order cannot go through (too many orders, item gone...), the
+  // customer can still reach the shop: WhatsApp opens with her order written
+  // out. Only when the shop gave a phone number.
+  const contactUrl = useMemo(() => {
+    const url = shopWhatsAppUrl(shop.shop_phone, shop.default_phone_country_code);
+    if (!url) return null;
+    const lines = cart
+      .map((item) => {
+        const product = products.find((p) => p.product_id === item.productId);
+        return product ? `${item.quantity} × ${product.name}` : null;
+      })
+      .filter(Boolean)
+      .join(", ");
+    return `${url}?text=${encodeURIComponent(t("contact_shop_message", { shop: shop.shop_name ?? "", items: lines }))}`;
+  }, [cart, products, shop.shop_phone, shop.default_phone_country_code, shop.shop_name, t]);
   const qtyInCart = (productId: string) => cart.find((i) => i.productId === productId)?.quantity ?? 0;
 
   const filteredProducts = useMemo(() => {
@@ -492,6 +519,16 @@ export default function StorefrontShop({
               <p className="rounded-xl bg-[var(--accent-light)] p-3 text-[13.5px] text-zinc-800">{t("pickup_notice")}</p>
 
               {error && <p role="alert" className="text-center text-[14px] font-semibold text-red-600">{tFeedback(error)}</p>}
+              {error && contactUrl && (
+                <a
+                  href={contactUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-center gap-2 rounded-xl border border-emerald-600 py-3 text-[14px] font-bold text-emerald-700 hover:bg-emerald-50"
+                >
+                  <MessageCircle className="h-4 w-4" /> {t("contact_shop_whatsapp")}
+                </a>
+              )}
 
               <button
                 type="submit"

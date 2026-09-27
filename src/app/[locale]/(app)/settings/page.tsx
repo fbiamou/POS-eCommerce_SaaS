@@ -224,7 +224,7 @@ export default async function SettingsPage({
                 </div>
                 <div className="flex flex-col gap-1.5">
                   <label className="text-[13px] font-bold text-zinc-700 dark:text-zinc-300" htmlFor="shop_phone">{t('phone')}</label>
-                  <input id="shop_phone" name="shop_phone" type="tel" defaultValue={shopSettings?.shop_phone || ''} placeholder="+237 6XX XXX XXX"
+                  <input id="shop_phone" name="shop_phone" type="tel" defaultValue={shopSettings?.shop_phone || ''} placeholder={t('shop_phone_placeholder', { code: shopSettings?.default_phone_country_code || '+237' })}
                     className="w-full rounded-xl border border-zinc-200 bg-white px-4 py-2.5 text-[13px] font-medium transition-colors focus:border-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-500 dark:border-[var(--line)] dark:bg-[var(--surface-1)]" />
                 </div>
                 <div className="flex flex-col gap-1.5">

@@ -205,7 +205,7 @@
     "full_name": "Nom complet",
     "full_name_placeholder": "Ex: Marie Louise",
     "phone_whatsapp": "Téléphone (WhatsApp)",
-    "phone_placeholder": "Ex: 699887766",
+    "phone_placeholder": "Numéro sans l'indicatif",
     "phone_country_code": "Indicatif du pays",
     "cancel": "Annuler",
     "create": "Créer",
@@ -504,7 +504,9 @@
     "report_close": "Fermer",
     "wishop_cta_title": "Vous aussi, vendez en ligne avec WISHOP",
     "wishop_cta_body": "Caisse, stock, crédits clients et vitrine en ligne, depuis votre téléphone. Gratuit pour commencer.",
-    "wishop_cta_button": "Découvrir WISHOP"
+    "wishop_cta_button": "Découvrir WISHOP",
+    "contact_shop_whatsapp": "Contacter la boutique sur WhatsApp",
+    "contact_shop_message": "Bonjour {shop}, je voudrais commander : {items}"
   },
   "Invoices": {
     "list_title": "Factures",
@@ -720,7 +722,8 @@
     "tab_appearance": "Apparence",
     "tab_plan": "Formule",
     "member_paused": "En pause (formule)",
-    "choose_storefront_address": "Choisir l’adresse de ma vitrine"
+    "choose_storefront_address": "Choisir l’adresse de ma vitrine",
+    "shop_phone_placeholder": "{code} XXX XXX XXX"
   },
   "Feedback": {
     "generic_error": "Une erreur inattendue est survenue. Réessayez.",
