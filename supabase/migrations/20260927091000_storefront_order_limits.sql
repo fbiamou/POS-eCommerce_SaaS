@@ -2,7 +2,8 @@
 -- so anyone could send thousands of fake orders to a shop (review of
 -- 26/09/2026). Limits, like the storefront reports already have:
 --   - at most 3 orders per phone number and shop in 15 minutes;
---   - at most 30 orders per shop in 10 minutes;
+--   - at most 100 orders per shop in 10 minutes (a live sale on Facebook
+--     can bring many at once; decided 28/09/2026);
 --   - at most 50 lines per order, a name of 100 characters, a phone of 30.
 -- A real customer never reaches them; the error codes are shown to the
 -- visitor in her language (lib/feedback.ts). A captcha comes on top later.
@@ -43,7 +44,7 @@ BEGIN
         WHERE shop_id = _shop_id AND customer_phone = trim(_customer_phone)
           AND created_at > now() - interval '15 minutes') >= 3
        OR (SELECT count(*) FROM online_orders
-        WHERE shop_id = _shop_id AND created_at > now() - interval '10 minutes') >= 30 THEN
+        WHERE shop_id = _shop_id AND created_at > now() - interval '10 minutes') >= 100 THEN
         RAISE EXCEPTION 'order_rate_limited';
     END IF;
 

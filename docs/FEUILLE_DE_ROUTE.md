@@ -23,7 +23,7 @@ Document vivant : ce qui est décidé pour les prochaines versions, pour le gard
 Préparé en local (branche `securite`), testé dans des transactions annulées, pas encore appliqué ni publié :
 
 - Index par boutique et sur les clés étrangères, règles d'accès calculées une fois par requête : la base reste rapide avec des centaines de boutiques.
-- Vitrine : au plus 3 commandes par numéro en 15 minutes, 30 par boutique en 10 minutes, 50 lignes par commande (contre les fausses commandes). Un anti-robot (captcha) viendra ensuite, avec une clé Cloudflare Turnstile à créer.
+- Vitrine : au plus 3 commandes par numéro en 15 minutes, 100 par boutique en 10 minutes, 50 lignes par commande (contre les fausses commandes). Un anti-robot (captcha) viendra ensuite, avec une clé Cloudflare Turnstile à créer.
 - Console WISHOP : code à 6 chiffres d'une application d'authentification en plus du mot de passe (double authentification), exigé aussi par la base pour chaque action de la console.
 - À décider : une base de données de test séparée de la vraie, pour que le lien de test ne touche plus les données réelles.
 - Plus tard : protection Supabase contre les mots de passe déjà piratés (formule Pro), surveillance des erreurs avec alertes, sauvegarde restaurable à la minute près, relances WhatsApp découpées par lots.
