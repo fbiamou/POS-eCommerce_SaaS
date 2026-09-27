@@ -1,3 +1,5 @@
+-- Applied by hand in production (Supabase SQL Editor) on 28/09/2026, so it
+-- is not listed in the Supabase migration history; applied on WISHOP test too.
 -- Storefront orders (place_online_order) can be placed without an account,
 -- so anyone could send thousands of fake orders to a shop (review of
 -- 26/09/2026). Limits, like the storefront reports already have:
