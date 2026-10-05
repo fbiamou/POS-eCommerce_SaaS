@@ -102,10 +102,11 @@
     "published": "Publié",
     "no_image": "Aucune photo",
     "choose_image": "Choisir une photo",
+    "remove_image": "Retirer la photo",
     "uploading": "Envoi...",
-    "download_template": "Modèle CSV",
-    "import_csv": "Importer CSV",
-    "export_csv": "Exporter CSV",
+    "download_template": "Modèle Excel",
+    "import_csv": "Importer (Excel ou CSV)",
+    "export_csv": "Exporter le stock (Excel)",
     "importing": "Importation en cours...",
     "import_success": "{created} produit(s) créé(s), {restocked} réapprovisionné(s).",
     "import_errors_count": "{count} ligne(s) ignorée(s) : {details}",
@@ -130,7 +131,8 @@
     "summary_low": "Stock bas",
     "summary_value": "Valeur au prix d'achat",
     "reorder": "Commander",
-    "csv_title": "Importer ou exporter le stock"
+    "csv_title": "Importer ou exporter le stock",
+    "csv_hint": "Téléchargez le modèle, remplissez-le dans Excel ou Google Sheets, puis importez-le. Une photo se met avec son adresse internet : l'onglet Aide du modèle explique comment la trouver."
   },
   "Sales": {
     "title": "Caisse",
@@ -181,6 +183,7 @@
     "paid_now": "Versé aujourd'hui ({currency})",
     "choose_client": "Choisir le client",
     "client_required_credit": "Choisissez le client : une vente à crédit doit avoir un nom, sinon la dette ne pourra pas être relancée.",
+    "client_phone_required_credit": "Ajoutez le numéro WhatsApp du client : c'est là que partent les rappels de la dette.",
     "submit_amount": "Encaisser {amount}",
     "new_sale": "Nouvelle vente",
     "unit_price": "{price} l'unité",
@@ -1269,5 +1272,34 @@
     "wrong_code": "Code incorrect ou expiré. Tapez le code affiché maintenant.",
     "failed": "La vérification n'a pas pu se faire. Réessayez.",
     "unavailable": "La double authentification n'est pas disponible. Vérifiez dans Supabase : Authentication › Multi-Factor › TOTP activé."
+  },
+  "Errors": {
+    "not_found_title": "Page introuvable",
+    "not_found_body": "Cette adresse ne mène à aucune page de WISHOP. Vérifiez-la, ou revenez à l'application.",
+    "back_home": "Retour à WISHOP",
+    "error_title": "Cette page n'a pas pu s'afficher",
+    "error_body": "Un problème est survenu de notre côté. Réessayez dans un instant ; s'il persiste, écrivez-nous sur WhatsApp au +240 222 779 813.",
+    "retry": "Réessayer"
+  },
+  "StockTemplate": {
+    "sheet_items": "Articles",
+    "sheet_help": "Aide",
+    "file_template": "modele-stock-WISHOP",
+    "file_export": "stock-WISHOP",
+    "help_column": "Colonne",
+    "help_meaning": "Ce qu'il faut y mettre",
+    "help_name": "Nom de l'article (obligatoire). Un article déjà présent avec le même nom, la même marque et le même type est réapprovisionné.",
+    "help_category": "Rayon de la boutique (facultatif), par exemple Perruques.",
+    "help_type": "Type d'article (facultatif), par exemple Lisse.",
+    "help_brand": "Marque (facultatif).",
+    "help_purchase_price": "Prix d'achat en chiffres, sans espace ni point (facultatif).",
+    "help_selling_price": "Prix de vente en chiffres, sans espace ni point.",
+    "help_quantity": "Quantité à ajouter au stock (obligatoire, au moins 1).",
+    "help_image_url": "Adresse internet d'une photo (facultatif), commençant par https://. Voir plus bas.",
+    "help_online": "oui pour montrer l'article sur la vitrine, non sinon. Vide : rien ne change.",
+    "help_supplier": "Fournisseur (facultatif).",
+    "help_origin_country": "Pays d'origine (facultatif).",
+    "help_image_title": "Trouver l'adresse d'une photo",
+    "help_image_body": "Ouvrez la photo sur internet (site du fournisseur, catalogue). Sur téléphone : appui long sur l'image, puis « Copier l'adresse de l'image ». Sur ordinateur : clic droit sur l'image, puis « Copier l'adresse de l'image ». Collez-la dans la colonne. Pour vos propres photos, ajoutez-les plutôt depuis la fiche de l'article dans WISHOP."
   }
 }

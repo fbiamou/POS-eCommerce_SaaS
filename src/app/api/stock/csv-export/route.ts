@@ -1,8 +1,13 @@
-import { NextResponse } from "next/server";
+import { NextResponse, type NextRequest } from "next/server";
+import { getTranslations } from "next-intl/server";
 import { createClient } from "@/utils/supabase/server";
-import { productsToCsv } from "@/features/stock/csv";
+import { productsToRows, stockLocale } from "@/features/stock/csv";
+import { buildXlsx } from "@/lib/xlsx";
 
-export async function GET() {
+// The shop's items as an Excel workbook, in the import format and in its
+// language (?locale=): edit it and import it back.
+export async function GET(request: NextRequest) {
+  const locale = stockLocale(request.nextUrl.searchParams.get("locale"));
   const supabase = await createClient();
 
   const { data: products, error } = await supabase
@@ -30,10 +35,12 @@ export async function GET() {
     is_published_online: p.is_published_online,
   }));
 
-  return new NextResponse(productsToCsv(rows), {
+  const t = await getTranslations({ locale, namespace: "StockTemplate" });
+  const workbook = buildXlsx([{ name: t("sheet_items"), rows: productsToRows(rows, locale) }]);
+  return new NextResponse(Buffer.from(workbook), {
     headers: {
-      "Content-Type": "text/csv; charset=utf-8",
-      "Content-Disposition": 'attachment; filename="stock.csv"',
+      "Content-Type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      "Content-Disposition": `attachment; filename="${t("file_export")}.xlsx"`,
     },
   });
 }

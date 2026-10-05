@@ -102,10 +102,11 @@
     "published": "Publicado",
     "no_image": "Sin foto",
     "choose_image": "Elegir una foto",
+    "remove_image": "Quitar la foto",
     "uploading": "Enviando...",
-    "download_template": "Plantilla CSV",
-    "import_csv": "Importar CSV",
-    "export_csv": "Exportar CSV",
+    "download_template": "Plantilla Excel",
+    "import_csv": "Importar (Excel o CSV)",
+    "export_csv": "Exportar el stock (Excel)",
     "importing": "Importando...",
     "import_success": "{created} producto(s) creado(s), {restocked} reabastecido(s).",
     "import_errors_count": "{count} línea(s) omitida(s): {details}",
@@ -130,7 +131,8 @@
     "summary_low": "Stock bajo",
     "summary_value": "Valor a precio de compra",
     "reorder": "Pedir",
-    "csv_title": "Importar o exportar tu stock"
+    "csv_title": "Importar o exportar tu stock",
+    "csv_hint": "Descarga la plantilla, rellénala en Excel o Google Sheets y luego impórtala. Una foto se pone con su dirección de internet: la pestaña Ayuda de la plantilla explica cómo encontrarla."
   },
   "Sales": {
     "title": "Caja",
@@ -181,6 +183,7 @@
     "paid_now": "Pagado hoy ({currency})",
     "choose_client": "Elige el cliente",
     "client_required_credit": "Elige el cliente: una venta a crédito necesita un nombre, si no la deuda no se podrá recordar.",
+    "client_phone_required_credit": "Añade el número de WhatsApp del cliente: ahí llegan los recordatorios de la deuda.",
     "submit_amount": "Cobrar {amount}",
     "new_sale": "Nueva venta",
     "unit_price": "{price} c/u",
@@ -1269,5 +1272,34 @@
     "wrong_code": "Código incorrecto o caducado. Escribe el código que se muestra ahora.",
     "failed": "No se pudo hacer la verificación. Vuelve a intentarlo.",
     "unavailable": "La doble autenticación no está disponible. Comprueba en Supabase: Authentication › Multi-Factor › TOTP activado."
+  },
+  "Errors": {
+    "not_found_title": "Página no encontrada",
+    "not_found_body": "Esta dirección no lleva a ninguna página de WISHOP. Compruébala o vuelve a la aplicación.",
+    "back_home": "Volver a WISHOP",
+    "error_title": "Esta página no se pudo mostrar",
+    "error_body": "Ha ocurrido un problema por nuestra parte. Inténtalo de nuevo en un momento; si continúa, escríbenos por WhatsApp al +240 222 779 813.",
+    "retry": "Reintentar"
+  },
+  "StockTemplate": {
+    "sheet_items": "Artículos",
+    "sheet_help": "Ayuda",
+    "file_template": "plantilla-stock-WISHOP",
+    "file_export": "stock-WISHOP",
+    "help_column": "Columna",
+    "help_meaning": "Qué poner",
+    "help_name": "Nombre del artículo (obligatorio). Un artículo que ya existe con el mismo nombre, marca y tipo se repone.",
+    "help_category": "Sección de la tienda (opcional), por ejemplo Pelucas.",
+    "help_type": "Tipo de artículo (opcional), por ejemplo Liso.",
+    "help_brand": "Marca (opcional).",
+    "help_purchase_price": "Precio de compra en cifras, sin espacios ni puntos (opcional).",
+    "help_selling_price": "Precio de venta en cifras, sin espacios ni puntos.",
+    "help_quantity": "Cantidad que se añade al stock (obligatoria, al menos 1).",
+    "help_image_url": "Dirección de internet de una foto (opcional), que empiece por https://. Ver más abajo.",
+    "help_online": "sí para mostrar el artículo en el escaparate, no si no. Vacío: nada cambia.",
+    "help_supplier": "Proveedor (opcional).",
+    "help_origin_country": "País de origen (opcional).",
+    "help_image_title": "Encontrar la dirección de una foto",
+    "help_image_body": "Abre la foto en internet (web del proveedor, catálogo). En el teléfono: mantén pulsada la imagen y elige «Copiar dirección de la imagen». En el ordenador: clic derecho en la imagen y «Copiar dirección de la imagen». Pégala en la columna. Para tus propias fotos, añádelas mejor desde la ficha del artículo en WISHOP."
   }
 }

@@ -18,6 +18,58 @@ export async function pinMatches(pin: string, salt: string | null, hash: string 
   return (await sha256Hex(salt + pin)) === hash;
 }
 
+// Wrong codes checked on the device (a colleague's code, kept as a
+// fingerprint): after PIN_MAX_TRIES in a row the code is refused for
+// PIN_LOCK_MINUTES, like the server does for the codes it checks. Counted per
+// device and per person; a right code clears the count.
+export const PIN_MAX_TRIES = 5;
+export const PIN_LOCK_MINUTES = 15;
+
+type Tries = { count: number; until: number | null };
+
+function triesKey(shopId: string, memberId: string) {
+  return `wishop-pin-tries-${shopId}-${memberId}`;
+}
+
+function readTries(storage: Pick<globalThis.Storage, "getItem">, shopId: string, memberId: string): Tries {
+  try {
+    const raw = storage.getItem(triesKey(shopId, memberId));
+    const parsed = raw ? (JSON.parse(raw) as Tries) : null;
+    return parsed && typeof parsed.count === "number" ? parsed : { count: 0, until: null };
+  } catch {
+    return { count: 0, until: null };
+  }
+}
+
+/** The time until which this person's code is refused, or null. */
+export function pinLockedUntil(storage: Pick<globalThis.Storage, "getItem">, shopId: string, memberId: string, now: number = Date.now()): number | null {
+  const { until } = readTries(storage, shopId, memberId);
+  return until !== null && until > now ? until : null;
+}
+
+/** Counts a wrong code; returns the lock's end once the limit is reached. */
+export function recordPinFailure(
+  storage: Pick<globalThis.Storage, "getItem" | "setItem">,
+  shopId: string,
+  memberId: string,
+  now: number = Date.now(),
+): number | null {
+  const previous = readTries(storage, shopId, memberId);
+  // A lock that has ended starts a new count.
+  const count = (previous.until !== null && previous.until <= now ? 0 : previous.count) + 1;
+  const until = count >= PIN_MAX_TRIES ? now + PIN_LOCK_MINUTES * 60_000 : null;
+  try {
+    storage.setItem(triesKey(shopId, memberId), JSON.stringify({ count: until ? 0 : count, until }));
+  } catch {}
+  return until;
+}
+
+export function clearPinFailures(storage: Pick<globalThis.Storage, "removeItem">, shopId: string, memberId: string) {
+  try {
+    storage.removeItem(triesKey(shopId, memberId));
+  } catch {}
+}
+
 // The person selling on this device. It starts as the signed-in account and
 // changes when someone types their code; it goes back to the account when
 // another person signs in on the device.

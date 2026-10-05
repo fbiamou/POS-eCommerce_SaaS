@@ -7,6 +7,7 @@ import { routing } from "@/i18n/routing";
 import { DEFAULT_TIME_ZONE } from "@/lib/format";
 import { buildExportFiles, withoutDeletedOrders, type ExportData } from "@/features/export/build";
 import { buildZip } from "@/features/export/zip";
+import { buildXlsx } from "@/lib/xlsx";
 
 export const runtime = "nodejs";
 
@@ -110,9 +111,16 @@ export async function GET(request: NextRequest) {
   }
 
   const files = buildExportFiles(data, (key) => t(key), settings?.timezone ?? DEFAULT_TIME_ZONE, locale);
-  const zip = buildZip(files);
   const day = new Date().toISOString().slice(0, 10);
-  const name = `wishop-${settings?.shop_slug || "export"}-${day}.zip`;
+  const base = `wishop-${settings?.shop_slug || "export"}-${day}`;
+  // One Excel workbook with a sheet per table, to read (it opens in columns
+  // whatever the spreadsheet's settings); the same tables as CSV files in a
+  // folder, for other software.
+  const zip = buildZip([
+    { name: `${base}.xlsx`, content: buildXlsx(files.map((file) => file.sheet)) },
+    ...files.map((file) => ({ name: `csv/${file.name}`, content: file.content })),
+  ]);
+  const name = `${base}.zip`;
 
   return new NextResponse(zip as unknown as BodyInit, {
     headers: {

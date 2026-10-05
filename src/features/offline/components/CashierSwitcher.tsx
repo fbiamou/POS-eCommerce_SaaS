@@ -7,7 +7,7 @@ import { useLiveQuery } from "dexie-react-hooks";
 import { Delete, UserRound } from "lucide-react";
 import { Modal } from "@/components/ui/Modal";
 import { useOptionalOfflineContext } from "../OfflineProvider";
-import { PIN_LENGTH, pinMatches, readCashierDay, shopDay, writeCashierDay } from "../pin";
+import { PIN_LENGTH, clearPinFailures, pinLockedUntil, pinMatches, readCashierDay, recordPinFailure, shopDay, writeCashierDay } from "../pin";
 import { switchCashier } from "@/features/team/cashierActions";
 import type { LocalMember } from "../db";
 
@@ -102,8 +102,14 @@ function CashierPanel({ onClose, onChosen }: { onClose: () => void; onChosen: ()
     setChecking(true);
     let ok = false;
     if (chosen.pin_hash) {
-      ok = await pinMatches(next, chosen.pin_salt, chosen.pin_hash);
-      if (!ok) setRefusal("wrong");
+      const storage = window.localStorage;
+      if (pinLockedUntil(storage, offline.shopId, chosen.id)) {
+        setRefusal("locked");
+      } else {
+        ok = await pinMatches(next, chosen.pin_salt, chosen.pin_hash);
+        if (ok) clearPinFailures(storage, offline.shopId, chosen.id);
+        else setRefusal(recordPinFailure(storage, offline.shopId, chosen.id) ? "locked" : "wrong");
+      }
     } else {
       // A manager's code is not kept on the devices of the team: the server
       // checks it, and locks it after five wrong codes.

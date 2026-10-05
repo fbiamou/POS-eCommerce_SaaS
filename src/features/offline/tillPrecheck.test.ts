@@ -42,9 +42,9 @@ describe("check made before the page is drawn", () => {
   });
 
   it("follows the same rules as the server and the app (appPages.ts)", () => {
-    const cases = [["sales", "invoices"], ["dashboard", "stock"], [], ["clients"], ["settings", "reminders"]];
+    const cases = [["sales", "invoices"], ["sales"], ["dashboard", "stock"], [], ["clients"], ["settings", "reminders"]];
     for (const allowed of cases) {
-      for (const { path } of [...APP_PAGES, { path: "/invoices/abc" }]) {
+      for (const { path } of [...APP_PAGES, { path: "/invoices/abc" }, { path: "/invoices/abc/ticket" }]) {
         const expected = isPageAllowed("SELLER", allowed, path) ? null : `/fr${firstOpenPath("SELLER", allowed)}`;
         expect(run(`/fr${path}`, seller(allowed)), `${path} with ${allowed.join(",")}`).toBe(expected);
       }

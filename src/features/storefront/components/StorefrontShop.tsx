@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
+import { isOwnImage } from "@/lib/imageHost";
 import { Plus, Minus, Trash2, ShoppingBag, CheckCircle2, MapPin, Phone, Store, Flag, MessageCircle } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { LocaleSwitcher } from "@/components/LocaleSwitcher";
@@ -204,7 +205,7 @@ export default function StorefrontShop({
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3 sm:px-6">
           <div className="flex min-w-0 items-center gap-3">
             {shop.shop_logo_url ? (
-              <Image src={shop.shop_logo_url} alt="" width={40} height={40} className="h-10 w-10 shrink-0 rounded-xl object-cover" />
+              <Image src={shop.shop_logo_url} unoptimized={!isOwnImage(shop.shop_logo_url)} alt="" width={40} height={40} className="h-10 w-10 shrink-0 rounded-xl object-cover" />
             ) : (
               <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[var(--accent-bg)] text-lg font-bold text-white">
                 {shopName[0]?.toUpperCase()}
@@ -291,6 +292,7 @@ export default function StorefrontShop({
                       {product.image_url ? (
                         <Image
                           src={product.image_url}
+                          unoptimized={!isOwnImage(product.image_url)}
                           alt=""
                           fill
                           sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
@@ -394,7 +396,7 @@ export default function StorefrontShop({
           <div className="flex flex-col gap-4">
             <div className="relative aspect-square w-full overflow-hidden rounded-2xl bg-zinc-100">
               {openProduct.image_url ? (
-                <Image src={openProduct.image_url} alt="" fill sizes="(max-width: 640px) 100vw, 512px" className="object-cover" />
+                <Image src={openProduct.image_url} unoptimized={!isOwnImage(openProduct.image_url)} alt="" fill sizes="(max-width: 640px) 100vw, 512px" className="object-cover" />
               ) : (
                 <span className="store-heading flex h-full w-full items-center justify-center text-[72px] font-bold text-zinc-300">
                   {openProduct.name.trim()[0]?.toUpperCase()}
@@ -478,7 +480,7 @@ export default function StorefrontShop({
                 return (
                   <li key={item.productId} className="flex items-center gap-3 py-3">
                     <span className="relative h-14 w-14 shrink-0 overflow-hidden rounded-xl bg-zinc-100">
-                      {product.image_url && <Image src={product.image_url} alt="" fill sizes="56px" className="object-cover" />}
+                      {product.image_url && <Image src={product.image_url} unoptimized={!isOwnImage(product.image_url)} alt="" fill sizes="56px" className="object-cover" />}
                     </span>
                     <span className="min-w-0 flex-1">
                       <span className="block truncate text-[14px] font-semibold">{product.name}</span>

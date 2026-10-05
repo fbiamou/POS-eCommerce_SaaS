@@ -25,6 +25,13 @@ describe("isPageAllowed", () => {
     expect(isPageAllowed("SELLER", ["sales", "invoices"], "/clients")).toBe(false);
     expect(isPageAllowed("SELLER", ["sales", "settings"], "/settings")).toBe(false);
   });
+
+  it("gives the till the receipt of a sale, not the list of invoices", () => {
+    expect(isPageAllowed("SELLER", ["sales"], "/invoices/abc")).toBe(true);
+    expect(isPageAllowed("SELLER", ["sales"], "/invoices/abc/ticket")).toBe(true);
+    expect(isPageAllowed("SELLER", ["sales"], "/invoices")).toBe(false);
+    expect(isPageAllowed("SELLER", ["stock"], "/invoices/abc")).toBe(false);
+  });
 });
 
 describe("firstAllowedPath", () => {

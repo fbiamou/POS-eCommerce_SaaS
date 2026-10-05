@@ -102,10 +102,11 @@
     "published": "Published",
     "no_image": "No photo",
     "choose_image": "Choose a photo",
+    "remove_image": "Remove photo",
     "uploading": "Uploading...",
-    "download_template": "CSV Template",
-    "import_csv": "Import CSV",
-    "export_csv": "Export CSV",
+    "download_template": "Excel template",
+    "import_csv": "Import (Excel or CSV)",
+    "export_csv": "Export stock (Excel)",
     "importing": "Importing...",
     "import_success": "{created} product(s) created, {restocked} restocked.",
     "import_errors_count": "{count} row(s) skipped: {details}",
@@ -130,7 +131,8 @@
     "summary_low": "Low stock",
     "summary_value": "Value at purchase price",
     "reorder": "Reorder",
-    "csv_title": "Import or export your stock"
+    "csv_title": "Import or export your stock",
+    "csv_hint": "Download the template, fill it in Excel or Google Sheets, then import it. A photo goes in as its web address: the template's Help tab explains how to find it."
   },
   "Sales": {
     "title": "Till",
@@ -181,6 +183,7 @@
     "paid_now": "Paid today ({currency})",
     "choose_client": "Choose the customer",
     "client_required_credit": "Choose the customer: a credit sale needs a name, otherwise the debt can't be followed up.",
+    "client_phone_required_credit": "Add the customer's WhatsApp number: that is where debt reminders go.",
     "submit_amount": "Charge {amount}",
     "new_sale": "New sale",
     "unit_price": "{price} each",
@@ -1269,5 +1272,34 @@
     "wrong_code": "Wrong or expired code. Type the code shown now.",
     "failed": "The check could not be done. Try again.",
     "unavailable": "Two-factor authentication is not available. Check in Supabase: Authentication › Multi-Factor › TOTP enabled."
+  },
+  "Errors": {
+    "not_found_title": "Page not found",
+    "not_found_body": "This address leads to no WISHOP page. Check it, or go back to the app.",
+    "back_home": "Back to WISHOP",
+    "error_title": "This page could not be shown",
+    "error_body": "Something went wrong on our side. Try again in a moment; if it keeps happening, write to us on WhatsApp at +240 222 779 813.",
+    "retry": "Try again"
+  },
+  "StockTemplate": {
+    "sheet_items": "Items",
+    "sheet_help": "Help",
+    "file_template": "WISHOP-stock-template",
+    "file_export": "WISHOP-stock",
+    "help_column": "Column",
+    "help_meaning": "What to put in it",
+    "help_name": "Item name (required). An item that already exists with the same name, brand and type is restocked.",
+    "help_category": "Shop section (optional), for example Wigs.",
+    "help_type": "Item type (optional), for example Straight.",
+    "help_brand": "Brand (optional).",
+    "help_purchase_price": "Purchase price in figures, no spaces or dots (optional).",
+    "help_selling_price": "Selling price in figures, no spaces or dots.",
+    "help_quantity": "Quantity added to the stock (required, at least 1).",
+    "help_image_url": "Web address of a photo (optional), starting with https://. See below.",
+    "help_online": "yes to show the item on the storefront, no otherwise. Blank: nothing changes.",
+    "help_supplier": "Supplier (optional).",
+    "help_origin_country": "Country of origin (optional).",
+    "help_image_title": "Finding a photo's address",
+    "help_image_body": "Open the photo on the web (supplier's site, catalogue). On a phone: press and hold the image, then \"Copy image address\". On a computer: right-click the image, then \"Copy image address\". Paste it in the column. For your own photos, add them from the item's page in WISHOP instead."
   }
 }

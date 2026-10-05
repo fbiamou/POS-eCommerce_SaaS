@@ -4,7 +4,9 @@
 // needed to rebuild the links in another tool.
 
 import { exportDate, toExportCsv, type CsvValue } from "./csv";
-import type { ZipEntry } from "./zip";
+// Each table of the export: a CSV file, and the same rows for the Excel
+// workbook that goes with it (lib/xlsx.ts).
+export type ExportFile = { name: string; content: string; sheet: { name: string; rows: CsvValue[][] } };
 
 type Id = string;
 
@@ -154,7 +156,7 @@ function chronological<T>(rows: T[], date: (row: T) => string | null): T[] {
   return [...rows].sort((a, b) => (date(a) ?? "").localeCompare(date(b) ?? ""));
 }
 
-export function buildExportFiles(data: ExportData, t: ExportTranslate, timeZone: string, locale: string): ZipEntry[] {
+export function buildExportFiles(data: ExportData, t: ExportTranslate, timeZone: string, locale: string): ExportFile[] {
   const yes = (value: boolean) => (value ? t("yes") : t("no"));
   const label = (kind: CodeKind, value: string | null) => {
     if (!value) return "";
@@ -174,10 +176,14 @@ export function buildExportFiles(data: ExportData, t: ExportTranslate, timeZone:
   const personName = (id: Id | null) => (id ? people.get(id)?.full_name ?? "" : "");
   const invoiceNumber = (id: Id | null) => (id ? invoices.get(id)?.invoice_number ?? "" : "");
 
-  const file = (key: string, columns: string[], rows: CsvValue[][]): ZipEntry => ({
-    name: `${t(`file_${key}`)}.csv`,
-    content: toExportCsv(columns.map((column) => t(`col_${column}`)), rows),
-  });
+  const file = (key: string, columns: string[], rows: CsvValue[][]): ExportFile => {
+    const headers = columns.map((column) => t(`col_${column}`));
+    return {
+      name: `${t(`file_${key}`)}.csv`,
+      content: toExportCsv(headers, rows),
+      sheet: { name: t(`file_${key}`), rows: [headers, ...rows] },
+    };
+  };
 
   const shop = data.shop;
   return [

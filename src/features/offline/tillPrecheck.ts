@@ -29,6 +29,7 @@ const PRECHECK = `(function (shop, user, pages, managerOnly) {
       var key = keyOf(p);
       if (key && managerOnly.indexOf(key) >= 0) return false;
       if (!allowed.length || !key) return true;
+      if (key === "invoices" && p !== "/invoices" && allowed.indexOf("sales") >= 0) return true;
       return allowed.indexOf(key) >= 0;
     };
     if (path.indexOf("/admin") !== 0 && open(path)) return;

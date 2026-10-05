@@ -187,8 +187,11 @@ export default function CreateSaleForm({
   const received = Math.max(0, parseInt(cashReceived, 10) || 0);
   const hasClient = Boolean(selectedClientId) || (isCreatingClient && newClientName.trim().length > 0);
   // A debt nobody can be reminded of is lost money: a sale that is not paid
-  // in full must name its customer.
-  const creditNeedsClient = cart.length > 0 && paidValue < totalAmount && !hasClient;
+  // in full must name its customer, and a customer created here for it needs
+  // her WhatsApp number, which the reminders go to (decided 05/10/2026).
+  const isCredit = cart.length > 0 && paidValue < totalAmount;
+  const creditNeedsClient = isCredit && !hasClient;
+  const creditNeedsPhone = isCredit && !creditNeedsClient && isCreatingClient && !selectedClientId && newClientPhone.replace(/\D/g, "").length < 6;
 
   // Derive filter options based on current selection
   const categories = useMemo(() => Array.from(new Set(products.map(p => p.category).filter(Boolean))).sort(), [products]);
@@ -248,7 +251,7 @@ export default function CreateSaleForm({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (creditNeedsClient) return;
+    if (creditNeedsClient || creditNeedsPhone) return;
     setIsSubmitting(true);
     setSubmitError(null);
     setLastInvoiceId(null);
@@ -723,6 +726,9 @@ export default function CreateSaleForm({
               {creditNeedsClient && (
                 <p className="mt-2 text-[13px] text-zinc-600 dark:text-zinc-300">{t("client_required_credit")}</p>
               )}
+              {creditNeedsPhone && (
+                <p className="mt-2 text-[13px] text-zinc-600 dark:text-zinc-300">{t("client_phone_required_credit")}</p>
+              )}
 
               {submitError && (
                 <p role="alert" className="mt-3 rounded-xl bg-red-50 p-3 text-[13px] font-semibold text-red-700 dark:bg-red-900/20 dark:text-red-400">
@@ -732,7 +738,7 @@ export default function CreateSaleForm({
 
               <button
                 type="submit"
-                disabled={cart.length === 0 || isSubmitting || creditNeedsClient}
+                disabled={cart.length === 0 || isSubmitting || creditNeedsClient || creditNeedsPhone}
                 className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl bg-violet-600 py-3.5 text-[15px] font-bold text-white transition-colors hover:bg-violet-700 disabled:opacity-50"
               >
                 {isSubmitting ? t("submitting") : payMode === "full" ? t("submit_amount", { amount: format.money(totalAmount) }) : t("submit")}

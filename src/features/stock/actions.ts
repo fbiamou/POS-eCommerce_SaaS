@@ -3,7 +3,8 @@
 import { createClient } from "@/utils/supabase/server";
 import { revalidatePath } from "next/cache";
 import type { FeedbackCode } from "@/lib/feedback";
-import { parseImportCsv, type ImportRowError } from "./csv";
+import { csvToRows, parseImportRows, type ImportRowError } from "./csv";
+import { isXlsx, readXlsxRows } from "@/lib/xlsxRead";
 
 type SupabaseServerClient = Awaited<ReturnType<typeof createClient>>;
 
@@ -251,6 +252,39 @@ export async function uploadProductImage(
   return { success: true, imageUrl: publicUrl };
 }
 
+// "Retirer la photo": the item goes back to no photo. The file is deleted
+// when it is one WISHOP stores; an address from an import is only forgotten.
+export async function removeProductImage(productId: string): Promise<{ success?: true; error?: FeedbackCode }> {
+  const supabase = await createClient();
+  const { shopId, error: shopError } = await getShopId(supabase);
+  if (!shopId) return { error: shopError };
+
+  const { data: product } = await supabase
+    .from("products")
+    .select("image_url")
+    .eq("id", productId)
+    .eq("shop_id", shopId)
+    .maybeSingle();
+
+  const { error: updateError } = await supabase
+    .from("products")
+    .update({ image_url: null })
+    .eq("id", productId)
+    .eq("shop_id", shopId);
+  if (updateError) {
+    console.error("Product image removal error:", updateError);
+    return { error: "image_saved_update_failed" };
+  }
+
+  const stored = product?.image_url?.split("/storage/v1/object/public/product-images/")[1];
+  if (stored && stored.startsWith(`${shopId}/`)) {
+    await supabase.storage.from("product-images").remove([decodeURIComponent(stored.split("?")[0])]);
+  }
+
+  revalidatePath("/stock");
+  return { success: true };
+}
+
 export type ImportSummary = {
   created: number;
   restocked: number;
@@ -265,9 +299,11 @@ export async function importProductsCsv(formData: FormData): Promise<{ summary?:
   const file = formData.get("file") as File | null;
   if (!file || file.size === 0) return { error: "csv_file_missing" };
 
-  let parsed: ReturnType<typeof parseImportCsv>;
+  // An Excel workbook (the template WISHOP gives) or a CSV.
+  let parsed: ReturnType<typeof parseImportRows>;
   try {
-    parsed = parseImportCsv(await file.text());
+    const bytes = new Uint8Array(await file.arrayBuffer());
+    parsed = parseImportRows(isXlsx(bytes) ? readXlsxRows(bytes) : csvToRows(new TextDecoder().decode(bytes)));
   } catch (err) {
     console.error("CSV parse error:", err);
     return { error: "csv_invalid" };

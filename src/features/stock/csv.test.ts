@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { buildCsvTemplate, parseImportCsv, productsToCsv } from "./csv";
+import { buildCsvTemplate, parseImportCsv, parseImportRows, productsToCsv, productsToRows, templateRows } from "./csv";
 
 const header = "nom,categorie,type,marque,prix_achat,prix_vente,quantite,image_url,en_ligne";
 
@@ -60,5 +60,31 @@ describe("CSV export", () => {
 
   it("offers a template that imports cleanly", () => {
     expect(parseImportCsv(buildCsvTemplate()).errors).toEqual([]);
+  });
+});
+
+describe("columns in the shop's language", () => {
+  it("reads Spanish and English titles, accents and capitals ignored", () => {
+    const { rows, errors } = parseImportRows([
+      ["Nombre", "Categoría", "Precio_venta", "CANTIDAD", "En línea", "URL_imagen"],
+      ["Peluca lisa", "Pelucas", "32000", "9", "sí", "https://example.com/p.jpg"],
+    ]);
+    expect(errors).toEqual([]);
+    expect(rows[0]).toMatchObject({ name: "Peluca lisa", category: "Pelucas", selling_price: 32000, quantity: 9, is_published_online: true, image_url: "https://example.com/p.jpg" });
+    expect(parseImportRows([["name", "quantity", "online"], ["Wig", "2", "no"]]).rows[0]).toMatchObject({ name: "Wig", quantity: 2, is_published_online: false });
+  });
+
+  it("reads a CSV separated by semicolons", () => {
+    const { rows, errors } = parseImportCsv("\uFEFFnom;prix_vente;quantite\r\nRobe, longue;15000;3\r\n");
+    expect(errors).toEqual([]);
+    expect(rows[0]).toMatchObject({ name: "Robe, longue", selling_price: 15000, quantity: 3 });
+  });
+
+  it("offers a template and an export that import cleanly in each language", () => {
+    for (const locale of ["fr", "es", "en"] as const) {
+      expect(parseImportRows(templateRows(locale).map((r) => r.map(String))).errors).toEqual([]);
+      const exported = productsToRows([{ name: "Robe", category: "", purchase_price: 0, selling_price: 100, quantity_in_stock: 2, is_published_online: true }], locale);
+      expect(parseImportRows(exported.map((r) => r.map(String))).rows[0]).toMatchObject({ name: "Robe", quantity: 2, is_published_online: true });
+    }
   });
 });

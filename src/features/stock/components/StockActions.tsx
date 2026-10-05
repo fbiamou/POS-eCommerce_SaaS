@@ -2,11 +2,12 @@
 
 import { useRef, useState, useTransition } from "react";
 import { Download, Upload, FileDown } from "lucide-react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { importProductsCsv } from "../actions";
 
 export function StockActions() {
   const t = useTranslations("Stock");
+  const locale = useLocale();
   const tFeedback = useTranslations("Feedback");
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isPending, startTransition] = useTransition();
@@ -48,20 +49,19 @@ export function StockActions() {
   return (
     <section aria-labelledby="stock-csv-title" className="flex flex-col gap-3 rounded-2xl bg-[var(--surface-1)] p-4 shadow-card">
       <h2 id="stock-csv-title" className="text-[15px] font-bold">{t("csv_title")}</h2>
+      <p className="text-[13px] text-zinc-500 dark:text-zinc-400">{t("csv_hint")}</p>
       <div className="flex flex-wrap gap-2">
         {/* File downloads served by API routes, not page navigations: a plain link is intended. */}
-        {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
         <a
-          href="/api/stock/csv-template"
+          href={`/api/stock/csv-template?locale=${locale}`}
           className="flex items-center gap-2 rounded-xl bg-zinc-100 dark:bg-white/5 px-3 sm:px-4 py-2.5 text-[13px] font-bold text-zinc-700 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-white/10 transition-colors"
         >
           <FileDown className="h-4 w-4 shrink-0" />
           <span>{t("download_template")}</span>
         </a>
 
-        {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
         <a
-          href="/api/stock/csv-export"
+          href={`/api/stock/csv-export?locale=${locale}`}
           className="flex items-center gap-2 rounded-xl border border-zinc-200 bg-white px-3 sm:px-4 py-2.5 text-[13px] font-bold text-zinc-700 hover:bg-zinc-50 dark:border-[var(--line)] dark:bg-[var(--surface-1)] dark:text-zinc-300 dark:hover:bg-white/[0.02] transition-colors shadow-sm"
         >
           <Download className="h-4 w-4 shrink-0" />
@@ -80,7 +80,7 @@ export function StockActions() {
         <input
           ref={fileInputRef}
           type="file"
-          accept=".csv,text/csv"
+          accept=".xlsx,.csv,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
           className="hidden"
           onChange={handleFileChange}
         />

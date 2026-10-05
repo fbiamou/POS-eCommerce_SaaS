@@ -1,5 +1,5 @@
 // A minimal ZIP writer (no compression), enough to hand a shop its data as
-// one file. CSV files are small; storing them uncompressed keeps this free of
+// one file, and to build an Excel workbook (lib/xlsx.ts, itself a ZIP). CSV files are small; storing them uncompressed keeps this free of
 // any dependency and readable by every unzip tool, phones included.
 
 const CRC_TABLE = (() => {
@@ -25,7 +25,7 @@ function dosDateTime(date: Date): { time: number; day: number } {
   };
 }
 
-export type ZipEntry = { name: string; content: string };
+export type ZipEntry = { name: string; content: string | Uint8Array };
 
 export function buildZip(entries: ZipEntry[], date: Date = new Date()): Uint8Array {
   const encoder = new TextEncoder();
@@ -36,7 +36,7 @@ export function buildZip(entries: ZipEntry[], date: Date = new Date()): Uint8Arr
 
   for (const entry of entries) {
     const name = encoder.encode(entry.name);
-    const data = encoder.encode(entry.content);
+    const data = typeof entry.content === "string" ? encoder.encode(entry.content) : entry.content;
     const crc = crc32(data);
 
     const local = new Uint8Array(30 + name.length + data.length);

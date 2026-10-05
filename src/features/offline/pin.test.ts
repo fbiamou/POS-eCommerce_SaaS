@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto";
 import { describe, expect, it } from "vitest";
-import { isValidPin, pinMatches, readCashier, readCashierDay, shopDay, writeCashier, writeCashierDay } from "./pin";
+import { PIN_LOCK_MINUTES, clearPinFailures, isValidPin, pinLockedUntil, pinMatches, readCashier, readCashierDay, recordPinFailure, shopDay, writeCashier, writeCashierDay } from "./pin";
 
 // Same fingerprint as set_member_pin: sha256(salt || pin), in hexadecimal.
 const salt = "3f1c9a0b7e2d4c5a8b6f0e1d2c3b4a59";
@@ -58,5 +58,34 @@ describe("the person selling on the device", () => {
     writeCashier(storage, "shop", "owner", { id: "awa", name: "Awa" });
     writeCashier(storage, "shop", "owner", { id: "owner", name: "Fred" });
     expect(readCashier(storage, "shop", "owner")).toBeNull();
+  });
+});
+
+describe("wrong codes on the device", () => {
+  const now = Date.UTC(2026, 9, 5, 12, 0);
+
+  it("locks a code for 15 minutes after 5 wrong ones in a row", () => {
+    const storage = memoryStorage();
+    for (let i = 0; i < 4; i++) expect(recordPinFailure(storage, "shop", "awa", now)).toBeNull();
+    expect(pinLockedUntil(storage, "shop", "awa", now)).toBeNull();
+    const until = recordPinFailure(storage, "shop", "awa", now);
+    expect(until).toBe(now + PIN_LOCK_MINUTES * 60_000);
+    expect(pinLockedUntil(storage, "shop", "awa", now + 60_000)).toBe(until);
+    expect(pinLockedUntil(storage, "shop", "awa", now + PIN_LOCK_MINUTES * 60_000)).toBeNull();
+  });
+
+  it("counts each person apart, and a right code clears the count", () => {
+    const storage = memoryStorage();
+    for (let i = 0; i < 4; i++) recordPinFailure(storage, "shop", "awa", now);
+    expect(recordPinFailure(storage, "shop", "binta", now)).toBeNull();
+    clearPinFailures(storage, "shop", "awa");
+    expect(recordPinFailure(storage, "shop", "awa", now)).toBeNull();
+  });
+
+  it("starts a new count once a lock has ended", () => {
+    const storage = memoryStorage();
+    for (let i = 0; i < 5; i++) recordPinFailure(storage, "shop", "awa", now);
+    const later = now + PIN_LOCK_MINUTES * 60_000 + 1;
+    expect(recordPinFailure(storage, "shop", "awa", later)).toBeNull();
   });
 });

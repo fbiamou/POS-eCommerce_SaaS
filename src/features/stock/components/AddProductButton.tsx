@@ -34,9 +34,15 @@ export function AddProductButton({
   const tOffline = useTranslations("Offline");
   const offline = useOptionalOfflineContext();
 
+  // The dialog stays in the page between two items: a new form each time it
+  // closes, so the next item starts blank (before, on a phone, the previous
+  // item's fields stayed filled in, as if it had not been saved).
+  const [formKey, setFormKey] = useState(0);
   const close = () => {
     setIsOpen(false);
     setPreviewUrl(null);
+    setError(null);
+    setFormKey((k) => k + 1);
   };
 
   const handleImagePick = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -123,7 +129,7 @@ export function AddProductButton({
       </button>
 
       <Modal isOpen={isOpen} onClose={close} title={t("add_product")}>
-        <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+        <form key={formKey} onSubmit={handleSubmit} className="flex flex-col gap-5">
           {error && <p className="text-[13px] font-medium text-red-500">{error}</p>}
 
           <div className="flex items-center gap-4">

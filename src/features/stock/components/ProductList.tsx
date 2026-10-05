@@ -2,10 +2,10 @@
 
 import { useMemo, useRef, useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
-import { Upload, Search, Globe, Pencil } from "lucide-react";
+import { Upload, Search, Globe, Pencil, Trash2 } from "lucide-react";
 import { Modal } from "@/components/ui/Modal";
 import { useShopFormat } from "@/components/ShopFormatProvider";
-import { updateProduct, uploadProductImage } from "../actions";
+import { removeProductImage, updateProduct, uploadProductImage } from "../actions";
 import { shrinkImage } from "@/lib/shrinkImage";
 import { useToast } from "@/components/ui/Toast";
 import { Select } from "@/components/ui/Select";
@@ -158,6 +158,22 @@ export default function ProductList({
     });
   };
 
+  const handleImageRemove = () => {
+    if (!editingProduct) return;
+    if (offline && !offline.status.online) {
+      setError(tFeedback("needs_connection"));
+      return;
+    }
+    startImageUpload(async () => {
+      const result = await removeProductImage(editingProduct.id);
+      if (result.error) setError(tFeedback(result.error));
+      else {
+        setPreviewUrl(null);
+        if (imageInputRef.current) imageInputRef.current.value = "";
+      }
+    });
+  };
+
   const lowCount = products.filter((p) => format.isLowStock(p.quantity_in_stock)).length;
   const onlineCount = products.filter((p) => p.is_published_online).length;
   const term = search.trim().toLowerCase();
@@ -281,7 +297,7 @@ export default function ProductList({
             {error && <p className="text-sm font-medium text-red-500">{error}</p>}
             <input type="hidden" name="id" value={editingProduct.id} />
 
-            <div className="flex items-center gap-4">
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
               <div className="flex h-16 w-16 items-center justify-center overflow-hidden rounded-md bg-zinc-100 dark:bg-zinc-800 flex-shrink-0">
                 {previewUrl ? (
                   // eslint-disable-next-line @next/next/no-img-element
@@ -299,6 +315,17 @@ export default function ProductList({
                 <Upload className="h-4 w-4" />
                 {isUploadingImage ? t("uploading") : t("choose_image")}
               </button>
+              {previewUrl && (
+                <button
+                  type="button"
+                  onClick={handleImageRemove}
+                  disabled={isUploadingImage}
+                  className="flex items-center gap-1.5 rounded-md px-2 py-2 text-sm font-semibold text-red-600 hover:bg-red-50 disabled:opacity-50 dark:text-red-400 dark:hover:bg-red-900/20"
+                >
+                  <Trash2 className="h-4 w-4" />
+                  {t("remove_image")}
+                </button>
+              )}
               <input ref={imageInputRef} type="file" accept="image/*" className="hidden" onChange={handleImageChange} />
             </div>
 

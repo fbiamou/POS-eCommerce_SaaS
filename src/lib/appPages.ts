@@ -59,6 +59,9 @@ export function isPageAllowed(role: string, allowedPages: string[], pathWithoutL
   if (key && MANAGER_ONLY_PAGES.includes(key)) return false;
   if (!allowedPages || allowedPages.length === 0) return true;
   if (!key) return true;
+  // The till includes the receipt of each sale: one invoice and its ticket
+  // (/invoices/<id>), never the list of invoices (decided 05/10/2026).
+  if (key === "invoices" && pathWithoutLocale !== "/invoices" && allowedPages.includes("sales")) return true;
   return allowedPages.includes(key);
 }
 
