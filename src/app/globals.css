@@ -340,3 +340,12 @@ h1, h2, h3, .font-display {
 html[data-till="held"] [data-till-guard]:not([data-till-ok]) {
   visibility: hidden;
 }
+
+/* Phone: while a text field is being typed in, the keyboard takes the
+   bottom of the screen; the tab bar steps aside so the field and what is
+   typed stay visible (see interactiveWidget in app/[locale]/layout.tsx). */
+@media (max-width: 767px) {
+  body:has(input:not([type="checkbox"]):not([type="radio"]):not([type="button"]):not([type="submit"]):focus, textarea:focus) [data-keyboard-hide] {
+    display: none;
+  }
+}

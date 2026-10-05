@@ -95,7 +95,7 @@ export function MobileTabBar({ profile, shopSlug, isPlatformAdmin: isAdminAccoun
     <>
       <nav
         aria-label={t("app_name")}
-        className="md:hidden fixed bottom-0 left-0 right-0 z-40 flex items-stretch justify-around border-t border-zinc-200 bg-[var(--surface-1)] pb-[env(safe-area-inset-bottom)] dark:border-[var(--line)]"
+        data-keyboard-hide className="md:hidden fixed bottom-0 left-0 right-0 z-40 flex items-stretch justify-around border-t border-zinc-200 bg-[var(--surface-1)] pb-[env(safe-area-inset-bottom)] dark:border-[var(--line)]"
       >
         {left.map(renderTab)}
         {center && (

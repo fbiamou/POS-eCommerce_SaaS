@@ -1,4 +1,5 @@
 <!--
+  Signature et pied de page légal ajoutés le 05/10/2026 (logo, contacts, NIF, liens conditions).
   Le lien porte le jeton lui-même (token_hash) : il marche aussi ouvert sur un autre appareil ou un autre navigateur que celui de l'inscription (correctif du 27/09/2026).
   E-mail « Confirm signup » de Supabase, dans la langue de l'inscription.
   À coller dans Supabase : Authentication > Emails > Templates > Confirm signup
@@ -15,23 +16,81 @@
       <span style="color:#FFFFFF;font-size:20px;font-weight:800;letter-spacing:-0.3px;">WISHOP</span>
       <span style="display:inline-block;width:8px;height:8px;background:#F4B63F;transform:rotate(45deg);margin-left:6px;"></span>
     </div>
+    {{ if eq .Data.locale "fr" }}
     <div style="padding:28px 24px;">
-      {{ if eq .Data.locale "fr" }}
       <h1 style="margin:0 0 12px;font-size:22px;">Bienvenue sur WISHOP</h1>
       <p style="margin:0 0 20px;font-size:15px;line-height:1.5;color:#4F5780;">Votre boutique est créée. Il reste une étape : confirmer votre adresse e-mail.</p>
       <a href="{{ .RedirectTo }}&token_hash={{ .TokenHash }}&type=email" style="display:inline-block;background:#2B44A0;color:#FFFFFF;text-decoration:none;font-weight:700;font-size:15px;padding:14px 22px;border-radius:12px;">Confirmer et ouvrir ma boutique</a>
       <p style="margin:20px 0 0;font-size:13px;line-height:1.5;color:#6D77A6;">Si vous n'avez pas créé de boutique sur WISHOP, ignorez cet e-mail.</p>
-      {{ else if eq .Data.locale "en" }}
+      <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin-top:28px;border-top:1px solid #D7DBEA;padding-top:18px;width:100%;">
+        <tr>
+          <td style="width:52px;vertical-align:top;padding-top:18px;"><img src="https://wishop-saa-s.vercel.app/icons/icon-192.png" width="40" height="40" alt="WISHOP" style="display:block;border-radius:10px;"></td>
+          <td style="vertical-align:top;padding-top:18px;font-size:13px;line-height:1.55;color:#4F5780;">
+            <div style="font-size:15px;font-weight:800;color:#141C45;">L'équipe WISHOP</div>
+            <div style="margin-bottom:6px;">Caisse, stock, crédits clients et vitrine en ligne. Même sans internet.</div>
+            <a href="https://wishop-saa-s.vercel.app" style="color:#2B44A0;text-decoration:none;font-weight:700;">wishop-saa-s.vercel.app</a>
+            <span style="color:#C9CEE2;">&nbsp;|&nbsp;</span>
+            <a href="https://wa.me/240222779813" style="color:#2B44A0;text-decoration:none;">WhatsApp +240&nbsp;222&nbsp;779&nbsp;813</a>
+            <span style="color:#C9CEE2;">&nbsp;|&nbsp;</span>
+            <a href="mailto:wishop.app.contact@gmail.com" style="color:#2B44A0;text-decoration:none;">wishop.app.contact@gmail.com</a>
+          </td>
+        </tr>
+      </table>
+    </div>
+    <div style="padding:14px 24px;background:#E7EAF4;font-size:11px;line-height:1.5;color:#6D77A6;">
+      Williams Informatic · Malabo, Guinée équatoriale · NIF AA342453FW-26/BN<br>
+      <a href="https://wishop-saa-s.vercel.app/legal/conditions" style="color:#6D77A6;">Conditions d'utilisation</a> · <a href="https://wishop-saa-s.vercel.app/legal/conditions#confidentialite" style="color:#6D77A6;">Confidentialité</a>
+    </div>
+    {{ else if eq .Data.locale "en" }}
+    <div style="padding:28px 24px;">
       <h1 style="margin:0 0 12px;font-size:22px;">Welcome to WISHOP</h1>
       <p style="margin:0 0 20px;font-size:15px;line-height:1.5;color:#4F5780;">Your shop is created. One step left: confirm your email address.</p>
       <a href="{{ .RedirectTo }}&token_hash={{ .TokenHash }}&type=email" style="display:inline-block;background:#2B44A0;color:#FFFFFF;text-decoration:none;font-weight:700;font-size:15px;padding:14px 22px;border-radius:12px;">Confirm and open my shop</a>
       <p style="margin:20px 0 0;font-size:13px;line-height:1.5;color:#6D77A6;">If you did not create a shop on WISHOP, you can ignore this email.</p>
-      {{ else }}
+      <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin-top:28px;border-top:1px solid #D7DBEA;padding-top:18px;width:100%;">
+        <tr>
+          <td style="width:52px;vertical-align:top;padding-top:18px;"><img src="https://wishop-saa-s.vercel.app/icons/icon-192.png" width="40" height="40" alt="WISHOP" style="display:block;border-radius:10px;"></td>
+          <td style="vertical-align:top;padding-top:18px;font-size:13px;line-height:1.55;color:#4F5780;">
+            <div style="font-size:15px;font-weight:800;color:#141C45;">The WISHOP team</div>
+            <div style="margin-bottom:6px;">Till, stock, customer credit and online storefront. Even offline.</div>
+            <a href="https://wishop-saa-s.vercel.app" style="color:#2B44A0;text-decoration:none;font-weight:700;">wishop-saa-s.vercel.app</a>
+            <span style="color:#C9CEE2;">&nbsp;|&nbsp;</span>
+            <a href="https://wa.me/240222779813" style="color:#2B44A0;text-decoration:none;">WhatsApp +240&nbsp;222&nbsp;779&nbsp;813</a>
+            <span style="color:#C9CEE2;">&nbsp;|&nbsp;</span>
+            <a href="mailto:wishop.app.contact@gmail.com" style="color:#2B44A0;text-decoration:none;">wishop.app.contact@gmail.com</a>
+          </td>
+        </tr>
+      </table>
+    </div>
+    <div style="padding:14px 24px;background:#E7EAF4;font-size:11px;line-height:1.5;color:#6D77A6;">
+      Williams Informatic · Malabo, Equatorial Guinea · NIF AA342453FW-26/BN<br>
+      <a href="https://wishop-saa-s.vercel.app/legal/conditions" style="color:#6D77A6;">Terms of use</a> · <a href="https://wishop-saa-s.vercel.app/legal/conditions#confidentialite" style="color:#6D77A6;">Privacy</a>
+    </div>
+    {{ else }}
+    <div style="padding:28px 24px;">
       <h1 style="margin:0 0 12px;font-size:22px;">Te damos la bienvenida a WISHOP</h1>
       <p style="margin:0 0 20px;font-size:15px;line-height:1.5;color:#4F5780;">Tu tienda está creada. Queda un paso: confirmar tu correo electrónico.</p>
       <a href="{{ .RedirectTo }}&token_hash={{ .TokenHash }}&type=email" style="display:inline-block;background:#2B44A0;color:#FFFFFF;text-decoration:none;font-weight:700;font-size:15px;padding:14px 22px;border-radius:12px;">Confirmar y abrir mi tienda</a>
       <p style="margin:20px 0 0;font-size:13px;line-height:1.5;color:#6D77A6;">Si no creaste una tienda en WISHOP, ignora este correo.</p>
-      {{ end }}
+      <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin-top:28px;border-top:1px solid #D7DBEA;padding-top:18px;width:100%;">
+        <tr>
+          <td style="width:52px;vertical-align:top;padding-top:18px;"><img src="https://wishop-saa-s.vercel.app/icons/icon-192.png" width="40" height="40" alt="WISHOP" style="display:block;border-radius:10px;"></td>
+          <td style="vertical-align:top;padding-top:18px;font-size:13px;line-height:1.55;color:#4F5780;">
+            <div style="font-size:15px;font-weight:800;color:#141C45;">El equipo de WISHOP</div>
+            <div style="margin-bottom:6px;">Caja, stock, créditos de clientes y escaparate en línea. Incluso sin internet.</div>
+            <a href="https://wishop-saa-s.vercel.app" style="color:#2B44A0;text-decoration:none;font-weight:700;">wishop-saa-s.vercel.app</a>
+            <span style="color:#C9CEE2;">&nbsp;|&nbsp;</span>
+            <a href="https://wa.me/240222779813" style="color:#2B44A0;text-decoration:none;">WhatsApp +240&nbsp;222&nbsp;779&nbsp;813</a>
+            <span style="color:#C9CEE2;">&nbsp;|&nbsp;</span>
+            <a href="mailto:wishop.app.contact@gmail.com" style="color:#2B44A0;text-decoration:none;">wishop.app.contact@gmail.com</a>
+          </td>
+        </tr>
+      </table>
     </div>
+    <div style="padding:14px 24px;background:#E7EAF4;font-size:11px;line-height:1.5;color:#6D77A6;">
+      Williams Informatic · Malabo, Guinea Ecuatorial · NIF AA342453FW-26/BN<br>
+      <a href="https://wishop-saa-s.vercel.app/legal/condiciones" style="color:#6D77A6;">Condiciones de uso</a> · <a href="https://wishop-saa-s.vercel.app/legal/condiciones#privacidad" style="color:#6D77A6;">Privacidad</a>
+    </div>
+    {{ end }}
   </div>
 </div>

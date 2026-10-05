@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Bricolage_Grotesque, Figtree, Spline_Sans_Mono } from "next/font/google";
 import "../globals.css";
 import { NextIntlClientProvider } from 'next-intl';
@@ -27,6 +27,11 @@ const appMono = Spline_Sans_Mono({
   variable: "--font-app-mono",
   subsets: ["latin"],
 });
+
+// On a phone, the on-screen keyboard shrinks the page instead of covering
+// it: the field being typed in stays visible above the keyboard (Chrome,
+// Edge and Samsung Internet on Android; iOS already behaves this way).
+export const viewport: Viewport = { interactiveWidget: "resizes-content" };
 
 export async function generateMetadata({
   params,
