@@ -133,7 +133,7 @@ export async function signup(formData: FormData) {
   const locale = await getLocale()
   const emailRedirectTo = origin ? `${origin}/auth/confirm?locale=${locale}` : undefined
 
-  const { error } = await supabase.auth.signUp({
+  const { data, error } = await supabase.auth.signUp({
     email: formData.get('email') as string,
     password: formData.get('password') as string,
     options: {
@@ -157,6 +157,13 @@ export async function signup(formData: FormData) {
   if (error) {
     console.error('Signup error:', error.code, error.status, error.message)
     return redirectLocalized('/login', { mode: 'signup', error: signupFailure(error) })
+  }
+
+  // An address that already has a confirmed account: Supabase answers as if
+  // the sign-up worked (no error, no identity, no email sent). Say so,
+  // instead of asking the owner to wait for an email that never comes.
+  if (data.user && data.user.identities?.length === 0) {
+    return redirectLocalized('/login', { mode: 'signup', error: 'email_taken' })
   }
 
   // Email confirmation is required before the first sign-in.
