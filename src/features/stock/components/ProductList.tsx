@@ -6,6 +6,7 @@ import { Upload, Search, Globe, Pencil } from "lucide-react";
 import { Modal } from "@/components/ui/Modal";
 import { useShopFormat } from "@/components/ShopFormatProvider";
 import { updateProduct, uploadProductImage } from "../actions";
+import { shrinkImage } from "@/lib/shrinkImage";
 import { useToast } from "@/components/ui/Toast";
 import { Select } from "@/components/ui/Select";
 import { useOptionalOfflineContext } from "@/features/offline/OfflineProvider";
@@ -145,10 +146,9 @@ export default function ProductList({
     const localPreview = URL.createObjectURL(file);
     setPreviewUrl(localPreview);
 
-    const formData = new FormData();
-    formData.append("image", file);
-
     startImageUpload(async () => {
+      const formData = new FormData();
+      formData.append("image", await shrinkImage(file, "photo"));
       const result = await uploadProductImage(editingProduct.id, formData);
       if (result.error) {
         setError(tFeedback(result.error));

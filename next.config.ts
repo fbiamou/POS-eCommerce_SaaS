@@ -4,6 +4,12 @@ import createNextIntlPlugin from "next-intl/plugin";
 const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
 
 const nextConfig: NextConfig = {
+  // Logo and product photos are resized in the browser first (lib/shrinkImage.ts);
+  // this leaves room for a large CSV import or a photo the browser could not
+  // resize (HEIC). Vercel accepts up to 4.5 MB per request.
+  experimental: {
+    serverActions: { bodySizeLimit: "4mb" },
+  },
   // Version of the app, to tell a page kept for offline use that a newer
   // one is out (features/offline: "Nouvelle version disponible").
   env: {

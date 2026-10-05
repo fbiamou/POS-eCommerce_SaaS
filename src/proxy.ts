@@ -105,7 +105,11 @@ export async function proxy(request: NextRequest) {
   // A signed-in visitor clicking "Créer ma boutique" (/login?mode=signup)
   // sees the form's "you are already signed in" choice instead of being
   // sent silently to their own shop.
-  const isSignupForm = isAuthPage && request.nextUrl.searchParams.get('mode') === 'signup'
+  // Same for a password reset link that did not work: the form says why.
+  const isSignupForm =
+    isAuthPage &&
+    (request.nextUrl.searchParams.get('mode') === 'signup' ||
+      (request.nextUrl.searchParams.get('mode') === 'reset' && request.nextUrl.searchParams.has('error')))
 
   if (user && (isAuthPage || isLandingPage) && !isSignupForm) {
     const homeUrl = request.nextUrl.clone()

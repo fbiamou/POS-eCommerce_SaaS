@@ -7,29 +7,10 @@ import { createClient } from "@/utils/supabase/client";
 import { formatMoney } from "@/lib/format";
 import { feedbackFromError, type FeedbackCode } from "@/lib/feedback";
 import { normalizeDeclaredItem, type DeclaredItem } from "@/features/shipments/matching";
+import { shrinkImage } from "@/lib/shrinkImage";
 
 const inputClass =
   "w-full rounded-xl border border-zinc-200 bg-white px-3 py-2.5 text-base focus:border-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-500";
-
-const MAX_PHOTO_WIDTH = 1600;
-
-// Phone photos weigh several megabytes: resize before sending, over what may
-// be a slow mobile connection. Formats the browser cannot decode (HEIC on
-// most Android browsers) are sent as they are.
-async function shrinkPhoto(file: File): Promise<Blob> {
-  try {
-    const bitmap = await createImageBitmap(file);
-    const scale = Math.min(1, MAX_PHOTO_WIDTH / bitmap.width);
-    const canvas = document.createElement("canvas");
-    canvas.width = Math.round(bitmap.width * scale);
-    canvas.height = Math.round(bitmap.height * scale);
-    canvas.getContext("2d")?.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
-    const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, "image/jpeg", 0.82));
-    return blob ?? file;
-  } catch {
-    return file;
-  }
-}
 
 // The intermediary's page: no account, one link per parcel. What has been
 // typed is kept in this browser until the parcel is submitted, so a lost
@@ -108,7 +89,7 @@ export default function ProcurementForm({ token, currencySymbol }: { token: stri
     setIsSubmitting(true);
     try {
       const supabase = createClient();
-      const blob = await shrinkPhoto(photo);
+      const blob = await shrinkImage(photo, "photo");
       const extension = blob.type === "image/jpeg" ? "jpg" : (photo.name.split(".").pop() ?? "jpg").toLowerCase();
       const path = `${token}/${Date.now()}.${extension}`;
       const { error: uploadError } = await supabase.storage

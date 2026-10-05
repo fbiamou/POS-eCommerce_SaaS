@@ -37,6 +37,7 @@ export const FEEDBACK_CODES = [
   "password_updated",
   "email_confirmed",
   "confirmation_link_invalid",
+  "reset_link_invalid",
   // Settings
   "name_required",
   "profile_updated",

@@ -804,6 +804,7 @@
     "admin_invalid": "Vérifiez la formule, la durée, le montant et le moyen de paiement.",
     "email_confirmed": "Adresse confirmée. Connectez-vous pour ouvrir votre boutique.",
     "confirmation_link_invalid": "Ce lien de confirmation a expiré ou a déjà servi. Essayez de vous connecter ; sinon, inscrivez-vous à nouveau.",
+    "reset_link_invalid": "Ce lien pour changer de mot de passe a expiré ou a déjà servi. Demandez-en un nouveau ci-dessous : seul le dernier lien reçu fonctionne, une seule fois.",
     "shop_has_payments": "Cette boutique a déjà payé : elle ne peut pas être supprimée, seulement suspendue.",
     "shop_has_admin": "Cette boutique contient un compte administrateur WISHOP : elle ne peut pas être supprimée.",
     "delete_name_mismatch": "Le nom tapé ne correspond pas à celui de la boutique.",

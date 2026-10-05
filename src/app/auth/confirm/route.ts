@@ -30,6 +30,11 @@ export async function GET(request: NextRequest) {
     if (!error) return to(next);
   }
 
+  // A "Mot de passe oublié" link already used or expired (only the latest
+  // one works, once): back to the request form, with the reason. Sent to the
+  // login page, a browser already signed in went straight to the shop and the
+  // owner never knew why she could not change her password.
+  if (next === "/reset-password") return to("/login?mode=reset&error=reset_link_invalid");
   if (params.get("error")) return to("/login?error=confirmation_link_invalid");
   return to("/login?message=email_confirmed");
 }

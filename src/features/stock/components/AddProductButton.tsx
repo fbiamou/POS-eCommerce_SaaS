@@ -5,6 +5,7 @@ import { Upload, Plus } from "lucide-react";
 import { Modal } from "@/components/ui/Modal";
 import { useTranslations } from "next-intl";
 import { addProduct, uploadProductImage } from "../actions";
+import { shrinkImage } from "@/lib/shrinkImage";
 import { useToast } from "@/components/ui/Toast";
 import { Select } from "@/components/ui/Select";
 import { useOptionalOfflineContext } from "@/features/offline/OfflineProvider";
@@ -96,7 +97,7 @@ export function AddProductButton({
 
       if (imageFile) {
         const imageFormData = new FormData();
-        imageFormData.append("image", imageFile);
+        imageFormData.append("image", await shrinkImage(imageFile, "photo"));
         const uploadResult = await uploadProductImage(result.productId, imageFormData);
         if (uploadResult.error) {
           setError(tFeedback(uploadResult.error));

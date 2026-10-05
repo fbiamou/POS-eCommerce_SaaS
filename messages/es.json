@@ -804,6 +804,7 @@
     "admin_invalid": "Revisa el plan, la duración, el importe y el medio de pago.",
     "email_confirmed": "Dirección confirmada. Inicia sesión para abrir tu tienda.",
     "confirmation_link_invalid": "Este enlace de confirmación ha caducado o ya se usó. Intenta iniciar sesión; si no, regístrate de nuevo.",
+    "reset_link_invalid": "Este enlace para cambiar la contraseña ha caducado o ya se usó. Pide uno nuevo aquí abajo: solo funciona el último enlace recibido, una sola vez.",
     "shop_has_payments": "Esta tienda ya ha pagado: no se puede eliminar, solo suspender.",
     "shop_has_admin": "Esta tienda contiene una cuenta de administrador de WISHOP: no se puede eliminar.",
     "delete_name_mismatch": "El nombre escrito no coincide con el de la tienda.",

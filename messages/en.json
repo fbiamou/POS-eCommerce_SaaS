@@ -804,6 +804,7 @@
     "admin_invalid": "Check the plan, duration, amount and payment method.",
     "email_confirmed": "Address confirmed. Sign in to open your shop.",
     "confirmation_link_invalid": "This confirmation link has expired or was already used. Try signing in; otherwise, sign up again.",
+    "reset_link_invalid": "This password reset link has expired or was already used. Ask for a new one below: only the latest link works, and only once.",
     "shop_has_payments": "This shop has already paid: it cannot be deleted, only suspended.",
     "shop_has_admin": "This shop contains a WISHOP admin account: it cannot be deleted.",
     "delete_name_mismatch": "The name typed does not match the shop’s name.",
