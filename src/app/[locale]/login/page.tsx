@@ -12,6 +12,7 @@ import { SHOP_COUNTRIES } from '@/lib/countries'
 import { PasswordField } from '@/components/PasswordField'
 import { PasswordInput } from '@/components/PasswordInput'
 import { MailCheck } from 'lucide-react'
+import { ForgetTillHolder } from '@/features/offline/components/ForgetTillHolder'
 
 export async function generateMetadata() {
   const t = await getTranslations('Auth')
@@ -54,6 +55,9 @@ export default async function LoginPage({
 
   return (
     <div className="min-h-dvh w-full bg-background lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)]">
+      {/* Signed out here (the proxy only lets a signed-in visitor reach the
+          sign-up tab, or a reset link that did not work). */}
+      {!isSignup && !(isReset && error) && <ForgetTillHolder />}
       {/* Brand panel: indigo night, the thread and the three promises */}
       <aside className="relative hidden overflow-hidden bg-night px-12 py-12 text-white lg:flex lg:flex-col lg:justify-between">
         <div className="flex items-center gap-2.5">

@@ -64,8 +64,9 @@ export function SupplierManager({
 
   return (
     <section className="rounded-2xl border border-zinc-100 bg-white p-5 shadow-sm dark:border-[var(--line)] dark:bg-[var(--surface-1)]">
-      <div className="mb-4 flex items-center justify-between gap-3">
-        <div>
+      {/* On a phone the button goes under the text instead of past the card. */}
+      <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+        <div className="min-w-0 flex-1 basis-56">
           <h2 className="text-lg font-bold">{t("title")}</h2>
           <p className="text-xs text-zinc-500">{t("subtitle")}</p>
         </div>

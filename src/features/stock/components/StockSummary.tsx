@@ -1,5 +1,6 @@
 "use client";
 
+import { amountSize } from "@/lib/amountSize";
 import { useTranslations } from "next-intl";
 import { ArrowRight } from "lucide-react";
 import { Link } from "@/i18n/routing";
@@ -51,7 +52,7 @@ export function StockSummary({ serverProducts, itemLimit }: { serverProducts: Su
       </div>
       <div className="rounded-2xl bg-[var(--surface-1)] p-4 shadow-card">
         <dt className="text-[12px] font-semibold text-zinc-500">{t("summary_value")}</dt>
-        <dd className="mt-1 font-mono text-xl font-semibold tabular-nums">{format.money(summary.value)}</dd>
+        <dd className={`mt-1 font-mono text-xl font-semibold tabular-nums ${amountSize(format.money(summary.value))}`}>{format.money(summary.value)}</dd>
       </div>
     </dl>
   );

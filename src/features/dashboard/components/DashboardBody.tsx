@@ -1,5 +1,6 @@
 "use client";
 
+import { amountSize } from "@/lib/amountSize";
 import { useMemo } from "react";
 import { useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
@@ -85,7 +86,7 @@ export function DashboardBody({
       <div className="grid grid-cols-2 gap-3 md:gap-4 lg:grid-cols-4">
         <div className={`${card} flex min-h-[100px] flex-col justify-between p-4 sm:p-5`}>
           <span className="text-xs font-medium text-zinc-500 dark:text-zinc-400">{t("today_ca")}</span>
-          <span className="mt-2 font-mono text-[17px] font-bold leading-tight tabular-nums text-zinc-900 dark:text-white sm:text-xl">
+          <span className={`mt-2 font-mono text-[17px] font-bold leading-tight tabular-nums text-zinc-900 dark:text-white sm:text-xl ${amountSize(format.money(figures.todayRevenue))}`}>
             {format.money(figures.todayRevenue)}
           </span>
         </div>
@@ -99,7 +100,7 @@ export function DashboardBody({
 
         <Link href="/clients" className={`${card} flex min-h-[100px] flex-col justify-between p-4 sm:p-5`}>
           <span className="text-xs font-medium text-zinc-500 dark:text-zinc-400">{t("debts")}</span>
-          <span className="mt-2 font-mono text-[17px] font-bold leading-tight tabular-nums text-red-600 dark:text-red-400 sm:text-xl">
+          <span className={`mt-2 font-mono text-[17px] font-bold leading-tight tabular-nums text-red-600 dark:text-red-400 sm:text-xl ${amountSize(format.money(figures.totalDebt))}`}>
             {format.money(figures.totalDebt)}
           </span>
         </Link>
