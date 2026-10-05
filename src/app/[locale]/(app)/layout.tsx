@@ -61,7 +61,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
 
   const shell = (
     <ShopFormatProvider value={shopFormat}>
-      <div className="relative flex h-screen w-full flex-col overflow-hidden md:flex-row">
+      <div className="relative flex h-dvh w-full flex-col overflow-hidden md:flex-row">
         {/* Before anything is drawn: a colleague holding the till who opens a
             page closed to her goes straight to the till (offline included). */}
         {profile && (

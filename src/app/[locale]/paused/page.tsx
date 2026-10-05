@@ -14,7 +14,7 @@ export async function generateMetadata() {
 export default async function PausedPage() {
   const t = await getTranslations("Plans");
   return (
-    <main className="flex min-h-screen items-center justify-center bg-background px-4">
+    <main className="flex min-h-dvh items-center justify-center bg-background px-4">
       <div className="flex max-w-md flex-col items-center gap-4 rounded-2xl bg-[var(--surface-1)] px-6 py-10 text-center shadow-card">
         <WishopMark className="h-7 w-auto text-violet-700" />
         <PauseCircle className="h-12 w-12 text-amber-600" />

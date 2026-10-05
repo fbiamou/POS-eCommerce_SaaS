@@ -35,7 +35,7 @@ export default async function ProcurementPage({ params }: { params: Promise<{ id
   const [t, intake] = await Promise.all([getTranslations("Procurement"), getIntake(id)]);
 
   return (
-    <main className="min-h-screen bg-zinc-50 text-zinc-900">
+    <main className="min-h-dvh bg-zinc-50 text-zinc-900">
       <header className="sticky top-0 z-20 border-b border-zinc-200 bg-white px-4 py-3">
         <div className="mx-auto flex max-w-md items-center justify-between gap-3">
           <div className="min-w-0">
