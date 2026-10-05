@@ -1,5 +1,5 @@
 // WISHOP plans (public pricing grid, decided September 2026). Amounts in XAF,
-// all taxes included. A shop that subscribes during the launch keeps the
+// no VAT (the publisher is not VAT-registered). A shop that subscribes during the launch keeps the
 // launch price for 12 months; the normal price applies after that.
 //
 // A shop starts on Standard (free). Paid months are granted or recorded by a

@@ -1,6 +1,6 @@
 {
   "nom_projet": "WISHOP",
-  "pays": "Guinée équatoriale (autónomo, à confirmer)",
+  "pays": "Guinée équatoriale (autónomo, non assujetti à la TVA)",
   "devise": "XAF",
   "clients_initiaux": 0,
   "mois_lancement": 1,
@@ -12,7 +12,7 @@
   "part_boutiques_paiement": 0,
   "volume_b2c_par_client": 0,
   "taux_commission": 0,
-  "taux_tva": 0.15,
+  "taux_tva": 0,
   "part_ca_soumis_tva": 1.0,
   "part_achats_avec_tva": 0,
   "taux_is": 0.25,
@@ -35,8 +35,20 @@
   "duree_amortissement": 10,
   "apport_initial": 1000000,
   "offres": [
-    {"nom": "Essentiel", "prix_mensuel_ht": 4348, "mix": 0.6},
-    {"nom": "Pro", "prix_mensuel_ht": 10870, "mix": 0.3},
-    {"nom": "Pro Plus", "prix_mensuel_ht": 21739, "mix": 0.1}
+    {
+      "nom": "Essentiel",
+      "prix_mensuel_ht": 5000,
+      "mix": 0.6
+    },
+    {
+      "nom": "Pro",
+      "prix_mensuel_ht": 12500,
+      "mix": 0.3
+    },
+    {
+      "nom": "Pro Plus",
+      "prix_mensuel_ht": 25000,
+      "mix": 0.1
+    }
   ]
 }

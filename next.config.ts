@@ -24,23 +24,8 @@ const nextConfig: NextConfig = {
       { source: "/legal/condiciones", destination: "/legal/condiciones.html" },
     ];
   },
-  // Preview phase: keep the marketing page out of search engines until the
-  // public launch (remove together with the robots meta in its index.html).
   async headers() {
     return [
-      {
-        source: "/landing/:path*",
-        headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow" }],
-      },
-      {
-        source: "/landing",
-        headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow" }],
-      },
-      // Provisional terms, under legal review: not for search engines.
-      {
-        source: "/legal/:path*",
-        headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow" }],
-      },
       // Offline mode (public/sw.js): the browser checks for a new version of
       // the service worker on every visit instead of keeping an old one.
       {
